@@ -20,17 +20,15 @@ exports.handler = async function() {
   try {
     const [standingsData, matchesData] = await Promise.all([
       fetchURL('/v4/competitions/PPL/standings'),
-      fetchURL('/v4/teams/498/matches?status=SCHEDULED&limit=1')
+      fetchURL('/v4/teams/503/matches?status=SCHEDULED&limit=1')
     ]);
 
-    // Stats classement
     const table = standingsData.standings[0].table;
-    const porto = table.find(t => t.team.id === 498);
+    const porto = table.find(t => t.team.id === 503);
     const second = table.find(t => t.position === 2);
 
-    // Prochain match
     const match = matchesData.matches[0];
-    const isHome = match.homeTeam.id === 498;
+    const isHome = match.homeTeam.id === 503;
 
     return {
       statusCode: 200,
