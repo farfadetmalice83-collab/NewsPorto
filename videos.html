@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vidéos — NewsPorto · FC Porto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.1);
+      --grid-color: rgba(255,255,255,0.055);
+      --blue: #003DA5;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #000; color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+    /* ── GRID BG ── */
+    .grid-bg { position: fixed; inset: 0; z-index: 0; background-image: linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px); background-size: 44px 44px; animation: gridScroll 12s linear infinite; pointer-events: none; }
+    @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 44px 44px; } }
+    .page { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav { display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 72px; border-bottom: 1px solid var(--border); backdrop-filter: blur(6px); background: rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 100; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--white); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--white); color: var(--white); background: transparent; padding: 8px 20px; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
+    .nav-cta:hover { background: var(--white); color: #000; }
+
+    /* ── TICKER ── */
+    .ticker { border-bottom: 1px solid var(--border); overflow: hidden; padding: 10px 0; background: rgba(255,255,255,0.02); }
+    .ticker-inner { display: flex; gap: 64px; animation: ticker 28s linear infinite; width: max-content; }
+    .ticker-item { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
+    .ticker-item b { color: var(--white); margin-right: 8px; }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ── PAGE HERO ── */
+    .page-hero { padding: 72px 48px 56px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; }
+    .page-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
+    .page-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gray); }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 8vw, 120px); line-height: .88; letter-spacing: 1px; }
+    .page-title .outline { -webkit-text-stroke: 1.5px var(--white); color: transparent; }
+    .hero-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); padding-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+    .live-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.3;} }
+
+    /* ── LOADING ── */
+    .loading-block { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 48px; gap: 16px; }
+    .loading-spinner { width: 36px; height: 36px; border: 2px solid var(--border); border-top-color: var(--white); border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); }
+
+    /* ── VIDEO FEATURED (first video big) ── */
+    .video-featured {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border-bottom: 1px solid var(--border);
+    }
+    .video-featured-thumb {
+      position: relative; overflow: hidden; cursor: pointer;
+      aspect-ratio: 16/9;
+    }
+    .video-featured-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s ease; }
+    .video-featured-thumb:hover img { transform: scale(1.03); }
+    .play-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.25);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: opacity .2s;
+    }
+    .video-featured-thumb:hover .play-overlay { opacity: 1; }
+    .play-btn {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      border: 2px solid rgba(255,255,255,0.8);
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .play-btn::after { content: ''; width: 0; height: 0; border-top: 11px solid transparent; border-bottom: 11px solid transparent; border-left: 20px solid #fff; margin-left: 4px; }
+    .video-duration {
+      position: absolute; bottom: 12px; right: 12px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 1px; background: rgba(0,0,0,0.8); color: #fff;
+      padding: 3px 7px; border-radius: 2px;
+    }
+    .video-featured-body {
+      padding: 48px 48px;
+      display: flex; flex-direction: column; justify-content: center; gap: 16px;
+    }
+    .video-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); display: flex; align-items: center; gap: 8px; }
+    .video-tag::before { content: ''; display: block; width: 20px; height: 1px; background: var(--gray); }
+    .video-title-lg { font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 3.5vw, 46px); letter-spacing: .5px; line-height: 1; }
+    .video-date-lg { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+    .video-views-lg { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+    .watch-btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.3); color: rgba(255,255,255,0.7);
+      padding: 10px 24px; text-decoration: none; margin-top: 8px;
+      transition: border-color .2s, color .2s; width: fit-content;
+    }
+    .watch-btn:hover { border-color: #fff; color: #fff; }
+    .watch-btn::before { content: '▶'; font-size: 9px; }
+
+    /* ── VIDEO GRID ── */
+    .videos-section { padding: 48px 48px; }
+    .section-header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 28px; }
+    .section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); }
+    .section-count { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+
+    .videos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+    .video-card { background: #000; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: background .2s; }
+    .video-card:hover { background: rgba(255,255,255,0.02); }
+    .video-thumb { position: relative; overflow: hidden; aspect-ratio: 16/9; }
+    .video-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+    .video-card:hover .video-thumb img { transform: scale(1.04); }
+    .video-thumb .play-overlay { opacity: 0; transition: opacity .2s; }
+    .video-card:hover .video-thumb .play-overlay { opacity: 1; }
+    .video-thumb .play-btn { width: 44px; height: 44px; }
+    .video-thumb .play-btn::after { border-top-width: 8px; border-bottom-width: 8px; border-left-width: 14px; }
+    .video-info { padding: 16px 16px 20px; flex: 1; display: flex; flex-direction: column; gap: 8px; border-top: 1px solid var(--border); }
+    .video-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; line-height: 1.2; flex: 1; }
+    .video-meta { display: flex; align-items: center; justify-content: space-between; }
+    .video-date { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    .video-views { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
+
+    /* ── NO VIDEOS ── */
+    .no-videos { padding: 80px 48px; text-align: center; }
+    .no-videos p { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+
+    /* ── FOOTER ── */
+    footer { padding: 36px 48px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
+    .footer-logo { display: flex; align-items: center; gap: 8px; }
+    .footer-logo img { height: 32px; width: auto; }
+    .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: rgba(255,255,255,0.4); }
+    .footer-copy { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); text-decoration: none; transition: color .2s; }
+    .footer-links a:hover { color: var(--white); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      nav, .page-hero, .videos-section, footer { padding-left: 24px; padding-right: 24px; }
+      .video-featured { grid-template-columns: 1fr; }
+      .video-featured-body { padding: 28px 24px; }
+      .videos-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .videos-grid { grid-template-columns: 1fr; }
+      .videos-section { padding: 32px 20px; }
+      footer { flex-direction: column; gap: 20px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actu</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="videos.html" class="active">Vidéos</a></li>
+    </ul>
+    <a href="#" class="nav-cta">Shop →</a>
+  </nav>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner" id="ticker-inner">
+      <span class="ticker-item"><b>EUROPA</b> L'enfer du Dragão attend Nottingham Forest — Quart de finale</span>
+      <span class="ticker-item"><b>EUROPE</b> Porto Conquiert l'Europe — Stuttgart balayé 4-1</span>
+      <span class="ticker-item"><b>FOCUS</b> William Gomes : L'ascension fulgurante du joyau de l'Olival</span>
+      <span class="ticker-item"><b>LIGA</b> Course au titre : Porto garde ses distances en tête</span>
+      <span class="ticker-item"><b>STATS</b> Diogo Costa — Le mur infranchissable de l'Europa League</span>
+      <span class="ticker-item"><b>ANALYSE</b> Le 4-3-3 de Farioli décrypté — Comment Porto neutralise l'Europe</span>
+      <span class="ticker-item"><b>INSTITUTION</b> L'effet André Villas-Boas — Un club modernisé et plus fort</span>
+      <span class="ticker-item"><b>MERCATO</b> Rodrigo Mora prolonge — Le futur du Dragão est sécurisé</span>
+    </div>
+  </div>
+  <script>
+  // Duplication dynamique pour boucle ticker parfaite sans saut
+  (function() {
+    const inner = document.getElementById('ticker-inner');
+    if (!inner) return;
+    const original = inner.innerHTML;
+    inner.innerHTML = original + original;
+    const itemWidth = inner.scrollWidth / 2;
+    // Remplace l'animation CSS par une version calculée dynamiquement
+    inner.style.animation = 'none';
+    let pos = 0;
+    const speed = 0.4; // px par frame
+    function animate() {
+      pos -= speed;
+      if (Math.abs(pos) >= itemWidth) pos = 0;
+      inner.style.transform = `translateX(${pos}px)`;
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  })();
+  </script>
+  </div>
+
+  <!-- PAGE HERO -->
+  <div class="page-hero">
+    <div>
+      <p class="page-eyebrow">FC Porto · Résumés officiels</p>
+      <h1 class="page-title">
+        Les<br><span class="outline">Vidéos</span>
+      </h1>
+    </div>
+    <div class="hero-meta">
+      <span class="live-dot"></span>
+      <span id="updated-time">Chargement...</span>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading" class="loading-block">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Récupération des résumés</p>
+  </div>
+
+  <!-- CONTENT -->
+  <div id="videos-content" style="display:none">
+
+    <!-- VIDEO FEATURED -->
+    <div class="video-featured" id="video-featured"></div>
+
+    <!-- VIDEO GRID -->
+    <div class="videos-section">
+      <div class="section-header">
+        <span class="section-label">— Derniers résumés</span>
+        <span class="section-count" id="videos-count"></span>
+      </div>
+      <div class="videos-grid" id="videos-grid"></div>
+    </div>
+
+  </div>
+
+  <!-- NO VIDEOS -->
+  <div id="no-videos" style="display:none" class="no-videos">
+    <p>Aucun résumé disponible pour le moment</p>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="footer-logo-text">NewsPorto</span>
+    </div>
+    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <ul class="footer-links">
+      <li><a href="#">TikTok</a></li>
+      <li><a href="#">Contact</a></li>
+      <li><a href="#">Mentions légales</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtViews(n) {
+  if (!n) return '';
+  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M vues';
+  if (n >= 1000)    return Math.round(n/1000) + 'K vues';
+  return n + ' vues';
+}
+
+fetch('/.netlify/functions/porto-youtube')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => {
+    document.getElementById('loading').style.display = 'none';
+
+    const videos = data.videos ?? [];
+
+    if (videos.length === 0) {
+      document.getElementById('no-videos').style.display = 'block';
+      return;
+    }
+
+    // Updated badge
+    if (data.updatedAt) {
+      const d = new Date(data.updatedAt);
+      document.getElementById('updated-time').textContent =
+        'Mis à jour · ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    document.getElementById('videos-content').style.display = 'block';
+
+    // ── Featured — première vidéo ────────────────────────────────────────────
+    const first = videos[0];
+    document.getElementById('video-featured').innerHTML = `
+      <a href="${first.url}" target="_blank" rel="noopener" class="video-featured-thumb">
+        <img src="${first.thumb}" alt="${first.title}" loading="lazy">
+        <div class="play-overlay"><div class="play-btn"></div></div>
+        <span class="video-duration">${first.duration}</span>
+      </a>
+      <div class="video-featured-body">
+        <div class="video-tag">Résumé · Dernier match</div>
+        <h2 class="video-title-lg">${first.title}</h2>
+        <div class="video-date-lg">${fmtDate(first.published)}</div>
+        ${first.views ? `<div class="video-views-lg">${fmtViews(first.views)}</div>` : ''}
+        <a href="${first.url}" target="_blank" rel="noopener" class="watch-btn">Voir le résumé</a>
+      </div>`;
+
+    // ── Grid — le reste ──────────────────────────────────────────────────────
+    const rest = videos.slice(1);
+    document.getElementById('videos-count').textContent = `${rest.length} résumé${rest.length > 1 ? 's' : ''}`;
+
+    document.getElementById('videos-grid').innerHTML = rest.map(v => `
+      <a href="${v.url}" target="_blank" rel="noopener" class="video-card">
+        <div class="video-thumb">
+          <img src="${v.thumb}" alt="${v.title}" loading="lazy">
+          <div class="play-overlay"><div class="play-btn"></div></div>
+          <span class="video-duration">${v.duration}</span>
+        </div>
+        <div class="video-info">
+          <div class="video-title">${v.title}</div>
+          <div class="video-meta">
+            <span class="video-date">${fmtDate(v.published)}</span>
+            ${v.views ? `<span class="video-views">${fmtViews(v.views)}</span>` : ''}
+          </div>
+        </div>
+      </a>`).join('');
+  })
+  .catch(err => {
+    document.getElementById('loading').innerHTML = `
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(239,68,68,0.7);">
+        Données indisponibles · ${err.message}
+      </p>`;
+  });
+</script>
+
+</body>
+</html>
