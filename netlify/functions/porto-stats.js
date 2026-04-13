@@ -1,16 +1,14 @@
-// netlify/functions/porto-stats.js
+// api/porto-stats.js  ← Vercel Serverless Function
 // FC Porto (ID 503) — football-data.org
 // Returns: stats, nextMatch, liveMatch, lineup, recentMatches, upcomingMatches, standings, europeanStats
 
-const BASE       = 'https://api.football-data.org/v4';
-const PORTO_ID   = 503;
-const LIGA_CODE  = 'PPL'; // Primeira Liga Portugal
+const BASE      = 'https://api.football-data.org/v4';
+const PORTO_ID  = 503;
+const LIGA_CODE = 'PPL'; // Primeira Liga Portugal
 
 const API_HEADERS = {
   'X-Auth-Token': process.env.FOOTBALL_API_KEY,
 };
-
-const LIVE_STATUSES = new Set(['IN_PLAY', 'PAUSED', 'HALF_TIME']);
 
 async function fetchFD(path) {
   const res = await fetch(`${BASE}${path}`, { headers: API_HEADERS });
@@ -32,11 +30,12 @@ function extractLineup(matchDetail, competition) {
     competition: competition ?? '',
     formation:   porto.formation ?? null,
     startXI:     (porto.startXIs ?? porto.lineup ?? []).map(mapPlayer),
-    bench:        (porto.bench ?? []).map(mapPlayer),
+    bench:       (porto.bench ?? []).map(mapPlayer),
   };
 }
 
-exports.handler = async () => {
+// ── Vercel handler (remplace exports.handler de Netlify) ──────────────────────
+export default async function handler(req, res) {
   try {
     // 1. Standings
     const standingsData = await fetchFD(`/competitions/${LIGA_CODE}/standings`);
@@ -70,9 +69,7 @@ exports.handler = async () => {
       goalDiff: r.goalDifference, points: r.points, isPorto: r.team.id === PORTO_ID,
     }));
 
-    // 2. Matches — fetch SCHEDULED/FINISHED + live in parallel
-    // Plan gratuit : un seul status à la fois, on fait 3 appels séparés
-    // et on ignore les erreurs 400 sur les statuts non supportés
+    // 2. Matches
     async function fetchLive(status) {
       try {
         const d = await fetchFD(`/teams/${PORTO_ID}/matches?status=${status}`);
@@ -131,7 +128,6 @@ exports.handler = async () => {
     const upcomingMatches = scheduled.slice(0, 5).map(mapUpcoming);
     const nextMatch = upcomingMatches[0] ?? null;
 
-    // Pre-match lineup (available ~1h before kickoff)
     if (!liveMatch && nextMatch?.id) {
       const detail = await fetchFD(`/matches/${nextMatch.id}`);
       if (detail) {
@@ -195,28 +191,23 @@ exports.handler = async () => {
     let winStreak = 0;
     for (const m of recentMatches) { if (m.result === 'W') winStreak++; else break; }
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': `public, max-age=${liveMatch ? 60 : 300}`,
-      },
-      body: JSON.stringify({
-        stats: { ...stats, winStreak },
-        nextMatch,
-        liveMatch,
-        lineup,
-        recentMatches,
-        upcomingMatches,
-        standings,
-        europeanStats,
-        updatedAt: new Date().toISOString(),
-      }),
-    };
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', `public, max-age=${liveMatch ? 60 : 300}`);
+    res.status(200).json({
+      stats: { ...stats, winStreak },
+      nextMatch,
+      liveMatch,
+      lineup,
+      recentMatches,
+      upcomingMatches,
+      standings,
+      europeanStats,
+      updatedAt: new Date().toISOString(),
+    });
 
   } catch (err) {
     console.error('porto-stats error:', err);
-    return { statusCode: 500, body: JSON.stringify({ error: err.message }) };
+    res.status(500).json({ error: err.message });
   }
-};
+}
