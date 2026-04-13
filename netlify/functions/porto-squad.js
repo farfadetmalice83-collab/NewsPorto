@@ -1,4 +1,4 @@
-// netlify/functions/porto-squad.js
+// api/porto-squad.js  ← Vercel Serverless Function
 // FC Porto (ID 503) — football-data.org
 // Returns full squad grouped by position + coach
 
@@ -10,19 +10,20 @@ const API_HEADERS = {
 };
 
 const POSITION_FR = {
-  'Goalkeeper':  'Gardiens',
-  'Defence':     'Défenseurs',
-  'Midfield':    'Milieux',
-  'Offence':     'Attaquants',
+  'Goalkeeper': 'Gardiens',
+  'Defence':    'Défenseurs',
+  'Midfield':   'Milieux',
+  'Offence':    'Attaquants',
 };
 
 const POSITION_ORDER = ['Goalkeeper', 'Defence', 'Midfield', 'Offence'];
 
-exports.handler = async () => {
+// ── Vercel handler ────────────────────────────────────────────────────────────
+export default async function handler(req, res) {
   try {
-    const res = await fetch(`${BASE}/teams/${PORTO_ID}`, { headers: API_HEADERS });
-    if (!res.ok) throw new Error(`football-data ${res.status}`);
-    const data = await res.json();
+    const response = await fetch(`${BASE}/teams/${PORTO_ID}`, { headers: API_HEADERS });
+    if (!response.ok) throw new Error(`football-data ${response.status}`);
+    const data = await response.json();
 
     // ── Squad ──────────────────────────────────────────────────────────────
     const players = (data.squad ?? []).map(p => ({
@@ -34,17 +35,16 @@ exports.handler = async () => {
       position:    p.position ?? 'Offence',
       nationality: p.nationality ?? null,
       birthDate:   p.dateOfBirth ?? null,
-      marketValue: null, // not in free tier
+      marketValue: null,
     }));
 
-    // Group by position in display order
     const grouped = {};
     POSITION_ORDER.forEach(pos => {
       const list = players.filter(p => p.position === pos);
       if (list.length > 0) {
         grouped[pos] = {
-          label: POSITION_FR[pos] ?? pos,
-          count: list.length,
+          label:   POSITION_FR[pos] ?? pos,
+          count:   list.length,
           players: list.sort((a, b) => (a.number ?? 99) - (b.number ?? 99)),
         };
       }
@@ -68,21 +68,13 @@ exports.handler = async () => {
       website: data.website,
     };
 
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Cache-Control': 'public, max-age=3600', // 1h cache
-      },
-      body: JSON.stringify({ club, coach, grouped, updatedAt: new Date().toISOString() }),
-    };
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    res.status(200).json({ club, coach, grouped, updatedAt: new Date().toISOString() });
 
   } catch (err) {
     console.error('porto-squad error:', err);
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: err.message }),
-    };
+    res.status(500).json({ error: err.message });
   }
-};
+}
