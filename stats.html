@@ -685,10 +685,11 @@
       <span class="nav-logo-text">NewsPorto</span>
     </a>
     <ul class="nav-links">
-      <li><a href="actu.html">Actu</a></li>
-      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="#">Actu</a></li>
+      <li><a href="#">Matchs</a></li>
       <li><a href="stats.html" class="active">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="#">Mercato</a></li>
+      <li><a href="#">Vidéos</a></li>
     </ul>
     <a href="#" class="nav-cta">Shop →</a>
   </nav>
@@ -696,37 +697,15 @@
   <!-- TICKER -->
   <div class="ticker">
     <div class="ticker-inner" id="ticker-inner">
-      <span class="ticker-item"><b>EUROPA</b> L'enfer du Dragão attend Nottingham Forest — Quart de finale</span>
-      <span class="ticker-item"><b>EUROPE</b> Porto Conquiert l'Europe — Stuttgart balayé 4-1</span>
-      <span class="ticker-item"><b>FOCUS</b> William Gomes : L'ascension fulgurante du joyau de l'Olival</span>
-      <span class="ticker-item"><b>LIGA</b> Course au titre : Porto garde ses distances en tête</span>
-      <span class="ticker-item"><b>STATS</b> Diogo Costa — Le mur infranchissable de l'Europa League</span>
-      <span class="ticker-item"><b>ANALYSE</b> Le 4-3-3 de Farioli décrypté — Comment Porto neutralise l'Europe</span>
-      <span class="ticker-item"><b>INSTITUTION</b> L'effet André Villas-Boas — Un club modernisé et plus fort</span>
-      <span class="ticker-item"><b>MERCATO</b> Rodrigo Mora prolonge — Le futur du Dragão est sécurisé</span>
+      <span class="ticker-item"><b>STATS</b> FC Porto · Saison 2025/26 · Données en temps réel</span>
+      <span class="ticker-item"><b>LIGA</b> Classement · Victoires · Buts · Points</span>
+      <span class="ticker-item"><b>EUROPE</b> Parcours européen saison en cours</span>
+      <span class="ticker-item"><b>FORME</b> 5 derniers résultats du FC Porto</span>
+      <span class="ticker-item"><b>STATS</b> FC Porto · Saison 2025/26 · Données en temps réel</span>
+      <span class="ticker-item"><b>LIGA</b> Classement · Victoires · Buts · Points</span>
+      <span class="ticker-item"><b>EUROPE</b> Parcours européen saison en cours</span>
+      <span class="ticker-item"><b>FORME</b> 5 derniers résultats du FC Porto</span>
     </div>
-  </div>
-  <script>
-  // Duplication dynamique pour boucle ticker parfaite sans saut
-  (function() {
-    const inner = document.getElementById('ticker-inner');
-    if (!inner) return;
-    const original = inner.innerHTML;
-    inner.innerHTML = original + original;
-    const itemWidth = inner.scrollWidth / 2;
-    // Remplace l'animation CSS par une version calculée dynamiquement
-    inner.style.animation = 'none';
-    let pos = 0;
-    const speed = 0.4; // px par frame
-    function animate() {
-      pos -= speed;
-      if (Math.abs(pos) >= itemWidth) pos = 0;
-      inner.style.transform = `translateX(${pos}px)`;
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-  })();
-  </script>
   </div>
 
   <!-- PAGE HERO -->
@@ -878,7 +857,7 @@ function diffClass(val) {
 }
 
 // ── Fetch & render ────────────────────────────────────────────────────────────
-fetch('/.netlify/functions/porto-stats')
+fetch('/api/porto-stats')
   .then(r => {
     if (!r.ok) throw new Error('API error ' + r.status);
     return r.json();
