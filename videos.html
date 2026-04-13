@@ -189,8 +189,49 @@
     .stat-cell:hover::after { opacity: 1; }
     .stat-num { display: inline-block; transition: transform .3s cubic-bezier(.22,1,.36,1); }
     .stat-cell:hover .stat-num { transform: scale(1.06); }
-    @keyframes shimmer { 0% { background-position: -300% center; } 100% { background-position: 300% center; } }
-    .counting { background: linear-gradient(90deg,#fff 0%,#fff 35%,#4488ff 50%,#fff 65%,#fff 100%); background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 0.9s linear; }
+
+    /* ═══════════════════════════════════════════
+       BLUE ACCENTS — effets subtils Porto Blue
+    ═══════════════════════════════════════════ */
+
+    /* 1. Nav — bottom border glow bleu */
+    nav { border-bottom: 1px solid rgba(0,61,165,0.5) !important; box-shadow: 0 1px 0 0 rgba(0,61,165,0.25), 0 4px 24px rgba(0,61,165,0.06); }
+
+    /* 2. Nav links — underline bleu */
+    .nav-links a::after { background: #003DA5 !important; }
+    .nav-links a:hover::after, .nav-links a.active::after { background: #003DA5 !important; }
+
+    /* 3. Nav CTA — hover bleu Porto */
+    .nav-cta:hover { background: #003DA5 !important; color: #fff !important; border-color: #003DA5 !important; }
+
+    /* 4. Ticker — fond bleu sombre + accent labels */
+    .ticker { background: rgba(0,20,80,0.18) !important; border-top: 1px solid rgba(0,61,165,0.3) !important; border-bottom: 1px solid rgba(0,61,165,0.3) !important; }
+    .ticker-item b { color: #4d82d4 !important; }
+
+    /* 5. Eyebrow / section-label — tiret bleu */
+    .section-label::before, .page-eyebrow::before, .hero-eyebrow::before { background: #003DA5 !important; }
+
+    /* 6. Stat-cell — top border scan + glow bleu */
+    .stat-cell::before { content: ; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+    .stat-cell:hover::before { transform: scaleX(1); }
+    .stat-cell:hover { background: rgba(0,20,80,0.22) !important; }
+    .stat-cell::after { background: radial-gradient(ellipse at 50% 120%, rgba(0,61,165,0.28) 0%, transparent 68%) !important; }
+
+    /* 7. Article card — bordure gauche bleue au hover */
+    .article-card { border-left: 2px solid transparent !important; transition: background .2s, transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .3s !important; }
+    .article-card:hover { border-left-color: #003DA5 !important; }
+
+    /* 8. Hero visual glow — plus riche */
+    .hero-visual::before { background: radial-gradient(ellipse at center 80%, rgba(0,61,165,0.65) 0%, rgba(0,20,90,0.3) 45%, transparent 100%) !important; }
+
+    /* 9. Footer — top border glow */
+    footer { border-top: 1px solid rgba(0,61,165,0.4) !important; box-shadow: 0 -1px 0 0 rgba(0,61,165,0.15), inset 0 1px 60px rgba(0,20,80,0.07); }
+
+    /* 10. Cursor glow */
+    #cursor-glow { position: fixed; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(0,61,165,0.09) 0%, transparent 70%); pointer-events: none; transform: translate(-50%, -50%); z-index: 9999; transition: opacity .5s; opacity: 0; }
+
+    .counting { animation: countColor 1.2s ease forwards; }
+    @keyframes countColor { 0% { color: #003DA5; } 100% { color: #ffffff; } }
     .nav-logo:hover .nav-logo-text { animation: glitch .35s steps(2) forwards; }
     @keyframes glitch { 0% { text-shadow: none; } 25% { text-shadow: -2px 0 #003DA5,2px 0 rgba(255,255,255,0.3); } 50% { text-shadow: 2px 0 #003DA5,-1px 0 rgba(255,255,255,0.3); } 75% { text-shadow: -1px 0 rgba(255,255,255,0.4); } 100% { text-shadow: none; } }
     .hero-team-img { will-change: transform; }
@@ -208,6 +249,7 @@
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
 <div class="grid-bg"></div>
+  <div id="cursor-glow"></div>
 <div class="page">
 
   <!-- NAV -->
@@ -369,7 +411,7 @@ fetch('/api/porto-youtube')
         Données indisponibles · ${err.message}
       </p>`;
   });
-</script>
+  </script>
 
 
   <script>
@@ -476,6 +518,16 @@ fetch('/api/porto-youtube')
     },{threshold:0.1});
     vobs.observe(vsec);
   }
-  </script>
+      // Cursor glow bleu
+  const cg = document.getElementById("cursor-glow");
+  if (cg) {
+    document.addEventListener("mousemove", e => {
+      cg.style.left = e.clientX + "px";
+      cg.style.top = e.clientY + "px";
+      cg.style.opacity = "1";
+    }, { passive: true });
+    document.addEventListener("mouseleave", () => cg.style.opacity = "0");
+  }
+</script>
 </body>
 </html>
