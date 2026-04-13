@@ -831,38 +831,16 @@
 
   <!-- TICKER -->
   <div class="ticker">
-    <div class="ticker-inner" id="ticker-inner">
-      <span class="ticker-item"><b>EUROPA</b> L'enfer du Dragão attend Nottingham Forest — Quart de finale</span>
-      <span class="ticker-item"><b>EUROPE</b> Porto Conquiert l'Europe — Stuttgart balayé 4-1</span>
-      <span class="ticker-item"><b>FOCUS</b> William Gomes : L'ascension fulgurante du joyau de l'Olival</span>
-      <span class="ticker-item"><b>LIGA</b> Course au titre : Porto garde ses distances en tête</span>
-      <span class="ticker-item"><b>STATS</b> Diogo Costa — Le mur infranchissable de l'Europa League</span>
-      <span class="ticker-item"><b>ANALYSE</b> Le 4-3-3 de Farioli décrypté — Comment Porto neutralise l'Europe</span>
-      <span class="ticker-item"><b>INSTITUTION</b> L'effet André Villas-Boas — Un club modernisé et plus fort</span>
-      <span class="ticker-item"><b>MERCATO</b> Rodrigo Mora prolonge — Le futur du Dragão est sécurisé</span>
+    <div class="ticker-inner">
+      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
+      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
+      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
+      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
+      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
+      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
+      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
+      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
     </div>
-  </div>
-  <script>
-  // Duplication dynamique pour boucle ticker parfaite sans saut
-  (function() {
-    const inner = document.getElementById('ticker-inner');
-    if (!inner) return;
-    const original = inner.innerHTML;
-    inner.innerHTML = original + original;
-    const itemWidth = inner.scrollWidth / 2;
-    // Remplace l'animation CSS par une version calculée dynamiquement
-    inner.style.animation = 'none';
-    let pos = 0;
-    const speed = 0.4; // px par frame
-    function animate() {
-      pos -= speed;
-      if (Math.abs(pos) >= itemWidth) pos = 0;
-      inner.style.transform = `translateX(${pos}px)`;
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-  })();
-  </script>
   </div>
 
   <!-- HERO -->
@@ -1095,7 +1073,7 @@
   }
 
   function loadData() {
-    fetch('/.netlify/functions/porto-stats')
+    fetch('/api/porto-stats')
       .then(r => r.json())
       .then(data => {
         renderMatch(data);
