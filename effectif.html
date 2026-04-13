@@ -54,11 +54,92 @@
     .coach-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
     .coach-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; }
     .coach-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
-    .club-bar { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); }
-    .club-stat { padding: 28px 48px; border-right: 1px solid var(--border); }
+    .club-bar-section { border-bottom: 1px solid var(--border); }
+    .club-bar-eyebrow {
+      padding: 28px 48px 20px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .club-bar-eyebrow::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: #003DA5;
+    }
+    .eyebrow-season { color: rgba(255,255,255,0.35); }
+    .eyebrow-season strong {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 15px;
+      letter-spacing: 3px;
+      color: #fff;
+      margin-left: 4px;
+    }
+    .club-stat-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .club-bar { display: grid; grid-template-columns: repeat(4, 1fr); }
+    .club-stat {
+      padding: 20px 48px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
     .club-stat:last-child { border-right: none; }
-    .club-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; }
-    .club-stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
+    .club-stat::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: #003DA5;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.22,1,.36,1);
+    }
+    .club-stat:hover::before { transform: scaleX(1); }
+    .club-stat::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 100%, rgba(0,61,165,0.18) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity .4s;
+      pointer-events: none;
+    }
+    .club-stat:hover::after { opacity: 1; }
+    .club-stat-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.45);
+      margin-bottom: 10px;
+    }
+    .club-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(56px, 5.5vw, 88px);
+      line-height: 1;
+      letter-spacing: -1px;
+      color: #003DA5;
+      transition: color .3s;
+    }
+    .club-stat:hover .club-stat-num { color: #fff; }
     .filter-bar { padding: 0 48px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0; overflow-x: auto; }
     .filter-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray); background: transparent; border: none; padding: 16px 24px; cursor: pointer; white-space: nowrap; border-right: 1px solid var(--border); transition: color .2s; border-bottom: 2px solid transparent; }
     .filter-btn:first-child { border-left: 1px solid var(--border); }
@@ -128,9 +209,49 @@
     .stat-cell:hover::after { opacity: 1; }
     .stat-num { display: inline-block; transition: transform .3s cubic-bezier(.22,1,.36,1); }
     .stat-cell:hover .stat-num { transform: scale(1.06); }
-    @keyframes shimmer { 0% { background-position: -300% center; } 100% { background-position: 300% center; } }
-    .counting { color: rgba(255,255,255,0.7); animation: countFade 1.2s ease; }
-    @keyframes countFade { 0% { color: rgba(0,80,200,0.9); } 100% { color: #fff; } }
+
+    /* ═══════════════════════════════════════════
+       BLUE ACCENTS — effets subtils Porto Blue
+    ═══════════════════════════════════════════ */
+
+    /* 1. Nav — bottom border glow bleu */
+    nav { border-bottom: 1px solid rgba(0,61,165,0.5) !important; box-shadow: 0 1px 0 0 rgba(0,61,165,0.25), 0 4px 24px rgba(0,61,165,0.06); }
+
+    /* 2. Nav links — underline bleu */
+    .nav-links a::after { background: #003DA5 !important; }
+    .nav-links a:hover::after, .nav-links a.active::after { background: #003DA5 !important; }
+
+    /* 3. Nav CTA — hover bleu Porto */
+    .nav-cta:hover { background: #003DA5 !important; color: #fff !important; border-color: #003DA5 !important; }
+
+    /* 4. Ticker — fond bleu sombre + accent labels */
+    .ticker { background: rgba(0,20,80,0.18) !important; border-top: 1px solid rgba(0,61,165,0.3) !important; border-bottom: 1px solid rgba(0,61,165,0.3) !important; }
+    .ticker-item b { color: #4d82d4 !important; }
+
+    /* 5. Eyebrow / section-label — tiret bleu */
+    .section-label::before, .page-eyebrow::before, .hero-eyebrow::before { background: #003DA5 !important; }
+
+    /* 6. Stat-cell — top border scan + glow bleu */
+    .stat-cell::before { content: ; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+    .stat-cell:hover::before { transform: scaleX(1); }
+    .stat-cell:hover { background: rgba(0,20,80,0.22) !important; }
+    .stat-cell::after { background: radial-gradient(ellipse at 50% 120%, rgba(0,61,165,0.28) 0%, transparent 68%) !important; }
+
+    /* 7. Article card — bordure gauche bleue au hover */
+    .article-card { border-left: 2px solid transparent !important; transition: background .2s, transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .3s !important; }
+    .article-card:hover { border-left-color: #003DA5 !important; }
+
+    /* 8. Hero visual glow — plus riche */
+    .hero-visual::before { background: radial-gradient(ellipse at center 80%, rgba(0,61,165,0.65) 0%, rgba(0,20,90,0.3) 45%, transparent 100%) !important; }
+
+    /* 9. Footer — top border glow */
+    footer { border-top: 1px solid rgba(0,61,165,0.4) !important; box-shadow: 0 -1px 0 0 rgba(0,61,165,0.15), inset 0 1px 60px rgba(0,20,80,0.07); }
+
+    /* 10. Cursor glow */
+    #cursor-glow { position: fixed; width: 320px; height: 320px; border-radius: 50%; background: radial-gradient(circle, rgba(0,61,165,0.09) 0%, transparent 70%); pointer-events: none; transform: translate(-50%, -50%); z-index: 9999; transition: opacity .5s; opacity: 0; }
+
+    .counting { animation: countColor 1.2s ease forwards; }
+    @keyframes countColor { 0% { color: #003DA5; } 100% { color: #ffffff; } }
     .nav-logo:hover .nav-logo-text { animation: glitch .35s steps(2) forwards; }
     @keyframes glitch { 0% { text-shadow: none; } 25% { text-shadow: -2px 0 #003DA5,2px 0 rgba(255,255,255,0.3); } 50% { text-shadow: 2px 0 #003DA5,-1px 0 rgba(255,255,255,0.3); } 75% { text-shadow: -1px 0 rgba(255,255,255,0.4); } 100% { text-shadow: none; } }
     .hero-team-img { will-change: transform; }
@@ -148,6 +269,7 @@
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
 <div class="grid-bg"></div>
+  <div id="cursor-glow"></div>
 <div class="page">
 
   <nav>
@@ -187,11 +309,32 @@
     </div>
   </div>
 
-  <div class="club-bar">
-    <div class="club-stat"><div class="club-stat-num">35</div><div class="club-stat-label">Joueurs</div></div>
-    <div class="club-stat"><div class="club-stat-num">14</div><div class="club-stat-label">Nationalités</div></div>
-    <div class="club-stat"><div class="club-stat-num">23.8</div><div class="club-stat-label">Âge moyen</div></div>
-    <div class="club-stat"><div class="club-stat-num">1893</div><div class="club-stat-label">Fondé en</div></div>
+  <div class="club-bar-section">
+    <div class="club-bar-eyebrow">
+      <span class="eyebrow-season">Saison <strong>2025 / 26</strong></span>
+    </div>
+    <div class="club-bar">
+      <div class="club-stat">
+        <div class="club-stat-title">Nombre de joueurs</div>
+        <div class="club-stat-num">35</div>
+        <div class="club-stat-label">Joueurs</div>
+      </div>
+      <div class="club-stat">
+        <div class="club-stat-title">Nationalités représentées</div>
+        <div class="club-stat-num">14</div>
+        <div class="club-stat-label">Nationalités</div>
+      </div>
+      <div class="club-stat">
+        <div class="club-stat-title">Âge moyen du groupe</div>
+        <div class="club-stat-num">25.4</div>
+        <div class="club-stat-label">Âge moyen</div>
+      </div>
+      <div class="club-stat">
+        <div class="club-stat-title">Date de fondation</div>
+        <div class="club-stat-num">1893</div>
+        <div class="club-stat-label">Fondé en</div>
+      </div>
+    </div>
   </div>
 
   <div class="filter-bar">
@@ -326,7 +469,7 @@ function filterPos(pos, btn) {
 window.filterPos = filterPos;
 
 render();
-</script>
+  </script>
 
   <script>
   // Page loader
@@ -386,24 +529,18 @@ render();
     const el = document.getElementById(id);
     if (el) watchCounters(el);
   });
-  // Compteurs statiques effectif — cible uniquement .club-stat-num
-  const clubBar = document.querySelector('.club-bar');
-  if (clubBar) {
+  // aussi les .club-stat-num statiques (effectif)
+  document.querySelectorAll('.club-stat-num').forEach(el => {
     const obs2 = new IntersectionObserver((entries) => {
       if (!entries[0].isIntersecting) return;
-      clubBar.querySelectorAll('.club-stat-num').forEach(el => {
-        if (el.dataset.animated) return;
-        const txt = el.textContent.trim();
-        const num = parseFloat(txt.replace(/[^0-9.]/g, ''));
-        if (!isNaN(num) && num > 0) {
-          el.dataset.animated = '1';
-          animateCount(el, num);
-        }
-      });
-      obs2.unobserve(clubBar);
-    }, { threshold: 0.3 });
-    obs2.observe(clubBar);
-  }
+      const num = parseFloat(el.textContent.replace(/[^0-9.]/g,''));
+      if (!isNaN(num) && num > 0 && !el.dataset.animated) {
+        el.dataset.animated='1'; animateCount(el, num);
+      }
+      obs2.unobserve(el);
+    }, {threshold:0.3});
+    obs2.observe(el);
+  });
 
   // Match card spotlight
   const mc = document.getElementById('match-card');
@@ -438,6 +575,16 @@ render();
     },{threshold:0.1});
     vobs.observe(vsec);
   }
-  </script>
+      // Cursor glow bleu
+  const cg = document.getElementById("cursor-glow");
+  if (cg) {
+    document.addEventListener("mousemove", e => {
+      cg.style.left = e.clientX + "px";
+      cg.style.top = e.clientY + "px";
+      cg.style.opacity = "1";
+    }, { passive: true });
+    document.addEventListener("mouseleave", () => cg.style.opacity = "0");
+  }
+</script>
 </body>
 </html>
