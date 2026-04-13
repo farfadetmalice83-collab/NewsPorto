@@ -129,7 +129,8 @@
     .stat-num { display: inline-block; transition: transform .3s cubic-bezier(.22,1,.36,1); }
     .stat-cell:hover .stat-num { transform: scale(1.06); }
     @keyframes shimmer { 0% { background-position: -300% center; } 100% { background-position: 300% center; } }
-    .counting { background: linear-gradient(90deg,#fff 0%,#fff 35%,#4488ff 50%,#fff 65%,#fff 100%); background-size: 300% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 0.9s linear; }
+    .counting { color: rgba(255,255,255,0.7); animation: countFade 1.2s ease; }
+    @keyframes countFade { 0% { color: rgba(0,80,200,0.9); } 100% { color: #fff; } }
     .nav-logo:hover .nav-logo-text { animation: glitch .35s steps(2) forwards; }
     @keyframes glitch { 0% { text-shadow: none; } 25% { text-shadow: -2px 0 #003DA5,2px 0 rgba(255,255,255,0.3); } 50% { text-shadow: 2px 0 #003DA5,-1px 0 rgba(255,255,255,0.3); } 75% { text-shadow: -1px 0 rgba(255,255,255,0.4); } 100% { text-shadow: none; } }
     .hero-team-img { will-change: transform; }
@@ -385,18 +386,24 @@ render();
     const el = document.getElementById(id);
     if (el) watchCounters(el);
   });
-  // aussi les .club-stat-num statiques (effectif)
-  document.querySelectorAll('.club-stat-num, .club-stat').forEach(el => {
+  // Compteurs statiques effectif — cible uniquement .club-stat-num
+  const clubBar = document.querySelector('.club-bar');
+  if (clubBar) {
     const obs2 = new IntersectionObserver((entries) => {
       if (!entries[0].isIntersecting) return;
-      const num = parseFloat(el.textContent.replace(/[^0-9.]/g,''));
-      if (!isNaN(num) && num > 0 && !el.dataset.animated) {
-        el.dataset.animated='1'; animateCount(el, num);
-      }
-      obs2.unobserve(el);
-    }, {threshold:0.3});
-    obs2.observe(el);
-  });
+      clubBar.querySelectorAll('.club-stat-num').forEach(el => {
+        if (el.dataset.animated) return;
+        const txt = el.textContent.trim();
+        const num = parseFloat(txt.replace(/[^0-9.]/g, ''));
+        if (!isNaN(num) && num > 0) {
+          el.dataset.animated = '1';
+          animateCount(el, num);
+        }
+      });
+      obs2.unobserve(clubBar);
+    }, { threshold: 0.3 });
+    obs2.observe(clubBar);
+  }
 
   // Match card spotlight
   const mc = document.getElementById('match-card');
