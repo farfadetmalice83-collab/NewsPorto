@@ -183,38 +183,14 @@
 
   <!-- TICKER -->
   <div class="ticker">
-    <div class="ticker-inner" id="ticker-inner">
-      <span class="ticker-item"><b>EUROPA</b> L'enfer du Dragão attend Nottingham Forest — Quart de finale</span>
-      <span class="ticker-item"><b>EUROPE</b> Porto Conquiert l'Europe — Stuttgart balayé 4-1</span>
-      <span class="ticker-item"><b>FOCUS</b> William Gomes : L'ascension fulgurante du joyau de l'Olival</span>
-      <span class="ticker-item"><b>LIGA</b> Course au titre : Porto garde ses distances en tête</span>
-      <span class="ticker-item"><b>STATS</b> Diogo Costa — Le mur infranchissable de l'Europa League</span>
-      <span class="ticker-item"><b>ANALYSE</b> Le 4-3-3 de Farioli décrypté — Comment Porto neutralise l'Europe</span>
-      <span class="ticker-item"><b>INSTITUTION</b> L'effet André Villas-Boas — Un club modernisé et plus fort</span>
-      <span class="ticker-item"><b>MERCATO</b> Rodrigo Mora prolonge — Le futur du Dragão est sécurisé</span>
+    <div class="ticker-inner">
+      <span class="ticker-item"><b>VIDÉOS</b> Résumés FC Porto · Source VSPORTS Liga Portugal</span>
+      <span class="ticker-item"><b>RESUMO</b> Filtrage automatique · Toutes compétitions</span>
+      <span class="ticker-item"><b>WATCH</b> Liga Portugal · Taça de Portugal · Europa League</span>
+      <span class="ticker-item"><b>VIDÉOS</b> Résumés FC Porto · Source VSPORTS Liga Portugal</span>
+      <span class="ticker-item"><b>RESUMO</b> Filtrage automatique · Toutes compétitions</span>
+      <span class="ticker-item"><b>WATCH</b> Liga Portugal · Taça de Portugal · Europa League</span>
     </div>
-  </div>
-  <script>
-  // Duplication dynamique pour boucle ticker parfaite sans saut
-  (function() {
-    const inner = document.getElementById('ticker-inner');
-    if (!inner) return;
-    const original = inner.innerHTML;
-    inner.innerHTML = original + original;
-    const itemWidth = inner.scrollWidth / 2;
-    // Remplace l'animation CSS par une version calculée dynamiquement
-    inner.style.animation = 'none';
-    let pos = 0;
-    const speed = 0.4; // px par frame
-    function animate() {
-      pos -= speed;
-      if (Math.abs(pos) >= itemWidth) pos = 0;
-      inner.style.transform = `translateX(${pos}px)`;
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-  })();
-  </script>
   </div>
 
   <!-- PAGE HERO -->
@@ -286,7 +262,7 @@ function fmtViews(n) {
   return n + ' vues';
 }
 
-fetch('/.netlify/functions/porto-youtube')
+fetch('/api/porto-youtube')
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(data => {
     document.getElementById('loading').style.display = 'none';
