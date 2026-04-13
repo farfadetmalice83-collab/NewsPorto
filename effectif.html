@@ -295,45 +295,21 @@
       <li><a href="actu.html">Actu</a></li>
       <li><a href="effectif.html" class="active">Effectif</a></li>
       <li><a href="stats.html">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="#">Vidéos</a></li>
     </ul>
     <a href="#" class="nav-cta">Shop →</a>
   </nav>
 
   <!-- TICKER -->
   <div class="ticker">
-    <div class="ticker-inner" id="ticker-inner">
-      <span class="ticker-item"><b>EUROPA</b> L'enfer du Dragão attend Nottingham Forest — Quart de finale</span>
-      <span class="ticker-item"><b>EUROPE</b> Porto Conquiert l'Europe — Stuttgart balayé 4-1</span>
-      <span class="ticker-item"><b>FOCUS</b> William Gomes : L'ascension fulgurante du joyau de l'Olival</span>
-      <span class="ticker-item"><b>LIGA</b> Course au titre : Porto garde ses distances en tête</span>
-      <span class="ticker-item"><b>STATS</b> Diogo Costa — Le mur infranchissable de l'Europa League</span>
-      <span class="ticker-item"><b>ANALYSE</b> Le 4-3-3 de Farioli décrypté — Comment Porto neutralise l'Europe</span>
-      <span class="ticker-item"><b>INSTITUTION</b> L'effet André Villas-Boas — Un club modernisé et plus fort</span>
-      <span class="ticker-item"><b>MERCATO</b> Rodrigo Mora prolonge — Le futur du Dragão est sécurisé</span>
+    <div class="ticker-inner">
+      <span class="ticker-item"><b>EFFECTIF</b> FC Porto · Saison 2025/26 · Données officielles</span>
+      <span class="ticker-item"><b>DRAGÃO</b> Gardiens · Défenseurs · Milieux · Attaquants</span>
+      <span class="ticker-item"><b>OLIVAL</b> Centre d'entraînement · Formation d'élite</span>
+      <span class="ticker-item"><b>EFFECTIF</b> FC Porto · Saison 2025/26 · Données officielles</span>
+      <span class="ticker-item"><b>DRAGÃO</b> Gardiens · Défenseurs · Milieux · Attaquants</span>
+      <span class="ticker-item"><b>OLIVAL</b> Centre d'entraînement · Formation d'élite</span>
     </div>
-  </div>
-  <script>
-  // Duplication dynamique pour boucle ticker parfaite sans saut
-  (function() {
-    const inner = document.getElementById('ticker-inner');
-    if (!inner) return;
-    const original = inner.innerHTML;
-    inner.innerHTML = original + original;
-    const itemWidth = inner.scrollWidth / 2;
-    // Remplace l'animation CSS par une version calculée dynamiquement
-    inner.style.animation = 'none';
-    let pos = 0;
-    const speed = 0.4; // px par frame
-    function animate() {
-      pos -= speed;
-      if (Math.abs(pos) >= itemWidth) pos = 0;
-      inner.style.transform = `translateX(${pos}px)`;
-      requestAnimationFrame(animate);
-    }
-    requestAnimationFrame(animate);
-  })();
-  </script>
   </div>
 
   <!-- PAGE HERO -->
@@ -483,7 +459,7 @@ function filterPos(pos, btn) {
 window.filterPos = filterPos;
 
 // ── Fetch ────────────────────────────────────────────────────────────────────
-fetch('/.netlify/functions/porto-squad')
+fetch('/api/porto-squad')
   .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
   .then(data => {
     document.getElementById('loading').style.display = 'none';
