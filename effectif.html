@@ -16,246 +16,70 @@
       --blue: #003DA5;
       --blue-glow: rgba(0, 61, 165, 0.25);
     }
-
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
     body { background: #000; color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
-
-    /* ── GRID BG ── */
     .grid-bg {
       position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 44px 44px;
-      animation: gridScroll 12s linear infinite;
-      pointer-events: none;
+      background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px; animation: gridScroll 12s linear infinite; pointer-events: none;
     }
     @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 44px 44px; } }
     .page { position: relative; z-index: 1; }
-
-    /* ── NAV ── */
     nav {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 72px;
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(6px); background: rgba(0,0,0,0.5);
-      position: sticky; top: 0; z-index: 100;
+      padding: 0 48px; height: 72px; border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(6px); background: rgba(0,0,0,0.5); position: sticky; top: 0; z-index: 100;
     }
     .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .nav-logo img { height: 46px; width: auto; }
     .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--white); }
     .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
-      letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray);
-      text-decoration: none; transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--white); }
-    .nav-links a.active { color: var(--white); }
-    .nav-cta {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      border: 1px solid var(--white); color: var(--white); background: transparent;
-      padding: 8px 20px; cursor: pointer; text-decoration: none; transition: background .2s, color .2s;
-    }
+    .nav-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray); text-decoration: none; transition: color .2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--white); color: var(--white); background: transparent; padding: 8px 20px; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
     .nav-cta:hover { background: var(--white); color: #000; }
-
-    /* ── TICKER ── */
-    .ticker {
-      border-bottom: 1px solid var(--border); overflow: hidden;
-      padding: 10px 0; background: rgba(255,255,255,0.02);
-    }
+    .ticker { border-bottom: 1px solid var(--border); overflow: hidden; padding: 10px 0; background: rgba(255,255,255,0.02); }
     .ticker-inner { display: flex; gap: 64px; animation: ticker 28s linear infinite; width: max-content; }
     .ticker-item { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
     .ticker-item b { color: var(--white); margin-right: 8px; }
     @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-    /* ── PAGE HERO ── */
-    .page-hero {
-      padding: 72px 48px 56px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: flex-end; justify-content: space-between; gap: 32px;
-    }
-    .page-eyebrow {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: 4px; text-transform: uppercase; color: var(--gray);
-      margin-bottom: 14px; display: flex; align-items: center; gap: 10px;
-    }
+    .page-hero { padding: 72px 48px 56px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; }
+    .page-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
     .page-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gray); }
-    .page-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(64px, 8vw, 120px); line-height: .88; letter-spacing: 1px;
-    }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(64px, 8vw, 120px); line-height: .88; letter-spacing: 1px; }
     .page-title .outline { -webkit-text-stroke: 1.5px var(--white); color: transparent; }
     .hero-right { text-align: right; padding-bottom: 8px; }
-    .coach-block {
-      font-family: 'Barlow Condensed', sans-serif;
-    }
-    .coach-label {
-      font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--gray); margin-bottom: 6px;
-    }
-    .coach-name {
-      font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px;
-    }
-    .coach-meta {
-      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
-      color: var(--gray); margin-top: 4px;
-    }
-
-    /* ── FILTER BAR ── */
-    .filter-bar {
-      padding: 0 48px;
-      border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; gap: 0; overflow-x: auto;
-    }
-    .filter-btn {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: 2.5px; text-transform: uppercase;
-      color: var(--gray); background: transparent; border: none;
-      padding: 16px 24px; cursor: pointer; white-space: nowrap;
-      border-right: 1px solid var(--border);
-      transition: color .2s, background .2s;
-      border-bottom: 2px solid transparent;
-    }
+    .coach-label { font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 6px; }
+    .coach-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; }
+    .coach-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
+    .club-bar { display: grid; grid-template-columns: repeat(4, 1fr); border-bottom: 1px solid var(--border); }
+    .club-stat { padding: 28px 48px; border-right: 1px solid var(--border); }
+    .club-stat:last-child { border-right: none; }
+    .club-stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; line-height: 1; }
+    .club-stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-top: 4px; }
+    .filter-bar { padding: 0 48px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0; overflow-x: auto; }
+    .filter-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray); background: transparent; border: none; padding: 16px 24px; cursor: pointer; white-space: nowrap; border-right: 1px solid var(--border); transition: color .2s; border-bottom: 2px solid transparent; }
     .filter-btn:first-child { border-left: 1px solid var(--border); }
     .filter-btn:hover { color: var(--white); }
     .filter-btn.active { color: var(--white); border-bottom-color: var(--white); }
-
-    /* ── LOADING / ERROR ── */
-    .loading-block {
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; padding: 80px 48px; gap: 16px;
-    }
-    .loading-spinner {
-      width: 36px; height: 36px;
-      border: 2px solid var(--border); border-top-color: var(--white);
-      border-radius: 50%; animation: spin .8s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .loading-text {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
-      letter-spacing: 3px; text-transform: uppercase; color: var(--gray);
-    }
-
-    /* ── POSITION GROUP ── */
-    .squad-section {
-      border-bottom: 1px solid var(--border);
-    }
+    .squad-section { border-bottom: 1px solid var(--border); }
     .squad-section.hidden { display: none; }
-
-    .position-header {
-      display: flex; align-items: baseline; justify-content: space-between;
-      padding: 32px 48px 20px;
-    }
-    .position-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: var(--gray);
-    }
-    .position-count {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
-    }
-
-    /* ── PLAYER GRID ── */
-    .player-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-      gap: 1px;
-      background: var(--border);
-      border-top: 1px solid var(--border);
-      margin: 0 48px;
-      border: 1px solid var(--border);
-    }
-
-    .player-card {
-      background: #000;
-      padding: 24px 20px;
-      display: flex; flex-direction: column; gap: 10px;
-      transition: background .2s;
-      cursor: default;
-      position: relative;
-      overflow: hidden;
-    }
-    .player-card:hover {
-      background: rgba(0, 61, 165, 0.08);
-    }
-    .player-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0;
-      height: 1px;
-      background: transparent;
-      transition: background .2s;
-    }
-    .player-card:hover::before {
-      background: rgba(0, 61, 165, 0.6);
-    }
-
-    /* Big shirt number */
-    .player-number {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 64px; line-height: 1; letter-spacing: -2px;
-      color: rgba(255,255,255,0.06);
-      position: absolute; top: 12px; right: 16px;
-      pointer-events: none;
-      transition: color .2s;
-    }
-    .player-card:hover .player-number {
-      color: rgba(0, 61, 165, 0.2);
-    }
-
-    .player-name {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: .5px; line-height: 1.05;
-      position: relative; z-index: 1;
-    }
-    .player-meta {
-      display: flex; flex-direction: column; gap: 4px;
-      position: relative; z-index: 1;
-    }
-    .player-nationality {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: var(--gray);
-      display: flex; align-items: center; gap: 6px;
-    }
-    .player-age {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
-    }
-
-    /* ── CLUB STATS BAR ── */
-    .club-bar {
-      padding: 32px 48px;
-      border-bottom: 1px solid var(--border);
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-    .club-stat {
-      padding: 0 24px;
-      border-right: 1px solid var(--border);
-    }
-    .club-stat:first-child { padding-left: 0; }
-    .club-stat:last-child { border-right: none; }
-    .club-stat-num {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 40px; letter-spacing: 1px; line-height: 1;
-    }
-    .club-stat-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 2.5px;
-      text-transform: uppercase; color: var(--gray); margin-top: 4px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 36px 48px; display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--border);
-    }
+    .position-header { display: flex; align-items: baseline; justify-content: space-between; padding: 32px 48px 20px; }
+    .position-title { font-family: 'Bebas Neue', sans-serif; font-size: 13px; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); }
+    .position-count { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    .player-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1px; background: var(--border); margin: 0 48px; border: 1px solid var(--border); }
+    .player-card { background: #000; padding: 24px 20px; display: flex; flex-direction: column; gap: 10px; transition: background .2s; cursor: default; position: relative; overflow: hidden; }
+    .player-card:hover { background: rgba(0, 61, 165, 0.08); }
+    .player-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: transparent; transition: background .2s; }
+    .player-card:hover::before { background: rgba(0, 61, 165, 0.6); }
+    .player-number { font-family: 'Bebas Neue', sans-serif; font-size: 64px; line-height: 1; letter-spacing: -2px; color: rgba(255,255,255,0.06); position: absolute; top: 12px; right: 16px; pointer-events: none; transition: color .2s; }
+    .player-card:hover .player-number { color: rgba(0, 61, 165, 0.2); }
+    .player-name { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 1px; line-height: 1.1; position: relative; z-index: 1; padding-right: 40px; }
+    .player-meta { display: flex; flex-direction: column; gap: 4px; position: relative; z-index: 1; }
+    .player-nationality { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1px; color: var(--gray); }
+    .player-age { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
+    footer { padding: 36px 48px; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid var(--border); }
     .footer-logo { display: flex; align-items: center; gap: 8px; }
     .footer-logo img { height: 32px; width: auto; }
     .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: rgba(255,255,255,0.4); }
@@ -263,21 +87,16 @@
     .footer-links { display: flex; gap: 24px; list-style: none; }
     .footer-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); text-decoration: none; transition: color .2s; }
     .footer-links a:hover { color: var(--white); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      nav, .page-hero, .position-header, .filter-bar, .club-bar, footer { padding-left: 24px; padding-right: 24px; }
-      .player-grid { margin: 0 24px; }
-      .club-bar { grid-template-columns: repeat(2,1fr); gap: 1px; background: var(--border); }
-      .club-stat { background: #000; padding: 20px; border-right: none; }
-    }
     @media (max-width: 768px) {
       nav { padding: 0 20px; }
       .nav-links { display: none; }
-      .page-hero { flex-direction: column; align-items: flex-start; padding: 40px 20px 32px; }
-      .hero-right { text-align: left; }
-      .player-grid { grid-template-columns: repeat(2, 1fr); margin: 0 20px; }
-      footer { flex-direction: column; gap: 20px; text-align: center; }
+      .page-hero { padding: 40px 20px 32px; flex-direction: column; align-items: flex-start; }
+      .club-bar { grid-template-columns: repeat(2, 1fr); }
+      .club-stat { padding: 20px 20px; }
+      .filter-bar { padding: 0 20px; }
+      .position-header { padding: 24px 20px 16px; }
+      .player-grid { margin: 0 20px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+      footer { padding: 24px 20px; flex-direction: column; gap: 16px; text-align: center; }
     }
   </style>
 </head>
@@ -285,7 +104,6 @@
 <div class="grid-bg"></div>
 <div class="page">
 
-  <!-- NAV -->
   <nav>
     <a href="index.html" class="nav-logo">
       <img src="Logo.png" alt="NewsPorto">
@@ -295,12 +113,11 @@
       <li><a href="actu.html">Actu</a></li>
       <li><a href="effectif.html" class="active">Effectif</a></li>
       <li><a href="stats.html">Stats</a></li>
-      <li><a href="#">Vidéos</a></li>
+      <li><a href="videos.html">Vidéos</a></li>
     </ul>
     <a href="#" class="nav-cta">Shop →</a>
   </nav>
 
-  <!-- TICKER -->
   <div class="ticker">
     <div class="ticker-inner">
       <span class="ticker-item"><b>EFFECTIF</b> FC Porto · Saison 2025/26 · Données officielles</span>
@@ -312,46 +129,26 @@
     </div>
   </div>
 
-  <!-- PAGE HERO -->
   <div class="page-hero">
     <div>
       <p class="page-eyebrow">FC Porto · Saison 2025/26</p>
-      <h1 class="page-title">
-        L'<span class="outline">Effectif</span><br>
-        Des Dragons
-      </h1>
+      <h1 class="page-title">L'<span class="outline">Effectif</span><br>Des Dragons</h1>
     </div>
-    <div class="hero-right" id="coach-block" style="display:none">
-      <div class="coach-block">
-        <div class="coach-label">Entraîneur</div>
-        <div class="coach-name" id="coach-name">—</div>
-        <div class="coach-meta" id="coach-meta">—</div>
-      </div>
+    <div class="hero-right">
+      <div class="coach-label">Entraîneur</div>
+      <div class="coach-name">Francesco Farioli</div>
+      <div class="coach-meta">Italy · 36 ans · Contrat jusqu'en 2028</div>
     </div>
   </div>
 
-  <!-- CLUB STATS BAR -->
-  <div class="club-bar" id="club-bar" style="display:none">
-    <div class="club-stat">
-      <div class="club-stat-num" id="stat-total">—</div>
-      <div class="club-stat-label">Joueurs</div>
-    </div>
-    <div class="club-stat">
-      <div class="club-stat-num" id="stat-nations">—</div>
-      <div class="club-stat-label">Nationalités</div>
-    </div>
-    <div class="club-stat">
-      <div class="club-stat-num" id="stat-avg-age">—</div>
-      <div class="club-stat-label">Âge moyen</div>
-    </div>
-    <div class="club-stat">
-      <div class="club-stat-num" id="stat-founded">—</div>
-      <div class="club-stat-label">Fondé en</div>
-    </div>
+  <div class="club-bar">
+    <div class="club-stat"><div class="club-stat-num">35</div><div class="club-stat-label">Joueurs</div></div>
+    <div class="club-stat"><div class="club-stat-num">14</div><div class="club-stat-label">Nationalités</div></div>
+    <div class="club-stat"><div class="club-stat-num">23.8</div><div class="club-stat-label">Âge moyen</div></div>
+    <div class="club-stat"><div class="club-stat-num">1893</div><div class="club-stat-label">Fondé en</div></div>
   </div>
 
-  <!-- FILTER BAR -->
-  <div class="filter-bar" id="filter-bar" style="display:none">
+  <div class="filter-bar">
     <button class="filter-btn active" onclick="filterPos('all', this)">Tous</button>
     <button class="filter-btn" onclick="filterPos('Goalkeeper', this)">Gardiens</button>
     <button class="filter-btn" onclick="filterPos('Defence', this)">Défenseurs</button>
@@ -359,16 +156,8 @@
     <button class="filter-btn" onclick="filterPos('Offence', this)">Attaquants</button>
   </div>
 
-  <!-- LOADING -->
-  <div id="loading" class="loading-block">
-    <div class="loading-spinner"></div>
-    <p class="loading-text">Chargement de l'effectif</p>
-  </div>
-
-  <!-- SQUAD CONTENT -->
   <div id="squad-content"></div>
 
-  <!-- FOOTER -->
   <footer>
     <div class="footer-logo">
       <img src="Logo.png" alt="NewsPorto">
@@ -385,70 +174,102 @@
 </div>
 
 <script>
-const POSITION_ORDER = ['Goalkeeper','Defence','Midfield','Offence'];
-const POSITION_FR    = { Goalkeeper:'Gardiens', Defence:'Défenseurs', Midfield:'Milieux', Offence:'Attaquants' };
+const SQUAD = {
+  Goalkeeper: {
+    label: 'Gardiens', players: [
+      { name: 'Diogo Costa',   nationality: 'Portugal', birthDate: '1999-09-19', number: 1  },
+      { name: 'Cláudio Ramos', nationality: 'Portugal', birthDate: '1991-01-21', number: 12 },
+      { name: 'João Costa',    nationality: 'Portugal', birthDate: '2004-03-10', number: 33 },
+    ]
+  },
+  Defence: {
+    label: 'Défenseurs', players: [
+      { name: 'Thiago Silva',     nationality: 'Brazil',     birthDate: '1984-09-22', number: 3  },
+      { name: 'Nehuén Pérez',     nationality: 'Argentina',  birthDate: '2000-06-24', number: 4  },
+      { name: 'Jan Bednarek',     nationality: 'Poland',     birthDate: '1996-04-12', number: 5  },
+      { name: 'Jakub Kiwior',     nationality: 'Poland',     birthDate: '2000-01-15', number: 15 },
+      { name: 'Francisco Moura',  nationality: 'Portugal',   birthDate: '1999-01-13', number: 22 },
+      { name: 'Zaidu Sanusi',     nationality: 'Nigeria',    birthDate: '1997-03-11', number: 35 },
+      { name: 'Dominik Prpić',    nationality: 'Croatia',    birthDate: '2004-02-14', number: 44 },
+      { name: 'Pedro Lima',       nationality: 'Brazil',     birthDate: '2006-02-01', number: 66 },
+      { name: 'Gabriel Brás',     nationality: 'Portugal',   birthDate: '2003-04-20', number: 77 },
+      { name: 'Alberto Costa',    nationality: 'Portugal',   birthDate: '2003-01-05', number: 84 },
+      { name: 'Martim Fernandes', nationality: 'Portugal',   birthDate: '2005-03-12', number: 57 },
+    ]
+  },
+  Midfield: {
+    label: 'Milieux', players: [
+      { name: 'Alan Varela',        nationality: 'Argentina',  birthDate: '2001-07-11', number: 6  },
+      { name: 'Stephen Eustáquio',  nationality: 'Canada',     birthDate: '1996-12-21', number: 8  },
+      { name: 'Gabri Veiga',        nationality: 'Spain',      birthDate: '2002-04-09', number: 10 },
+      { name: 'Pablo Rosario',      nationality: 'Netherlands',birthDate: '1997-01-07', number: 16 },
+      { name: 'Seko Fofana',        nationality: 'Ivory Coast',birthDate: '1995-05-07', number: 20 },
+      { name: 'Vasco Sousa',        nationality: 'Portugal',   birthDate: '2002-09-28', number: 25 },
+      { name: 'André Franco',       nationality: 'Portugal',   birthDate: '1997-04-11', number: 27 },
+      { name: 'Rodrigo Mora',       nationality: 'Portugal',   birthDate: '2007-01-14', number: 50 },
+      { name: 'Victor Froholdt',    nationality: 'Denmark',    birthDate: '2005-03-05', number: 55 },
+      { name: 'Oskar Pietuszewski', nationality: 'Poland',     birthDate: '2007-11-01', number: 70 },
+    ]
+  },
+  Offence: {
+    label: 'Attaquants', players: [
+      { name: 'Pepê',           nationality: 'Brazil',      birthDate: '1997-02-22', number: 7  },
+      { name: 'Samu Aghehowa',  nationality: 'Spain',       birthDate: '2004-03-19', number: 9  },
+      { name: 'Terem Moffi',    nationality: 'Nigeria',     birthDate: '1999-05-16', number: 11 },
+      { name: 'Luuk de Jong',   nationality: 'Netherlands', birthDate: '1990-08-27', number: 17 },
+      { name: 'Borja Sainz',    nationality: 'Spain',       birthDate: '2001-01-22', number: 19 },
+      { name: 'Yann Karamoh',   nationality: 'France',      birthDate: '1998-07-08', number: 23 },
+      { name: 'Danny Namaso',   nationality: 'England',     birthDate: '2001-02-14', number: 24 },
+      { name: 'Gabriel Veron',  nationality: 'Brazil',      birthDate: '2002-09-22', number: 26 },
+      { name: 'William Gomes',  nationality: 'Brazil',      birthDate: '2005-06-10', number: 37 },
+      { name: 'Deniz Gül',      nationality: 'Sweden',      birthDate: '2004-04-05', number: 45 },
+      { name: 'Gonçalo Sousa',  nationality: 'Portugal',    birthDate: '2006-08-22', number: 62 },
+    ]
+  }
+};
 
-// ── Helpers ──────────────────────────────────────────────────────────────────
+const FLAGS = {
+  'Portugal':'🇵🇹','Brazil':'🇧🇷','France':'🇫🇷','Spain':'🇪🇸',
+  'Argentina':'🇦🇷','Nigeria':'🇳🇬','Poland':'🇵🇱','Croatia':'🇭🇷',
+  'Netherlands':'🇳🇱','Ivory Coast':'🇨🇮','Canada':'🇨🇦',
+  'Denmark':'🇩🇰','Sweden':'🇸🇪','England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+};
+
 function calcAge(dob) {
   if (!dob) return null;
-  const diff = Date.now() - new Date(dob).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+  return Math.floor((Date.now() - new Date(dob)) / (1000 * 60 * 60 * 24 * 365.25));
 }
 
-function flagEmoji(nationality) {
-  // Country name → flag via region indicator letters
-  const map = {
-    'Portugal':'🇵🇹','Brazil':'🇧🇷','France':'🇫🇷','Spain':'🇪🇸',
-    'Argentina':'🇦🇷','Uruguay':'🇺🇾','Colombia':'🇨🇴','Nigeria':'🇳🇬',
-    'Morocco':'🇲🇦','Senegal':'🇸🇳','Ghana':'🇬🇭','Ivory Coast':'🇨🇮',
-    'Belgium':'🇧🇪','Netherlands':'🇳🇱','Germany':'🇩🇪','Italy':'🇮🇹',
-    'England':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Sweden':'🇸🇪','Denmark':'🇩🇰','Norway':'🇳🇴',
-    'Serbia':'🇷🇸','Croatia':'🇭🇷','Slovenia':'🇸🇮','Slovakia':'🇸🇰',
-    'Mexico':'🇲🇽','Ecuador':'🇪🇨','Chile':'🇨🇱','Venezuela':'🇻🇪',
-    'Cameroon':'🇨🇲','Mali':'🇲🇱','Guinea':'🇬🇳','DR Congo':'🇨🇩',
-    'Angola':'🇦🇴','Mozambique':'🇲🇿','Cape Verde':'🇨🇻',
-    'Guinea-Bissau':'🇬🇼','São Tomé and Príncipe':'🇸🇹',
-  };
-  return map[nationality] ?? '🌍';
-}
-
-// ── Build player card ────────────────────────────────────────────────────────
-function playerCard(p) {
-  const age = calcAge(p.birthDate);
-  const flag = flagEmoji(p.nationality);
-  return `
-    <div class="player-card" data-pos="${p.position}">
-      <div class="player-number">${p.number ?? ''}</div>
-      <div class="player-name">${p.name}</div>
-      <div class="player-meta">
-        <div class="player-nationality">${flag} ${p.nationality ?? '—'}</div>
-        ${age ? `<div class="player-age">${age} ans</div>` : ''}
-      </div>
-    </div>`;
-}
-
-// ── Render squad ─────────────────────────────────────────────────────────────
-function renderSquad(grouped) {
-  const container = document.getElementById('squad-content');
+function render() {
   let html = '';
-  POSITION_ORDER.forEach(pos => {
-    const group = grouped[pos];
-    if (!group) return;
+  ['Goalkeeper','Defence','Midfield','Offence'].forEach(pos => {
+    const group = SQUAD[pos];
     html += `
-      <div class="squad-section" data-pos="${pos}" id="section-${pos}">
+      <div class="squad-section" data-pos="${pos}">
         <div class="position-header">
           <span class="position-title">— ${group.label}</span>
-          <span class="position-count">${group.count} joueur${group.count > 1 ? 's' : ''}</span>
+          <span class="position-count">${group.players.length} joueurs</span>
         </div>
         <div class="player-grid">
-          ${group.players.map(playerCard).join('')}
+          ${group.players.map(p => {
+            const age = calcAge(p.birthDate);
+            const flag = FLAGS[p.nationality] ?? '🌍';
+            return `
+              <div class="player-card" data-pos="${pos}">
+                <div class="player-number">${p.number ?? ''}</div>
+                <div class="player-name">${p.name}</div>
+                <div class="player-meta">
+                  <div class="player-nationality">${flag} ${p.nationality}</div>
+                  ${age ? `<div class="player-age">${age} ans</div>` : ''}
+                </div>
+              </div>`;
+          }).join('')}
         </div>
       </div>`;
   });
-  container.innerHTML = html;
+  document.getElementById('squad-content').innerHTML = html;
 }
 
-// ── Filter by position ───────────────────────────────────────────────────────
 function filterPos(pos, btn) {
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -458,48 +279,7 @@ function filterPos(pos, btn) {
 }
 window.filterPos = filterPos;
 
-// ── Fetch ────────────────────────────────────────────────────────────────────
-fetch('/api/porto-squad')
-  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
-  .then(data => {
-    document.getElementById('loading').style.display = 'none';
-
-    // Coach
-    if (data.coach) {
-      document.getElementById('coach-name').textContent = data.coach.name;
-      const age = calcAge(data.coach.birthDate);
-      const nat = data.coach.nationality ?? '';
-      document.getElementById('coach-meta').textContent =
-        [nat, age ? `${age} ans` : null, data.coach.contract ? `Contrat jusqu'en ${data.coach.contract.slice(0,4)}` : null]
-        .filter(Boolean).join(' · ');
-      document.getElementById('coach-block').style.display = 'block';
-    }
-
-    // Club stats bar
-    const allPlayers = Object.values(data.grouped).flatMap(g => g.players);
-    const nations = new Set(allPlayers.map(p => p.nationality).filter(Boolean)).size;
-    const ages = allPlayers.map(p => calcAge(p.birthDate)).filter(Boolean);
-    const avgAge = ages.length ? (ages.reduce((a,b) => a+b, 0) / ages.length).toFixed(1) : '—';
-
-    document.getElementById('stat-total').textContent   = allPlayers.length;
-    document.getElementById('stat-nations').textContent = nations;
-    document.getElementById('stat-avg-age').textContent = avgAge;
-    document.getElementById('stat-founded').textContent = data.club?.founded ?? '1893';
-    document.getElementById('club-bar').style.display   = 'grid';
-
-    // Filter bar
-    document.getElementById('filter-bar').style.display = 'flex';
-
-    // Squad
-    renderSquad(data.grouped);
-  })
-  .catch(err => {
-    document.getElementById('loading').innerHTML = `
-      <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:rgba(239,68,68,0.7);">
-        Données indisponibles · ${err.message}
-      </p>`;
-  });
+render();
 </script>
-
 </body>
 </html>
