@@ -88,6 +88,8 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
     raw = re.sub(r"^```json\s*", "", raw)
     raw = re.sub(r"^```\s*", "", raw)
     raw = re.sub(r"```$", "", raw).strip()
+    # Nettoie les caractères de contrôle invalides dans le JSON
+    raw = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", raw)
     return json.loads(raw)
 
 def build_html(data, image, date_str):
