@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsPorto — Admin · Créer un article</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --off-white: #e8e8e8;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.1);
+      --grid-color: rgba(255,255,255,0.055);
+      --blue: #0057b8;
+      --green: #00a86b;
+      --red: #c0392b;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000;
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── GRID BG ── */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px;
+      animation: gridScroll 12s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridScroll {
+      0%   { background-position: 0 0; }
+      100% { background-position: 44px 44px; }
+    }
+    .page { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 56px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(12px);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: inherit;
+    }
+    .nav-logo img { height: 28px; width: auto; }
+    .nav-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px; letter-spacing: 4px; color: var(--white);
+    }
+    .nav-admin-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      background: rgba(255,255,255,0.1); border: 1px solid var(--border);
+      padding: 3px 10px; color: var(--gray);
+    }
+    .nav-back {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray); text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 2px;
+      transition: color .2s;
+    }
+    .nav-back:hover { color: var(--white); }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 48px 48px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .page-label::before {
+      content: ''; display: block; width: 18px; height: 1px; background: var(--gray);
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(40px, 5vw, 72px);
+      letter-spacing: 1px; line-height: 0.95;
+      padding-bottom: 32px;
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 0;
+      min-height: calc(100vh - 200px);
+    }
+
+    /* ── LEFT PANEL ── */
+    .panel-left {
+      padding: 40px 48px;
+      border-right: 1px solid var(--border);
+    }
+
+    /* ── RIGHT PANEL ── */
+    .panel-right {
+      padding: 40px 32px;
+    }
+
+    /* ── SECTION BLOCKS ── */
+    .form-section {
+      margin-bottom: 40px;
+    }
+    .form-section-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .form-section-label::before {
+      content: ''; display: block; width: 12px; height: 1px; background: var(--gray);
+    }
+
+    /* ── INPUTS ── */
+    .field { margin-bottom: 20px; }
+    .field label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 8px;
+    }
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      font-size: 14px;
+      padding: 12px 16px;
+      outline: none;
+      transition: border-color .2s, background .2s;
+      resize: none;
+      appearance: none;
+    }
+    .field input::placeholder,
+    .field textarea::placeholder {
+      color: rgba(255,255,255,0.2);
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      border-color: rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.07);
+    }
+    .field textarea { min-height: 220px; line-height: 1.7; }
+    .field select option { background: #111; color: var(--white); }
+
+    /* ── IMAGE PREVIEW ── */
+    .img-preview-wrap {
+      position: relative;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: rgba(255,255,255,0.03);
+    }
+    .img-preview-wrap.cover { aspect-ratio: 16/9; }
+    .img-preview-wrap.inline { aspect-ratio: 4/3; }
+    .img-preview {
+      width: 100%; height: 100%;
+      object-fit: cover; display: block;
+      transition: opacity .3s;
+    }
+    .img-preview-placeholder {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 8px;
+      color: rgba(255,255,255,0.15);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px; letter-spacing: -1px;
+    }
+    .img-preview-placeholder span {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,255,255,0.2); font-weight: 700;
+    }
+    .img-preview-badge {
+      position: absolute; top: 12px; left: 12px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      background: rgba(0,0,0,0.7); border: 1px solid var(--border);
+      padding: 3px 8px; color: var(--gray);
+    }
+
+    /* ── GROQ SECTION ── */
+    .groq-box {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .groq-box-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .groq-box-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gray); display: flex; align-items: center; gap: 8px;
+    }
+    .groq-status {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      padding: 3px 10px;
+      border: 1px solid var(--border);
+    }
+    .groq-status.idle { color: rgba(255,255,255,0.25); border-color: var(--border); }
+    .groq-status.loading { color: #f0a500; border-color: rgba(240,165,0,0.3); animation: blink 1s ease infinite; }
+    .groq-status.done { color: #00a86b; border-color: rgba(0,168,107,0.3); }
+    .groq-status.error { color: #e74c3c; border-color: rgba(231,76,60,0.3); }
+    @keyframes blink {
+      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
+    }
+
+    /* ── API KEY FIELD ── */
+    .api-key-wrap {
+      display: flex; gap: 8px; align-items: stretch;
+    }
+    .api-key-wrap input {
+      flex: 1;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; letter-spacing: 1px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      border: 1px solid var(--border); color: var(--gray);
+      background: transparent; padding: 12px 24px;
+      cursor: pointer; transition: border-color .2s, color .2s, background .2s;
+      white-space: nowrap;
+    }
+    .btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--white); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-primary {
+      border-color: var(--white);
+      color: #000; background: var(--white);
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--off-white); border-color: var(--off-white); color: #000; }
+
+    .btn-groq {
+      width: 100%;
+      border-color: rgba(255,165,0,0.4);
+      color: #f0a500; background: rgba(255,165,0,0.05);
+      padding: 14px;
+    }
+    .btn-groq:hover:not(:disabled) {
+      border-color: rgba(255,165,0,0.8);
+      background: rgba(255,165,0,0.1);
+      color: #f5b830;
+    }
+
+    .btn-generate {
+      width: 100%;
+      border-color: rgba(0,168,107,0.4);
+      color: #00a86b; background: rgba(0,168,107,0.05);
+      padding: 14px;
+      margin-top: 12px;
+    }
+    .btn-generate:hover:not(:disabled) {
+      border-color: rgba(0,168,107,0.8);
+      background: rgba(0,168,107,0.1);
+      color: #00c47e;
+    }
+    .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    /* ── RESULT OUTPUT ── */
+    .result-output {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 16px;
+      font-size: 13px; line-height: 1.75;
+      color: rgba(255,255,255,0.75);
+      min-height: 80px;
+      white-space: pre-wrap;
+      display: none;
+    }
+    .result-output.visible { display: block; }
+
+    /* ── PREVIEW CARD ── */
+    .preview-card {
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .preview-card-img {
+      width: 100%; aspect-ratio: 16/9;
+      object-fit: cover; display: block;
+      opacity: 0.8;
+      background: #0a0a0a;
+    }
+    .preview-card-img-placeholder {
+      width: 100%; aspect-ratio: 16/9;
+      background: rgba(255,255,255,0.03);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: -1px;
+      color: rgba(255,255,255,0.06);
+    }
+    .preview-card-body { padding: 20px; }
+    .preview-card-cat {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .preview-card-cat::before {
+      content: ''; display: block; width: 14px; height: 1px; background: var(--gray);
+    }
+    .preview-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px; letter-spacing: .5px; line-height: 1;
+      margin-bottom: 10px; color: var(--white);
+    }
+    .preview-card-excerpt {
+      font-size: 12px; line-height: 1.6;
+      color: rgba(255,255,255,0.4);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 32px 0;
+    }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      border: 1px solid rgba(255,255,255,0.07);
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      margin-bottom: 20px;
+    }
+    .info-box p {
+      font-size: 12px; line-height: 1.65;
+      color: rgba(255,255,255,0.35);
+    }
+    .info-box strong {
+      color: rgba(255,255,255,0.6);
+      font-weight: 600;
+    }
+
+    /* ── JSON OUTPUT ── */
+    .json-output {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 11px; line-height: 1.6;
+      color: rgba(255,255,255,0.5);
+      overflow-x: auto;
+      white-space: pre;
+      display: none;
+      margin-top: 12px;
+    }
+    .json-output.visible { display: block; }
+
+    /* ── COUNTER ── */
+    .char-count {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.2); text-align: right; margin-top: 6px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 28px 48px; display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid var(--border); margin-top: 40px;
+    }
+    .footer-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px; letter-spacing: 3px; color: rgba(255,255,255,0.2);
+    }
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,255,255,0.15);
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed; bottom: 32px; right: 48px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      padding: 14px 24px; border: 1px solid var(--border);
+      background: #000; color: var(--white);
+      z-index: 9999; pointer-events: none;
+      opacity: 0; transform: translateY(12px);
+      transition: opacity .3s, transform .3s;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-color: rgba(0,168,107,0.5); color: #00a86b; }
+    .toast.error { border-color: rgba(231,76,60,0.5); color: #e74c3c; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
+      nav, .page-header, .panel-left, .panel-right, footer { padding-left: 24px; padding-right: 24px; }
+    }
+    @media (max-width: 640px) {
+      nav, .page-header, .panel-left, .panel-right, footer { padding-left: 16px; padding-right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page">
+
+    <!-- NAV -->
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="porto_logo.png" alt="FC Porto" onerror="this.style.display='none'">
+        <span class="nav-logo-text">NewsPorto</span>
+      </a>
+      <span class="nav-admin-badge">Admin</span>
+      <a href="index.html" class="nav-back">← Retour au site</a>
+    </nav>
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <p class="page-label">Administration</p>
+      <h1 class="page-title">Créer<br>un article</h1>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="admin-layout">
+
+      <!-- LEFT : FORM -->
+      <div class="panel-left">
+
+        <!-- SECTION 1: META -->
+        <div class="form-section">
+          <p class="form-section-label">01 — Métadonnées</p>
+
+          <div class="field">
+            <label>Titre de l'article *</label>
+            <input type="text" id="title" placeholder="Ex : Porto s'impose face au Sporting en déplacement" maxlength="120">
+            <div class="char-count" id="title-count">0 / 120</div>
+          </div>
+
+          <div class="field">
+            <label>Catégorie *</label>
+            <select id="category">
+              <option value="">— Choisir une catégorie</option>
+              <option value="Actualité">Actualité</option>
+              <option value="Liga">Liga Portugal</option>
+              <option value="Europe">Europe</option>
+              <option value="Analyse">Analyse</option>
+              <option value="Mercato">Mercato</option>
+              <option value="Focus">Focus joueur</option>
+              <option value="Institution">Institution</option>
+              <option value="Stats">Stats</option>
+            </select>
+          </div>
+
+        </div>
+
+        <hr class="divider">
+
+        <!-- SECTION 2: IMAGES -->
+        <div class="form-section">
+          <p class="form-section-label">02 — Images</p>
+
+          <div class="field">
+            <label>URL image de couverture *</label>
+            <div style="display:flex; gap:8px;">
+              <input type="url" id="cover-url" placeholder="https://images.unsplash.com/…" style="flex:1;">
+              <button class="btn" onclick="previewCover()">Aperçu</button>
+            </div>
+          </div>
+          <div class="img-preview-wrap cover" style="margin-bottom:20px;">
+            <div class="img-preview-placeholder" id="cover-placeholder">
+              COUV<span>Image de couverture</span>
+            </div>
+            <img class="img-preview" id="cover-img" src="" alt="" style="display:none;">
+            <span class="img-preview-badge">Couverture · 16:9</span>
+          </div>
+
+          <div class="field">
+            <label>URL image d'illustration (dans l'article)</label>
+            <div style="display:flex; gap:8px;">
+              <input type="url" id="inline-url" placeholder="https://images.unsplash.com/…" style="flex:1;">
+              <button class="btn" onclick="previewInline()">Aperçu</button>
+            </div>
+          </div>
+          <div class="img-preview-wrap inline">
+            <div class="img-preview-placeholder" id="inline-placeholder">
+              IMG<span>Illustration article</span>
+            </div>
+            <img class="img-preview" id="inline-img" src="" alt="" style="display:none;">
+            <span class="img-preview-badge">Illustration · 4:3</span>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- SECTION 3: SOURCE TEXT -->
+        <div class="form-section">
+          <p class="form-section-label">03 — Texte source à reformuler</p>
+
+          <div class="info-box">
+            <p>Collez ici le <strong>texte brut de l'article source</strong> (depuis un site, une dépêche, etc.). Groq va le reformuler entièrement en français dans le style NewsPorto.</p>
+          </div>
+
+          <div class="field">
+            <label>Contenu source *</label>
+            <textarea id="source-text" placeholder="Collez ici le texte original à reformuler…" style="min-height:280px;" maxlength="8000"></textarea>
+            <div class="char-count" id="source-count">0 / 8000</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- SECTION 4: GROQ REFORMULATION -->
+        <div class="form-section">
+          <p class="form-section-label">04 — Reformulation Groq</p>
+
+          <div class="groq-box">
+            <div class="groq-box-header">
+              <span class="groq-box-title">⚡ Groq · llama-3.3-70b</span>
+              <span class="groq-status idle" id="groq-status">PRÊT</span>
+            </div>
+
+            <div class="field">
+              <label>Clé API Groq <span id="key-saved-badge" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00a86b;border:1px solid rgba(0,168,107,0.3);padding:2px 8px;margin-left:8px;">SAUVEGARDÉE</span></label>
+              <div class="api-key-wrap">
+                <input type="password" id="groq-key" placeholder="gsk_…" autocomplete="off">
+                <button class="btn" onclick="toggleKeyVisibility()">Voir</button>
+                <button class="btn" onclick="saveKey()">Sauver</button>
+              </div>
+            </div>
+
+            <button class="btn btn-groq" id="btn-rewrite" onclick="rewriteWithGroq()">
+              ⚡ Reformuler avec Groq
+            </button>
+          </div>
+
+          <div id="rewritten-output" class="result-output"></div>
+
+          <div id="rewritten-actions" style="display:none; margin-top:12px; gap:8px; display:none; flex-wrap:wrap;">
+            <button class="btn" onclick="useRewritten()">Utiliser ce texte ✓</button>
+            <button class="btn" onclick="rewriteWithGroq()">Relancer</button>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- SECTION 5: FINAL BODY -->
+        <div class="form-section">
+          <p class="form-section-label">05 — Corps de l'article final</p>
+
+          <div class="info-box">
+            <p>Ce texte sera le contenu final de la page article. Vous pouvez <strong>modifier manuellement</strong> après reformulation Groq, ou écrire directement ici.</p>
+          </div>
+
+          <div class="field">
+            <label>Texte final *</label>
+            <textarea id="body-text" placeholder="Le corps de l'article final sera ici après reformulation, ou écrivez directement…" style="min-height:320px;"></textarea>
+            <div class="char-count" id="body-count">0 / ∞</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT : PREVIEW + EXPORT -->
+      <div class="panel-right">
+
+        <!-- PREVIEW CARD -->
+        <p class="form-section-label" style="margin-bottom:16px;">Aperçu carte</p>
+        <div class="preview-card" id="preview-card">
+          <div class="preview-card-img-placeholder" id="preview-img-placeholder">PORTO</div>
+          <img class="preview-card-img" id="preview-cover" src="" alt="" style="display:none;">
+          <div class="preview-card-body">
+            <p class="preview-card-cat" id="preview-cat">Actualité</p>
+            <h2 class="preview-card-title" id="preview-title">Titre de l'article</h2>
+            <p class="preview-card-excerpt" id="preview-excerpt">L'extrait de l'article apparaîtra ici…</p>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- GENERATE -->
+        <p class="form-section-label" style="margin-bottom:16px;">Générer les fichiers</p>
+
+        <div class="info-box">
+          <p>Génère le <strong>HTML de l'article</strong> + la ligne JSON à ajouter dans <strong>articles/index.json</strong>.</p>
+        </div>
+
+        <button class="btn btn-generate" id="btn-generate" onclick="generateFiles()">
+          ⬇ Générer HTML + JSON
+        </button>
+
+        <!-- JSON OUTPUT -->
+        <div id="json-output" class="json-output"></div>
+
+        <div id="download-actions" style="display:none; margin-top:16px; gap:8px; flex-direction:column;">
+          <button class="btn btn-primary" onclick="downloadHTML()" style="width:100%; padding:14px;">
+            ↓ Télécharger article.html
+          </button>
+          <button class="btn" onclick="copyJSON()" style="width:100%; padding:14px;">
+            ⎘ Copier entrée index.json
+          </button>
+        </div>
+
+        <hr class="divider">
+
+        <!-- CHECKLIST -->
+        <p class="form-section-label" style="margin-bottom:16px;">Checklist</p>
+        <div id="checklist" style="display:flex; flex-direction:column; gap:8px;">
+          <div class="check-item" data-field="title">
+            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Titre</span>
+          </div>
+          <div class="check-item" data-field="category">
+            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Catégorie</span>
+          </div>
+          <div class="check-item" data-field="cover-url">
+            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Image couverture</span>
+          </div>
+          <div class="check-item" data-field="body-text">
+            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
+            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Corps de l'article</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <span class="footer-logo-text">NewsPorto</span>
+      <span class="footer-copy">Admin · Création d'article</span>
+    </footer>
+
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ──────────────────────────────────
+    //  LIVE PREVIEW + CHAR COUNTS
+    // ──────────────────────────────────
+    const $ = id => document.getElementById(id);
+
+    function updatePreview() {
+      const title   = $('title').value.trim();
+      const cat     = $('category').value;
+
+      $('preview-title').textContent   = title || 'Titre de l\'article';
+      $('preview-cat').textContent     = cat   || 'Actualité';
+      updateChecklist();
+    }
+
+    function charCount(inputId, countId, max) {
+      const el = $(inputId);
+      const ct = $(countId);
+      const len = el.value.length;
+      ct.textContent = `${len} / ${max}`;
+      ct.style.color = len > max * 0.85 ? 'rgba(255,140,0,0.6)' : 'rgba(255,255,255,0.2)';
+    }
+
+    $('title').addEventListener('input', () => { charCount('title','title-count',120); updatePreview(); });
+    $('source-text').addEventListener('input', () => charCount('source-text','source-count',8000));
+    $('category').addEventListener('change', updatePreview);
+    $('body-text').addEventListener('input', () => {
+      const len = $('body-text').value.length;
+      $('body-count').textContent = `${len} / ∞`;
+      updateChecklist();
+    });
+
+    // ──────────────────────────────────
+    //  IMAGE PREVIEWS
+    // ──────────────────────────────────
+    function previewCover() {
+      const url = $('cover-url').value.trim();
+      if (!url) return;
+      const img = $('cover-img');
+      img.src = url;
+      img.style.display = 'block';
+      $('cover-placeholder').style.display = 'none';
+
+      // Also update right panel preview
+      const prevCover = $('preview-cover');
+      prevCover.src = url;
+      prevCover.style.display = 'block';
+      $('preview-img-placeholder').style.display = 'none';
+
+      img.onerror = () => { showToast('URL image invalide', 'error'); img.style.display='none'; $('cover-placeholder').style.display='flex'; };
+      updateChecklist();
+    }
+
+    function previewInline() {
+      const url = $('inline-url').value.trim();
+      if (!url) return;
+      const img = $('inline-img');
+      img.src = url;
+      img.style.display = 'block';
+      $('inline-placeholder').style.display = 'none';
+      img.onerror = () => { showToast('URL image invalide', 'error'); img.style.display='none'; $('inline-placeholder').style.display='flex'; };
+    }
+
+    // Enter on url fields triggers preview
+    $('cover-url').addEventListener('keydown', e => { if(e.key==='Enter') previewCover(); });
+    $('inline-url').addEventListener('keydown', e => { if(e.key==='Enter') previewInline(); });
+
+    // ──────────────────────────────────
+    //  API KEY — localStorage
+    // ──────────────────────────────────
+    function loadKey() {
+      const saved = localStorage.getItem('newsporto_groq_key');
+      if (saved) {
+        $('groq-key').value = saved;
+        $('key-saved-badge').style.display = 'inline';
+      }
+    }
+
+    function saveKey() {
+      const key = $('groq-key').value.trim();
+      if (!key) { showToast('Clé vide — rien à sauver', 'error'); return; }
+      localStorage.setItem('newsporto_groq_key', key);
+      $('key-saved-badge').style.display = 'inline';
+      showToast('Clé sauvegardée ✓', 'success');
+    }
+
+    function toggleKeyVisibility() {
+      const f = $('groq-key');
+      f.type = f.type === 'password' ? 'text' : 'password';
+    }
+
+    // ──────────────────────────────────
+    //  GROQ REFORMULATION
+    // ──────────────────────────────────
+    async function rewriteWithGroq() {
+      const apiKey     = $('groq-key').value.trim();
+      const sourceText = $('source-text').value.trim();
+      const title      = $('title').value.trim();
+      const cat        = $('category').value;
+
+      if (!apiKey)     { showToast('Clé API Groq manquante', 'error'); return; }
+      if (!sourceText) { showToast('Texte source vide', 'error'); return; }
+
+      const btn    = $('btn-rewrite');
+      const status = $('groq-status');
+      const output = $('rewritten-output');
+
+      btn.disabled = true;
+      status.className = 'groq-status loading';
+      status.textContent = 'EN COURS…';
+      output.className = 'result-output';
+      output.textContent = '';
+
+      const systemPrompt = `Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto. 
+Ton style est : percutant, passionné, journalistique, parfaitement en français. 
+Tu écris pour un public de fans éclairés qui connaissent le foot. 
+Jamais de traduction mot-à-mot : tu reformules, tu enrichis, tu donnes du rythme.
+Catégorie de l'article : ${cat || 'Actualité'}.
+${title ? `Titre de l'article : "${title}".` : ''}
+Consignes :
+- Commence directement par le premier paragraphe, sans titre.
+- Utilise des paragraphes séparés par deux sauts de ligne.
+- Longueur : 4 à 6 paragraphes minimum.
+- Termine sur une note d'ambition ou d'émotion.
+- Ne mentionne jamais les sources.`;
+
+      const userPrompt = `Reformule entièrement cet article en français pour NewsPorto :\n\n${sourceText}`;
+
+      try {
+        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            max_tokens: 2048,
+            temperature: 0.72,
+            messages: [
+              { role: 'system', content: systemPrompt },
+              { role: 'user',   content: userPrompt }
+            ]
+          })
+        });
+
+        if (!resp.ok) {
+          const err = await resp.json();
+          throw new Error(err.error?.message || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        const text = data.choices?.[0]?.message?.content || '';
+
+        output.textContent = text;
+        output.className   = 'result-output visible';
+
+        status.className   = 'groq-status done';
+        status.textContent = 'TERMINÉ';
+
+        const actions = $('rewritten-actions');
+        actions.style.display = 'flex';
+
+        showToast('Reformulation réussie ✓', 'success');
+
+      } catch(err) {
+        status.className   = 'groq-status error';
+        status.textContent = 'ERREUR';
+        output.textContent = `Erreur : ${err.message}`;
+        output.className   = 'result-output visible';
+        showToast('Erreur Groq : ' + err.message, 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    function useRewritten() {
+      const text = $('rewritten-output').textContent;
+      $('body-text').value = text;
+      const len = text.length;
+      $('body-count').textContent = `${len} / ∞`;
+      updateChecklist();
+      showToast('Texte appliqué ✓', 'success');
+      $('body-text').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ──────────────────────────────────
+    //  GENERATE FILES
+    // ──────────────────────────────────
+    let generatedHTML = '';
+    let generatedJSON = '';
+
+    function generateFiles() {
+      const title    = $('title').value.trim();
+      const cat      = $('category').value;
+      const coverUrl = $('cover-url').value.trim();
+      const inlineUrl = $('inline-url').value.trim();
+      const body     = $('body-text').value.trim();
+
+      if (!title || !cat || !coverUrl || !body) {
+        showToast('Remplis tous les champs obligatoires *', 'error');
+        return;
+      }
+
+      // Auto-generate excerpt from first ~180 chars of body
+      const firstPara = body.split(/\n\n/)[0].trim();
+      const excerpt   = firstPara.length > 180 ? firstPara.slice(0, 177) + '…' : firstPara;
+
+      const now     = new Date();
+      const dateStr = now.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
+      const isoDate = now.toISOString().split('T')[0];
+      const slug    = title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 60);
+
+      const wordCount = body.split(/\s+/).length;
+      const readTime  = Math.max(2, Math.ceil(wordCount / 200));
+
+      // Format body into paragraphs
+      const paragraphs = body.split(/\n\n+/).filter(p => p.trim()).map(p =>
+        `      <p>${p.trim().replace(/\n/g, '<br>')}</p>`
+      ).join('\n');
+
+      const inlineImgHTML = inlineUrl ? `
+      <figure class="article-figure">
+        <img src="${inlineUrl}" alt="${title}" loading="lazy">
+      </figure>
+` : '';
+
+      // ── HTML ARTICLE ──
+      generatedHTML = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${title} — NewsPorto</title>
+  <meta name="description" content="${excerpt}">
+  <meta property="og:title" content="${title}">
+  <meta property="og:description" content="${excerpt}">
+  <meta property="og:image" content="${coverUrl}">
+  <meta property="og:type" content="article">
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root { --white:#fff; --gray:rgba(255,255,255,.45); --border:rgba(255,255,255,.1); --grid:rgba(255,255,255,.055); }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    body{background:#000;color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden}
+    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gs 12s linear infinite;pointer-events:none}
+    @keyframes gs{0%{background-position:0 0}100%{background-position:44px 44px}}
+    .page{position:relative;z-index:1}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(12px)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .nav-logo img{height:28px;width:auto}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
+    .back-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
+    .back-link:hover{color:var(--white)}
+    .hero{position:relative;height:60vh;min-height:400px;overflow:hidden;border-bottom:1px solid var(--border)}
+    .hero img{width:100%;height:100%;object-fit:cover;opacity:.55;display:block}
+    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 30%,rgba(0,0,0,.2))}
+    .hero-content{position:absolute;bottom:0;left:0;right:0;padding:40px 48px}
+    .article-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .article-cat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
+    .article-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
+    .article-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
+    .article-layout{display:grid;grid-template-columns:1fr 300px;gap:0}
+    .article-body{padding:48px 48px;border-right:1px solid var(--border)}
+    .article-body p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
+    .article-body p:first-child::first-letter{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;float:left;margin-right:10px;color:var(--white)}
+    .article-figure{margin:32px 0;border:1px solid var(--border)}
+    .article-figure img{width:100%;display:block;opacity:.85}
+    .article-excerpt-pull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
+    .article-sidebar{padding:40px 32px}
+    .sidebar-section-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .sidebar-section-label::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
+    footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
+    .footer-logo-text{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
+    .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+    @media(max-width:768px){nav,footer{padding:0 20px}.nav-links{display:none}.hero-content{padding:24px 20px}.article-layout{grid-template-columns:1fr}.article-body{padding:32px 20px;border-right:none}.article-sidebar{padding:24px 20px}}
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+  <div class="page">
+    <nav>
+      <a href="../index.html" class="nav-logo">
+        <img src="../porto_logo.png" alt="FC Porto" onerror="this.style.display='none'">
+        <span class="nav-logo-text">NewsPorto</span>
+      </a>
+      <a href="../actu.html" class="back-link">← Actualités</a>
+    </nav>
+
+    <section class="hero">
+      <img src="${coverUrl}" alt="${title}" loading="eager">
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <p class="article-cat">${cat}</p>
+        <h1 class="article-headline">${title}</h1>
+        <div class="article-meta">
+          <span>${dateStr}</span>
+          <span>·</span>
+          <span>${readTime} min de lecture</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="article-layout">
+      <article class="article-body">
+        <div class="article-excerpt-pull">${excerpt}</div>
+${paragraphs}
+${inlineImgHTML}
+      </article>
+
+      <aside class="article-sidebar">
+        <p class="sidebar-section-label">À la une</p>
+        <script src="../ticker-dynamic.js"><\/script>
+      </aside>
+    </div>
+
+    <footer>
+      <span class="footer-logo-text">NewsPorto</span>
+      <span class="footer-copy">© ${now.getFullYear()} NewsPorto · Fan Media</span>
+    </footer>
+  </div>
+</body>
+</html>`;
+
+      // ── JSON ENTRY ──
+      const jsonEntry = {
+        id: slug,
+        title: title,
+        category: cat,
+        excerpt: excerpt,
+        cover: `articles/${slug}couv.jpg`,
+        coverUrl: coverUrl,
+        date: isoDate,
+        dateLabel: dateStr,
+        readTime: `${readTime} min`,
+        file: `articles/${slug}.html`
+      };
+
+      generatedJSON = JSON.stringify(jsonEntry, null, 2);
+
+      // Display JSON
+      const jsonOut = $('json-output');
+      jsonOut.textContent = generatedJSON;
+      jsonOut.className = 'json-output visible';
+
+      // Show download buttons
+      $('download-actions').style.display = 'flex';
+
+      showToast('Fichiers générés ✓', 'success');
+    }
+
+    function downloadHTML() {
+      if (!generatedHTML) return;
+      const title = $('title').value.trim();
+      const slug  = title.toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-').slice(0, 60);
+      const blob = new Blob([generatedHTML], { type: 'text/html;charset=utf-8' });
+      const a    = document.createElement('a');
+      a.href     = URL.createObjectURL(blob);
+      a.download = `${slug}.html`;
+      a.click();
+      showToast(`Téléchargement : ${slug}.html`, 'success');
+    }
+
+    function copyJSON() {
+      if (!generatedJSON) return;
+      navigator.clipboard.writeText(generatedJSON).then(() => {
+        showToast('JSON copié dans le presse-papier ✓', 'success');
+      }).catch(() => {
+        showToast('Copie manuelle : sélectionnez le JSON ci-dessus', 'error');
+      });
+    }
+
+    function updateChecklist() {
+      const checks = {
+        'title':     $('title').value.trim().length > 3,
+        'category':  $('category').value !== '',
+        'cover-url': $('cover-url').value.trim().startsWith('http'),
+        'body-text': $('body-text').value.trim().length > 50
+      };
+      // Update preview excerpt from body
+      const body = $('body-text').value.trim();
+      if (body) {
+        const firstPara = body.split(/\n\n/)[0].trim();
+        $('preview-excerpt').textContent = firstPara.length > 120 ? firstPara.slice(0,117)+'…' : firstPara;
+      } else {
+        $('preview-excerpt').textContent = 'L\'extrait sera généré depuis le corps de l\'article…';
+      }
+      document.querySelectorAll('.check-item').forEach(item => {
+        const field = item.dataset.field;
+        const ok    = checks[field];
+        const icon  = item.querySelector('.check-icon');
+        const label = item.querySelector('span:last-child');
+        if (ok) {
+          icon.textContent  = '●';
+          icon.style.color  = '#00a86b';
+          label.style.color = 'rgba(255,255,255,0.6)';
+        } else {
+          icon.textContent  = '○';
+          icon.style.color  = 'rgba(255,255,255,0.2)';
+          label.style.color = 'rgba(255,255,255,0.3)';
+        }
+      });
+    }
+
+    // ──────────────────────────────────
+    //  TOAST
+    // ──────────────────────────────────
+    function showToast(msg, type = '') {
+      const t = $('toast');
+      t.textContent  = msg;
+      t.className    = `toast ${type} show`;
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
+    }
+
+    // Init
+    loadKey();
+    updateChecklist();
+  </script>
+</body>
+</html>
