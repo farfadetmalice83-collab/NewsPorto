@@ -2,8 +2,9 @@
 import os, json, re, requests, random
 from datetime import datetime
 
-GROQ_KEY     = os.environ["GROQ_API_KEY"]
-UNSPLASH_KEY = os.environ["UNSPLASH_ACCESS_KEY"]
+GROQ_KEY    = os.environ["GROQ_API_KEY"]
+TAVILY_KEY  = os.environ["TAVILY_API_KEY"]
+UNSPLASH_KEY= os.environ["UNSPLASH_ACCESS_KEY"]
 
 MONTHS_FR = {"Jan":"Jan","Feb":"Fév","Mar":"Mar","Apr":"Avr","May":"Mai",
              "Jun":"Jun","Jul":"Jul","Aug":"Aoû","Sep":"Sep","Oct":"Oct",
@@ -19,6 +20,76 @@ def load_index():
 def save_index(data):
     with open("articles/index.json", "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+
+def search_porto_news(existing_titles):
+    """Cherche les vraies news FC Porto via Tavily"""
+    queries = [
+        "FC Porto actualité résultat match 2025 2026",
+        "FC Porto transfert mercato 2025 2026",
+        "FC Porto Europa League Champions League 2026",
+        "FC Porto Liga Portugal classement 2026"
+    ]
+    query = random.choice(queries)
+    
+    r = requests.post("https://api.tavily.com/search", json={
+        "api_key": TAVILY_KEY,
+        "query": query,
+        "search_depth": "basic",
+        "max_results": 5,
+        "include_answer": True,
+        "days": 7
+    })
+    r.raise_for_status()
+    data = r.json()
+    
+    # Compile les résultats en contexte
+    context = data.get("answer", "") + "\n\n"
+    for result in data.get("results", []):
+        context += f"- {result.get('title','')}: {result.get('content','')[:300]}\n"
+    
+    return context, query
+
+def generate_article(existing_titles, news_context):
+    """Génère l'article avec Groq basé sur les vraies news"""
+    titles_str = "\n".join(f"- {t}" for t in existing_titles[-15:]) if existing_titles else "Aucun."
+    
+    prompt = f"""Tu es un journaliste sportif expert du FC Porto pour NewsPorto.fr.
+
+ACTUALITÉS RÉCENTES TROUVÉES SUR LE WEB :
+{news_context}
+
+MISSION : Rédige un article de qualité journalistique basé UNIQUEMENT sur ces actualités réelles.
+
+RÈGLES :
+1. Utilise uniquement les faits présents dans les actualités ci-dessus. Ne pas inventer de scores ou de faits.
+2. NE génère PAS un article sur un sujet déjà traité :
+{titles_str}
+3. Ne mentionne jamais que l'article est généré par une IA.
+4. Si les actualités ne contiennent pas assez d'infos sur un sujet, fais une analyse générale basée sur la saison.
+
+RÉPONSE : JSON uniquement, sans markdown, sans backticks.
+
+{{"title": "Titre accrocheur en français (max 65 caractères)",
+  "category": "europe | analyse | transfert | liga | interview",
+  "excerpt": "Accroche percutante 150 caractères max",
+  "read_time": "X min de lecture",
+  "unsplash_query": "requête anglais pour image football générique",
+  "content": "HTML : minimum 5 balises <p> riches, 2 balises <h2>. Style journalistique passionné. PAS de balises html/head/body."
+}}"""
+
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {GROQ_KEY}", "Content-Type": "application/json"}
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.7,
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"}
+    }
+    r = requests.post(url, headers=headers, json=payload)
+    r.raise_for_status()
+    raw = r.json()["choices"][0]["message"]["content"].strip()
+    return json.loads(raw)
 
 def get_unsplash_image(query, used_ids):
     params = {"query": query, "per_page": 20, "orientation": "landscape", "client_id": UNSPLASH_KEY}
@@ -38,71 +109,10 @@ def get_unsplash_image(query, used_ids):
                 "author_link": photo["user"]["links"]["html"]}
     return None
 
-def generate_article(existing_titles):
-    styles = [
-        "un compte-rendu d'un match récent du FC Porto",
-        "une analyse tactique d'un match ou système de jeu récent",
-        "un article mercato sur un transfert ou une rumeur récente",
-        "un focus sur les performances récentes d'un joueur de Porto",
-        "un article sur la course au titre en Liga Portugal cette saison",
-        "un article sur le parcours européen actuel du FC Porto"
-    ]
-    style = random.choice(styles)
-    titles_str = "\n".join(f"- {t}" for t in existing_titles[-15:]) if existing_titles else "Aucun."
-
-    prompt = f"""Tu es un journaliste sportif expert du FC Porto pour NewsPorto.fr.
-
-MISSION : Génère {style}.
-
-RÈGLES STRICTES :
-1. Base-toi sur des faits réels et récents de la saison 2025/2026 du FC Porto.
-2. NE génère PAS un article sur un sujet déjà traité :
-{titles_str}
-3. Ne mentionne jamais que l'article est généré par une IA.
-
-RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/après.
-
-{{
-  "title": "Titre accrocheur en français (max 65 caractères)",
-  "category": "europe | analyse | transfert | liga | interview",
-  "excerpt": "Accroche percutante 150 caractères max",
-  "read_time": "X min de lecture",
-  "unsplash_query": "requête anglais pour image football générique (ex: soccer stadium crowd, football match action)",
-  "content": "HTML : minimum 5 balises <p> avec contenu riche, 2 balises <h2>. Style journalistique passionné. PAS de balises html/head/body."
-}}"""
-
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [{"role": "user", "content": prompt}],
-        "temperature": 0.8,
-        "max_tokens": 2048,
-        "response_format": {"type": "json_object"}
-    }
-    r = requests.post(url, headers=headers, json=payload)
-    r.raise_for_status()
-    raw = r.json()["choices"][0]["message"]["content"].strip()
-    raw = re.sub(r"^```json\s*", "", raw)
-    raw = re.sub(r"^```\s*", "", raw)
-    raw = re.sub(r"```$", "", raw).strip()
-    # Extrait uniquement le bloc JSON
-    match = re.search(r'\{.*\}', raw, re.DOTALL)
-    if match:
-        raw = match.group(0)
-    # Remplace les sauts de ligne dans les valeurs JSON par des espaces
-    raw = re.sub(r'(?<!\\)\n', ' ', raw)
-    raw = re.sub(r'(?<!\\)\t', ' ', raw)
-    raw = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', raw)
-    return json.loads(raw)
-
 def build_html(data, image, date_str):
     cat_labels = {"europe":"Europa League","analyse":"Analyse","transfert":"Mercato",
                   "liga":"Championnat","interview":"Interview"}
-    cat_label = cat_labels.get(data["category"], data["category"].capitalize())
+    cat_label      = cat_labels.get(data["category"], data["category"].capitalize())
     img_url        = image["url"] if image else "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200"
     img_author     = image["author"] if image else "Unsplash"
     img_author_link= image["author_link"] if image else "#"
@@ -226,8 +236,12 @@ def main():
     ex_titles = [a["title"] for a in index.get("articles", [])]
     used_ids  = index.get("used_image_ids", [])
 
-    print("🔍 Génération Gemini...")
-    data = generate_article(ex_titles)
+    print("🔍 Recherche actualités Porto via Tavily...")
+    news_context, query = search_porto_news(ex_titles)
+    print(f"✅ News récupérées pour : {query}")
+
+    print("✍️  Génération article avec Groq...")
+    data = generate_article(ex_titles, news_context)
     print(f"✅ Titre : {data['title']}")
 
     print("🖼️  Unsplash...")
@@ -260,7 +274,7 @@ def main():
         index["used_image_ids"].append(image["id"])
 
     save_index(index)
-    print(f"✅ Sauvegardé : articles/{filename} — {len(index['articles'])} articles")
+    print(f"✅ Sauvegardé : articles/{filename} — {len(index['articles'])} articles total")
 
 if __name__ == "__main__":
     main()
