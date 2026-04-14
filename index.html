@@ -823,13 +823,15 @@
       transition: opacity 0.5s ease, visibility 0.5s ease;
     }
     #page-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #page-loader { animation: autoHide 1s ease 0.8s forwards; }
+    @keyframes autoHide { to { opacity: 0; visibility: hidden; pointer-events: none; } }
     .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
     .loader-bar { width: 100px; height: 1px; background: rgba(255,255,255,0.1); overflow: hidden; }
     .loader-bar-fill { height: 100%; background: #fff; animation: loaderFill 0.45s cubic-bezier(.22,1,.36,1) forwards; }
     @keyframes loaderFill { from { width: 0; } to { width: 100%; } }
     .loader-text { font-family: 'Bebas Neue', sans-serif; font-size: 11px; letter-spacing: 8px; color: rgba(255,255,255,0.3); }
-    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s cubic-bezier(.22,1,.36,1), transform 0.65s cubic-bezier(.22,1,.36,1); }
-    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal { opacity: 1; transform: none; }
+    .reveal.visible { opacity: 1; transform: none; }
     .reveal-d1 { transition-delay: 0.1s; }
     .reveal-d2 { transition-delay: 0.2s; }
     .reveal-d3 { transition-delay: 0.3s; }
@@ -1248,7 +1250,7 @@
           <p class="shop-card-cat">Sweat à capuche</p>
           <p class="shop-card-name">Hoodie Édition Dragon</p>
           <div class="shop-card-footer">
-            <span class="shop-card-price">€41</span>
+            <span class="shop-card-price">41€</span>
             <span class="shop-card-arrow">→</span>
           </div>
         </div>
@@ -1262,7 +1264,7 @@
           <p class="shop-card-cat">Casquette</p>
           <p class="shop-card-name">Cap Dragon NP</p>
           <div class="shop-card-footer">
-            <span class="shop-card-price">€22</span>
+            <span class="shop-card-price">22€</span>
             <span class="shop-card-arrow">→</span>
           </div>
         </div>
@@ -1277,7 +1279,7 @@
           <p class="shop-card-cat">Poster</p>
           <p class="shop-card-name">Poster Soit Portista</p>
           <div class="shop-card-footer">
-            <span class="shop-card-price">€26+</span>
+            <span class="shop-card-price">26€+</span>
             <span class="shop-card-arrow">→</span>
           </div>
         </div>
@@ -1305,18 +1307,28 @@
     <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
     <ul class="footer-links">
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
-      <li><a href="mailto:luisdasilva83310@gmail.com">Contact</a></li>
+      <li><a href="/cdn-cgi/l/email-protection#412d342832252032282d3720797272707101262c20282d6f222e2c">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
     </ul>
   </footer>
 
 </div>
 
-  <script>
+  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
   // Page loader
-  window.addEventListener('load', () => {
-    setTimeout(() => document.getElementById('page-loader').classList.add('hidden'), 350);
+  // Hide loader immediately
+  (function() {
+    var l = document.getElementById('page-loader');
+    if (l) l.classList.add('hidden');
+  })();
+  document.addEventListener('DOMContentLoaded', () => {
+    var l = document.getElementById('page-loader');
+    if (l) l.classList.add('hidden');
   });
+  setTimeout(() => {
+    var l = document.getElementById('page-loader');
+    if (l) l.classList.add('hidden');
+  }, 500);
 
   // Scroll reveal
   const ro = new IntersectionObserver((entries) => {
@@ -1422,10 +1434,3 @@
     document.addEventListener("mousemove", e => {
       cg.style.left = e.clientX + "px";
       cg.style.top = e.clientY + "px";
-      cg.style.opacity = "1";
-    }, { passive: true });
-    document.addEventListener("mouseleave", () => cg.style.opacity = "0");
-  }
-</script>
-</body>
-</html>
