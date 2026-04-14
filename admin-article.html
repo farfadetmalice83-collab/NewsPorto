@@ -267,12 +267,13 @@
           </div>
           <button class="btn btn-w btn-gr" id="btn-publish" onclick="publish()">🚀 Publier sur GitHub</button>
           <div class="pub-steps" id="pub-steps">
-            <div class="step" id="step-1"><div class="step-ico">1</div><span>Génération du fichier HTML</span></div>
-            <div class="step" id="step-2"><div class="step-ico">2</div><span>Upload articles/[slug].html</span></div>
-            <div class="step" id="step-3"><div class="step-ico">3</div><span>Lecture de index.json</span></div>
-            <div class="step" id="step-4"><div class="step-ico">4</div><span>Mise à jour index.json</span></div>
-            <div class="step" id="step-5"><div class="step-ico">5</div><span>Mise à jour sitemap.xml</span></div>
+            <div class="step" id="step-1"><div class="step-ico">1</div><span>Génération du HTML</span></div>
+            <div class="step" id="step-2"><div class="step-ico">2</div><span>Lecture index.json existant</span></div>
+            <div class="step" id="step-3"><div class="step-ico">3</div><span>Préparation des fichiers</span></div>
+            <div class="step" id="step-4"><div class="step-ico">4</div><span>1 commit → HTML + JSON + sitemap</span></div>
+            <div class="step" id="step-5"><div class="step-ico">5</div><span>Déploiement déclenché ✓</span></div>
           </div>
+          <button class="btn btn-w" id="btn-new-article" onclick="resetForm()" style="display:none;margin-top:16px;border-color:rgba(255,255,255,.3);color:var(--white)">+ Publier un autre article</button>
         </div>
       </div>
 
@@ -596,96 +597,88 @@ async function publish() {
     // ÉTAPE 1 — Génération HTML
     setStep('step-1','active');
     const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime);
-    await delay(300);
+    await delay(200);
     setStep('step-1','done');
 
-    // ÉTAPE 2 — Upload HTML
+    // ÉTAPE 2 — Lecture index.json existant
     setStep('step-2','active');
-    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
-    let existSHA = null;
-    try {
-      const chk = await fetch(`${base}/contents/${filePath}`,{headers:hdrs});
-      if(chk.ok){const d=await chk.json();existSHA=d.sha;}
-    } catch(_){}
-    const r2 = await fetch(`${base}/contents/${filePath}`,{
-      method:'PUT', headers:hdrs,
-      body:JSON.stringify({message:`article: ${title}`,content:htmlB64,...(existSHA&&{sha:existSHA})})
-    });
-    if(!r2.ok){const e=await r2.json();throw new Error(`Upload HTML — ${e.message}`);}
-    setStep('step-2','done');
-
-    // ÉTAPE 3 — Lecture index.json
-    setStep('step-3','active');
-    const idxPath='articles/index.json';
+    const idxPath='articles/articlestotal.json';
     let existArticles=[];
-    let idxSHA=null;
+    let mainSHA=null;
     try {
+      const rRef=await fetch(`${base}/git/ref/heads/main`,{headers:hdrs});
+      if(rRef.ok){const d=await rRef.json();mainSHA=d.object.sha;}
       const r3=await fetch(`${base}/contents/${idxPath}`,{headers:hdrs});
       if(r3.ok){
-        const d3=await r3.json(); idxSHA=d3.sha;
+        const d3=await r3.json();
         const decoded=decodeURIComponent(escape(atob(d3.content.replace(/\n/g,''))));
         existArticles=(JSON.parse(decoded).articles)||[];
       }
     } catch(_){}
+    setStep('step-2','done');
+
+    // ÉTAPE 3 — Préparation des 3 fichiers
+    setStep('step-3','active');
+    const newEntry = {file:fileName,title,category:cat,excerpt,image:coverUrl,date:dateStr,read_time:`${readTime} min de lecture`};
+    const updated  = [newEntry,...existArticles.filter(a=>a.file!==fileName)];
+
+    const domain  = 'https://newsporto.fr';
+    const isoNow  = new Date().toISOString().split('T')[0];
+    const staticPages = ['','actu','effectif','stats','videos','shop'].map(p=>`
+  <url><loc>${domain}/${p?p+'.html':''}</loc><changefreq>${p===''||p==='actu'?'daily':'weekly'}</changefreq><priority>${p===''?'1.0':p==='actu'?'0.9':'0.7'}</priority></url>`).join('');
+    const articlePages = updated.map(a=>`
+  <url><loc>${domain}/articles/${a.file}</loc><lastmod>${isoNow}</lastmod><changefreq>never</changefreq><priority>0.8</priority></url>`).join('');
+    const sitemapXML=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${staticPages}${articlePages}\n</urlset>`;
+    await delay(200);
     setStep('step-3','done');
 
-    // ÉTAPE 4 — Mise à jour index.json
+    // ÉTAPE 4 — Upload en 1 seul commit (Git Tree API)
     setStep('step-4','active');
-    const newEntry = {
-      file: fileName,
-      title: title,
-      category: cat,
-      excerpt: excerpt,
-      image: coverUrl,
-      date: dateStr,
-      read_time: `${readTime} min de lecture`
+    // Crée les blobs
+    const makeBlob = async (content) => {
+      const r=await fetch(`${base}/git/blobs`,{method:'POST',headers:hdrs,body:JSON.stringify({content:btoa(unescape(encodeURIComponent(content))),encoding:'base64'})});
+      if(!r.ok){const e=await r.json();throw new Error(e.message);}
+      return (await r.json()).sha;
     };
-    const updated = [newEntry, ...existArticles.filter(a=>a.file!==fileName)];
-    const idxB64  = btoa(unescape(encodeURIComponent(JSON.stringify({articles:updated},null,2))));
-    const r4 = await fetch(`${base}/contents/${idxPath}`,{
-      method:'PUT', headers:hdrs,
-      body:JSON.stringify({message:`index: ${title}`,content:idxB64,...(idxSHA&&{sha:idxSHA})})
-    });
-    if(!r4.ok){const e=await r4.json();throw new Error(`index.json — ${e.message}`);}
+    const [blobHTML, blobJSON, blobSitemap] = await Promise.all([
+      makeBlob(html),
+      makeBlob(JSON.stringify({articles:updated},null,2)),
+      makeBlob(sitemapXML)
+    ]);
+    // Crée le tree
+    const treeR=await fetch(`${base}/git/trees`,{method:'POST',headers:hdrs,body:JSON.stringify({
+      base_tree:mainSHA,
+      tree:[
+        {path:filePath,       mode:'100644',type:'blob',sha:blobHTML},
+        {path:idxPath,        mode:'100644',type:'blob',sha:blobJSON},
+        {path:'sitemap.xml',  mode:'100644',type:'blob',sha:blobSitemap}
+      ]
+    })});
+    if(!treeR.ok){const e=await treeR.json();throw new Error(`Tree: ${e.message}`);}
+    const treeSHA=(await treeR.json()).sha;
+    // Crée le commit
+    const commitR=await fetch(`${base}/git/commits`,{method:'POST',headers:hdrs,body:JSON.stringify({
+      message:`✨ article: ${title}`,
+      tree:treeSHA,
+      parents:[mainSHA]
+    })});
+    if(!commitR.ok){const e=await commitR.json();throw new Error(`Commit: ${e.message}`);}
+    const commitSHA=(await commitR.json()).sha;
+    // Met à jour la ref main
+    const refR=await fetch(`${base}/git/refs/heads/main`,{method:'PATCH',headers:hdrs,body:JSON.stringify({sha:commitSHA})});
+    if(!refR.ok){const e=await refR.json();throw new Error(`Ref: ${e.message}`);}
     setStep('step-4','done');
 
-    // ÉTAPE 5 — Mise à jour sitemap.xml
+    // ÉTAPE 5 — Terminé
     setStep('step-5','active');
-    const domain = 'https://newsporto.fr';
-    const isoNow = new Date().toISOString().split('T')[0];
-    const staticPages = ['','actu','effectif','stats','videos','shop'].map(p => `
-  <url>
-    <loc>${domain}/${p ? p+'.html' : ''}</loc>
-    <changefreq>${p===''||p==='actu'?'daily':'weekly'}</changefreq>
-    <priority>${p===''?'1.0':p==='actu'?'0.9':'0.7'}</priority>
-  </url>`).join('');
-    const articlePages = updated.map(a => `
-  <url>
-    <loc>${domain}/articles/${a.file}</loc>
-    <lastmod>${isoNow}</lastmod>
-    <changefreq>never</changefreq>
-    <priority>0.8</priority>
-  </url>`).join('');
-    const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${staticPages}
-${articlePages}
-</urlset>`;
-    const sitemapB64 = btoa(unescape(encodeURIComponent(sitemapXML)));
-    let smSHA = null;
-    try {
-      const smChk = await fetch(`${base}/contents/sitemap.xml`,{headers:hdrs});
-      if(smChk.ok){const d=await smChk.json();smSHA=d.sha;}
-    } catch(_){}
-    const r5 = await fetch(`${base}/contents/sitemap.xml`,{
-      method:'PUT', headers:hdrs,
-      body:JSON.stringify({message:`sitemap: ${title}`,content:sitemapB64,...(smSHA&&{sha:smSHA})})
-    });
-    if(!r5.ok){const e=await r5.json();throw new Error(`sitemap.xml — ${e.message}`);}
+    await delay(400);
     setStep('step-5','done');
 
     setPill('gh-status','p-ok','PUBLIÉ ✓');
-    toast('Article publié 🎉 Le site se redéploie automatiquement !','ok');
+    toast('Article publié 🎉 1 seul déploiement déclenché !','ok');
+
+    // Bouton publier un autre
+    $('btn-new-article').style.display='block';
 
   } catch(err) {
     setPill('gh-status','p-err','ERREUR');
@@ -697,7 +690,29 @@ ${articlePages}
   }
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────
+// ── RESET FORM ────────────────────────────────────────────────────
+function resetForm() {
+  $('f-title').value=''; $('f-cat').value=''; $('f-cover').value='';
+  $('f-inline').value=''; $('f-source').value=''; $('f-body').value='';
+  $('img-cover').style.display='none'; $('ph-cover').style.display='flex';
+  $('img-inline').style.display='none'; $('ph-inline').style.display='flex';
+  $('prev-cover').style.display='none'; $('prev-ph').style.display='flex';
+  $('prev-title').textContent="Titre de l'article";
+  $('prev-cat').textContent='Catégorie';
+  $('prev-excerpt').textContent="L'extrait apparaîtra ici…";
+  $('groq-output').className='result-text'; $('groq-output').textContent='';
+  $('groq-actions').style.display='none';
+  $('btn-new-article').style.display='none';
+  setPill('gh-status','p-idle','EN ATTENTE');
+  setPill('groq-status','p-idle','PRÊT');
+  resetSteps();
+  ['c-title','c-source','c-body'].forEach(id=>{ const e=$(id); if(e) e.textContent=id==='c-body'?'0 / ∞':'0 / '+(id==='c-title'?120:8000); });
+  updateChecklist();
+  window.scrollTo({top:0,behavior:'smooth'});
+  toast('Formulaire réinitialisé ✓','ok');
+}
+
+
 function setPill(id,cls,txt){const e=$(id);e.className='pill '+cls;e.textContent=txt;}
 function resetSteps(){['step-1','step-2','step-3','step-4','step-5'].forEach((id,i)=>{$(id).className='step';$(id).querySelector('.step-ico').textContent=i+1;});}
 function setStep(id,state){const e=$(id);e.className='step '+state;if(state==='done')e.querySelector('.step-ico').textContent='✓';}
