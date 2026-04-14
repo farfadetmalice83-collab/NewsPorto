@@ -3,408 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Porto Conquiert L'Europe — NewsPorto</title>
+  <title>Porto domine le derby — NewsPorto</title>
+  <meta name="description" content="Le FC Porto confirme sa suprématie avec une victoire 3-0 contre Boavista">
+  <meta property="og:title" content="Porto domine le derby">
+  <meta property="og:description" content="Le FC Porto confirme sa suprématie avec une victoire 3-0 contre Boavista">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200">
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --white: #ffffff;
-      --off-white: #e8e8e8;
-      --gray: rgba(255,255,255,0.45);
-      --border: rgba(255,255,255,0.1);
-      --grid-color: rgba(255,255,255,0.055);
-    }
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body { background: #000; color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
-
-    /* ── GRID BG ── */
-    .grid-bg {
-      position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 44px 44px;
-      animation: gridScroll 12s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 44px 44px; } }
-    .page { position: relative; z-index: 1; }
-
-    /* ── NAV ── */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 72px;
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(6px); background: rgba(0,0,0,0.5);
-      position: sticky; top: 0; z-index: 100;
-    }
-    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo img { height: 46px; width: auto; }
-    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--white); }
-    .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
-      letter-spacing: 2.5px; text-transform: uppercase; color: var(--gray);
-      text-decoration: none; transition: color .2s;
-    }
-    .nav-links a:hover { color: var(--white); }
-    .nav-cta {
-      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      border: 1px solid var(--white); color: var(--white); background: transparent;
-      padding: 8px 20px; cursor: pointer; text-decoration: none; transition: background .2s, color .2s;
-    }
-    .nav-cta:hover { background: var(--white); color: #000; }
-
-    /* ── ARTICLE HERO ── */
-    .article-hero {
-      position: relative;
-      min-height: 70vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border);
-    }
-    .article-hero-img {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      object-position: center top;
-      opacity: 0.55;
-    }
-    /* Gradient : top léger + bas fort pour lisibilité du texte */
-    .article-hero::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background:
-        linear-gradient(to bottom,
-          rgba(0,0,0,0.3) 0%,
-          rgba(0,0,0,0) 30%,
-          rgba(0,0,0,0.7) 70%,
-          rgba(0,0,0,0.97) 100%
-        );
-      z-index: 1;
-    }
-    .article-hero-content {
-      position: relative;
-      z-index: 2;
-      padding: 0 48px 56px;
-      max-width: 860px;
-    }
-    .article-cat-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; font-weight: 700;
-      letter-spacing: 4px; text-transform: uppercase;
-      color: var(--gray);
-      margin-bottom: 20px;
-    }
-    .article-cat-badge::before {
-      content: ''; display: block; width: 28px; height: 1px; background: var(--gray);
-    }
-    .article-hero-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(52px, 7vw, 100px);
-      line-height: .88; letter-spacing: 1px; text-transform: uppercase;
-      margin-bottom: 24px;
-    }
-    .article-hero-title .outline {
-      -webkit-text-stroke: 1.5px var(--white); color: transparent;
-    }
-    .article-hero-sub {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px; font-weight: 600; letter-spacing: .5px;
-      color: rgba(255,255,255,0.65);
-      margin-bottom: 28px; max-width: 680px; line-height: 1.3;
-    }
-    .article-hero-meta {
-      display: flex; align-items: center; gap: 16px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 2px;
-      text-transform: uppercase; color: rgba(255,255,255,0.3);
-    }
-    .meta-sep { width: 3px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 50%; }
-
-    /* ── ARTICLE BODY ── */
-    .article-body {
-      display: grid;
-      grid-template-columns: 1fr 640px 1fr;
-      padding: 64px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .article-main { grid-column: 2; }
-
-    /* Chapeau */
-    .article-chapeau {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 600; line-height: 1.45;
-      color: rgba(255,255,255,0.75);
-      border-left: 2px solid rgba(255,255,255,0.2);
-      padding-left: 24px;
-      margin-bottom: 48px;
-    }
-
-    /* Séparateur */
-    .article-divider {
-      width: 40px; height: 1px;
-      background: rgba(255,255,255,0.2);
-      margin-bottom: 40px;
-    }
-
-    /* Paragraphes */
-    .article-text p {
-      font-size: 17px; line-height: 1.8;
-      color: rgba(255,255,255,0.72);
-      margin-bottom: 28px;
-    }
-    .article-text p:first-child::first-letter {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 72px; line-height: .75;
-      float: left; margin-right: 8px; margin-top: 6px;
-      color: var(--white);
-    }
-    .article-text p strong {
-      color: var(--white); font-weight: 600;
-    }
-
-    /* Image inline */
-    .article-img-wrap {
-      margin: 40px -80px;
-      position: relative;
-    }
-    .article-img-wrap img {
-      width: 100%; height: auto;
-      display: block;
-      opacity: 0.9;
-    }
-    .article-img-caption {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      color: rgba(255,255,255,0.25);
-      margin-top: 10px; padding-left: 4px;
-    }
-
-    /* Pull quote */
-    .article-pullquote {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(28px, 3.5vw, 42px);
-      line-height: 1.05; letter-spacing: .5px;
-      color: var(--white);
-      border-top: 1px solid rgba(255,255,255,0.15);
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-      padding: 28px 0;
-      margin: 48px 0;
-    }
-
-    /* ── BACK LINK ── */
-    .back-bar {
-      padding: 28px 48px;
-      border-bottom: 1px solid var(--border);
-    }
-    .back-link {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 2.5px;
-      text-transform: uppercase; color: var(--gray);
-      text-decoration: none; display: inline-flex; align-items: center; gap: 10px;
-      transition: color .2s;
-    }
-    .back-link::before { content: '←'; }
-    .back-link:hover { color: var(--white); }
-
-    /* ── RELATED ── */
-    .related-section { padding: 56px 48px; border-bottom: 1px solid var(--border); }
-    .section-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 4px;
-      text-transform: uppercase; color: var(--gray);
-      margin-bottom: 28px; display: block;
-    }
-    .related-grid {
-      display: grid; grid-template-columns: repeat(3,1fr);
-      gap: 1px; background: var(--border); border: 1px solid var(--border);
-    }
-    .related-card {
-      background: #000; padding: 24px 20px;
-      text-decoration: none; color: inherit; transition: background .2s;
-    }
-    .related-card:hover { background: rgba(255,255,255,0.03); }
-    .related-cat {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 3px;
-      text-transform: uppercase; color: var(--gray); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .related-cat::before { content:''; display:block; width:14px; height:1px; background:var(--gray); }
-    .related-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 17px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: .3px; line-height: 1.2;
-    }
-    .related-date {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-      color: rgba(255,255,255,0.2); margin-top: 12px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 36px 48px; display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--border);
-    }
-    .footer-logo { display: flex; align-items: center; gap: 8px; }
-    .footer-logo img { height: 32px; width: auto; }
-    .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 16px; letter-spacing: 3px; color: rgba(255,255,255,0.4); }
-    .footer-copy { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); }
-    .footer-links { display: flex; gap: 24px; list-style: none; }
-    .footer-links a { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2); text-decoration: none; transition: color .2s; }
-    .footer-links a:hover { color: var(--white); }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      .article-body { grid-template-columns: 1fr; }
-      .article-main { grid-column: 1; padding: 0 24px; }
-      .article-img-wrap { margin: 32px 0; }
-      .article-hero-content { padding: 0 24px 40px; }
-      nav { padding: 0 24px; }
-      .nav-links { display: none; }
-      .related-grid { grid-template-columns: 1fr; }
-      footer { flex-direction: column; gap: 20px; text-align: center; }
+    :root{--white:#fff;--gray:rgba(255,255,255,0.45);--border:rgba(255,255,255,0.09);--grid-color:rgba(255,255,255,0.035);}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{background:#000;color:#fff;font-family:'Barlow',sans-serif;overflow-x:hidden;}
+    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:44px 44px;animation:gridScroll 16s linear infinite;pointer-events:none;}
+    @keyframes gridScroll{0%{background-position:0 0}100%{background-position:44px 44px}}
+    .page{position:relative;z-index:1;}
+    #page-loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .4s,visibility .4s;}
+    #page-loader.hidden{opacity:0;visibility:hidden;}
+    .loader-text{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:8px;}
+    .loader-bar{width:160px;height:1px;background:var(--border);overflow:hidden;margin-top:20px;}
+    .loader-bar-fill{height:100%;width:0%;background:#fff;animation:loadBar .55s ease forwards;}
+    @keyframes loadBar{to{width:100%;}}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;border-bottom:1px solid rgba(0,61,165,0.5);backdrop-filter:blur(10px);background:rgba(0,0,0,0.65);position:sticky;top:0;z-index:100;}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo img{height:44px;}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;}
+    .nav-links{display:flex;gap:36px;list-style:none;}
+    .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover{color:#fff;}
+    .nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.18);color:#fff;background:transparent;padding:8px 22px;text-decoration:none;}
+    .article-hero{position:relative;height:480px;overflow:hidden;}
+    .article-hero img{width:100%;height:100%;object-fit:cover;opacity:0.55;}
+    .article-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,#000 0%,rgba(0,0,0,0.4) 60%,transparent 100%);}
+    .article-hero-content{position:absolute;bottom:0;left:0;right:0;padding:48px 80px;z-index:2;}
+    .article-cat-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:#fff;color:#000;padding:4px 12px;display:inline-block;margin-bottom:16px;}
+    .article-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px;}
+    .article-meta-bar{display:flex;align-items:center;gap:24px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+    .article-body{max-width:760px;margin:0 auto;padding:64px 40px 80px;}
+    .article-body p{font-size:16px;line-height:1.85;color:rgba(255,255,255,0.72);margin-bottom:24px;}
+    .article-body h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;margin:48px 0 20px;}
+    .article-lead{font-size:17px!important;color:rgba(255,255,255,0.85)!important;font-weight:500;line-height:1.7!important;margin-bottom:32px!important;border-left:2px solid rgba(0,61,165,0.7);padding-left:20px;}
+    .article-back{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;padding:40px 40px 0;transition:color .2s;}
+    .article-back:hover{color:#fff;}
+    .img-credit{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;padding:8px 40px;text-align:right;}
+    .img-credit a{color:rgba(255,255,255,0.25);text-decoration:none;}
+    footer{padding:36px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-wrap:wrap;gap:16px;}
+    .footer-logo{display:flex;align-items:center;gap:8px;}
+    .footer-logo img{height:32px;}
+    .footer-logo-text{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:rgba(255,255,255,0.4);}
+    .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .footer-links{display:flex;gap:24px;list-style:none;}
+    .footer-links a{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-decoration:none;transition:color .2s;}
+    .footer-links a:hover{color:#fff;}
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1);}
+    .reveal.visible{opacity:1;transform:none;}
+    @media(max-width:768px){
+      nav{padding:0 20px;} .nav-links,.nav-cta{display:none;}
+      .article-hero{height:280px;} .article-hero-content{padding:24px;}
+      .article-body{padding:40px 20px 60px;} .article-back{padding:24px 20px 0;}
+      footer{flex-direction:column;text-align:center;}
     }
   </style>
 </head>
 <body>
+<div id="page-loader"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div>
 <div class="grid-bg"></div>
 <div class="page">
-
-  <!-- NAV -->
   <nav>
-    <a href="../index.html" class="nav-logo">
-      <img src="../Logo.png" alt="NewsPorto">
-      <span class="nav-logo-text">NewsPorto</span>
-    </a>
+    <a href="../index.html" class="nav-logo"><img src="../Logo.png" alt="NewsPorto"><span class="nav-logo-text">NewsPorto</span></a>
     <ul class="nav-links">
-      <li><a href="actu.html">Actu</a></li>
-      <li><a href="effectif.html">Effectif</a></li>
-      <li><a href="stats.html">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="../actu.html">Actu</a></li>
+      <li><a href="../effectif.html">Effectif</a></li>
+      <li><a href="../stats.html">Stats</a></li>
+      <li><a href="../videos.html">Vidéos</a></li>
+      <li><a href="../shop.html">Shop</a></li>
     </ul>
-    <a href="#" class="nav-cta">Shop →</a>
+    <a href="../shop.html" class="nav-cta">Boutique →</a>
   </nav>
-
-  <!-- HERO ARTICLE -->
   <div class="article-hero">
-    <img src="article1couv.jpg" alt="Porto Conquiert L'Europe" class="article-hero-img">
+    <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=1200" alt="Porto domine le derby">
     <div class="article-hero-content">
-      <p class="article-cat-badge">Europa League</p>
-      <h1 class="article-hero-title">
-        Porto<br>
-        <span class="outline">Conquiert</span><br>
-        L'Europe
-      </h1>
-      <p class="article-hero-sub">Le Dragon foudroie Stuttgart et s'envole vers les sommets</p>
-      <div class="article-hero-meta">
-        <span>04 Avr 2026</span>
-        <span class="meta-sep"></span>
-        <span>7 min de lecture</span>
-        <span class="meta-sep"></span>
-        <span>NewsPorto FR</span>
-      </div>
+      <span class="article-cat-badge">Europe | analyse</span>
+      <h1 class="article-title">Porto domine le derby</h1>
+      <div class="article-meta-bar"><span>14 Avr 2026</span><span>·</span><span>5 min de lecture</span></div>
     </div>
   </div>
+  <p class="img-credit">Photo : <a href="#" target="_blank">Unsplash</a> / Unsplash</p>
+  <a href="../actu.html" class="article-back">← Retour aux articles</a>
+  <div class="article-body reveal">
+    <p class="article-lead">Le FC Porto confirme sa suprématie avec une victoire 3-0 contre Boavista</p>
+    
+   <p>Le FC Porto a démontré sa puissance lors du dernier derby contre Boavista, remportant la victoire avec un score de 3-0. Cette performance impressionnante confirme la suprématie des Dragons dans le championnat portugais.</p>
+   <h2>Une attaque implacable</h2>
+   <p>L'attaque portiste a été particulièrement efficace, avec des buts marqués par les jeunes talents de l'équipe. La création de chances a été constante tout au long du match, mettant à rude épreuve la défense de Boavista.</p>
+   <p>Le milieu de terrain portiste a également joué un rôle clé, contrôlant le jeu et distribuant les passes avec précision. Cette maîtrise du jeu a permis aux attaquants de bénéficier de nombreuses opportunités de but.</p>
+   <h2>Une défense solide</h2>
+   <p>La défense du FC Porto a été solide tout au long du match, ne laissant aucune chance à l'équipe adverse de marquer. Les défenseurs ont été impeccables dans leur lecture du jeu et leur anticipation, annulant les attaques de Boavista.</p>
+   <p>Cette victoire est un témoignage de la force et de la détermination de l'équipe. Le FC Porto continue de dominer le championnat et semble bien parti pour remporter le titre cette saison.</p>
 
-  <!-- BACK -->
-  <div class="back-bar">
-    <a href="../actu.html" class="back-link">Retour aux articles</a>
   </div>
-
-  <!-- BODY -->
-  <div class="article-body">
-    <div class="article-main">
-
-      <!-- Chapeau -->
-      <p class="article-chapeau">
-        Après une double confrontation magistrale face au 4e de Bundesliga, le FC Porto confirme son statut de grand favori de l'Europa League. Retour sur une qualification autoritaire qui a marqué les esprits sur tout le continent.
-      </p>
-
-      <div class="article-divider"></div>
-
-      <!-- Texte -->
-      <div class="article-text">
-
-        <p>Le FC Porto a rappelé à l'Europe entière que le prestige ne s'achète pas, il se gagne sur le terrain. En balayant le VfB Stuttgart avec un score cumulé de <strong>4-1</strong>, nos Dragons ont validé leur place en quarts de finale de l'Europa League de la plus belle des manières. Face à une équipe allemande qui bouscule pourtant la hiérarchie en Bundesliga cette saison, les hommes du Dragão ont affiché une supériorité tactique et mentale qui ne laisse aucune place au doute.</p>
-
-        <p>Tout a commencé lors de ce match aller maîtrisé à la MHP Arena. Dans l'hostilité de l'ambiance allemande le 12 mars dernier, nos joueurs ont fait preuve d'un sang-froid clinique pour s'imposer <strong>2-1</strong> et ramener un avantage précieux à la maison. Ce jeudi, lors du match retour, l'Estádio do Dragão a une nouvelle fois été le théâtre d'une démonstration de force. Porto a verrouillé la rencontre dès les premières minutes, ne laissant aucun espace aux attaquants adverses.</p>
-
-      </div>
-
-      <!-- Image inline -->
-      <div class="article-img-wrap">
-        <img src="article1.jpg" alt="FC Porto vs Stuttgart">
-        <p class="article-img-caption">Estádio do Dragão · Match retour · 03 Avr 2026</p>
-      </div>
-
-      <!-- Suite texte -->
-      <div class="article-text">
-
-        <p>La victoire <strong>2-0</strong> scellée devant notre public n'est que la suite logique d'une domination totale, portée par le talent pur de <strong>William Gomes</strong> et la percussion de <strong>Victor Froholdt</strong>. L'écart de niveau entre le 4e de Bundesliga et notre institution a été flagrant tout au long de la double confrontation.</p>
-
-        <!-- Pull quote -->
-        <div class="article-pullquote">
-          « Avec une moyenne de 0,8 but encaissé par match en Europe, le bloc Porto est devenu une forteresse. »
-        </div>
-
-        <p>Alors que Stuttgart tentait d'imposer son rythme, Porto a répondu par une solidité défensive de fer, guidée par un <strong>Diogo Costa</strong> impérial. Même les meilleures attaques allemandes n'ont pas réussi à fissurer ce mur bleu et blanc.</p>
-
-        <p>Désormais, le regard est tourné vers les quarts de finale. Le tirage nous offre l'occasion parfaite de prendre une revanche attendue contre <strong>Nottingham Forest</strong>, qui nous avait surpris lors de la phase de ligue en octobre dernier. Le rendez-vous est fixé au <strong>9 avril prochain au Dragão</strong>. Mais après avoir éteint Stuttgart avec une telle autorité, le message envoyé par le club est limpide : nous ne craignons personne. La route vers la gloire continue, et le Dragon a plus que jamais faim de trophée.</p>
-
-      </div>
-
-    </div>
-  </div>
-
-  <!-- RELATED -->
-  <div class="related-section">
-    <span class="section-label">— À lire aussi</span>
-    <div class="related-grid">
-      <a href="#" class="related-card">
-        <p class="related-cat">Europa League</p>
-        <h3 class="related-title">Ligue Europa : Le Parcours 2025/26 En Chiffres</h3>
-        <p class="related-date">31 Mar 2026</p>
-      </a>
-      <a href="#" class="related-card">
-        <p class="related-cat">Analyse</p>
-        <h3 class="related-title">Le Système 4-3-3 De Conceição Décrypté</h3>
-        <p class="related-date">03 Avr 2026</p>
-      </a>
-      <a href="#" class="related-card">
-        <p class="related-cat">Interview</p>
-        <h3 class="related-title">Evanilson : « Je Veux Marquer L'Histoire De Ce Club »</h3>
-        <p class="related-date">01 Avr 2026</p>
-      </a>
-    </div>
-  </div>
-
-  <!-- FOOTER -->
   <footer>
-    <div class="footer-logo">
-      <img src="../Logo.png" alt="NewsPorto">
-      <span class="footer-logo-text">NewsPorto</span>
-    </div>
+    <div class="footer-logo"><img src="../Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
     <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
     <ul class="footer-links">
-      <li><a href="#">TikTok</a></li>
-      <li><a href="#">Contact</a></li>
-      <li><a href="#">Mentions légales</a></li>
+      <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
+      <li><a href="mailto:luisdasilva83310@gmail.com">Contact</a></li>
+      <li><a href="../mentions-legales.html">Mentions légales</a></li>
     </ul>
   </footer>
-
 </div>
+<script>
+  window.addEventListener('load',()=>{setTimeout(()=>document.getElementById('page-loader').classList.add('hidden'),350);});
+  const ro=new IntersectionObserver(e=>{e.forEach(el=>{if(el.isIntersecting){el.target.classList.add('visible');ro.unobserve(el.target);}});},{threshold:0.05});
+  document.querySelectorAll('.reveal').forEach(el=>ro.observe(el));
+</script>
 </body>
 </html>
