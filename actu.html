@@ -716,7 +716,7 @@
     document.getElementById('actu-count').textContent = `${filtered.length} article${filtered.length > 1 ? 's' : ''}`;
   }
 
-  fetch('articles/index.json')
+  fetch('articles/articlestotal.json')
     .then(r => r.json())
     .then(data => {
       allArticles = data.articles || [];
