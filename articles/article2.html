@@ -3,178 +3,118 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>L'enfer du Dragão attend Nottingham Forest — NewsPorto</title>
+  <title>FC Porto : Enjeux tactiques - NewsPorto</title>
+  <meta name="description" content="Le FC Porto cherche à renforcer son attaque pour le reste de la saison">
+  <meta property="og:image" content="https://images.unsplash.com/photo-1748112444029-de3c77529cd9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxGQyUyMFBvcnRvJTIwZm9vdGJhbGwlMjB0YWN0aWNzfGVufDB8MHx8fDE3NzYyMDIzMjl8MA&ixlib=rb-4.1.0&q=80&w=1080">
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --white:#ffffff;--off-white:#e8e8e8;--gray:rgba(255,255,255,0.45);
-      --border:rgba(255,255,255,0.1);--grid-color:rgba(255,255,255,0.055);
-    }
+    :root{--white:#fff;--gray:rgba(255,255,255,0.45);--border:rgba(255,255,255,0.09);--grid-color:rgba(255,255,255,0.035);}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-    html{scroll-behavior:smooth;}
-    body{background:#000;color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden;}
-    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:44px 44px;animation:gridScroll 12s linear infinite;pointer-events:none;}
-    @keyframes gridScroll{0%{background-position:0 0;}100%{background-position:44px 44px;}}
+    body{background:#000;color:#fff;font-family:'Barlow',sans-serif;overflow-x:hidden;}
+    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid-color) 1px,transparent 1px),linear-gradient(90deg,var(--grid-color) 1px,transparent 1px);background-size:44px 44px;animation:gridScroll 16s linear infinite;pointer-events:none;}
+    @keyframes gridScroll{0%{background-position:0 0}100%{background-position:44px 44px}}
     .page{position:relative;z-index:1;}
-    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:72px;border-bottom:1px solid var(--border);backdrop-filter:blur(6px);background:rgba(0,0,0,0.5);position:sticky;top:0;z-index:100;}
+    #page-loader{position:fixed;inset:0;background:#000;z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .4s,visibility .4s;}
+    #page-loader.hidden{opacity:0;visibility:hidden;}
+    .loader-text{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:8px;}
+    .loader-bar{width:160px;height:1px;background:var(--border);overflow:hidden;margin-top:20px;}
+    .loader-bar-fill{height:100%;width:0%;background:#fff;animation:loadBar .55s ease forwards;}
+    @keyframes loadBar{to{width:100%;}}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:72px;border-bottom:1px solid rgba(0,61,165,0.5);backdrop-filter:blur(10px);background:rgba(0,0,0,0.65);position:sticky;top:0;z-index:100;}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
-    .nav-logo img{height:46px;width:auto;}
-    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);}
+    .nav-logo img{height:44px;}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;}
     .nav-links{display:flex;gap:36px;list-style:none;}
-    .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;}
-    .nav-links a:hover{color:var(--white);}
-    .nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid var(--white);color:var(--white);background:transparent;padding:8px 20px;cursor:pointer;text-decoration:none;transition:background .2s,color .2s;}
-    .nav-cta:hover{background:var(--white);color:#000;}
-    .article-hero{position:relative;min-height:70vh;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;border-bottom:1px solid var(--border);}
-    .article-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top;opacity:0.55;}
-    .article-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.3) 0%,rgba(0,0,0,0) 30%,rgba(0,0,0,0.7) 70%,rgba(0,0,0,0.97) 100%);z-index:1;}
-    .article-hero-content{position:relative;z-index:2;padding:0 48px 56px;max-width:860px;}
-    .article-cat-badge{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;}
-    .article-cat-badge::before{content:'';display:block;width:28px;height:1px;background:var(--gray);}
-    .article-hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,7vw,100px);line-height:.88;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
-    .article-hero-title .outline{-webkit-text-stroke:1.5px var(--white);color:transparent;}
-    .article-hero-sub{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,0.65);margin-bottom:28px;max-width:680px;line-height:1.3;}
-    .article-hero-meta{display:flex;align-items:center;gap:16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);}
-    .meta-sep{width:3px;height:3px;background:rgba(255,255,255,0.2);border-radius:50%;}
-    .back-bar{padding:28px 48px;border-bottom:1px solid var(--border);}
-    .back-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gray);text-decoration:none;display:inline-flex;align-items:center;gap:10px;transition:color .2s;}
-    .back-link::before{content:'←';}
-    .back-link:hover{color:var(--white);}
-    .article-body{display:grid;grid-template-columns:1fr 640px 1fr;padding:64px 0;border-bottom:1px solid var(--border);}
-    .article-main{grid-column:2;}
-    .article-chapeau{font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:600;line-height:1.45;color:rgba(255,255,255,0.75);border-left:2px solid rgba(255,255,255,0.2);padding-left:24px;margin-bottom:48px;}
-    .article-divider{width:40px;height:1px;background:rgba(255,255,255,0.2);margin-bottom:40px;}
-    .article-text p{font-size:17px;line-height:1.8;color:rgba(255,255,255,0.72);margin-bottom:28px;}
-    .article-text p:first-child::first-letter{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:.75;float:left;margin-right:8px;margin-top:6px;color:var(--white);}
-    .article-text p strong{color:var(--white);font-weight:600;}
-    .article-img-wrap{margin:40px -80px;position:relative;}
-    .article-img-wrap img{width:100%;height:auto;display:block;opacity:0.9;}
-    .article-img-caption{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-top:10px;padding-left:4px;}
-    .article-pullquote{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.5vw,42px);line-height:1.05;letter-spacing:.5px;color:var(--white);border-top:1px solid rgba(255,255,255,0.15);border-bottom:1px solid rgba(255,255,255,0.15);padding:28px 0;margin:48px 0;}
-    .related-section{padding:56px 48px;border-bottom:1px solid var(--border);}
-    .section-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:28px;display:block;}
-    .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);}
-    .related-card{background:#000;padding:24px 20px;text-decoration:none;color:inherit;transition:background .2s;}
-    .related-card:hover{background:rgba(255,255,255,0.03);}
-    .related-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:6px;}
-    .related-cat::before{content:'';display:block;width:14px;height:1px;background:var(--gray);}
-    .related-title{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;}
-    .related-date{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);margin-top:12px;}
-    footer{padding:36px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
+    .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;transition:color .2s;}
+    .nav-links a:hover{color:#fff;}
+    .nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.18);color:#fff;background:transparent;padding:8px 22px;text-decoration:none;}
+    .article-hero{position:relative;height:480px;overflow:hidden;}
+    .article-hero img{width:100%;height:100%;object-fit:cover;opacity:0.55;}
+    .article-hero::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,#000 0%,rgba(0,0,0,0.4) 60%,transparent 100%);}
+    .article-hero-content{position:absolute;bottom:0;left:0;right:0;padding:48px 80px;z-index:2;}
+    .article-cat-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:#fff;color:#000;padding:4px 12px;display:inline-block;margin-bottom:16px;}
+    .article-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px;}
+    .article-meta-bar{display:flex;align-items:center;gap:24px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+    .article-body{max-width:760px;margin:0 auto;padding:64px 40px 80px;}
+    .article-body p{font-size:16px;line-height:1.85;color:rgba(255,255,255,0.72);margin-bottom:24px;}
+    .article-body h2{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:.5px;margin:48px 0 20px;}
+    .article-lead{font-size:17px!important;color:rgba(255,255,255,0.85)!important;font-weight:500;line-height:1.7!important;margin-bottom:32px!important;border-left:2px solid rgba(0,61,165,0.7);padding-left:20px;}
+    .article-back{display:inline-flex;align-items:center;gap:8px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);text-decoration:none;padding:40px 40px 0;transition:color .2s;}
+    .article-back:hover{color:#fff;}
+    .img-credit{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);letter-spacing:1px;padding:8px 40px;text-align:right;}
+    .img-credit a{color:rgba(255,255,255,0.25);text-decoration:none;}
+    footer{padding:36px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);flex-wrap:wrap;gap:16px;}
     .footer-logo{display:flex;align-items:center;gap:8px;}
-    .footer-logo img{height:32px;width:auto;}
+    .footer-logo img{height:32px;}
     .footer-logo-text{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:rgba(255,255,255,0.4);}
     .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
     .footer-links{display:flex;gap:24px;list-style:none;}
     .footer-links a{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);text-decoration:none;transition:color .2s;}
-    .footer-links a:hover{color:var(--white);}
-    @media(max-width:900px){
-      .article-body{grid-template-columns:1fr;}
-      .article-main{grid-column:1;padding:0 24px;}
-      .article-img-wrap{margin:32px 0;}
-      .article-hero-content{padding:0 24px 40px;}
-      nav{padding:0 24px;}
-      .nav-links{display:none;}
-      .related-grid{grid-template-columns:1fr;}
-      footer{flex-direction:column;gap:20px;text-align:center;}
+    .footer-links a:hover{color:#fff;}
+    .reveal{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1);}
+    .reveal.visible{opacity:1;transform:none;}
+    @media(max-width:768px){
+      nav{padding:0 20px;} .nav-links,.nav-cta{display:none;}
+      .article-hero{height:280px;} .article-hero-content{padding:24px;}
+      .article-body{padding:40px 20px 60px;} .article-back{padding:24px 20px 0;}
+      footer{flex-direction:column;text-align:center;}
     }
   </style>
 </head>
 <body>
+<div id="page-loader"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div>
 <div class="grid-bg"></div>
 <div class="page">
   <nav>
-    <a href="../index.html" class="nav-logo">
-      <img src="../Logo.png" alt="NewsPorto">
-      <span class="nav-logo-text">NewsPorto</span>
-    </a>
+    <a href="../index.html" class="nav-logo"><img src="../Logo.png" alt="NewsPorto"><span class="nav-logo-text">NewsPorto</span></a>
     <ul class="nav-links">
-      <li><a href="actu.html">Actu</a></li>
-      <li><a href="effectif.html">Effectif</a></li>
-      <li><a href="stats.html">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="../actu.html">Actu</a></li>
+      <li><a href="../effectif.html">Effectif</a></li>
+      <li><a href="../stats.html">Stats</a></li>
+      <li><a href="../videos.html">Videos</a></li>
+      <li><a href="../shop.html">Shop</a></li>
     </ul>
-    <a href="#" class="nav-cta">Shop →</a>
+    <a href="../shop.html" class="nav-cta">Boutique</a>
   </nav>
-
   <div class="article-hero">
-    <img src="article2couv.jpg" alt="L'enfer du Dragão attend Nottingham Forest" class="article-hero-img">
+    <img src="https://images.unsplash.com/photo-1748112444029-de3c77529cd9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxGQyUyMFBvcnRvJTIwZm9vdGJhbGwlMjB0YWN0aWNzfGVufDB8MHx8fDE3NzYyMDIzMjl8MA&ixlib=rb-4.1.0&q=80&w=1080" alt="FC Porto : Enjeux tactiques">
     <div class="article-hero-content">
-      <p class="article-cat-badge">Europe</p>
-      <h1 class="article-hero-title">L'enfer du<br><span class='outline'>Dragão</span><br>attend Forest</h1>
-      <p class="article-hero-sub">L'heure de la revanche a sonné en Europa League</p>
-      <div class="article-hero-meta">
-        <span>05 Avr 2026</span>
-        <span class="meta-sep"></span>
-        <span>5 min de lecture</span>
-        <span class="meta-sep"></span>
-        <span>NewsPorto FR</span>
-      </div>
+      <span class="article-cat-badge">Analyse</span>
+      <h1 class="article-title">FC Porto : Enjeux tactiques</h1>
+      <div class="article-meta-bar"><span>14 Avr 2026</span><span>.</span><span>5 min de lecture</span></div>
     </div>
   </div>
+  <p class="img-credit">Photo : <a href="https://unsplash.com/@salaheregouane" target="_blank">Salah Regouane</a> / Unsplash</p>
+  <a href="../actu.html" class="article-back">Retour aux articles</a>
+  <div class="article-body reveal">
+    <p class="article-lead">Le FC Porto cherche à renforcer son attaque pour le reste de la saison</p>
+    
+<p>Le FC Porto est actuellement troisième de la Liga Portugal, avec des difficultés à marquer des buts, notamment en février 2026 où ils n'ont inscrit que trois buts.</p>
+<h2>Enjeux tactiques</h2>
+<p>Le système de jeu du FC Porto doit être réévalué pour permettre une meilleure création de occasions de but. Les joueurs doivent être en mesure de se créer des espaces et de jouer avec plus de liberté pour mettre en danger les défenses adverses.</p>
+<p>La compétition dans la Liga Portugal est très forte, avec des équipes comme le Sporting CP et Benfica qui sont très solides. Le FC Porto doit donc être en mesure de performer à son meilleur niveau pour espérer grimper au classement.</p>
+<h2>Performances individuelles</h2>
+<p>Certaines performances individuelles ont été notables, mais il est clair que le FC Porto a besoin de plus de cohésion d'équipe pour atteindre ses objectifs. Les joueurs doivent travailler ensemble pour créer des occasions de but et défendre de manière solide.</p>
+<p>Le FC Porto a encore des matches importants à jouer dans la Liga Portugal et en Europa League. Les prochaines semaines seront cruciales pour déterminer le cours de la saison.</p>
+<p>Il est donc essentiel pour le FC Porto de trouver un équilibre entre l'attaque et la défense pour atteindre ses objectifs et faire plaisir à ses supporters.</p>
 
-  <div class="back-bar">
-    <a href="../actu.html" class="back-link">Retour aux articles</a>
   </div>
-
-  <div class="article-body">
-    <div class="article-main">
-      <p class="article-chapeau">À quelques jours du quart de finale aller, l'ambiance monte d'un cran. Les Dragons s'apprêtent à recevoir les Anglais avec un seul objectif : laver l'affront du match de poules.</p>
-      <div class="article-divider"></div>
-      <div class="article-text">
-        <p>Le calendrier ne ment jamais et il nous offre l'opportunité parfaite de remettre les pendules à l'heure. Après avoir balayé Stuttgart, nos Dragons se préparent à un choc physique contre <strong>Nottingham Forest</strong> ce jeudi. Tout le monde a encore en travers de la gorge cette défaite imméritée d'octobre dernier, et on sent dans le groupe une envie de revanche qui va bien au-delà de la simple qualification.</p>
-
-        <p>Farioli a insisté lors de l'entraînement ce matin sur l'importance de l'impact physique dès les premières minutes. Les Anglais pensent nous avoir déjà cernés, mais ils vont découvrir une équipe transfigurée par l'enjeu et portée par un stade en fusion. Tactiquement, Porto a évolué et ne compte plus laisser le moindre centimètre carré de liberté aux attaquants de Premier League.</p>
-
-        <!-- Image inline -->
-        <div class="article-img-wrap">
-          <img src="article2.jpg" alt="L'enfer du Dragão attend Nottingham Forest">
-          <p class="article-img-caption">FC Porto · 05 Avr 2026</p>
-        </div>
-
-        <div class="article-pullquote">« Chez nous, personne ne repart avec le sourire. »</div>
-
-        <p>L'infirmerie est quasi vide, ce qui offre un luxe de choix pour le onze de départ. Le moral est au beau fixe après la démonstration contre Stuttgart et chaque joueur sait qu'une victoire nette au match aller nous ouvrirait les portes du dernier carré. C'est le moment de montrer que chez nous, personne ne repart avec le sourire.</p>
-
-
-      </div>
-    </div>
-  </div>
-
-  <div class="related-section">
-    <span class="section-label">— À lire aussi</span>
-    <div class="related-grid">
-      <a href="article1.html" class="related-card">
-        <p class="related-cat">Europa League</p>
-        <h3 class="related-title">Porto Conquiert L'Europe</h3>
-        <p class="related-date">04 Avr 2026</p>
-      </a>
-      <a href="article1.html" class="related-card">
-        <p class="related-cat">Focus</p>
-        <h3 class="related-title">Article précédent</h3>
-        <p class="related-date">05 Avr 2026</p>
-      </a>
-      <a href="article3.html" class="related-card">
-        <p class="related-cat">Analyse</p>
-        <h3 class="related-title">Article suivant</h3>
-        <p class="related-date">05 Avr 2026</p>
-      </a>
-    </div>
-  </div>
-
   <footer>
-    <div class="footer-logo">
-      <img src="../Logo.png" alt="NewsPorto">
-      <span class="footer-logo-text">NewsPorto</span>
-    </div>
-    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <div class="footer-logo"><img src="../Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
+    <p class="footer-copy">2026 NewsPorto FR</p>
     <ul class="footer-links">
-      <li><a href="#">TikTok</a></li>
-      <li><a href="#">Contact</a></li>
-      <li><a href="#">Mentions légales</a></li>
+      <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
+      <li><a href="mailto:luisdasilva83310@gmail.com">Contact</a></li>
+      <li><a href="../mentions-legales.html">Mentions legales</a></li>
     </ul>
   </footer>
 </div>
+<script>
+  window.addEventListener('load',function(){setTimeout(function(){document.getElementById('page-loader').classList.add('hidden');},350);});
+  var ro=new IntersectionObserver(function(e){e.forEach(function(el){if(el.isIntersecting){el.target.classList.add('visible');ro.unobserve(el.target);}});},{threshold:0.05});
+  document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
+</script>
 </body>
 </html>

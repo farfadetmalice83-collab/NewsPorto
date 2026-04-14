@@ -1,6 +1,18 @@
 {
   "articles": [
     {
+      "id": 2,
+      "file": "article2.html",
+      "title": "FC Porto : Enjeux tactiques",
+      "excerpt": "Le FC Porto cherche à renforcer son attaque pour le reste de la saison",
+      "category": "analyse",
+      "read_time": "5 min de lecture",
+      "date": "14 Avr 2026",
+      "date_iso": "2026-04-14",
+      "image": "https://images.unsplash.com/photo-1748112444029-de3c77529cd9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxGQyUyMFBvcnRvJTIwZm9vdGJhbGwlMjB0YWN0aWNzfGVufDB8MHx8fDE3NzYyMDIzMjl8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "image_thumb": "https://images.unsplash.com/photo-1748112444029-de3c77529cd9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxGQyUyMFBvcnRvJTIwZm9vdGJhbGwlMjB0YWN0aWNzfGVufDB8MHx8fDE3NzYyMDIzMjl8MA&ixlib=rb-4.1.0&q=80&w=400"
+    },
+    {
       "id": 1,
       "file": "article1.html",
       "title": "FC Porto en difficulté",
@@ -15,6 +27,7 @@
   ],
   "used_image_ids": [
     "tHjoZcCqqPQ",
-    "v0H-vn0BixI"
+    "v0H-vn0BixI",
+    "nL8GZC-_vKQ"
   ]
 }
