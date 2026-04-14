@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsPorto — Mentions Légales</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --off-white: #e8e8e8;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.09);
+      --grid-color: rgba(255,255,255,0.035);
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #000; color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px; animation: gridScroll 16s linear infinite; pointer-events: none;
+    }
+    @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 44px 44px; } }
+
+    .page { position: relative; z-index: 1; }
+
+    #page-loader {
+      position: fixed; inset: 0; background: #000; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .4s, visibility .4s;
+    }
+    #page-loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .loader-text { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 8px; }
+    .loader-bar { width: 160px; height: 1px; background: var(--border); overflow: hidden; }
+    .loader-bar-fill { height: 100%; width: 0%; background: var(--white); animation: loadBar .55s ease forwards; }
+    @keyframes loadBar { to { width: 100%; } }
+
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px; height: 72px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px); background: rgba(0,0,0,0.65);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 44px; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--white); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.18); color: var(--white); background: transparent;
+      padding: 8px 22px; text-decoration: none; transition: background .2s, border-color .2s;
+    }
+    .nav-cta:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.35); }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 64px 56px 48px;
+      border-bottom: 1px solid var(--border);
+    }
+    .page-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.28);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 12px;
+    }
+    .page-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: rgba(255,255,255,0.2); }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 6vw, 80px);
+      line-height: .92; letter-spacing: 1px;
+    }
+    .page-title .outline { -webkit-text-stroke: 1.5px rgba(255,255,255,0.45); color: transparent; }
+    .page-date {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.22);
+      margin-top: 20px;
+    }
+
+    /* CONTENT */
+    .content-wrap {
+      max-width: 820px;
+      padding: 64px 56px 80px;
+    }
+
+    .ml-section {
+      margin-bottom: 56px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid var(--border);
+    }
+    .ml-section:last-child { border-bottom: none; margin-bottom: 0; }
+
+    .ml-section-num {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.22);
+      margin-bottom: 10px;
+    }
+    .ml-section-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px;
+      color: var(--white); margin-bottom: 20px; line-height: 1;
+    }
+    .ml-section-title .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.4); color: transparent; }
+
+    .ml-text {
+      font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.55);
+    }
+    .ml-text + .ml-text { margin-top: 12px; }
+    .ml-text strong { color: rgba(255,255,255,0.8); font-weight: 500; }
+    .ml-text a { color: rgba(255,255,255,0.6); text-decoration: underline; transition: color .2s; }
+    .ml-text a:hover { color: var(--white); }
+
+    .ml-block {
+      margin-top: 16px;
+      padding: 20px 24px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+    }
+    .ml-block p {
+      font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.5);
+    }
+    .ml-block p + p { margin-top: 4px; }
+    .ml-block strong { color: rgba(255,255,255,0.75); font-weight: 500; }
+
+    .ml-list {
+      margin-top: 14px; padding-left: 0; list-style: none;
+    }
+    .ml-list li {
+      font-size: 14px; line-height: 1.8; color: rgba(255,255,255,0.5);
+      padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+      display: flex; gap: 12px; align-items: flex-start;
+    }
+    .ml-list li::before {
+      content: '—'; color: rgba(255,255,255,0.2); flex-shrink: 0; margin-top: 1px;
+    }
+    .ml-list li:last-child { border-bottom: none; }
+
+    /* FOOTER */
+    footer {
+      padding: 44px 56px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; }
+    .footer-logo img { height: 34px; }
+    .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: rgba(255,255,255,0.3); }
+    .footer-copy { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.22);
+      text-decoration: none; transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .page-hero { padding: 48px 24px 36px; }
+      .content-wrap { padding: 40px 24px 60px; }
+      footer { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-inner">
+    <div class="loader-text">NewsPorto</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actu</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="shop.html">Shop</a></li>
+    </ul>
+    <a href="shop.html" class="nav-cta">Boutique →</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="page-hero reveal">
+    <p class="page-eyebrow">NewsPorto · Informations légales</p>
+    <h1 class="page-title">Mentions <span class="outline">Légales</span></h1>
+    <p class="page-date">Dernière mise à jour : Avril 2026</p>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content-wrap">
+
+    <!-- 1. ÉDITEUR -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 01</p>
+      <h2 class="ml-section-title">Éditeur du <span class="outline">site</span></h2>
+      <p class="ml-text">Le site NewsPorto (accessible à l'adresse <strong>newsporto.fr</strong>) est édité à titre personnel par :</p>
+      <div class="ml-block">
+        <p><strong>Nom :</strong> Luis Da Silva Carvalho</p>
+        <p><strong>Adresse :</strong> La Garde, France</p>
+        <p><strong>Email :</strong> <a href="mailto:luisdasilva83310@gmail.com">luisdasilva83310@gmail.com</a></p>
+        <p><strong>Statut :</strong> Particulier — site à caractère non commercial (passion, revenus complémentaires non principaux)</p>
+        <p><strong>Discord :</strong> <a href="https://discord.gg/YCcuMHmGcH" target="_blank">discord.gg/YCcuMHmGcH</a></p>
+      </div>
+      <p class="ml-text" style="margin-top:16px;">Ce site n'est pas exploité dans le cadre d'une activité commerciale principale. Il s'agit d'un projet de passion dédié à l'actualité du FC Porto, pouvant générer des revenus complémentaires accessoires (boutique, partenariats).</p>
+    </div>
+
+    <!-- 2. HÉBERGEMENT -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 02</p>
+      <h2 class="ml-section-title">Héber<span class="outline">gement</span></h2>
+      <p class="ml-text">Ce site est hébergé par :</p>
+      <div class="ml-block">
+        <p><strong>Hébergeur :</strong> À compléter selon votre hébergeur (ex : OVH, GitHub Pages, Netlify…)</p>
+        <p><strong>Adresse :</strong> À compléter</p>
+        <p><strong>Site web :</strong> À compléter</p>
+      </div>
+      <p class="ml-text" style="margin-top:14px;">La boutique en ligne est gérée par la plateforme <strong>Fourthwall</strong> (Fourthwall, Inc., États-Unis). Les transactions sont traitées via <strong>Stripe</strong>. NewsPorto n'est pas responsable du traitement des données de paiement, entièrement délégué à ces prestataires tiers.</p>
+    </div>
+
+    <!-- 3. PROPRIÉTÉ INTELLECTUELLE -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 03</p>
+      <h2 class="ml-section-title">Propriété <span class="outline">intellectuelle</span></h2>
+      <p class="ml-text">L'ensemble des contenus présents sur ce site (textes, visuels, logos, design, code) sont la propriété exclusive de <strong>Luis Da Silva Carvalho</strong>, sauf mention contraire.</p>
+      <p class="ml-text">Toute reproduction, distribution, modification ou utilisation de ces contenus sans autorisation écrite préalable est strictement interdite.</p>
+      <p class="ml-text">Les images, vidéos et statistiques relatives au <strong>FC Porto</strong> sont la propriété de leurs ayants droit respectifs. NewsPorto n'est pas affilié au FC Porto ni à la Liga Portugal. Ce site est un site de supporters indépendant.</p>
+    </div>
+
+    <!-- 4. DONNÉES PERSONNELLES -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 04</p>
+      <h2 class="ml-section-title">Données <span class="outline">personnelles</span></h2>
+      <p class="ml-text">Conformément au Règlement Général sur la Protection des Données (<strong>RGPD</strong> — UE 2016/679) et à la loi Informatique et Libertés, vous disposez des droits suivants :</p>
+      <ul class="ml-list">
+        <li>Droit d'accès à vos données personnelles</li>
+        <li>Droit de rectification des données inexactes</li>
+        <li>Droit à l'effacement (droit à l'oubli)</li>
+        <li>Droit d'opposition au traitement de vos données</li>
+        <li>Droit à la portabilité de vos données</li>
+        <li>Droit de limitation du traitement</li>
+      </ul>
+      <p class="ml-text" style="margin-top:16px;">Pour exercer ces droits, contactez : <a href="mailto:luisdasilva83310@gmail.com">luisdasilva83310@gmail.com</a></p>
+      <p class="ml-text">Les données collectées via la boutique Fourthwall sont traitées selon la politique de confidentialité de Fourthwall, accessible sur leur site officiel.</p>
+      <p class="ml-text">Ce site ne collecte pas directement de données personnelles en dehors des formulaires de contact ou d'inscription éventuels.</p>
+    </div>
+
+    <!-- 5. COOKIES -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 05</p>
+      <h2 class="ml-section-title">Cookies & <span class="outline">traceurs</span></h2>
+      <p class="ml-text">Ce site peut utiliser des cookies techniques nécessaires à son bon fonctionnement. Aucun cookie publicitaire ou de tracking tiers n'est déposé sans votre consentement.</p>
+      <p class="ml-text">Les vidéos intégrées (YouTube, Dailymotion) peuvent déposer des cookies tiers lors de leur lecture. Ces cookies sont soumis aux politiques de confidentialité des plateformes concernées.</p>
+      <p class="ml-text">Vous pouvez à tout moment configurer votre navigateur pour refuser ou supprimer les cookies.</p>
+    </div>
+
+    <!-- 6. RESPONSABILITÉ -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 06</p>
+      <h2 class="ml-section-title">Limitation de <span class="outline">responsabilité</span></h2>
+      <p class="ml-text">NewsPorto s'efforce de fournir des informations exactes et à jour. Toutefois, l'exactitude, l'exhaustivité et l'actualité des informations publiées ne peuvent être garanties.</p>
+      <p class="ml-text">L'éditeur ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation du site, ni des contenus des sites tiers vers lesquels des liens peuvent être proposés.</p>
+      <p class="ml-text">NewsPorto est un site de supporters <strong>indépendant et non officiel</strong>. Il n'est ni affilié, ni partenaire, ni approuvé par le FC Porto ou la Fédération Portugaise de Football.</p>
+    </div>
+
+    <!-- 7. DROIT APPLICABLE -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 07</p>
+      <h2 class="ml-section-title">Droit <span class="outline">applicable</span></h2>
+      <p class="ml-text">Les présentes mentions légales sont soumises au droit français. En cas de litige, et à défaut de résolution amiable, les tribunaux français seront seuls compétents.</p>
+      <p class="ml-text">Pour tout contact : <a href="mailto:luisdasilva83310@gmail.com">luisdasilva83310@gmail.com</a></p>
+    </div>
+
+    <!-- 8. CONTACT & COMMUNAUTÉ -->
+    <div class="ml-section reveal">
+      <p class="ml-section-num">Article 08</p>
+      <h2 class="ml-section-title">Contact & <span class="outline">communauté</span></h2>
+      <div class="ml-block">
+        <p><strong>Email :</strong> <a href="mailto:luisdasilva83310@gmail.com">luisdasilva83310@gmail.com</a></p>
+        <p><strong>Discord :</strong> <a href="https://discord.gg/YCcuMHmGcH" target="_blank">discord.gg/YCcuMHmGcH</a></p>
+        <p><strong>Boutique officielle :</strong> <a href="https://newsporto-shop.fourthwall.com/en-eur" target="_blank">newsporto-shop.fourthwall.com</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="footer-logo-text">NewsPorto</span>
+    </div>
+    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <ul class="footer-links">
+      <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
+      <li><a href="mailto:luisdasilva83310@gmail.com">Contact</a></li>
+      <li><a href="mentions-legales.html">Mentions légales</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('page-loader').classList.add('hidden'), 350);
+  });
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+</script>
+</body>
+</html>
