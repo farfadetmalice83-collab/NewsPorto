@@ -922,7 +922,7 @@
     .section-label::before, .page-eyebrow::before, .hero-eyebrow::before { background: #003DA5 !important; }
 
     /* 6. Stat-cell — top border scan + glow bleu */
-    .stat-cell::before { content: ; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+    .stat-cell::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
     .stat-cell:hover::before { transform: scaleX(1); }
     .stat-cell:hover { background: rgba(0,20,80,0.22) !important; }
     .stat-cell::after { background: radial-gradient(ellipse at 50% 120%, rgba(0,61,165,0.28) 0%, transparent 68%) !important; }
@@ -1108,14 +1108,15 @@
     /* Particles canvas */
     #particles-canvas {
       position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
+      top: 0; left: 0;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1;
       pointer-events: none;
+      display: block;
     }
-    .hero-visual { position: relative; }
-    .hero-team-img { position: relative; z-index: 2; }
+    .hero-visual { position: relative !important; overflow: visible !important; }
+    .hero-team-img { position: relative; z-index: 3; }
 
   </style>
 </head>
@@ -1691,3 +1692,110 @@
     document.addEventListener("mousemove", e => {
       cg.style.left = e.clientX + "px";
       cg.style.top = e.clientY + "px";
+
+  
+  // ── BLUE PARTICLES ──────────────────────────────────────────
+  (function() {
+    var canvas = document.getElementById('particles-canvas');
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var W, H;
+
+    function resize() {
+      var parent = canvas.parentElement;
+      W = canvas.width = parent ? parent.offsetWidth : 600;
+      H = canvas.height = parent ? parent.offsetHeight : 500;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function rand(a, b) { return Math.random() * (b - a) + a; }
+
+    var COLORS = [
+      [0, 61, 165],
+      [0, 90, 220],
+      [30, 130, 255],
+      [80, 160, 255],
+      [0, 40, 130]
+    ];
+
+    for (var i = 0; i < 80; i++) {
+      var col = COLORS[Math.floor(rand(0, COLORS.length))];
+      particles.push({
+        x: rand(0, 1), y: rand(0.3, 1.1),
+        vy: rand(-0.0005, -0.00015),
+        vx: rand(-0.0002, 0.0002),
+        r: rand(2, 6),
+        alpha: rand(0.45, 1.0),
+        col: col,
+        life: rand(0, 1),
+        lifeSpeed: rand(0.0015, 0.005),
+        pulse: rand(0, Math.PI * 2),
+        pulseSpeed: rand(0.015, 0.04)
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, W, H);
+
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.life += p.lifeSpeed;
+        p.pulse += p.pulseSpeed;
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.life >= 1 || p.y < -0.05) {
+          p.life = 0;
+          p.x = rand(0.05, 0.95);
+          p.y = rand(0.85, 1.1);
+          p.vy = rand(-0.0005, -0.00015);
+          p.vx = rand(-0.0002, 0.0002);
+        }
+
+        var fade = p.life < 0.12 ? p.life / 0.12
+                 : p.life > 0.78 ? (1 - p.life) / 0.22
+                 : 1;
+
+        var glow = p.r * (1 + Math.sin(p.pulse) * 0.35);
+        var cx = p.x * W;
+        var cy = p.y * H;
+        var a = p.alpha * fade;
+
+        // Outer glow
+        var g = ctx.createRadialGradient(cx, cy, 0, cx, cy, glow * 4);
+        g.addColorStop(0, 'rgba(' + p.col[0] + ',' + p.col[1] + ',' + p.col[2] + ',' + (a * 0.4) + ')');
+        g.addColorStop(1, 'rgba(' + p.col[0] + ',' + p.col[1] + ',' + p.col[2] + ',0)');
+        ctx.beginPath();
+        ctx.arc(cx, cy, glow * 4, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+
+        // Core
+        ctx.beginPath();
+        ctx.arc(cx, cy, glow, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + p.col[0] + ',' + p.col[1] + ',' + p.col[2] + ',' + a + ')';
+        ctx.fill();
+
+        // Lines between close particles
+        for (var j = i + 1; j < particles.length; j++) {
+          var q = particles[j];
+          var dx = (p.x - q.x) * W;
+          var dy = (p.y - q.y) * H;
+          var dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 110) {
+            var qfade = q.life < 0.12 ? q.life / 0.12 : q.life > 0.78 ? (1 - q.life) / 0.22 : 1;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy);
+            ctx.lineTo(q.x * W, q.y * H);
+            ctx.strokeStyle = 'rgba(0,80,200,' + (0.2 * (1 - dist / 110) * fade * qfade) + ')';
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
