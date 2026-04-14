@@ -35,7 +35,7 @@ def search_porto_news():
         "search_depth": "basic",
         "max_results": 5,
         "include_answer": True,
-        "days": 7
+        "days": 3
     })
     r.raise_for_status()
     data = r.json()
@@ -48,13 +48,13 @@ def generate_article(existing_titles, news_context):
     titles_str = "\n".join("- " + t for t in existing_titles[-15:]) if existing_titles else "Aucun."
     prompt = """Tu es un journaliste sportif senior, expert tactique du FC Porto, pour NewsPorto.fr.
 
-ACTUALITES RECENTES TROUVEES SUR LE WEB :
+ACTUALITES RECENTES (3 DERNIERS JOURS - date du jour : 14/04/2026) :
 """ + news_context + """
 
 MISSION : Redige un article journalistique de qualite professionnelle.
 
 REGLES STRICTES :
-1. Lis attentivement les actualites. Un score comme "1-0" signifie que la premiere equipe citee a marque 1 but et l'adversaire 0. Verifie toujours qui a gagne avant d'ecrire.
+1. Nous sommes le 14/04/2026. Lis attentivement les actualites et ignore tout fait qui semble date ou qui concerne une journee de championnat deja passee depuis longtemps. Un score comme "1-0" signifie que la premiere equipe citee a marque 1 but et l'adversaire 0. Verifie toujours qui a gagne avant d'ecrire.
 2. Si une equipe "gagne 2-0" elle a marque 2 buts et en a encaisse 0 - elle a GAGNE. Si elle "perd 0-2" elle a marque 0 et en a encaisse 2 - elle a PERDU.
 3. Base-toi uniquement sur les faits presents dans les actualites. Si tu n'es pas certain d'un score ou d'un fait, ne l'invente pas - fais une analyse tactique ou contextuelle a la place.
 4. Enrichis l'article avec une analyse football concrete : systeme de jeu, performances individuelles, enjeux tactiques, contexte de la competition, implications au classement.
