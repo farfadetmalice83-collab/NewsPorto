@@ -1596,36 +1596,39 @@
   });
 
   // ══ CORRECTIF : re-lancer les compteurs après injection API ══
-  // renderMatch() injecte les .stat-num dynamiquement → on surcharge pour re-déclencher
-  const _origRenderMatch = window.renderMatch || null;
+  // Utilise un flag pour éviter la boucle infinie MutationObserver ↔ animateCount
+  let _statsAnimating = false;
   function triggerCountersAfterRender() {
+    if (_statsAnimating) return;
     const grid = document.getElementById('stats-grid');
     if (!grid) return;
-    // Reset animated flags pour permettre une nouvelle animation
-    grid.querySelectorAll('.stat-num').forEach(el => delete el.dataset.animated);
-    // Si la section est déjà visible, animer direct ; sinon re-observer
-    const rect = grid.getBoundingClientRect();
-    const inView = rect.top < window.innerHeight && rect.bottom > 0;
-    if (inView) {
-      grid.querySelectorAll('.stat-num').forEach(el => {
-        const txt = el.textContent.trim();
-        const num = parseFloat(txt.replace(/[^0-9.]/g, ''));
-        if (!isNaN(num) && num > 0) {
-          el.dataset.animated = '1';
-          const suffix = /er$/.test(txt) ? 'er' : /e$/.test(txt) && isNaN(txt) ? 'e' : '';
-          el.dataset.suffix = suffix;
-          animateCount(el, num);
-        }
-      });
-    } else {
-      watchCounters(grid);
-    }
+    // Vérifie qu'il y a bien des vrais chiffres (pas des "—" ou vide)
+    const hasRealData = Array.from(grid.querySelectorAll('.stat-num')).some(el => {
+      const n = parseFloat(el.textContent.replace(/[^0-9.]/g, ''));
+      return !isNaN(n) && n > 0;
+    });
+    if (!hasRealData) return;
+    _statsAnimating = true;
+    grid.querySelectorAll('.stat-num').forEach(el => {
+      if (el.dataset.animated) return;
+      const txt = el.textContent.trim();
+      const num = parseFloat(txt.replace(/[^0-9.]/g, ''));
+      if (isNaN(num) || num <= 0) return;
+      el.dataset.animated = '1';
+      // Suffixe : seulement "er" pour le classement (ex: "1er"), rien sinon
+      el.dataset.suffix = /^\d+er$/.test(txt) ? 'er' : '';
+      animateCount(el, num);
+    });
+    setTimeout(() => { _statsAnimating = false; }, 1500);
   }
-  // Patch : on observe les mutations du stats-grid (l'API le remplit)
+  // MutationObserver sur le stats-grid — se déclenche quand l'API injecte le HTML
   const statsGrid = document.getElementById('stats-grid');
   if (statsGrid) {
-    new MutationObserver(() => triggerCountersAfterRender())
-      .observe(statsGrid, { childList: true, subtree: true });
+    new MutationObserver((mutations) => {
+      // Ne réagir qu'aux ajouts de nœuds (innerHTML rewrite), pas aux textContent changes
+      const hasAddedNodes = mutations.some(m => m.addedNodes.length > 0);
+      if (hasAddedNodes) triggerCountersAfterRender();
+    }).observe(statsGrid, { childList: true, subtree: true });
   }
 
   // ══ TILT 3D SUR LES ARTICLE CARDS ══════════════════════════
