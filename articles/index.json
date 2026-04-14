@@ -1,17 +1,4 @@
 {
-  "articles": [
-    {
-      "id": 1,
-      "file": "article1.html",
-      "title": "Porto domine le derby",
-      "excerpt": "Le FC Porto confirme sa suprématie avec une victoire 3-0 contre Boavista",
-      "category": "europe | analyse",
-      "read_time": "5 min de lecture",
-      "date": "14 Avr 2026",
-      "date_iso": "2026-04-14",
-      "image": "",
-      "image_thumb": ""
-    }
-  ],
+  "articles": [],
   "used_image_ids": []
 }
