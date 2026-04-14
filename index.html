@@ -2101,8 +2101,8 @@
   </script>
 
   <script>
-  // Charge les articles depuis index.json
-  fetch('articles/index.json')
+  // Charge les articles depuis articlestotal.json
+  fetch('articles/articlestotal.json')
     .then(r => r.json())
     .then(data => {
       const articles = data.articles || [];
