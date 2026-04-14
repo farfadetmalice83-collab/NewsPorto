@@ -1,6 +1,20 @@
 {
-  "articles": [],
+  "articles": [
+    {
+      "id": 1,
+      "file": "article1.html",
+      "title": "FC Porto en difficulté",
+      "excerpt": "Le FC Porto a perdu son dernier match 1-3 contre Estoril. Quels sont les enseignements de cette défaite pour le match à venir contre Nottingham Forest en UEFA Europa League ?",
+      "category": "analyse",
+      "read_time": "5 min de lecture",
+      "date": "14 Avr 2026",
+      "date_iso": "2026-04-14",
+      "image": "https://images.unsplash.com/photo-1603683180670-89e591ecf86a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHRhY3RpY3MlMjBjb2FjaHxlbnwwfDB8fHwxNzc2MjAxMzM2fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "image_thumb": "https://images.unsplash.com/photo-1603683180670-89e591ecf86a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHRhY3RpY3MlMjBjb2FjaHxlbnwwfDB8fHwxNzc2MjAxMzM2fDA&ixlib=rb-4.1.0&q=80&w=400"
+    }
+  ],
   "used_image_ids": [
-    "tHjoZcCqqPQ"
+    "tHjoZcCqqPQ",
+    "PRn2jQX3xkI"
   ]
 }
