@@ -88,12 +88,13 @@
 
     /* HERO */
     .shop-hero {
-      display: grid; grid-template-columns: 1fr 1fr 380px;
+      display: grid; grid-template-columns: 1fr 380px; position: relative; overflow: hidden;
       border-bottom: 1px solid var(--border); min-height: 360px;
     }
     .hero-left {
       padding: 72px 56px; border-right: 1px solid var(--border);
       display: flex; flex-direction: column; justify-content: center;
+      position: relative; z-index: 1;
     }
     .hero-eyebrow {
       font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
@@ -130,12 +131,16 @@
     .btn-secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.28); }
 
     .hero-visual {
-      border-right: 1px solid var(--border);
-      overflow: hidden;
-      position: relative;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
     }
-    .hero-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
-    .hero-right { display: flex; flex-direction: column; }
+    .hero-visual img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center top;
+      display: block; opacity: 0.12; filter: grayscale(30%);
+    }
+    .hero-right { display: flex; flex-direction: column; position: relative; z-index: 1; }
     .trust-item {
       flex: 1; padding: 0 32px;
       border-bottom: 1px solid var(--border);
@@ -406,7 +411,7 @@
           <p class="product-name">Hoodie Édition Dragon</p>
           <p class="product-desc">Coupe oversize premium · Logo NP imprimé poitrine · Coloris noir</p>
           <div class="product-footer">
-            <span class="product-price">€41</span>
+            <span class="product-price">41€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -422,7 +427,7 @@
           <p class="product-name">Tee Édition Dragon</p>
           <p class="product-desc">Regular fit · Logo NP imprimé poitrine · 100% coton · Coloris noir</p>
           <div class="product-footer">
-            <span class="product-price">€22</span>
+            <span class="product-price">22€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -451,7 +456,7 @@
           <p class="product-name">Cap Dragon NP</p>
           <p class="product-desc">Logo brodé · Dad cap déstructurée · Fermeture ajustable</p>
           <div class="product-footer">
-            <span class="product-price">€22</span>
+            <span class="product-price">22€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -466,7 +471,7 @@
           <p class="product-name">Bucket Hat Dragon NP</p>
           <p class="product-desc">Logo NP imprimé · Coupe bucket hat tendance · Matière légère</p>
           <div class="product-footer">
-            <span class="product-price">€28</span>
+            <span class="product-price">28€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -495,7 +500,7 @@
           <p class="product-name">Tumbler Dragão Noir</p>
           <p class="product-desc">Acier inoxydable double paroi · Maintien thermique · Paille inox incluse</p>
           <div class="product-footer">
-            <span class="product-price">€27</span>
+            <span class="product-price">27€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -510,7 +515,7 @@
           <p class="product-name">Mug Dragão Noir</p>
           <p class="product-desc">Céramique noire brillante · Disponible en 11oz & 15oz · Passe au lave-vaisselle</p>
           <div class="product-footer">
-            <span class="product-price">€14</span>
+            <span class="product-price">14€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -540,7 +545,7 @@
           <p class="product-name">Poster Soit Portista</p>
           <p class="product-desc">Design exclusif NewsPorto · Plusieurs formats disponibles · Papier mat premium</p>
           <div class="product-footer">
-            <span class="product-price">€26+</span>
+            <span class="product-price">26€+</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
@@ -555,7 +560,7 @@
           <p class="product-name">Sticker Dragon NP</p>
           <p class="product-desc">Format 3"×3" · Finition mate premium · Résistant à l'eau</p>
           <div class="product-footer">
-            <span class="product-price">€7</span>
+            <span class="product-price">7€</span>
             <span class="product-cta">Commander →</span>
           </div>
         </div>
