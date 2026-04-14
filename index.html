@@ -907,6 +907,14 @@
     /* 7. Article card — bordure gauche bleue au hover */
     .article-card { border-left: 2px solid transparent !important; transition: background .2s, transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s, border-color .3s !important; }
     .article-card:hover { border-left-color: #003DA5 !important; }
+    /* Glow dynamique tilt — suit la souris via --glow-x / --glow-y */
+    .article-card::before {
+      content: '';
+      position: absolute; inset: 0; z-index: 3; pointer-events: none;
+      background: radial-gradient(circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(0,61,165,0.12) 0%, transparent 60%);
+      opacity: 0; transition: opacity .2s;
+    }
+    .article-card:hover::before { opacity: 1; }
 
     /* 8. Hero visual glow — plus riche */
     .hero-visual::before { background: radial-gradient(ellipse at center 80%, rgba(0,61,165,0.65) 0%, rgba(0,20,90,0.3) 45%, transparent 100%) !important; }
@@ -931,6 +939,157 @@
     .player-card { transition: background .2s, transform .3s cubic-bezier(.22,1,.36,1); }
     .player-card:hover { transform: translateY(-3px); }
     .filter-btn { transition: color .2s, border-bottom-color .2s, background .2s; }
+
+    /* ══ PARTICLES CANVAS ══════════════════════════════════════ */
+    #particles-canvas {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+    .hero-visual { position: relative; overflow: hidden; }
+
+    /* ══ HERO TITLE GLITCH ENHANCED ══════════════════════════ */
+    .hero-title {
+      position: relative;
+    }
+    .hero-title::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0; top: 0;
+      opacity: 0;
+      color: #003DA5;
+      clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+      animation: titleReveal 1.4s cubic-bezier(.22,1,.36,1) 0.5s forwards;
+    }
+    @keyframes titleReveal {
+      0%   { opacity: 0; clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%); }
+      40%  { opacity: 0.07; }
+      100% { opacity: 0; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+    }
+
+    /* ══ SCANLINE HERO ══════════════════════════════════════ */
+    .hero::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, transparent, rgba(0,61,165,0.4) 30%, rgba(0,61,165,0.6) 50%, rgba(0,61,165,0.4) 70%, transparent);
+      z-index: 2;
+      pointer-events: none;
+      animation: scanline 3s ease-in-out infinite;
+    }
+    @keyframes scanline {
+      0%, 100% { opacity: 0.3; transform: scaleY(0.6); }
+      50% { opacity: 0.8; transform: scaleY(1); }
+    }
+
+    /* ══ HERO GLOW PULSE ══════════════════════════════════ */
+    .hero-visual::before {
+      animation: glowPulse 4s ease-in-out infinite !important;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.8; transform: translateX(-50%) scale(1); }
+      50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
+    }
+
+    /* ══ HERO IMG FLOAT ══════════════════════════════════ */
+    .hero-team-img {
+      animation: heroFloat 6s ease-in-out infinite;
+      will-change: transform;
+    }
+    @keyframes heroFloat {
+      0%, 100% { filter: drop-shadow(0 0 40px rgba(0,61,165,0.5)); }
+      50% { filter: drop-shadow(0 0 80px rgba(0,100,255,0.7)); }
+    }
+
+    /* ══ RING ORBITS ════════════════════════════════════ */
+    .hero-ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(0,61,165,0.2);
+      pointer-events: none;
+      z-index: 0;
+      left: 50%; top: 50%;
+    }
+    .hero-ring-1 {
+      width: 320px; height: 320px;
+      margin-left: -160px; margin-top: -160px;
+      animation: ringRotate 12s linear infinite;
+      border-color: rgba(0,61,165,0.15);
+    }
+    .hero-ring-2 {
+      width: 500px; height: 500px;
+      margin-left: -250px; margin-top: -250px;
+      animation: ringRotate 20s linear infinite reverse;
+      border-color: rgba(0,80,200,0.1);
+      border-style: dashed;
+    }
+    .hero-ring-3 {
+      width: 680px; height: 680px;
+      margin-left: -340px; margin-top: -340px;
+      animation: ringRotate 30s linear infinite;
+      border-color: rgba(0,50,140,0.07);
+    }
+    @keyframes ringRotate {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
+    /* ══ TICKER ENHANCED ══════════════════════════════════ */
+    .ticker { position: relative; overflow: hidden; }
+    .ticker::before, .ticker::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 80px; z-index: 2; pointer-events: none;
+    }
+    .ticker::before { left: 0; background: linear-gradient(to right, #000, transparent); }
+    .ticker::after  { right: 0; background: linear-gradient(to left, #000, transparent); }
+
+    /* ══ HERO BTN ENHANCED ═══════════════════════════════ */
+    .hero-btn {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0%, rgba(0,61,165,0.15) 50%, transparent 100%);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .hero-btn:hover::before { transform: translateX(100%); }
+
+    /* ══ STATS SECTION — bar animate ═══════════════════ */
+    .stat-cell {
+      position: relative;
+      transition: background 0.3s, transform 0.3s !important;
+    }
+    .stat-cell:hover { transform: translateY(-2px); }
+
+    /* ══ NAV ENHANCED ═══════════════════════════════════ */
+    nav {
+      transition: background 0.3s, box-shadow 0.3s;
+    }
+    nav.scrolled {
+      background: rgba(0,0,0,0.92) !important;
+      box-shadow: 0 1px 0 0 rgba(0,61,165,0.4), 0 4px 32px rgba(0,20,80,0.3) !important;
+    }
+
+    /* ══ ARTICLE CARD SHINE ════════════════════════════ */
+    .article-card::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -60%;
+      width: 40%; height: 200%;
+      background: linear-gradient(105deg, transparent, rgba(255,255,255,0.04), transparent);
+      transform: skewX(-20deg);
+      transition: left 0.6s ease;
+      z-index: 3;
+    }
+    .article-card:hover::before { left: 120%; }
   </style>
 </head>
 <body>
@@ -995,6 +1154,10 @@
 
     <!-- MILIEU : photo équipe sans fond -->
     <div class="hero-visual">
+      <canvas id="particles-canvas"></canvas>
+      <div class="hero-ring hero-ring-1"></div>
+      <div class="hero-ring hero-ring-2"></div>
+      <div class="hero-ring hero-ring-3"></div>
       <img src="team_nobg.png" alt="FC Porto" class="hero-team-img">
     </div>
 
@@ -1432,6 +1595,71 @@
     obs2.observe(el);
   });
 
+  // ══ CORRECTIF : re-lancer les compteurs après injection API ══
+  // renderMatch() injecte les .stat-num dynamiquement → on surcharge pour re-déclencher
+  const _origRenderMatch = window.renderMatch || null;
+  function triggerCountersAfterRender() {
+    const grid = document.getElementById('stats-grid');
+    if (!grid) return;
+    // Reset animated flags pour permettre une nouvelle animation
+    grid.querySelectorAll('.stat-num').forEach(el => delete el.dataset.animated);
+    // Si la section est déjà visible, animer direct ; sinon re-observer
+    const rect = grid.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight && rect.bottom > 0;
+    if (inView) {
+      grid.querySelectorAll('.stat-num').forEach(el => {
+        const txt = el.textContent.trim();
+        const num = parseFloat(txt.replace(/[^0-9.]/g, ''));
+        if (!isNaN(num) && num > 0) {
+          el.dataset.animated = '1';
+          const suffix = /er$/.test(txt) ? 'er' : /e$/.test(txt) && isNaN(txt) ? 'e' : '';
+          el.dataset.suffix = suffix;
+          animateCount(el, num);
+        }
+      });
+    } else {
+      watchCounters(grid);
+    }
+  }
+  // Patch : on observe les mutations du stats-grid (l'API le remplit)
+  const statsGrid = document.getElementById('stats-grid');
+  if (statsGrid) {
+    new MutationObserver(() => triggerCountersAfterRender())
+      .observe(statsGrid, { childList: true, subtree: true });
+  }
+
+  // ══ TILT 3D SUR LES ARTICLE CARDS ══════════════════════════
+  document.querySelectorAll('.article-card').forEach(card => {
+    card.style.transformStyle = 'preserve-3d';
+    card.style.willChange = 'transform';
+
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width  - 0.5;  // -0.5 → +0.5
+      const y = (e.clientY - r.top)  / r.height - 0.5;
+      const maxDeg = card.classList.contains('featured') ? 6 : 8;
+      const rotY =  x * maxDeg * 2;
+      const rotX = -y * maxDeg;
+      // Garde le translateY du hover existant + ajoute le tilt
+      card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(6px)`;
+      // Déplace le glow bg selon la souris
+      const glowX = (x + 0.5) * 100;
+      const glowY = (y + 0.5) * 100;
+      card.style.setProperty('--glow-x', glowX + '%');
+      card.style.setProperty('--glow-y', glowY + '%');
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card.style.transition = 'transform 0.5s cubic-bezier(.22,1,.36,1), box-shadow .35s';
+      card.style.transform = '';
+      setTimeout(() => card.style.transition = '', 500);
+    });
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transition = 'transform 0.08s ease, box-shadow .35s';
+    });
+  });
+
   // Match card spotlight
   const mc = document.getElementById('match-card');
   if (mc) {
@@ -1465,9 +1693,132 @@
     },{threshold:0.1});
     vobs.observe(vsec);
   }
-      // Cursor glow bleu
+  // Cursor glow bleu
   const cg = document.getElementById("cursor-glow");
   if (cg) {
     document.addEventListener("mousemove", e => {
       cg.style.left = e.clientX + "px";
       cg.style.top = e.clientY + "px";
+    });
+    cg.style.opacity = '1';
+  }
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (nav) {
+      if (window.scrollY > 20) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    }
+  }, { passive: true });
+
+  // ══ PARTICLES SYSTEM ══════════════════════════════════
+  (function() {
+    const canvas = document.getElementById('particles-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const hero = canvas.closest('.hero-visual');
+
+    function resize() {
+      canvas.width  = hero.offsetWidth;
+      canvas.height = hero.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const COUNT = 70;
+    const particles = [];
+
+    for (let i = 0; i < COUNT; i++) {
+      particles.push({
+        x: Math.random(),
+        y: Math.random(),
+        r: Math.random() * 2.2 + 0.4,
+        vx: (Math.random() - 0.5) * 0.0004,
+        vy: (Math.random() - 0.7) * 0.0005,
+        a: Math.random() * 0.7 + 0.1,
+        va: (Math.random() - 0.5) * 0.003,
+        hue: Math.random() > 0.7 ? 220 : (Math.random() > 0.5 ? 200 : 215),
+        sat: Math.round(Math.random() * 30 + 70),
+        pulse: Math.random() * Math.PI * 2,
+        pulseSpeed: Math.random() * 0.015 + 0.005
+      });
+    }
+
+    // Connexion lines between close particles
+    function drawConnections(pts, W, H) {
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i + 1; j < pts.length; j++) {
+          const dx = (pts[i].x - pts[j].x) * W;
+          const dy = (pts[i].y - pts[j].y) * H;
+          const dist = Math.sqrt(dx*dx + dy*dy);
+          if (dist < 90) {
+            const alpha = (1 - dist / 90) * 0.12;
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(0, 80, 220, ${alpha})`;
+            ctx.lineWidth = 0.6;
+            ctx.moveTo(pts[i].x * W, pts[i].y * H);
+            ctx.lineTo(pts[j].x * W, pts[j].y * H);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    let frame = 0;
+    function tick() {
+      const W = canvas.width, H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+
+      // Subtle blue radial fog behind image
+      const grad = ctx.createRadialGradient(W*0.5, H*0.8, 0, W*0.5, H*0.8, W*0.55);
+      grad.addColorStop(0, 'rgba(0, 40, 160, 0.18)');
+      grad.addColorStop(0.5, 'rgba(0, 20, 100, 0.08)');
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, H);
+
+      drawConnections(particles, W, H);
+
+      for (const p of particles) {
+        p.pulse += p.pulseSpeed;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.a += p.va;
+
+        if (p.x < 0) p.x = 1;
+        if (p.x > 1) p.x = 0;
+        if (p.y < 0) p.y = 1;
+        if (p.y > 1) p.y = 0;
+        if (p.a < 0.05) p.va = Math.abs(p.va);
+        if (p.a > 0.85) p.va = -Math.abs(p.va);
+
+        const px = p.x * W, py = p.y * H;
+        const radius = p.r * (1 + 0.3 * Math.sin(p.pulse));
+        const alpha = p.a * (0.8 + 0.2 * Math.sin(p.pulse));
+
+        // Glow
+        const glow = ctx.createRadialGradient(px, py, 0, px, py, radius * 5);
+        glow.addColorStop(0, `hsla(${p.hue}, ${p.sat}%, 60%, ${alpha * 0.4})`);
+        glow.addColorStop(1, 'transparent');
+        ctx.beginPath();
+        ctx.arc(px, py, radius * 5, 0, Math.PI * 2);
+        ctx.fillStyle = glow;
+        ctx.fill();
+
+        // Core dot
+        ctx.beginPath();
+        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.fillStyle = `hsla(${p.hue}, ${p.sat}%, 72%, ${alpha})`;
+        ctx.fill();
+      }
+
+      frame++;
+      requestAnimationFrame(tick);
+    }
+    tick();
+  })();
+
+  </script>
+</body>
+</html>
