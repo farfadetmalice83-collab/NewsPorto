@@ -1402,24 +1402,22 @@
   <section class="hero">
 
     <!-- GAUCHE : article à la une -->
-    <div class="hero-content">
-      <p class="hero-eyebrow">À la une · Europe · 05 Avr 2026</p>
-      <h1 class="hero-title">
-        <span class="hero-title-line"><span>L'Enfer du</span></span>
-        <span class="hero-title-line"><span><span class="outline">Dragão</span></span></span>
-        <span class="hero-title-line"><span>Attend Forest</span></span>
+    <div class="hero-content" id="hero-content">
+      <p class="hero-eyebrow" id="hero-eyebrow">À la une · Chargement...</p>
+      <h1 class="hero-title" id="hero-title">
+        <span class="hero-title-line"><span>Dernière</span></span>
+        <span class="hero-title-line"><span><span class="outline">Actu</span></span></span>
+        <span class="hero-title-line"><span>Porto</span></span>
       </h1>
       <div class="hero-meta">
-        <span>Analyse</span>
+        <span id="hero-cat">—</span>
         <span class="dot"></span>
-        <span>5 min de lecture</span>
+        <span id="hero-read">—</span>
         <span class="dot"></span>
         <span>NewsPorto FR</span>
       </div>
-      <p class="hero-lead">
-        À quelques jours du quart de finale aller, l'ambiance monte d'un cran. Les Dragons s'apprêtent à recevoir les Anglais avec un seul objectif : laver l'affront du match de poules.
-      </p>
-      <a href="articles/article2.html" class="hero-btn">Lire l'article →</a>
+      <p class="hero-lead" id="hero-lead">Chargement de l'article...</p>
+      <a href="#" id="hero-btn" class="hero-btn">Lire l'article →</a>
     </div>
 
     <!-- MILIEU : photo équipe sans fond -->
@@ -1440,25 +1438,24 @@
       <span class="section-label">— Derniers articles</span>
       <a href="actu.html" class="section-link">Tout voir →</a>
     </div>
-    <div class="articles-grid">
-      <a class="article-card featured reveal" href="articles/article1.html">
-        <div class="article-card-bg" style="background-image:url('articles/img/article1.jpg')"></div>
-        <p class="article-cat">Transfert</p>
-        <h2 class="article-title">Porto tient sa recrue prioritaire du mercato estival</h2>
-        <p class="article-excerpt">Le club bleu et blanc a officialisé l'arrivée de son nouveau milieu offensif. Un renfort de taille pour aborder la prochaine saison avec ambition.</p>
-        <p class="article-date">04 Avr 2026</p>
+    <div class="articles-grid" id="articles-grid">
+      <a class="article-card featured reveal" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
       </a>
-      <a class="article-card reveal reveal-d1" href="articles/article6.html">
-        <div class="article-card-bg" style="background-image:url('articles/img/article6.jpg')"></div>
-        <p class="article-cat">Analyse</p>
-        <h2 class="article-title">Tactique : Le 4-3-3 de Farioli décrypté</h2>
-        <p class="article-date">01 Avr 2026</p>
+      <a class="article-card reveal reveal-d1" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
       </a>
-      <a class="article-card reveal reveal-d2" href="articles/article3.html">
-        <div class="article-card-bg" style="background-image:url('articles/img/article3.jpg')"></div>
-        <p class="article-cat">Focus</p>
-        <h2 class="article-title">William Gomes : L'ascension fulgurante</h2>
-        <p class="article-date">04 Avr 2026</p>
+      <a class="article-card reveal reveal-d2" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
       </a>
     </div>
   </section>
@@ -2102,5 +2099,50 @@
   })();
 
   </script>
+
+  <script>
+  // Charge les articles depuis index.json
+  fetch('articles/index.json')
+    .then(r => r.json())
+    .then(data => {
+      const articles = data.articles || [];
+      if (!articles.length) return;
+      const catLabels = {europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+
+      // --- HERO : article le plus récent ---
+      const a0 = articles[0];
+      const catLabel0 = catLabels[a0.category] || a0.category;
+      document.getElementById('hero-eyebrow').textContent = `À la une · ${catLabel0} · ${a0.date}`;
+      const words = a0.title.split(' ');
+      const mid = Math.ceil(words.length / 2);
+      const line1 = words.slice(0, mid).join(' ');
+      const line2 = words.slice(mid).join(' ');
+      document.getElementById('hero-title').innerHTML = `
+        <span class="hero-title-line"><span>${line1}</span></span>
+        <span class="hero-title-line"><span><span class="outline">${line2}</span></span></span>`;
+      document.getElementById('hero-cat').textContent = catLabel0;
+      document.getElementById('hero-read').textContent = a0.read_time;
+      document.getElementById('hero-lead').textContent = a0.excerpt;
+      document.getElementById('hero-btn').href = `articles/${a0.file}`;
+
+      // --- GRILLE : 3 derniers articles ---
+      const grid = document.getElementById('articles-grid');
+      const cards = grid.querySelectorAll('.article-card');
+      articles.slice(0, 3).forEach((a, i) => {
+        const card = cards[i];
+        if (!card) return;
+        const cat = catLabels[a.category] || a.category;
+        card.href = `articles/${a.file}`;
+        card.querySelector('.article-card-bg').style.backgroundImage = a.image ? `url('${a.image}')` : '';
+        card.querySelector('.article-cat').textContent = cat;
+        card.querySelector('.article-title').textContent = a.title;
+        card.querySelector('.article-date').textContent = a.date;
+        const excerpt = card.querySelector('.article-excerpt');
+        if (excerpt) excerpt.textContent = a.excerpt || '';
+      });
+    })
+    .catch(() => {});
+  </script>
+  <script src="ticker-dynamic.js"></script>
 </body>
 </html>
