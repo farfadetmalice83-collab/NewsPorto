@@ -88,7 +88,15 @@ REPONSE : JSON uniquement, sans markdown, sans backticks.
     m = re.search(r'\{[\s\S]*\}', raw)
     if m:
         raw = m.group(0)
-    return json.loads(raw)
+    # Nettoie les caracteres de controle sauf newline/tab
+    cleaned = "".join(c for c in raw if ord(c) >= 32 or c in "\n\t")
+    # Parse avec gestion des newlines dans les valeurs string
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        # Remplace les newlines dans les valeurs par des espaces
+        cleaned2 = re.sub(r'(?<!\\)\n', ' ', cleaned)
+        return json.loads(cleaned2)
 
 def get_unsplash_image(query, used_ids):
     params = {"query": query, "per_page": 20, "orientation": "landscape", "client_id": UNSPLASH_KEY}
