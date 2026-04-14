@@ -41,7 +41,9 @@
       display: flex; align-items: center; justify-content: center;
       transition: opacity .4s, visibility .4s;
     }
-    #page-loader.hidden { opacity: 0; visibility: hidden; }
+    #page-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #page-loader { animation: loaderAutoHide 1s ease 0.8s forwards; }
+    @keyframes loaderAutoHide { to { opacity: 0; visibility: hidden; pointer-events: none; } }
     .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
     .loader-text { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 8px; }
     .loader-bar { width: 160px; height: 1px; background: var(--border); overflow: hidden; }
@@ -262,8 +264,7 @@
     .strip-text { font-size: 13px; color: rgba(255,255,255,0.3); line-height: 1.6; }
 
     /* REVEAL */
-    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
-    .reveal.visible { opacity: 1; transform: none; }
+    .reveal { opacity: 1; transform: none; }
 
     /* FOOTER */
     footer {
@@ -357,7 +358,7 @@
       </div>
     </div>
     <div class="hero-visual">
-      <img src="/mnt/user-data/uploads/81a12ddf-8a63-4158-96bf-15ef5fcc03e1.png" alt="Nous Soutenir" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
+      <img src="nous-soutenir.png" alt="Nous Soutenir" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
     </div>
     <div class="hero-right">
       <div class="trust-item">
@@ -397,7 +398,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-hoodie-edition-dragon" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/xHSgffDzsE8dzFv4nDyqZy2IXa0M3M5UDlaR7-s9yaY/w:1920/sm:1/enc/BgGctPZOsPIxlj2X/YYTv1fpPrStKuVM0/_7mwgM-OceEYnkqf/aU_AIciMLuzU5uyU/6Cg2YhE35xpBu3mh/vjpl6nnuFO1e07Pt/4gNwVUymTXSCScVR/vncyb54UMWVJj8C9/4n-7bgZwdONDi6TX/rft7qDzRZsMHsokL/FNkjwWwW-yezYuXE/s5zIKRLAMPd6R9xU/ZoNw-7hRB_ZVGQgI/2oEB_M-AI27PIlWB/1nQDDm5iVzg" alt="Hoodie NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/xHSgffDzsE8dzFv4nDyqZy2IXa0M3M5UDlaR7-s9yaY/w:1920/sm:1/enc/BgGctPZOsPIxlj2X/YYTv1fpPrStKuVM0/_7mwgM-OceEYnkqf/aU_AIciMLuzU5uyU/6Cg2YhE35xpBu3mh/vjpl6nnuFO1e07Pt/4gNwVUymTXSCScVR/vncyb54UMWVJj8C9/4n-7bgZwdONDi6TX/rft7qDzRZsMHsokL/FNkjwWwW-yezYuXE/s5zIKRLAMPd6R9xU/ZoNw-7hRB_ZVGQgI/2oEB_M-AI27PIlWB/1nQDDm5iVzg" alt="Hoodie NewsPorto">
           <span class="product-badge badge-best">Best seller</span>
         </div>
         <div class="product-info">
@@ -413,7 +414,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/t-shirt-newsporto-edition-dragon" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/K0YYPHjQkBk_Wt6gSGab9lhrNxCAOAo6bzDIx5lATSg/w:1920/sm:1/enc/__LixfvHL-LGTayE/0SYw0q7kGTbJglJw/qrk1XfR5MF_MZg9S/ROtTHoXTxsp7Hmny/a1lLyh1KIjQSC-Ha/Fa1EtqVXoMQwGoRS/_U_wWw3a0tbhzee2/pSw-gztImw7jIuKM/1cuQD6nMDdsP2W92/4IagI60v7-kzQssA/HRXiKyYQKqaXWHx0/gWH16G1RehbKe648/gwYr5XW17fNAI_rk/plMNN5a90xOXovKO/Ad-ITeiHuQo" alt="Tee NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/K0YYPHjQkBk_Wt6gSGab9lhrNxCAOAo6bzDIx5lATSg/w:1920/sm:1/enc/__LixfvHL-LGTayE/0SYw0q7kGTbJglJw/qrk1XfR5MF_MZg9S/ROtTHoXTxsp7Hmny/a1lLyh1KIjQSC-Ha/Fa1EtqVXoMQwGoRS/_U_wWw3a0tbhzee2/pSw-gztImw7jIuKM/1cuQD6nMDdsP2W92/4IagI60v7-kzQssA/HRXiKyYQKqaXWHx0/gWH16G1RehbKe648/gwYr5XW17fNAI_rk/plMNN5a90xOXovKO/Ad-ITeiHuQo" alt="Tee NewsPorto">
           <span class="product-badge badge-new">New</span>
         </div>
         <div class="product-info">
@@ -443,7 +444,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/casquette-newsporto-dragon-np" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/vl_V0H-EbH9L-A2Xv71gE7_Jp83SUT4atFYeFsA8F4k/w:1920/sm:1/enc/fc42axtaPZbvyXb_/yPbg60AKHgQy7nZz/vHIBsiyK3QKw6fDt/XG1kf-25CHwdpwdS/IjMQYxx4xi17P2qT/VhxLGRoLYO7ANvce/X3J_mVWAdtkB0N4X/svGNzfD8GwsbpI0u/o1e9-blO4YqBi7N5/ea1mUcFfuNbKzxtn/ZyD68x-tBvw8WnQx/-5C8a2sCMs9NReWu/Don7PUeHcJFr9AZk/-v-2R3EP_4yXR8Ba/G2RTyqbK2Mg" alt="Casquette NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/vl_V0H-EbH9L-A2Xv71gE7_Jp83SUT4atFYeFsA8F4k/w:1920/sm:1/enc/fc42axtaPZbvyXb_/yPbg60AKHgQy7nZz/vHIBsiyK3QKw6fDt/XG1kf-25CHwdpwdS/IjMQYxx4xi17P2qT/VhxLGRoLYO7ANvce/X3J_mVWAdtkB0N4X/svGNzfD8GwsbpI0u/o1e9-blO4YqBi7N5/ea1mUcFfuNbKzxtn/ZyD68x-tBvw8WnQx/-5C8a2sCMs9NReWu/Don7PUeHcJFr9AZk/-v-2R3EP_4yXR8Ba/G2RTyqbK2Mg" alt="Casquette NewsPorto">
         </div>
         <div class="product-info">
           <p class="product-category">Casquette</p>
@@ -458,7 +459,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/bob-newsporto-dragon-np" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/lGYpLHDsqf7X-ZwZV484wnQI0TxN6Yi5M6f9ZUdtLMU/w:1920/sm:1/enc/axLwKc6gtkm6xSe8/G1IrEJtWm9hwVuAJ/7xvR-JS6ERhl17x3/G2xuyO7-4YUvnvWq/3-w-Bn89zzNnu-8v/iVHzjxXw2fRkbXgP/d9O_9XYaMmRZvfaR/wgzM5KRhjCfmdDV4/IXKfwYxzrPFyhonp/IyGrIhCKO4KL901c/rMzyGdts9y45aLJY/hiw11mqUgK-qLA9g/-l23NGlVpN_lfjxv/8mlMBcOjuyZxxsyM/Dih0M7PcjC8" alt="Bob NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/lGYpLHDsqf7X-ZwZV484wnQI0TxN6Yi5M6f9ZUdtLMU/w:1920/sm:1/enc/axLwKc6gtkm6xSe8/G1IrEJtWm9hwVuAJ/7xvR-JS6ERhl17x3/G2xuyO7-4YUvnvWq/3-w-Bn89zzNnu-8v/iVHzjxXw2fRkbXgP/d9O_9XYaMmRZvfaR/wgzM5KRhjCfmdDV4/IXKfwYxzrPFyhonp/IyGrIhCKO4KL901c/rMzyGdts9y45aLJY/hiw11mqUgK-qLA9g/-l23NGlVpN_lfjxv/8mlMBcOjuyZxxsyM/Dih0M7PcjC8" alt="Bob NewsPorto">
         </div>
         <div class="product-info">
           <p class="product-category">Bob</p>
@@ -487,7 +488,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/stanley-cup-newsporto-dragao-noir" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/mNMFz3d2_3YbVd1vPELN3O7raaH_Il9To7ME3HZ3KnI/w:1920/sm:1/enc/C5UzolwyqlULBdqH/ZD4l_oIh00MhxeZY/Dj_V0vuJ8p0iMuHM/_5GTOZGn-3iPEiF6/bSborPxFkDaapnqz/0hmEsRKIUGq8-Fk-/bpORXmN93TIcqihm/vNwuBB2ZCSP1racm/8lfjh6FA7BJ0elqO/TzZHANkYLkRhQSkM/v9ybFRQbGoWtXkqp/WEqqmNdWSMpMcc7J/Bqowmgwwag_9ulkg/VeoE-XXE8ws9C9QF/nM2UhrQOd-k" alt="Stanley Cup NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/mNMFz3d2_3YbVd1vPELN3O7raaH_Il9To7ME3HZ3KnI/w:1920/sm:1/enc/C5UzolwyqlULBdqH/ZD4l_oIh00MhxeZY/Dj_V0vuJ8p0iMuHM/_5GTOZGn-3iPEiF6/bSborPxFkDaapnqz/0hmEsRKIUGq8-Fk-/bpORXmN93TIcqihm/vNwuBB2ZCSP1racm/8lfjh6FA7BJ0elqO/TzZHANkYLkRhQSkM/v9ybFRQbGoWtXkqp/WEqqmNdWSMpMcc7J/Bqowmgwwag_9ulkg/VeoE-XXE8ws9C9QF/nM2UhrQOd-k" alt="Stanley Cup NewsPorto">
         </div>
         <div class="product-info">
           <p class="product-category">Tumbler</p>
@@ -502,7 +503,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/mug-newsporto-dragao-noir" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/KQb2rd1v8pNCGVsPV9ZzGcO4WQ9Q0xyPK3SyC414flY/w:1920/sm:1/enc/jjz3wsb3jqmQ2CA2/TB3Ai9iU067Tqa1G/LDDj8m5jr_DT3-fy/LhU_4aqvuwu1NfmJ/OoSzP9OIu4F1Fs4e/alf6Mf50NxJpd-sd/DYeBuDPW-Bqryq_W/ez5owSHuanpvZY-G/g4aaQZcvjTQB8MiJ/Ef69CgHjs1EudqUQ/ilqH4WKKyTBU1WqQ/IfkfL1Zu2tj5UnbV/u1QFQK7D6YEa1nJI/Xp_-1j_p0jjTd3gM/3DaT7FoeuPI" alt="Mug NewsPorto" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/KQb2rd1v8pNCGVsPV9ZzGcO4WQ9Q0xyPK3SyC414flY/w:1920/sm:1/enc/jjz3wsb3jqmQ2CA2/TB3Ai9iU067Tqa1G/LDDj8m5jr_DT3-fy/LhU_4aqvuwu1NfmJ/OoSzP9OIu4F1Fs4e/alf6Mf50NxJpd-sd/DYeBuDPW-Bqryq_W/ez5owSHuanpvZY-G/g4aaQZcvjTQB8MiJ/Ef69CgHjs1EudqUQ/ilqH4WKKyTBU1WqQ/IfkfL1Zu2tj5UnbV/u1QFQK7D6YEa1nJI/Xp_-1j_p0jjTd3gM/3DaT7FoeuPI" alt="Mug NewsPorto">
         </div>
         <div class="product-info">
           <p class="product-category">Mug</p>
@@ -531,7 +532,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-poster-soit-portista" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster Soit Portista" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster Soit Portista">
           <span class="product-badge badge-exclu">Exclusif</span>
         </div>
         <div class="product-info">
@@ -547,7 +548,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-sticker-dragon-np" target="_blank" class="product-card reveal">
         <div class="product-img-wrap">
-          <img src="https://imgproxy.fourthwall.com/e9cKnYttqJW5rW-_XepdNPbyZjdD195frgkeDGZeWsc/w:1920/sm:1/enc/Gv65qTFIcHMiVAB7/FYK_qR8y-JtBBz5K/FJUeq8wB-TpJY0EZ/e5T23Rsm17WkHQYA/4WvhyUFsvOWiCEnp/GJAcDr3wnwyvbp6Y/5JhHohLZk5wOBQm3/AY2TzXizr79JFQBI/lLARVlvg19TySBv5/zSgIlHvA5HKmnU40/M_YGsMSGUei3KIjF/hy8iXgAW32IlOjKe/ZH7-teEMQ5HtFyYO/acrHttxMLy64dHvg/eeYPuwzy4cI" alt="Sticker Dragon NP" loading="lazy">
+          <img src="https://imgproxy.fourthwall.com/e9cKnYttqJW5rW-_XepdNPbyZjdD195frgkeDGZeWsc/w:1920/sm:1/enc/Gv65qTFIcHMiVAB7/FYK_qR8y-JtBBz5K/FJUeq8wB-TpJY0EZ/e5T23Rsm17WkHQYA/4WvhyUFsvOWiCEnp/GJAcDr3wnwyvbp6Y/5JhHohLZk5wOBQm3/AY2TzXizr79JFQBI/lLARVlvg19TySBv5/zSgIlHvA5HKmnU40/M_YGsMSGUei3KIjF/hy8iXgAW32IlOjKe/ZH7-teEMQ5HtFyYO/acrHttxMLy64dHvg/eeYPuwzy4cI" alt="Sticker Dragon NP">
         </div>
         <div class="product-info">
           <p class="product-category">Sticker</p>
@@ -597,26 +598,28 @@
     <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
     <ul class="footer-links">
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
-      <li><a href="mailto:luisdasilva83310@gmail.com">Contact</a></li>
+      <li><a href="/cdn-cgi/l/email-protection#dcb0a9b5afb8bdafb5b0aabde4efefedec9cbbb1bdb5b0f2bfb3b1">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
     </ul>
   </footer>
 
 </div>
 
-<script>
-  window.addEventListener('load', () => {
-    setTimeout(() => document.getElementById('page-loader').classList.add('hidden'), 350);
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Hide loader immediately
+  (function() {
+    var loader = document.getElementById('page-loader');
+    if (loader) loader.classList.add('hidden');
+  })();
+  document.addEventListener('DOMContentLoaded', () => {
+    var loader = document.getElementById('page-loader');
+    if (loader) loader.classList.add('hidden');
   });
-  const ro = new IntersectionObserver((entries) => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
-  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
-  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  setTimeout(() => {
+    var loader = document.getElementById('page-loader');
+    if (loader) loader.classList.add('hidden');
+  }, 500);
+
   const cg = document.getElementById('cursor-glow');
   document.addEventListener('mousemove', e => {
-    cg.style.left = e.clientX + 'px'; cg.style.top = e.clientY + 'px'; cg.style.opacity = '1';
-  }, { passive: true });
-  document.addEventListener('mouseleave', () => cg.style.opacity = '0');
-</script>
-</body>
-</html>
+    cg.style.left = e.clientX + 'px'; cg.style.top = e.clientY
