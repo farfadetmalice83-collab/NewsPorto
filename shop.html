@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsPorto — Shop Officiel</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --off-white: #e8e8e8;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.09);
+      --grid-color: rgba(255,255,255,0.035);
+      --blue: #003DA5;
+      --blue-accent: #0050CC;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: #000; color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image: linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px; animation: gridScroll 16s linear infinite; pointer-events: none;
+    }
+    @keyframes gridScroll { 0% { background-position: 0 0; } 100% { background-position: 44px 44px; } }
+
+    #cursor-glow {
+      position: fixed; width: 400px; height: 400px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,45,130,0.06) 0%, transparent 70%);
+      pointer-events: none; z-index: 0; transform: translate(-50%,-50%); opacity: 0; transition: opacity .3s;
+    }
+
+    .page { position: relative; z-index: 1; }
+
+    #page-loader {
+      position: fixed; inset: 0; background: #000; z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+      transition: opacity .4s, visibility .4s;
+    }
+    #page-loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+    .loader-text { font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: 8px; }
+    .loader-bar { width: 160px; height: 1px; background: var(--border); overflow: hidden; }
+    .loader-bar-fill { height: 100%; width: 0%; background: var(--white); animation: loadBar .55s ease forwards; }
+    @keyframes loadBar { to { width: 100%; } }
+
+    /* NAV */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px; height: 72px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(10px); background: rgba(0,0,0,0.65);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 44px; }
+    .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 3px; color: var(--white); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+      text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid rgba(255,255,255,0.18); color: var(--white); background: transparent;
+      padding: 8px 22px; text-decoration: none; transition: background .2s, border-color .2s;
+    }
+    .nav-cta:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.35); }
+
+    /* TICKER */
+    .ticker { border-bottom: 1px solid var(--border); overflow: hidden; height: 34px; display: flex; align-items: center; }
+    .ticker-inner { display: flex; animation: ticker 36s linear infinite; white-space: nowrap; }
+    .ticker-item {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.25); padding: 0 56px;
+    }
+    .ticker-item b { color: rgba(255,255,255,0.55); }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* HERO */
+    .shop-hero {
+      display: grid; grid-template-columns: 1fr 1fr 380px;
+      border-bottom: 1px solid var(--border); min-height: 360px;
+    }
+    .hero-left {
+      padding: 72px 56px; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: center;
+    }
+    .hero-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.28);
+      margin-bottom: 22px; display: flex; align-items: center; gap: 14px;
+    }
+    .hero-eyebrow::before { content: ''; display: block; width: 20px; height: 1px; background: rgba(255,255,255,0.18); }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(56px, 7vw, 100px);
+      line-height: .9; letter-spacing: 1px; margin-bottom: 24px;
+    }
+    .hero-title .outline { -webkit-text-stroke: 1.5px rgba(255,255,255,0.5); color: transparent; }
+    .hero-title .blue-stroke { -webkit-text-stroke: 1.5px var(--blue-accent); color: transparent; }
+    .hero-lead {
+      font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.4);
+      max-width: 400px; margin-bottom: 40px;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 14px 32px; background: var(--white); color: #000;
+      text-decoration: none; transition: background .2s, transform .15s;
+    }
+    .btn-primary:hover { background: var(--off-white); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 14px 32px; background: transparent; color: rgba(255,255,255,0.4);
+      border: 1px solid var(--border); text-decoration: none; transition: color .2s, border-color .2s;
+    }
+    .btn-secondary:hover { color: var(--white); border-color: rgba(255,255,255,0.28); }
+
+    .hero-visual {
+      border-right: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero-visual img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    .hero-right { display: flex; flex-direction: column; }
+    .trust-item {
+      flex: 1; padding: 0 32px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .trust-item:last-child { border-bottom: none; }
+    .trust-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: rgba(255,255,255,0.35);
+    }
+    .trust-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase; color: var(--white); line-height: 1.2;
+    }
+    .trust-sub {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 1px;
+      text-transform: uppercase; color: rgba(255,255,255,0.25); margin-top: 3px;
+    }
+
+    /* CATEGORY SECTIONS */
+    .cat-section { border-bottom: 1px solid var(--border); }
+    .cat-header {
+      padding: 52px 56px 36px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .cat-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 10px;
+    }
+    .cat-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: clamp(28px, 3.5vw, 46px); letter-spacing: 1px; line-height: 1;
+    }
+    .cat-title .outline { -webkit-text-stroke: 1px rgba(255,255,255,0.4); color: transparent; }
+    .cat-count {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2);
+    }
+
+    /* PRODUCTS — 2 per row for apparel, 3 for accessories/lifestyle */
+    .products-2 {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      border-left: 1px solid var(--border);
+    }
+    .products-3 {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-left: 1px solid var(--border);
+    }
+    .products-4 {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-left: 1px solid var(--border);
+    }
+
+    .product-card {
+      border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: #000; text-decoration: none; color: var(--white);
+      display: block; overflow: hidden; transition: background .3s;
+    }
+    .product-card:hover { background: #070707; }
+
+    .product-img-wrap {
+      position: relative;
+      background: #050505; border-bottom: 1px solid var(--border);
+      aspect-ratio: 1;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+
+    .product-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover; object-position: center top;
+      transition: transform .7s cubic-bezier(.22,1,.36,1), filter .3s;
+      filter: brightness(0.85);
+      display: block;
+    }
+    .product-card:hover .product-img-wrap img { transform: scale(1.06); filter: brightness(0.95); }
+
+    .product-badge {
+      position: absolute; top: 16px; left: 16px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; padding: 5px 12px; z-index: 2;
+    }
+    .badge-new { background: rgba(0,0,0,0.8); color: rgba(255,255,255,0.65); border: 1px solid rgba(255,255,255,0.15); }
+    .badge-best { background: var(--white); color: #000; }
+    .badge-exclu { background: var(--blue); color: var(--white); }
+
+    .product-info { padding: 22px 28px 26px; }
+    .product-category {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+      letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,0.25); margin-bottom: 6px;
+    }
+    .product-name {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700;
+      letter-spacing: 0.5px; text-transform: uppercase; color: var(--white); margin-bottom: 6px; line-height: 1.2;
+    }
+    .product-desc { font-size: 12px; color: rgba(255,255,255,0.3); line-height: 1.6; margin-bottom: 18px; }
+    .product-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-top: 14px; border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .product-price { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; color: var(--white); }
+    .product-cta {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      padding: 7px 16px; border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.4); transition: all .2s;
+    }
+    .product-card:hover .product-cta { border-color: rgba(255,255,255,0.4); color: var(--white); }
+
+    /* TRUST STRIP */
+    .trust-strip {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    }
+    .strip-item {
+      padding: 36px 40px; border-right: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 18px;
+    }
+    .strip-item:last-child { border-right: none; }
+    .strip-icon { font-size: 20px; opacity: 0.35; flex-shrink: 0; margin-top: 2px; }
+    .strip-title {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase; color: var(--white); margin-bottom: 6px;
+    }
+    .strip-text { font-size: 13px; color: rgba(255,255,255,0.3); line-height: 1.6; }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* FOOTER */
+    footer {
+      padding: 44px 56px; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; }
+    .footer-logo img { height: 34px; }
+    .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 18px; letter-spacing: 3px; color: rgba(255,255,255,0.3); }
+    .footer-copy { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255,255,255,0.18); }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.2);
+      text-decoration: none; transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    @media (max-width: 960px) {
+      nav { padding: 0 20px; }
+      .shop-hero { grid-template-columns: 1fr; }
+      .hero-right { flex-direction: row; border-top: 1px solid var(--border); }
+      .trust-item { min-height: 80px; padding: 0 20px; }
+      .hero-left { padding: 48px 24px; }
+      .cat-header { padding: 36px 24px 24px; }
+      .products-2, .products-3, .products-4 { grid-template-columns: repeat(2, 1fr); }
+      .trust-strip { grid-template-columns: 1fr; }
+      .strip-item { border-right: none; border-bottom: 1px solid var(--border); }
+      .strip-item:last-child { border-bottom: none; }
+      footer { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="page-loader">
+  <div class="loader-inner">
+    <div class="loader-text">NewsPorto</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+  </div>
+</div>
+<div class="grid-bg"></div>
+<div id="cursor-glow"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actu</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+    </ul>
+    <a href="https://newsporto-shop.fourthwall.com/en-eur" target="_blank" class="nav-cta">Boutique →</a>
+  </nav>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-item"><b>SHOP</b> Collection officielle NewsPorto · 2025/26</span>
+      <span class="ticker-item"><b>LIVRAISON</b> Mondiale · 5 à 11 jours ouvrés</span>
+      <span class="ticker-item"><b>PAIEMENT</b> Sécurisé · Stripe · Google Pay</span>
+      <span class="ticker-item"><b>PORTISTA</b> Porte les couleurs du Dragon · Força Porto</span>
+      <span class="ticker-item"><b>SHOP</b> Collection officielle NewsPorto · 2025/26</span>
+      <span class="ticker-item"><b>LIVRAISON</b> Mondiale · 5 à 11 jours ouvrés</span>
+      <span class="ticker-item"><b>PAIEMENT</b> Sécurisé · Stripe · Google Pay</span>
+      <span class="ticker-item"><b>PORTISTA</b> Porte les couleurs du Dragon · Força Porto</span>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="shop-hero reveal">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Collection officielle · Saison 2025/26</p>
+      <h1 class="hero-title">
+        Boutique<br>
+        <span class="blue-stroke">News</span><span class="outline">Porto</span>
+      </h1>
+      <p class="hero-lead">
+        Vêtements et accessoires aux couleurs du FC Porto. Paiement sécurisé, livraison partout dans le monde.
+      </p>
+      <div class="hero-btns">
+        <a href="https://newsporto-shop.fourthwall.com/en-eur" target="_blank" class="btn-primary">Voir la boutique →</a>
+        <a href="#vetements" class="btn-secondary">Parcourir</a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="/mnt/user-data/uploads/81a12ddf-8a63-4158-96bf-15ef5fcc03e1.png" alt="Nous Soutenir" style="width:100%;height:100%;object-fit:cover;object-position:center top;display:block;">
+    </div>
+    <div class="hero-right">
+      <div class="trust-item">
+        <div class="trust-icon">🔒</div>
+        <div>
+          <div class="trust-label">Paiement sécurisé</div>
+          <div class="trust-sub">Stripe · Google Pay</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">📦</div>
+        <div>
+          <div class="trust-label">Livraison mondiale</div>
+          <div class="trust-sub">5 à 11 jours ouvrés</div>
+        </div>
+      </div>
+      <div class="trust-item">
+        <div class="trust-icon">↩</div>
+        <div>
+          <div class="trust-label">Support inclus</div>
+          <div class="trust-sub">Service client Fourthwall</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CATÉGORIE : VÊTEMENTS ═══ -->
+  <section class="cat-section" id="vetements">
+    <div class="cat-header reveal">
+      <div>
+        <p class="cat-eyebrow">Catégorie 01</p>
+        <h2 class="cat-title">Vête<span class="outline">ments</span></h2>
+      </div>
+      <span class="cat-count">02 articles</span>
+    </div>
+    <div class="products-2">
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-hoodie-edition-dragon" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/xHSgffDzsE8dzFv4nDyqZy2IXa0M3M5UDlaR7-s9yaY/w:1920/sm:1/enc/BgGctPZOsPIxlj2X/YYTv1fpPrStKuVM0/_7mwgM-OceEYnkqf/aU_AIciMLuzU5uyU/6Cg2YhE35xpBu3mh/vjpl6nnuFO1e07Pt/4gNwVUymTXSCScVR/vncyb54UMWVJj8C9/4n-7bgZwdONDi6TX/rft7qDzRZsMHsokL/FNkjwWwW-yezYuXE/s5zIKRLAMPd6R9xU/ZoNw-7hRB_ZVGQgI/2oEB_M-AI27PIlWB/1nQDDm5iVzg" alt="Hoodie NewsPorto" loading="lazy">
+          <span class="product-badge badge-best">Best seller</span>
+        </div>
+        <div class="product-info">
+          <p class="product-category">Sweat à capuche</p>
+          <p class="product-name">Hoodie Édition Dragon</p>
+          <p class="product-desc">Coupe oversize premium · Logo NP imprimé poitrine · Coloris noir</p>
+          <div class="product-footer">
+            <span class="product-price">€41</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/t-shirt-newsporto-edition-dragon" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/K0YYPHjQkBk_Wt6gSGab9lhrNxCAOAo6bzDIx5lATSg/w:1920/sm:1/enc/__LixfvHL-LGTayE/0SYw0q7kGTbJglJw/qrk1XfR5MF_MZg9S/ROtTHoXTxsp7Hmny/a1lLyh1KIjQSC-Ha/Fa1EtqVXoMQwGoRS/_U_wWw3a0tbhzee2/pSw-gztImw7jIuKM/1cuQD6nMDdsP2W92/4IagI60v7-kzQssA/HRXiKyYQKqaXWHx0/gWH16G1RehbKe648/gwYr5XW17fNAI_rk/plMNN5a90xOXovKO/Ad-ITeiHuQo" alt="Tee NewsPorto" loading="lazy">
+          <span class="product-badge badge-new">New</span>
+        </div>
+        <div class="product-info">
+          <p class="product-category">T-shirt</p>
+          <p class="product-name">Tee Édition Dragon</p>
+          <p class="product-desc">Regular fit · Logo NP imprimé poitrine · 100% coton · Coloris noir</p>
+          <div class="product-footer">
+            <span class="product-price">€22</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ═══ CATÉGORIE : COUVRE-CHEFS ═══ -->
+  <section class="cat-section" id="couvre-chefs">
+    <div class="cat-header reveal">
+      <div>
+        <p class="cat-eyebrow">Catégorie 02</p>
+        <h2 class="cat-title">Couvre-<span class="outline">chefs</span></h2>
+      </div>
+      <span class="cat-count">02 articles</span>
+    </div>
+    <div class="products-2">
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/casquette-newsporto-dragon-np" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/vl_V0H-EbH9L-A2Xv71gE7_Jp83SUT4atFYeFsA8F4k/w:1920/sm:1/enc/fc42axtaPZbvyXb_/yPbg60AKHgQy7nZz/vHIBsiyK3QKw6fDt/XG1kf-25CHwdpwdS/IjMQYxx4xi17P2qT/VhxLGRoLYO7ANvce/X3J_mVWAdtkB0N4X/svGNzfD8GwsbpI0u/o1e9-blO4YqBi7N5/ea1mUcFfuNbKzxtn/ZyD68x-tBvw8WnQx/-5C8a2sCMs9NReWu/Don7PUeHcJFr9AZk/-v-2R3EP_4yXR8Ba/G2RTyqbK2Mg" alt="Casquette NewsPorto" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">Casquette</p>
+          <p class="product-name">Cap Dragon NP</p>
+          <p class="product-desc">Logo brodé · Dad cap déstructurée · Fermeture ajustable</p>
+          <div class="product-footer">
+            <span class="product-price">€22</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/bob-newsporto-dragon-np" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/lGYpLHDsqf7X-ZwZV484wnQI0TxN6Yi5M6f9ZUdtLMU/w:1920/sm:1/enc/axLwKc6gtkm6xSe8/G1IrEJtWm9hwVuAJ/7xvR-JS6ERhl17x3/G2xuyO7-4YUvnvWq/3-w-Bn89zzNnu-8v/iVHzjxXw2fRkbXgP/d9O_9XYaMmRZvfaR/wgzM5KRhjCfmdDV4/IXKfwYxzrPFyhonp/IyGrIhCKO4KL901c/rMzyGdts9y45aLJY/hiw11mqUgK-qLA9g/-l23NGlVpN_lfjxv/8mlMBcOjuyZxxsyM/Dih0M7PcjC8" alt="Bob NewsPorto" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">Bob</p>
+          <p class="product-name">Bucket Hat Dragon NP</p>
+          <p class="product-desc">Logo NP imprimé · Coupe bucket hat tendance · Matière légère</p>
+          <div class="product-footer">
+            <span class="product-price">€28</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ═══ CATÉGORIE : LIFESTYLE ═══ -->
+  <section class="cat-section" id="lifestyle">
+    <div class="cat-header reveal">
+      <div>
+        <p class="cat-eyebrow">Catégorie 03</p>
+        <h2 class="cat-title">Life<span class="outline">style</span></h2>
+      </div>
+      <span class="cat-count">02 articles</span>
+    </div>
+    <div class="products-2">
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/stanley-cup-newsporto-dragao-noir" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/mNMFz3d2_3YbVd1vPELN3O7raaH_Il9To7ME3HZ3KnI/w:1920/sm:1/enc/C5UzolwyqlULBdqH/ZD4l_oIh00MhxeZY/Dj_V0vuJ8p0iMuHM/_5GTOZGn-3iPEiF6/bSborPxFkDaapnqz/0hmEsRKIUGq8-Fk-/bpORXmN93TIcqihm/vNwuBB2ZCSP1racm/8lfjh6FA7BJ0elqO/TzZHANkYLkRhQSkM/v9ybFRQbGoWtXkqp/WEqqmNdWSMpMcc7J/Bqowmgwwag_9ulkg/VeoE-XXE8ws9C9QF/nM2UhrQOd-k" alt="Stanley Cup NewsPorto" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">Tumbler</p>
+          <p class="product-name">Tumbler Dragão Noir</p>
+          <p class="product-desc">Acier inoxydable double paroi · Maintien thermique · Paille inox incluse</p>
+          <div class="product-footer">
+            <span class="product-price">€27</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/mug-newsporto-dragao-noir" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/KQb2rd1v8pNCGVsPV9ZzGcO4WQ9Q0xyPK3SyC414flY/w:1920/sm:1/enc/jjz3wsb3jqmQ2CA2/TB3Ai9iU067Tqa1G/LDDj8m5jr_DT3-fy/LhU_4aqvuwu1NfmJ/OoSzP9OIu4F1Fs4e/alf6Mf50NxJpd-sd/DYeBuDPW-Bqryq_W/ez5owSHuanpvZY-G/g4aaQZcvjTQB8MiJ/Ef69CgHjs1EudqUQ/ilqH4WKKyTBU1WqQ/IfkfL1Zu2tj5UnbV/u1QFQK7D6YEa1nJI/Xp_-1j_p0jjTd3gM/3DaT7FoeuPI" alt="Mug NewsPorto" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">Mug</p>
+          <p class="product-name">Mug Dragão Noir</p>
+          <p class="product-desc">Céramique noire brillante · Disponible en 11oz & 15oz · Passe au lave-vaisselle</p>
+          <div class="product-footer">
+            <span class="product-price">€14</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- ═══ CATÉGORIE : DÉCO & ACCESSOIRES ═══ -->
+  <section class="cat-section" id="deco">
+    <div class="cat-header reveal">
+      <div>
+        <p class="cat-eyebrow">Catégorie 04</p>
+        <h2 class="cat-title">Déco & <span class="outline">Accessoires</span></h2>
+      </div>
+      <span class="cat-count">02 articles</span>
+    </div>
+    <div class="products-2">
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-poster-soit-portista" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster Soit Portista" loading="lazy">
+          <span class="product-badge badge-exclu">Exclusif</span>
+        </div>
+        <div class="product-info">
+          <p class="product-category">Poster</p>
+          <p class="product-name">Poster Soit Portista</p>
+          <p class="product-desc">Design exclusif NewsPorto · Plusieurs formats disponibles · Papier mat premium</p>
+          <div class="product-footer">
+            <span class="product-price">€26+</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+      <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-sticker-dragon-np" target="_blank" class="product-card reveal">
+        <div class="product-img-wrap">
+          <img src="https://imgproxy.fourthwall.com/e9cKnYttqJW5rW-_XepdNPbyZjdD195frgkeDGZeWsc/w:1920/sm:1/enc/Gv65qTFIcHMiVAB7/FYK_qR8y-JtBBz5K/FJUeq8wB-TpJY0EZ/e5T23Rsm17WkHQYA/4WvhyUFsvOWiCEnp/GJAcDr3wnwyvbp6Y/5JhHohLZk5wOBQm3/AY2TzXizr79JFQBI/lLARVlvg19TySBv5/zSgIlHvA5HKmnU40/M_YGsMSGUei3KIjF/hy8iXgAW32IlOjKe/ZH7-teEMQ5HtFyYO/acrHttxMLy64dHvg/eeYPuwzy4cI" alt="Sticker Dragon NP" loading="lazy">
+        </div>
+        <div class="product-info">
+          <p class="product-category">Sticker</p>
+          <p class="product-name">Sticker Dragon NP</p>
+          <p class="product-desc">Format 3"×3" · Finition mate premium · Résistant à l'eau</p>
+          <div class="product-footer">
+            <span class="product-price">€7</span>
+            <span class="product-cta">Commander →</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip reveal">
+    <div class="strip-item">
+      <div class="strip-icon">🔒</div>
+      <div>
+        <div class="strip-title">Paiement sécurisé</div>
+        <div class="strip-text">Stripe et Google Pay acceptés. Vos données bancaires sont chiffrées et protégées.</div>
+      </div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-icon">📦</div>
+      <div>
+        <div class="strip-title">Livraison mondiale</div>
+        <div class="strip-text">Expédition en 5 à 11 jours ouvrés. Suivi de commande inclus dans chaque envoi.</div>
+      </div>
+    </div>
+    <div class="strip-item">
+      <div class="strip-icon">↩</div>
+      <div>
+        <div class="strip-title">Support & retours</div>
+        <div class="strip-text">Service client disponible via Fourthwall. Chaque réclamation est traitée rapidement.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="footer-logo-text">NewsPorto</span>
+    </div>
+    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <ul class="footer-links">
+      <li><a href="#">TikTok</a></li>
+      <li><a href="#">Contact</a></li>
+      <li><a href="#">Mentions légales</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('page-loader').classList.add('hidden'), 350);
+  });
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+  const cg = document.getElementById('cursor-glow');
+  document.addEventListener('mousemove', e => {
+    cg.style.left = e.clientX + 'px'; cg.style.top = e.clientY + 'px'; cg.style.opacity = '1';
+  }, { passive: true });
+  document.addEventListener('mouseleave', () => cg.style.opacity = '0');
+</script>
+</body>
+</html>
