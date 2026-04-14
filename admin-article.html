@@ -464,6 +464,17 @@ function useRewritten() {
 function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime) {
   const catLabel=catLabels[cat]||cat;
   const year=new Date().getFullYear();
+  const isoDate=new Date().toISOString();
+  const schema=JSON.stringify({
+    "@context":"https://schema.org","@type":"NewsArticle",
+    "headline":title,"description":excerpt,"image":[coverUrl],
+    "datePublished":isoDate,"dateModified":isoDate,
+    "author":[{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
+    "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png"}},
+    "mainEntityOfPage":{"@type":"WebPage","@id":"https://newsporto.fr/articles/"+slug+".html"},
+    "articleSection":catLabel,"inLanguage":"fr-FR"
+  });
+  const schemaTag='<script type="application/ld+json">'+schema+'<\/script>';
   const paras=body.split(/\n\n+/).filter(p=>p.trim()).map((p,i)=>
     `      <p${i===0?' class="dc"':''}>${p.trim().replace(/\n/g,'<br>')}</p>`
   ).join('\n');
@@ -479,9 +490,13 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <meta property="og:description" content="${excerpt}">
   <meta property="og:image" content="${coverUrl}">
   <meta property="og:type" content="article">
+  <meta property="og:locale" content="fr_FR">
+  <meta property="og:site_name" content="NewsPorto">
+  <link rel="canonical" href="https://newsporto.fr/articles/${slug}.html">
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  ${schemaTag}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
