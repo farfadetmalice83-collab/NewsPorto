@@ -1,20 +1,6 @@
 {
-  "articles": [
-    {
-      "id": 1,
-      "file": "article1.html",
-      "title": "FC Porto en tête",
-      "excerpt": "Le FC Porto maintient sa position de leader en Liga Portugal après 27 journées, mais les enjeux tactiques sont cruciaux pour la suite de la saison",
-      "category": "liga",
-      "read_time": "4 min de lecture",
-      "date": "14 Avr 2026",
-      "date_iso": "2026-04-14",
-      "image": "https://images.unsplash.com/photo-1749577269406-f391c37071dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxwb3J0dWd1ZXNlJTIwZm9vdGJhbGwlMjBsaWdhJTIwc3RhZGl1bSUyMGNyb3dkJTIwYWN0aW9ufGVufDB8MHx8fDE3NzYyMDA4Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
-      "image_thumb": "https://images.unsplash.com/photo-1749577269406-f391c37071dc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxwb3J0dWd1ZXNlJTIwZm9vdGJhbGwlMjBsaWdhJTIwc3RhZGl1bSUyMGNyb3dkJTIwYWN0aW9ufGVufDB8MHx8fDE3NzYyMDA4Nzd8MA&ixlib=rb-4.1.0&q=80&w=400"
-    }
-  ],
+  "articles": [],
   "used_image_ids": [
-    "tHjoZcCqqPQ",
-    "Jb2ukfbP_bI"
+    "tHjoZcCqqPQ"
   ]
 }
