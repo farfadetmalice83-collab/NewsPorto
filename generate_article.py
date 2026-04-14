@@ -2,7 +2,7 @@
 import os, json, re, requests, random
 from datetime import datetime
 
-GEMINI_KEY   = os.environ["GEMINI_API_KEY"]
+GROQ_KEY     = os.environ["GROQ_API_KEY"]
 UNSPLASH_KEY = os.environ["UNSPLASH_ACCESS_KEY"]
 
 MONTHS_FR = {"Jan":"Jan","Feb":"Fév","Mar":"Mar","Apr":"Avr","May":"Mai",
@@ -71,24 +71,20 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
   "content": "HTML : minimum 5 balises <p> avec contenu riche, 2 balises <h2>. Style journalistique passionné. PAS de balises html/head/body."
 }}"""
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.8, "maxOutputTokens": 2048}
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {GROQ_KEY}",
+        "Content-Type": "application/json"
     }
-    import time
-    r = None
-    for attempt in range(3):
-        r = requests.post(url, json=payload)
-        if r.status_code == 429:
-            print(f"⏳ Rate limit, attente 60s (tentative {attempt+1}/3)...")
-            time.sleep(60)
-            continue
-        r.raise_for_status()
-        break
-    else:
-        r.raise_for_status()
-    raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.8,
+        "max_tokens": 2048
+    }
+    r = requests.post(url, headers=headers, json=payload)
+    r.raise_for_status()
+    raw = r.json()["choices"][0]["message"]["content"].strip()
     raw = re.sub(r"^```json\s*", "", raw)
     raw = re.sub(r"^```\s*", "", raw)
     raw = re.sub(r"```$", "", raw).strip()
