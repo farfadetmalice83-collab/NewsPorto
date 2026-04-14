@@ -46,27 +46,33 @@ def search_porto_news():
 
 def generate_article(existing_titles, news_context):
     titles_str = "\n".join("- " + t for t in existing_titles[-15:]) if existing_titles else "Aucun."
-    prompt = """Tu es un journaliste sportif expert du FC Porto pour NewsPorto.fr.
+    prompt = """Tu es un journaliste sportif senior, expert tactique du FC Porto, pour NewsPorto.fr.
 
-ACTUALITES RECENTES :
+ACTUALITES RECENTES TROUVEES SUR LE WEB :
 """ + news_context + """
 
-MISSION : Redige un article base UNIQUEMENT sur ces actualites reelles.
+MISSION : Redige un article journalistique de qualite professionnelle.
 
-REGLES :
-1. Utilise uniquement les faits presents dans les actualites. Ne pas inventer de scores.
-2. Ne pas traiter un sujet deja couvert :
+REGLES STRICTES :
+1. Lis attentivement les actualites. Un score comme "1-0" signifie que la premiere equipe citee a marque 1 but et l'adversaire 0. Verifie toujours qui a gagne avant d'ecrire.
+2. Si une equipe "gagne 2-0" elle a marque 2 buts et en a encaisse 0 - elle a GAGNE. Si elle "perd 0-2" elle a marque 0 et en a encaisse 2 - elle a PERDU.
+3. Base-toi uniquement sur les faits presents dans les actualites. Si tu n'es pas certain d'un score ou d'un fait, ne l'invente pas - fais une analyse tactique ou contextuelle a la place.
+4. Enrichis l'article avec une analyse football concrete : systeme de jeu, performances individuelles, enjeux tactiques, contexte de la competition, implications au classement.
+5. Style passionne et expert, comme L'Equipe ou RMC Sport. Phrases courtes et percutantes.
+6. Ne pas traiter un sujet deja couvert :
 """ + titles_str + """
-3. Ne mentionne jamais que l'article est genere par une IA.
+7. Ne mentionne JAMAIS que l'article est genere par une IA.
 
-REPONSE : JSON uniquement, sans markdown, sans backticks.
+FORMAT DE REPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant ou apres.
 
-{"title": "Titre en francais max 65 chars",
+{"title": "Titre accrocheur en francais max 65 chars",
   "category": "europe ou analyse ou transfert ou liga ou interview",
-  "excerpt": "Accroche 150 chars max",
+  "excerpt": "Accroche percutante 150 chars max qui donne envie de lire",
   "read_time": "X min de lecture",
-  "unsplash_query": "football stadium crowd",
-  "content": "HTML avec 5 balises p et 2 balises h2. Pas de html/head/body."
+  "unsplash_query": "requete anglais pour image football generique ex: soccer match stadium crowd action",
+  "category": "IMPORTANT - choisis la bonne categorie : europe = match Europa League ou Champions League UNIQUEMENT, liga = match ou classement Liga Portugal, analyse = analyse tactique ou bilan, transfert = mercato ou recrutement, interview = declaration ou portrait joueur",
+  "unsplash_query": "requete PRECISE en anglais liee au SUJET de l article ex: si mercato ecrire football transfer signing, si Europa League ecrire europa league football match, si Liga Portugal ecrire portuguese football liga, si analyse tactique ecrire football tactics coach, si joueur specifique ecrire football player dribbling",
+  "content": "Article HTML complet : minimum 5 balises p avec contenu riche et analyse, 2 balises h2 comme sous-titres. Style journalistique passionne et expert. PAS de balises html/head/body."
 }"""
 
     url = "https://api.groq.com/openai/v1/chat/completions"
@@ -80,23 +86,50 @@ REPONSE : JSON uniquement, sans markdown, sans backticks.
     r = requests.post(url, headers=headers, json=payload)
     r.raise_for_status()
     raw = r.json()["choices"][0]["message"]["content"].strip()
-    # Nettoie
-    if "```" in raw:
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-    m = re.search(r'\{[\s\S]*\}', raw)
-    if m:
-        raw = m.group(0)
-    # Nettoie les caracteres de controle sauf newline/tab
-    cleaned = "".join(c for c in raw if ord(c) >= 32 or c in "\n\t")
-    # Parse avec gestion des newlines dans les valeurs string
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        # Remplace les newlines dans les valeurs par des espaces
-        cleaned2 = re.sub(r'(?<!\\)\n', ' ', cleaned)
-        return json.loads(cleaned2)
+
+    # Extrait title
+    title_m = re.search(r'(?<="title": ")[^"]+', raw)
+    title = title_m.group(0) if title_m else "Actualite FC Porto"
+
+    # Extrait category et normalise
+    cat_m = re.search(r'(?<="category": ")[^"]+', raw)
+    cat_raw = cat_m.group(0).lower() if cat_m else "analyse"
+    if "europa" in cat_raw or "champion" in cat_raw or "europe" in cat_raw:
+        category = "europe"
+    elif "liga" in cat_raw or "championnat" in cat_raw:
+        category = "liga"
+    elif "transfert" in cat_raw or "mercato" in cat_raw:
+        category = "transfert"
+    elif "interview" in cat_raw:
+        category = "interview"
+    else:
+        category = "analyse"
+
+    # Extrait excerpt
+    exc_m = re.search(r'(?<="excerpt": ")[^"]+', raw)
+    excerpt = exc_m.group(0) if exc_m else ""
+
+    # Extrait read_time
+    rt_m = re.search(r'(?<="read_time": ")[^"]+', raw)
+    read_time = rt_m.group(0) if rt_m else "4 min de lecture"
+
+    # Extrait unsplash_query
+    uq_m = re.search(r'(?<="unsplash_query": ")[^"]+', raw)
+    unsplash_query = uq_m.group(0) if uq_m else "football match action"
+
+    # Extrait content HTML
+    cont_m = re.search(r'"content"\s*:\s*"([\s\S]*?)"\s*[,}]', raw)
+    html_content = cont_m.group(1) if cont_m else "<p>Article en cours.</p>"
+    html_content = html_content.replace("\\n", " ").replace("\\t", " ")
+
+    return {
+        "title": title,
+        "category": category,
+        "excerpt": excerpt,
+        "read_time": read_time,
+        "unsplash_query": unsplash_query,
+        "content": html_content
+    }
 
 def get_unsplash_image(query, used_ids):
     params = {"query": query, "per_page": 20, "orientation": "landscape", "client_id": UNSPLASH_KEY}
