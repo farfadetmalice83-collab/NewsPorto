@@ -3,902 +3,474 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>NewsPorto — Admin · Créer un article</title>
+  <title>NewsPorto — Admin</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --white: #ffffff;
-      --off-white: #e8e8e8;
-      --gray: rgba(255,255,255,0.45);
-      --border: rgba(255,255,255,0.1);
-      --grid-color: rgba(255,255,255,0.055);
-      --blue: #0057b8;
-      --green: #00a86b;
-      --red: #c0392b;
-    }
-
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    body {
-      background: #000;
-      color: var(--white);
-      font-family: 'Barlow', sans-serif;
-      overflow-x: hidden;
-      min-height: 100vh;
-    }
-
-    /* ── GRID BG ── */
-    .grid-bg {
-      position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(var(--grid-color) 1px, transparent 1px),
-        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-      background-size: 44px 44px;
-      animation: gridScroll 12s linear infinite;
-      pointer-events: none;
-    }
-    @keyframes gridScroll {
-      0%   { background-position: 0 0; }
-      100% { background-position: 44px 44px; }
-    }
-    .page { position: relative; z-index: 1; }
-
-    /* ── NAV ── */
-    nav {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 48px; height: 56px;
-      border-bottom: 1px solid var(--border);
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(0,0,0,0.92);
-      backdrop-filter: blur(12px);
-    }
-    .nav-logo {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none; color: inherit;
-    }
-    .nav-logo img { height: 28px; width: auto; }
-    .nav-logo-text {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 20px; letter-spacing: 4px; color: var(--white);
-    }
-    .nav-admin-badge {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      background: rgba(255,255,255,0.1); border: 1px solid var(--border);
-      padding: 3px 10px; color: var(--gray);
-    }
-    .nav-back {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      color: var(--gray); text-decoration: none;
-      border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 2px;
-      transition: color .2s;
-    }
-    .nav-back:hover { color: var(--white); }
-
-    /* ── PAGE HEADER ── */
-    .page-header {
-      padding: 48px 48px 0;
-      border-bottom: 1px solid var(--border);
-    }
-    .page-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
-      color: var(--gray); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .page-label::before {
-      content: ''; display: block; width: 18px; height: 1px; background: var(--gray);
-    }
-    .page-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: clamp(40px, 5vw, 72px);
-      letter-spacing: 1px; line-height: 0.95;
-      padding-bottom: 32px;
-    }
-
-    /* ── MAIN LAYOUT ── */
-    .admin-layout {
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 0;
-      min-height: calc(100vh - 200px);
-    }
-
-    /* ── LEFT PANEL ── */
-    .panel-left {
-      padding: 40px 48px;
-      border-right: 1px solid var(--border);
-    }
-
-    /* ── RIGHT PANEL ── */
-    .panel-right {
-      padding: 40px 32px;
-    }
-
-    /* ── SECTION BLOCKS ── */
-    .form-section {
-      margin-bottom: 40px;
-    }
-    .form-section-label {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
-      color: var(--gray); margin-bottom: 20px;
-      display: flex; align-items: center; gap: 8px;
-    }
-    .form-section-label::before {
-      content: ''; display: block; width: 12px; height: 1px; background: var(--gray);
-    }
-
-    /* ── INPUTS ── */
-    .field { margin-bottom: 20px; }
-    .field label {
-      display: block;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,255,255,0.4); margin-bottom: 8px;
-    }
-    .field input,
-    .field textarea,
-    .field select {
-      width: 100%;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid var(--border);
-      color: var(--white);
-      font-family: 'Barlow', sans-serif;
-      font-size: 14px;
-      padding: 12px 16px;
-      outline: none;
-      transition: border-color .2s, background .2s;
-      resize: none;
-      appearance: none;
-    }
-    .field input::placeholder,
-    .field textarea::placeholder {
-      color: rgba(255,255,255,0.2);
-    }
-    .field input:focus,
-    .field textarea:focus,
-    .field select:focus {
-      border-color: rgba(255,255,255,0.35);
-      background: rgba(255,255,255,0.07);
-    }
-    .field textarea { min-height: 220px; line-height: 1.7; }
-    .field select option { background: #111; color: var(--white); }
-
-    /* ── IMAGE PREVIEW ── */
-    .img-preview-wrap {
-      position: relative;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: rgba(255,255,255,0.03);
-    }
-    .img-preview-wrap.cover { aspect-ratio: 16/9; }
-    .img-preview-wrap.inline { aspect-ratio: 4/3; }
-    .img-preview {
-      width: 100%; height: 100%;
-      object-fit: cover; display: block;
-      transition: opacity .3s;
-    }
-    .img-preview-placeholder {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 8px;
-      color: rgba(255,255,255,0.15);
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 48px; letter-spacing: -1px;
-    }
-    .img-preview-placeholder span {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-      color: rgba(255,255,255,0.2); font-weight: 700;
-    }
-    .img-preview-badge {
-      position: absolute; top: 12px; left: 12px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      background: rgba(0,0,0,0.7); border: 1px solid var(--border);
-      padding: 3px 8px; color: var(--gray);
-    }
-
-    /* ── GROQ SECTION ── */
-    .groq-box {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      padding: 24px;
-      margin-bottom: 24px;
-    }
-    .groq-box-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px;
-    }
-    .groq-box-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--gray); display: flex; align-items: center; gap: 8px;
-    }
-    .groq-status {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-      padding: 3px 10px;
-      border: 1px solid var(--border);
-    }
-    .groq-status.idle { color: rgba(255,255,255,0.25); border-color: var(--border); }
-    .groq-status.loading { color: #f0a500; border-color: rgba(240,165,0,0.3); animation: blink 1s ease infinite; }
-    .groq-status.done { color: #00a86b; border-color: rgba(0,168,107,0.3); }
-    .groq-status.error { color: #e74c3c; border-color: rgba(231,76,60,0.3); }
-    @keyframes blink {
-      0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
-    }
-
-    /* ── API KEY FIELD ── */
-    .api-key-wrap {
-      display: flex; gap: 8px; align-items: stretch;
-    }
-    .api-key-wrap input {
-      flex: 1;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 12px; letter-spacing: 1px;
-    }
-
-    /* ── BUTTONS ── */
-    .btn {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
-      border: 1px solid var(--border); color: var(--gray);
-      background: transparent; padding: 12px 24px;
-      cursor: pointer; transition: border-color .2s, color .2s, background .2s;
-      white-space: nowrap;
-    }
-    .btn:hover:not(:disabled) { border-color: rgba(255,255,255,0.4); color: var(--white); }
-    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
-
-    .btn-primary {
-      border-color: var(--white);
-      color: #000; background: var(--white);
-    }
-    .btn-primary:hover:not(:disabled) { background: var(--off-white); border-color: var(--off-white); color: #000; }
-
-    .btn-groq {
-      width: 100%;
-      border-color: rgba(255,165,0,0.4);
-      color: #f0a500; background: rgba(255,165,0,0.05);
-      padding: 14px;
-    }
-    .btn-groq:hover:not(:disabled) {
-      border-color: rgba(255,165,0,0.8);
-      background: rgba(255,165,0,0.1);
-      color: #f5b830;
-    }
-
-    .btn-generate {
-      width: 100%;
-      border-color: rgba(0,168,107,0.4);
-      color: #00a86b; background: rgba(0,168,107,0.05);
-      padding: 14px;
-      margin-top: 12px;
-    }
-    .btn-generate:hover:not(:disabled) {
-      border-color: rgba(0,168,107,0.8);
-      background: rgba(0,168,107,0.1);
-      color: #00c47e;
-    }
-    .btn-generate:disabled { opacity: 0.3; cursor: not-allowed; }
-
-    /* ── RESULT OUTPUT ── */
-    .result-output {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      padding: 16px;
-      font-size: 13px; line-height: 1.75;
-      color: rgba(255,255,255,0.75);
-      min-height: 80px;
-      white-space: pre-wrap;
-      display: none;
-    }
-    .result-output.visible { display: block; }
-
-    /* ── PREVIEW CARD ── */
-    .preview-card {
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-    .preview-card-img {
-      width: 100%; aspect-ratio: 16/9;
-      object-fit: cover; display: block;
-      opacity: 0.8;
-      background: #0a0a0a;
-    }
-    .preview-card-img-placeholder {
-      width: 100%; aspect-ratio: 16/9;
-      background: rgba(255,255,255,0.03);
-      display: flex; align-items: center; justify-content: center;
-      font-family: 'Bebas Neue', sans-serif; font-size: 32px; letter-spacing: -1px;
-      color: rgba(255,255,255,0.06);
-    }
-    .preview-card-body { padding: 20px; }
-    .preview-card-cat {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-      color: var(--gray); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 6px;
-    }
-    .preview-card-cat::before {
-      content: ''; display: block; width: 14px; height: 1px; background: var(--gray);
-    }
-    .preview-card-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px; letter-spacing: .5px; line-height: 1;
-      margin-bottom: 10px; color: var(--white);
-    }
-    .preview-card-excerpt {
-      font-size: 12px; line-height: 1.6;
-      color: rgba(255,255,255,0.4);
-    }
-
-    /* ── DIVIDER ── */
-    .divider {
-      border: none; border-top: 1px solid var(--border);
-      margin: 32px 0;
-    }
-
-    /* ── INFO BOX ── */
-    .info-box {
-      border: 1px solid rgba(255,255,255,0.07);
-      padding: 16px;
-      background: rgba(255,255,255,0.02);
-      margin-bottom: 20px;
-    }
-    .info-box p {
-      font-size: 12px; line-height: 1.65;
-      color: rgba(255,255,255,0.35);
-    }
-    .info-box strong {
-      color: rgba(255,255,255,0.6);
-      font-weight: 600;
-    }
-
-    /* ── JSON OUTPUT ── */
-    .json-output {
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      padding: 16px;
-      font-family: 'Courier New', monospace;
-      font-size: 11px; line-height: 1.6;
-      color: rgba(255,255,255,0.5);
-      overflow-x: auto;
-      white-space: pre;
-      display: none;
-      margin-top: 12px;
-    }
-    .json-output.visible { display: block; }
-
-    /* ── COUNTER ── */
-    .char-count {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
-      color: rgba(255,255,255,0.2); text-align: right; margin-top: 6px;
-    }
-
-    /* ── FOOTER ── */
-    footer {
-      padding: 28px 48px; display: flex; align-items: center; justify-content: space-between;
-      border-top: 1px solid var(--border); margin-top: 40px;
-    }
-    .footer-logo-text {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 14px; letter-spacing: 3px; color: rgba(255,255,255,0.2);
-    }
-    .footer-copy {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
-      color: rgba(255,255,255,0.15);
-    }
-
-    /* ── TOAST ── */
-    .toast {
-      position: fixed; bottom: 32px; right: 48px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-      padding: 14px 24px; border: 1px solid var(--border);
-      background: #000; color: var(--white);
-      z-index: 9999; pointer-events: none;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity .3s, transform .3s;
-    }
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-color: rgba(0,168,107,0.5); color: #00a86b; }
-    .toast.error { border-color: rgba(231,76,60,0.5); color: #e74c3c; }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 1024px) {
-      .admin-layout { grid-template-columns: 1fr; }
-      .panel-left { border-right: none; border-bottom: 1px solid var(--border); }
-      nav, .page-header, .panel-left, .panel-right, footer { padding-left: 24px; padding-right: 24px; }
-    }
-    @media (max-width: 640px) {
-      nav, .page-header, .panel-left, .panel-right, footer { padding-left: 16px; padding-right: 16px; }
-    }
+    :root{--white:#fff;--off-white:#e8e8e8;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055);--green:#00a86b;--orange:#f0a500;--red:#e74c3c}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{background:#000;color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden;min-height:100vh}
+    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gs 12s linear infinite;pointer-events:none}
+    @keyframes gs{0%{background-position:0 0}100%{background-position:44px 44px}}
+    .page{position:relative;z-index:1}
+    nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(12px)}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .nav-logo img{height:28px;width:auto}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
+    .nav-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:rgba(255,255,255,.08);border:1px solid var(--border);padding:3px 10px;color:var(--gray)}
+    .nav-back{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
+    .nav-back:hover{color:var(--white)}
+    .page-header{padding:48px 48px 0;border-bottom:1px solid var(--border)}
+    .page-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .page-label::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
+    .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5vw,72px);letter-spacing:1px;line-height:.95;padding-bottom:32px}
+    .admin-layout{display:grid;grid-template-columns:1fr 380px;min-height:calc(100vh - 200px)}
+    .panel-left{padding:40px 48px;border-right:1px solid var(--border)}
+    .panel-right{padding:40px 32px}
+    .form-section{margin-bottom:40px}
+    .section-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .section-label::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
+    .field{margin-bottom:20px}
+    .field label{display:block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:8px}
+    .field input,.field textarea,.field select{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);font-family:'Barlow',sans-serif;font-size:14px;padding:12px 16px;outline:none;transition:border-color .2s,background .2s;resize:none;appearance:none}
+    .field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.2)}
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.07)}
+    .field textarea{min-height:220px;line-height:1.7}
+    .field select option{background:#111;color:var(--white)}
+    .char-count{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);text-align:right;margin-top:6px}
+    .img-wrap{position:relative;border:1px solid var(--border);overflow:hidden;background:rgba(255,255,255,.03);margin-bottom:20px}
+    .img-wrap.cover{aspect-ratio:16/9}
+    .img-wrap.sq{aspect-ratio:4/3}
+    .img-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,.1);font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:-1px}
+    .img-ph span{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.18);font-weight:700}
+    .img-badge{position:absolute;top:12px;left:12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:rgba(0,0,0,.7);border:1px solid var(--border);padding:3px 8px;color:var(--gray)}
+    .img-prev{width:100%;height:100%;object-fit:cover;display:none}
+    .btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:1px solid var(--border);color:var(--gray);background:transparent;padding:12px 24px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;white-space:nowrap}
+    .btn:hover:not(:disabled){border-color:rgba(255,255,255,.4);color:var(--white)}
+    .btn:disabled{opacity:.3;cursor:not-allowed}
+    .btn-w{width:100%;padding:14px}
+    .btn-or{border-color:rgba(240,165,0,.4);color:var(--orange);background:rgba(240,165,0,.05)}
+    .btn-or:hover:not(:disabled){border-color:rgba(240,165,0,.8);background:rgba(240,165,0,.1);color:#f5b830}
+    .btn-gr{border-color:rgba(0,168,107,.4);color:var(--green);background:rgba(0,168,107,.05)}
+    .btn-gr:hover:not(:disabled){border-color:rgba(0,168,107,.8);background:rgba(0,168,107,.1);color:#00c47e}
+    .box{border:1px solid var(--border);background:rgba(255,255,255,.02);padding:24px;margin-bottom:20px}
+    .box-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+    .box-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray)}
+    .pill{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border:1px solid var(--border)}
+    .p-idle{color:rgba(255,255,255,.25);border-color:var(--border)}
+    .p-run{color:var(--orange);border-color:rgba(240,165,0,.3);animation:blink 1s ease infinite}
+    .p-ok{color:var(--green);border-color:rgba(0,168,107,.3)}
+    .p-err{color:var(--red);border-color:rgba(231,76,60,.3)}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+    .info-box{border:1px solid rgba(255,255,255,.07);padding:14px;background:rgba(255,255,255,.02);margin-bottom:16px}
+    .info-box p{font-size:12px;line-height:1.65;color:rgba(255,255,255,.35)}
+    .info-box strong{color:rgba(255,255,255,.6)}
+    .info-box code{color:rgba(255,255,255,.55);font-family:monospace;font-size:11px}
+    .result-text{background:rgba(255,255,255,.03);border:1px solid var(--border);padding:16px;font-size:13px;line-height:1.75;color:rgba(255,255,255,.75);white-space:pre-wrap;display:none}
+    .result-text.on{display:block}
+    .pub-steps{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+    .step{display:flex;align-items:center;gap:12px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25)}
+    .step-ico{width:22px;height:22px;border:1px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;transition:all .3s}
+    .step.done .step-ico{border-color:var(--green);color:var(--green);background:rgba(0,168,107,.1)}
+    .step.done{color:rgba(255,255,255,.6)}
+    .step.active .step-ico{border-color:var(--orange);color:var(--orange);animation:blink .8s ease infinite}
+    .step.active{color:var(--orange)}
+    .step.err .step-ico{border-color:var(--red);color:var(--red)}
+    .step.err{color:var(--red)}
+    .prev-card{border:1px solid var(--border);background:rgba(255,255,255,.02);overflow:hidden;margin-bottom:24px}
+    .prev-card-img{width:100%;aspect-ratio:16/9;object-fit:cover;display:none;opacity:.8}
+    .prev-card-ph{width:100%;aspect-ratio:16/9;background:rgba(255,255,255,.03);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:32px;color:rgba(255,255,255,.06)}
+    .prev-card-body{padding:20px}
+    .prev-pcat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+    .prev-pcat::before{content:'';display:block;width:14px;height:1px;background:var(--gray)}
+    .prev-ptitle{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;line-height:1;margin-bottom:10px}
+    .prev-pexcerpt{font-size:12px;line-height:1.6;color:rgba(255,255,255,.4)}
+    .check-item{display:flex;align-items:center;gap:10px}
+    .ck-ico{font-size:12px;color:rgba(255,255,255,.2);transition:color .2s;flex-shrink:0}
+    .ck-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.3);transition:color .2s}
+    .key-row{display:flex;gap:8px;align-items:stretch}
+    .key-row input{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px}
+    .saved-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--green);border:1px solid rgba(0,168,107,.3);padding:2px 8px;display:none;align-self:center;white-space:nowrap}
+    .divider{border:none;border-top:1px solid var(--border);margin:32px 0}
+    .toast{position:fixed;bottom:32px;right:48px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 24px;border:1px solid var(--border);background:#000;color:var(--white);z-index:9999;pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}
+    .toast.show{opacity:1;transform:translateY(0)}
+    .toast.ok{border-color:rgba(0,168,107,.5);color:var(--green)}
+    .toast.ko{border-color:rgba(231,76,60,.5);color:var(--red)}
+    footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);margin-top:40px}
+    .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
+    .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+    @media(max-width:1024px){.admin-layout{grid-template-columns:1fr}.panel-left{border-right:none;border-bottom:1px solid var(--border)}nav,.page-header,.panel-left,.panel-right,footer{padding-left:24px;padding-right:24px}}
+    @media(max-width:640px){nav,.page-header,.panel-left,.panel-right,footer{padding-left:16px;padding-right:16px}}
   </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
-  <div class="page">
+<div class="grid-bg"></div>
+<div class="page">
 
-    <!-- NAV -->
-    <nav>
-      <a href="index.html" class="nav-logo">
-        <img src="porto_logo.png" alt="FC Porto" onerror="this.style.display='none'">
-        <span class="nav-logo-text">NewsPorto</span>
-      </a>
-      <span class="nav-admin-badge">Admin</span>
-      <a href="index.html" class="nav-back">← Retour au site</a>
-    </nav>
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto" onerror="this.style.display='none'">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <span class="nav-badge">Admin</span>
+    <a href="index.html" class="nav-back">← Retour au site</a>
+  </nav>
 
-    <!-- PAGE HEADER -->
-    <div class="page-header">
-      <p class="page-label">Administration</p>
-      <h1 class="page-title">Créer<br>un article</h1>
-    </div>
-
-    <!-- MAIN LAYOUT -->
-    <div class="admin-layout">
-
-      <!-- LEFT : FORM -->
-      <div class="panel-left">
-
-        <!-- SECTION 1: META -->
-        <div class="form-section">
-          <p class="form-section-label">01 — Métadonnées</p>
-
-          <div class="field">
-            <label>Titre de l'article *</label>
-            <input type="text" id="title" placeholder="Ex : Porto s'impose face au Sporting en déplacement" maxlength="120">
-            <div class="char-count" id="title-count">0 / 120</div>
-          </div>
-
-          <div class="field">
-            <label>Catégorie *</label>
-            <select id="category">
-              <option value="">— Choisir une catégorie</option>
-              <option value="Actualité">Actualité</option>
-              <option value="Liga">Liga Portugal</option>
-              <option value="Europe">Europe</option>
-              <option value="Analyse">Analyse</option>
-              <option value="Mercato">Mercato</option>
-              <option value="Focus">Focus joueur</option>
-              <option value="Institution">Institution</option>
-              <option value="Stats">Stats</option>
-            </select>
-          </div>
-
-        </div>
-
-        <hr class="divider">
-
-        <!-- SECTION 2: IMAGES -->
-        <div class="form-section">
-          <p class="form-section-label">02 — Images</p>
-
-          <div class="field">
-            <label>URL image de couverture *</label>
-            <div style="display:flex; gap:8px;">
-              <input type="url" id="cover-url" placeholder="https://images.unsplash.com/…" style="flex:1;">
-              <button class="btn" onclick="previewCover()">Aperçu</button>
-            </div>
-          </div>
-          <div class="img-preview-wrap cover" style="margin-bottom:20px;">
-            <div class="img-preview-placeholder" id="cover-placeholder">
-              COUV<span>Image de couverture</span>
-            </div>
-            <img class="img-preview" id="cover-img" src="" alt="" style="display:none;">
-            <span class="img-preview-badge">Couverture · 16:9</span>
-          </div>
-
-          <div class="field">
-            <label>URL image d'illustration (dans l'article)</label>
-            <div style="display:flex; gap:8px;">
-              <input type="url" id="inline-url" placeholder="https://images.unsplash.com/…" style="flex:1;">
-              <button class="btn" onclick="previewInline()">Aperçu</button>
-            </div>
-          </div>
-          <div class="img-preview-wrap inline">
-            <div class="img-preview-placeholder" id="inline-placeholder">
-              IMG<span>Illustration article</span>
-            </div>
-            <img class="img-preview" id="inline-img" src="" alt="" style="display:none;">
-            <span class="img-preview-badge">Illustration · 4:3</span>
-          </div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- SECTION 3: SOURCE TEXT -->
-        <div class="form-section">
-          <p class="form-section-label">03 — Texte source à reformuler</p>
-
-          <div class="info-box">
-            <p>Collez ici le <strong>texte brut de l'article source</strong> (depuis un site, une dépêche, etc.). Groq va le reformuler entièrement en français dans le style NewsPorto.</p>
-          </div>
-
-          <div class="field">
-            <label>Contenu source *</label>
-            <textarea id="source-text" placeholder="Collez ici le texte original à reformuler…" style="min-height:280px;" maxlength="8000"></textarea>
-            <div class="char-count" id="source-count">0 / 8000</div>
-          </div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- SECTION 4: GROQ REFORMULATION -->
-        <div class="form-section">
-          <p class="form-section-label">04 — Reformulation Groq</p>
-
-          <div class="groq-box">
-            <div class="groq-box-header">
-              <span class="groq-box-title">⚡ Groq · llama-3.3-70b</span>
-              <span class="groq-status idle" id="groq-status">PRÊT</span>
-            </div>
-
-            <div class="field">
-              <label>Clé API Groq <span id="key-saved-badge" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#00a86b;border:1px solid rgba(0,168,107,0.3);padding:2px 8px;margin-left:8px;">SAUVEGARDÉE</span></label>
-              <div class="api-key-wrap">
-                <input type="password" id="groq-key" placeholder="gsk_…" autocomplete="off">
-                <button class="btn" onclick="toggleKeyVisibility()">Voir</button>
-                <button class="btn" onclick="saveKey()">Sauver</button>
-              </div>
-            </div>
-
-            <button class="btn btn-groq" id="btn-rewrite" onclick="rewriteWithGroq()">
-              ⚡ Reformuler avec Groq
-            </button>
-          </div>
-
-          <div id="rewritten-output" class="result-output"></div>
-
-          <div id="rewritten-actions" style="display:none; margin-top:12px; gap:8px; display:none; flex-wrap:wrap;">
-            <button class="btn" onclick="useRewritten()">Utiliser ce texte ✓</button>
-            <button class="btn" onclick="rewriteWithGroq()">Relancer</button>
-          </div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- SECTION 5: FINAL BODY -->
-        <div class="form-section">
-          <p class="form-section-label">05 — Corps de l'article final</p>
-
-          <div class="info-box">
-            <p>Ce texte sera le contenu final de la page article. Vous pouvez <strong>modifier manuellement</strong> après reformulation Groq, ou écrire directement ici.</p>
-          </div>
-
-          <div class="field">
-            <label>Texte final *</label>
-            <textarea id="body-text" placeholder="Le corps de l'article final sera ici après reformulation, ou écrivez directement…" style="min-height:320px;"></textarea>
-            <div class="char-count" id="body-count">0 / ∞</div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- RIGHT : PREVIEW + EXPORT -->
-      <div class="panel-right">
-
-        <!-- PREVIEW CARD -->
-        <p class="form-section-label" style="margin-bottom:16px;">Aperçu carte</p>
-        <div class="preview-card" id="preview-card">
-          <div class="preview-card-img-placeholder" id="preview-img-placeholder">PORTO</div>
-          <img class="preview-card-img" id="preview-cover" src="" alt="" style="display:none;">
-          <div class="preview-card-body">
-            <p class="preview-card-cat" id="preview-cat">Actualité</p>
-            <h2 class="preview-card-title" id="preview-title">Titre de l'article</h2>
-            <p class="preview-card-excerpt" id="preview-excerpt">L'extrait de l'article apparaîtra ici…</p>
-          </div>
-        </div>
-
-        <hr class="divider">
-
-        <!-- GENERATE -->
-        <p class="form-section-label" style="margin-bottom:16px;">Générer les fichiers</p>
-
-        <div class="info-box">
-          <p>Génère le <strong>HTML de l'article</strong> + la ligne JSON à ajouter dans <strong>articles/index.json</strong>.</p>
-        </div>
-
-        <button class="btn btn-generate" id="btn-generate" onclick="generateFiles()">
-          ⬇ Générer HTML + JSON
-        </button>
-
-        <!-- JSON OUTPUT -->
-        <div id="json-output" class="json-output"></div>
-
-        <div id="download-actions" style="display:none; margin-top:16px; gap:8px; flex-direction:column;">
-          <button class="btn btn-primary" onclick="downloadHTML()" style="width:100%; padding:14px;">
-            ↓ Télécharger article.html
-          </button>
-          <button class="btn" onclick="copyJSON()" style="width:100%; padding:14px;">
-            ⎘ Copier entrée index.json
-          </button>
-        </div>
-
-        <hr class="divider">
-
-        <!-- CHECKLIST -->
-        <p class="form-section-label" style="margin-bottom:16px;">Checklist</p>
-        <div id="checklist" style="display:flex; flex-direction:column; gap:8px;">
-          <div class="check-item" data-field="title">
-            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
-            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Titre</span>
-          </div>
-          <div class="check-item" data-field="category">
-            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
-            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Catégorie</span>
-          </div>
-          <div class="check-item" data-field="cover-url">
-            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
-            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Image couverture</span>
-          </div>
-          <div class="check-item" data-field="body-text">
-            <span class="check-icon" style="font-size:13px; margin-right:8px; color:rgba(255,255,255,0.2);">○</span>
-            <span style="font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3);">Corps de l'article</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- FOOTER -->
-    <footer>
-      <span class="footer-logo-text">NewsPorto</span>
-      <span class="footer-copy">Admin · Création d'article</span>
-    </footer>
-
+  <div class="page-header">
+    <p class="page-label">Administration</p>
+    <h1 class="page-title">Créer<br>un article</h1>
   </div>
 
-  <!-- TOAST -->
-  <div class="toast" id="toast"></div>
+  <div class="admin-layout">
 
-  <script>
-    // ──────────────────────────────────
-    //  LIVE PREVIEW + CHAR COUNTS
-    // ──────────────────────────────────
-    const $ = id => document.getElementById(id);
+    <!-- ══ GAUCHE ══ -->
+    <div class="panel-left">
 
-    function updatePreview() {
-      const title   = $('title').value.trim();
-      const cat     = $('category').value;
+      <!-- 01 META -->
+      <div class="form-section">
+        <p class="section-label">01 — Métadonnées</p>
+        <div class="field">
+          <label>Titre *</label>
+          <input type="text" id="f-title" placeholder="Ex : Porto s'impose face au Sporting en déplacement" maxlength="120">
+          <div class="char-count" id="c-title">0 / 120</div>
+        </div>
+        <div class="field">
+          <label>Catégorie *</label>
+          <select id="f-cat">
+            <option value="">— Choisir</option>
+            <option value="europe">Europe</option>
+            <option value="liga">Liga Portugal</option>
+            <option value="analyse">Analyse</option>
+            <option value="transfert">Mercato</option>
+            <option value="interview">Interview</option>
+          </select>
+        </div>
+      </div>
 
-      $('preview-title').textContent   = title || 'Titre de l\'article';
-      $('preview-cat').textContent     = cat   || 'Actualité';
-      updateChecklist();
-    }
+      <hr class="divider">
 
-    function charCount(inputId, countId, max) {
-      const el = $(inputId);
-      const ct = $(countId);
-      const len = el.value.length;
-      ct.textContent = `${len} / ${max}`;
-      ct.style.color = len > max * 0.85 ? 'rgba(255,140,0,0.6)' : 'rgba(255,255,255,0.2)';
-    }
+      <!-- 02 IMAGES -->
+      <div class="form-section">
+        <p class="section-label">02 — Images</p>
+        <div class="field">
+          <label>URL image de couverture *</label>
+          <div style="display:flex;gap:8px">
+            <input type="url" id="f-cover" placeholder="https://…" style="flex:1">
+            <button class="btn" onclick="prevCover()">Aperçu</button>
+          </div>
+        </div>
+        <div class="img-wrap cover">
+          <div class="img-ph" id="ph-cover">COUV<span>Couverture 16:9</span></div>
+          <img class="img-prev" id="img-cover" alt="">
+          <span class="img-badge">Couverture · 16:9</span>
+        </div>
+        <div class="field">
+          <label>URL image d'illustration (optionnel)</label>
+          <div style="display:flex;gap:8px">
+            <input type="url" id="f-inline" placeholder="https://…" style="flex:1">
+            <button class="btn" onclick="prevInline()">Aperçu</button>
+          </div>
+        </div>
+        <div class="img-wrap sq">
+          <div class="img-ph" id="ph-inline">IMG<span>Illustration article</span></div>
+          <img class="img-prev" id="img-inline" alt="">
+          <span class="img-badge">Illustration · 4:3</span>
+        </div>
+      </div>
 
-    $('title').addEventListener('input', () => { charCount('title','title-count',120); updatePreview(); });
-    $('source-text').addEventListener('input', () => charCount('source-text','source-count',8000));
-    $('category').addEventListener('change', updatePreview);
-    $('body-text').addEventListener('input', () => {
-      const len = $('body-text').value.length;
-      $('body-count').textContent = `${len} / ∞`;
-      updateChecklist();
+      <hr class="divider">
+
+      <!-- 03 SOURCE -->
+      <div class="form-section">
+        <p class="section-label">03 — Texte source</p>
+        <div class="info-box">
+          <p>Collez le <strong>texte brut</strong> de l'article source. Groq le reformulera entièrement en français dans le style NewsPorto.</p>
+        </div>
+        <div class="field">
+          <label>Contenu source *</label>
+          <textarea id="f-source" placeholder="Collez ici le texte original…" style="min-height:280px" maxlength="8000"></textarea>
+          <div class="char-count" id="c-source">0 / 8000</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 04 GROQ -->
+      <div class="form-section">
+        <p class="section-label">04 — Reformulation Groq</p>
+        <div class="box">
+          <div class="box-hd">
+            <span class="box-title">⚡ Groq · llama-3.3-70b</span>
+            <span class="pill p-idle" id="groq-status">PRÊT</span>
+          </div>
+          <div class="field">
+            <label>Clé API Groq <span class="saved-badge" id="groq-saved">SAUVEGARDÉE</span></label>
+            <div class="key-row">
+              <input type="password" id="f-groq-key" placeholder="gsk_…" autocomplete="off">
+              <button class="btn" onclick="toggleVis('f-groq-key')">Voir</button>
+              <button class="btn" onclick="saveKey('f-groq-key','groq_key','groq-saved')">Sauver</button>
+            </div>
+          </div>
+          <button class="btn btn-w btn-or" id="btn-rewrite" onclick="rewrite()">⚡ Reformuler avec Groq</button>
+        </div>
+        <div class="result-text" id="groq-output"></div>
+        <div id="groq-actions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap">
+          <button class="btn" onclick="useRewritten()">Utiliser ce texte ✓</button>
+          <button class="btn" onclick="rewrite()">Relancer</button>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 05 CORPS FINAL -->
+      <div class="form-section">
+        <p class="section-label">05 — Corps de l'article final</p>
+        <div class="info-box">
+          <p>Texte final après reformulation. Modifiable manuellement. <strong>Séparez les paragraphes par une ligne vide.</strong></p>
+        </div>
+        <div class="field">
+          <label>Corps *</label>
+          <textarea id="f-body" placeholder="Le contenu final de l'article…" style="min-height:320px"></textarea>
+          <div class="char-count" id="c-body">0 / ∞</div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 06 GITHUB -->
+      <div class="form-section">
+        <p class="section-label">06 — Publication GitHub</p>
+        <div class="info-box">
+          <p>Le token GitHub publie <strong>automatiquement</strong> le fichier HTML et met à jour <code>articles/index.json</code>. Le site se déploie tout seul ensuite. Token requis avec le scope <strong>repo</strong>.</p>
+        </div>
+        <div class="box">
+          <div class="box-hd">
+            <span class="box-title">GitHub API</span>
+            <span class="pill p-idle" id="gh-status">EN ATTENTE</span>
+          </div>
+          <div class="field">
+            <label>Repo <span style="color:rgba(255,255,255,.3);font-size:9px">(ex: MonPseudo/newsporto)</span> <span class="saved-badge" id="repo-saved">SAUVEGARDÉ</span></label>
+            <div class="key-row">
+              <input type="text" id="f-repo" placeholder="utilisateur/nom-du-repo">
+              <button class="btn" onclick="saveKey('f-repo','gh_repo','repo-saved')">Sauver</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Token GitHub (scope repo) <span class="saved-badge" id="gh-saved">SAUVEGARDÉ</span></label>
+            <div class="key-row">
+              <input type="password" id="f-gh-token" placeholder="ghp_…" autocomplete="off">
+              <button class="btn" onclick="toggleVis('f-gh-token')">Voir</button>
+              <button class="btn" onclick="saveKey('f-gh-token','gh_token','gh-saved')">Sauver</button>
+            </div>
+          </div>
+          <button class="btn btn-w btn-gr" id="btn-publish" onclick="publish()">🚀 Publier sur GitHub</button>
+          <div class="pub-steps" id="pub-steps">
+            <div class="step" id="step-1"><div class="step-ico">1</div><span>Génération du fichier HTML</span></div>
+            <div class="step" id="step-2"><div class="step-ico">2</div><span>Upload articles/[slug].html</span></div>
+            <div class="step" id="step-3"><div class="step-ico">3</div><span>Lecture de index.json</span></div>
+            <div class="step" id="step-4"><div class="step-ico">4</div><span>Mise à jour index.json</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ DROITE ══ -->
+    <div class="panel-right">
+
+      <p class="section-label" style="margin-bottom:16px">Aperçu carte</p>
+      <div class="prev-card">
+        <div class="prev-card-ph" id="prev-ph">PORTO</div>
+        <img class="prev-card-img" id="prev-cover" src="" alt="">
+        <div class="prev-card-body">
+          <p class="prev-pcat" id="prev-cat">Catégorie</p>
+          <h2 class="prev-ptitle" id="prev-title">Titre de l'article</h2>
+          <p class="prev-pexcerpt" id="prev-excerpt">L'extrait apparaîtra ici…</p>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <p class="section-label" style="margin-bottom:16px">Checklist</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="check-item" data-field="f-title"><span class="ck-ico">○</span><span class="ck-lbl">Titre</span></div>
+        <div class="check-item" data-field="f-cat"><span class="ck-ico">○</span><span class="ck-lbl">Catégorie</span></div>
+        <div class="check-item" data-field="f-cover"><span class="ck-ico">○</span><span class="ck-lbl">Image couverture</span></div>
+        <div class="check-item" data-field="f-body"><span class="ck-ico">○</span><span class="ck-lbl">Corps de l'article</span></div>
+        <div class="check-item" data-field="f-repo"><span class="ck-ico">○</span><span class="ck-lbl">Repo GitHub</span></div>
+        <div class="check-item" data-field="f-gh-token"><span class="ck-ico">○</span><span class="ck-lbl">Token GitHub</span></div>
+      </div>
+
+    </div>
+  </div>
+
+  <footer>
+    <span class="fn">NewsPorto</span>
+    <span class="fc">Admin · Publication automatique</span>
+  </footer>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const catLabels = {europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+
+// ── INIT ──────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  loadSaved('f-groq-key','groq_key','groq-saved');
+  loadSaved('f-gh-token','gh_token','gh-saved');
+  loadSaved('f-repo','gh_repo','repo-saved');
+  updateChecklist();
+});
+
+// ── LOCALSTORAGE ──────────────────────────────────────────────────
+function loadSaved(inputId, key, badgeId) {
+  const v = localStorage.getItem('np_'+key);
+  if (!v) return;
+  $(inputId).value = v;
+  if (badgeId) $(badgeId).style.display = 'inline';
+}
+function saveKey(inputId, key, badgeId) {
+  const v = $(inputId).value.trim();
+  if (!v) { toast('Champ vide','ko'); return; }
+  localStorage.setItem('np_'+key, v);
+  if (badgeId) $(badgeId).style.display = 'inline';
+  toast('Sauvegardé ✓','ok');
+  updateChecklist();
+}
+function toggleVis(id) { const f=$(id); f.type=f.type==='password'?'text':'password'; }
+
+// ── LISTENERS ─────────────────────────────────────────────────────
+$('f-title').addEventListener('input',  () => { cc('f-title','c-title',120); updatePreview(); updateChecklist(); });
+$('f-cat').addEventListener('change',   () => { updatePreview(); updateChecklist(); });
+$('f-source').addEventListener('input', () => cc('f-source','c-source',8000));
+$('f-body').addEventListener('input',   () => { ccInf(); updatePreview(); updateChecklist(); });
+$('f-cover').addEventListener('keydown', e => { if(e.key==='Enter') prevCover(); });
+$('f-inline').addEventListener('keydown', e => { if(e.key==='Enter') prevInline(); });
+$('f-repo').addEventListener('input', updateChecklist);
+$('f-gh-token').addEventListener('input', updateChecklist);
+
+function cc(id, cid, max) {
+  const l=$(id).value.length;
+  $(cid).textContent=`${l} / ${max}`;
+  $(cid).style.color=l>max*.85?'rgba(255,140,0,.6)':'rgba(255,255,255,.2)';
+}
+function ccInf() {
+  $('c-body').textContent=`${$('f-body').value.length} / ∞`;
+}
+
+// ── IMAGE PREVIEW ─────────────────────────────────────────────────
+function prevCover() {
+  const url=$('f-cover').value.trim(); if(!url)return;
+  const img=$('img-cover');
+  img.src=url; img.style.display='block'; $('ph-cover').style.display='none';
+  img.onerror=()=>{ toast('URL invalide','ko'); img.style.display='none'; $('ph-cover').style.display='flex'; };
+  $('prev-cover').src=url; $('prev-cover').style.display='block'; $('prev-ph').style.display='none';
+  updateChecklist();
+}
+function prevInline() {
+  const url=$('f-inline').value.trim(); if(!url)return;
+  const img=$('img-inline');
+  img.src=url; img.style.display='block'; $('ph-inline').style.display='none';
+  img.onerror=()=>{ toast('URL invalide','ko'); img.style.display='none'; $('ph-inline').style.display='flex'; };
+}
+
+// ── LIVE PREVIEW ──────────────────────────────────────────────────
+function updatePreview() {
+  $('prev-title').textContent = $('f-title').value.trim() || "Titre de l'article";
+  $('prev-cat').textContent   = catLabels[$('f-cat').value] || $('f-cat').value || 'Catégorie';
+  const body=$('f-body').value.trim();
+  if (body) {
+    const fp=body.split(/\n\n/)[0].trim();
+    $('prev-excerpt').textContent = fp.length>120 ? fp.slice(0,117)+'…' : fp;
+  } else {
+    $('prev-excerpt').textContent = "L'extrait apparaîtra ici…";
+  }
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────────
+function updateChecklist() {
+  const ok = {
+    'f-title':    $('f-title').value.trim().length > 3,
+    'f-cat':      $('f-cat').value !== '',
+    'f-cover':    $('f-cover').value.trim().startsWith('http'),
+    'f-body':     $('f-body').value.trim().length > 50,
+    'f-repo':     $('f-repo').value.trim().includes('/'),
+    'f-gh-token': $('f-gh-token').value.trim().length > 10
+  };
+  document.querySelectorAll('.check-item').forEach(item => {
+    const v = ok[item.dataset.field];
+    item.querySelector('.ck-ico').textContent  = v ? '●' : '○';
+    item.querySelector('.ck-ico').style.color  = v ? 'var(--green)' : 'rgba(255,255,255,.2)';
+    item.querySelector('.ck-lbl').style.color  = v ? 'rgba(255,255,255,.6)' : 'rgba(255,255,255,.3)';
+  });
+}
+
+// ── GROQ ──────────────────────────────────────────────────────────
+async function rewrite() {
+  const key    = $('f-groq-key').value.trim();
+  const source = $('f-source').value.trim();
+  const title  = $('f-title').value.trim();
+  const cat    = $('f-cat').value;
+  if (!key)    { toast('Clé Groq manquante','ko'); return; }
+  if (!source) { toast('Texte source vide','ko'); return; }
+
+  $('btn-rewrite').disabled=true;
+  setPill('groq-status','p-run','EN COURS…');
+  $('groq-output').className='result-text';
+  $('groq-output').textContent='';
+  $('groq-actions').style.display='none';
+
+  const sys=`Tu es le rédacteur principal de NewsPorto, média de référence des fans du FC Porto.
+Style : percutant, passionné, journalistique, parfaitement en français.
+Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
+Règles : commence directement par le premier paragraphe sans titre. Paragraphes séparés par deux sauts de ligne. 4 à 6 paragraphes minimum. Ne mentionne jamais les sources.`;
+
+  try {
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:2048,temperature:0.72,
+        messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
     });
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`HTTP ${r.status}`);}
+    const d=await r.json();
+    const text=d.choices?.[0]?.message?.content||'';
+    $('groq-output').textContent=text;
+    $('groq-output').className='result-text on';
+    setPill('groq-status','p-ok','TERMINÉ');
+    $('groq-actions').style.display='flex';
+    toast('Reformulation réussie ✓','ok');
+  } catch(e) {
+    setPill('groq-status','p-err','ERREUR');
+    $('groq-output').textContent=`Erreur : ${e.message}`;
+    $('groq-output').className='result-text on';
+    toast('Erreur Groq : '+e.message,'ko');
+  } finally { $('btn-rewrite').disabled=false; }
+}
 
-    // ──────────────────────────────────
-    //  IMAGE PREVIEWS
-    // ──────────────────────────────────
-    function previewCover() {
-      const url = $('cover-url').value.trim();
-      if (!url) return;
-      const img = $('cover-img');
-      img.src = url;
-      img.style.display = 'block';
-      $('cover-placeholder').style.display = 'none';
+function useRewritten() {
+  const t=$('groq-output').textContent;
+  $('f-body').value=t; ccInf(); updatePreview(); updateChecklist();
+  toast('Texte appliqué ✓','ok');
+  $('f-body').scrollIntoView({behavior:'smooth',block:'center'});
+}
 
-      // Also update right panel preview
-      const prevCover = $('preview-cover');
-      prevCover.src = url;
-      prevCover.style.display = 'block';
-      $('preview-img-placeholder').style.display = 'none';
+// ── BUILD HTML ARTICLE ────────────────────────────────────────────
+function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime) {
+  const catLabel=catLabels[cat]||cat;
+  const year=new Date().getFullYear();
+  const paras=body.split(/\n\n+/).filter(p=>p.trim()).map((p,i)=>
+    `      <p${i===0?' class="dc"':''}>${p.trim().replace(/\n/g,'<br>')}</p>`
+  ).join('\n');
+  const inlineImg=inlineUrl?`\n      <figure class="afig">\n        <img src="${inlineUrl}" alt="${title}" loading="lazy">\n      </figure>`:'';
 
-      img.onerror = () => { showToast('URL image invalide', 'error'); img.style.display='none'; $('cover-placeholder').style.display='flex'; };
-      updateChecklist();
-    }
-
-    function previewInline() {
-      const url = $('inline-url').value.trim();
-      if (!url) return;
-      const img = $('inline-img');
-      img.src = url;
-      img.style.display = 'block';
-      $('inline-placeholder').style.display = 'none';
-      img.onerror = () => { showToast('URL image invalide', 'error'); img.style.display='none'; $('inline-placeholder').style.display='flex'; };
-    }
-
-    // Enter on url fields triggers preview
-    $('cover-url').addEventListener('keydown', e => { if(e.key==='Enter') previewCover(); });
-    $('inline-url').addEventListener('keydown', e => { if(e.key==='Enter') previewInline(); });
-
-    // ──────────────────────────────────
-    //  API KEY — localStorage
-    // ──────────────────────────────────
-    function loadKey() {
-      const saved = localStorage.getItem('newsporto_groq_key');
-      if (saved) {
-        $('groq-key').value = saved;
-        $('key-saved-badge').style.display = 'inline';
-      }
-    }
-
-    function saveKey() {
-      const key = $('groq-key').value.trim();
-      if (!key) { showToast('Clé vide — rien à sauver', 'error'); return; }
-      localStorage.setItem('newsporto_groq_key', key);
-      $('key-saved-badge').style.display = 'inline';
-      showToast('Clé sauvegardée ✓', 'success');
-    }
-
-    function toggleKeyVisibility() {
-      const f = $('groq-key');
-      f.type = f.type === 'password' ? 'text' : 'password';
-    }
-
-    // ──────────────────────────────────
-    //  GROQ REFORMULATION
-    // ──────────────────────────────────
-    async function rewriteWithGroq() {
-      const apiKey     = $('groq-key').value.trim();
-      const sourceText = $('source-text').value.trim();
-      const title      = $('title').value.trim();
-      const cat        = $('category').value;
-
-      if (!apiKey)     { showToast('Clé API Groq manquante', 'error'); return; }
-      if (!sourceText) { showToast('Texte source vide', 'error'); return; }
-
-      const btn    = $('btn-rewrite');
-      const status = $('groq-status');
-      const output = $('rewritten-output');
-
-      btn.disabled = true;
-      status.className = 'groq-status loading';
-      status.textContent = 'EN COURS…';
-      output.className = 'result-output';
-      output.textContent = '';
-
-      const systemPrompt = `Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto. 
-Ton style est : percutant, passionné, journalistique, parfaitement en français. 
-Tu écris pour un public de fans éclairés qui connaissent le foot. 
-Jamais de traduction mot-à-mot : tu reformules, tu enrichis, tu donnes du rythme.
-Catégorie de l'article : ${cat || 'Actualité'}.
-${title ? `Titre de l'article : "${title}".` : ''}
-Consignes :
-- Commence directement par le premier paragraphe, sans titre.
-- Utilise des paragraphes séparés par deux sauts de ligne.
-- Longueur : 4 à 6 paragraphes minimum.
-- Termine sur une note d'ambition ou d'émotion.
-- Ne mentionne jamais les sources.`;
-
-      const userPrompt = `Reformule entièrement cet article en français pour NewsPorto :\n\n${sourceText}`;
-
-      try {
-        const resp = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${apiKey}`
-          },
-          body: JSON.stringify({
-            model: 'llama-3.3-70b-versatile',
-            max_tokens: 2048,
-            temperature: 0.72,
-            messages: [
-              { role: 'system', content: systemPrompt },
-              { role: 'user',   content: userPrompt }
-            ]
-          })
-        });
-
-        if (!resp.ok) {
-          const err = await resp.json();
-          throw new Error(err.error?.message || `HTTP ${resp.status}`);
-        }
-
-        const data = await resp.json();
-        const text = data.choices?.[0]?.message?.content || '';
-
-        output.textContent = text;
-        output.className   = 'result-output visible';
-
-        status.className   = 'groq-status done';
-        status.textContent = 'TERMINÉ';
-
-        const actions = $('rewritten-actions');
-        actions.style.display = 'flex';
-
-        showToast('Reformulation réussie ✓', 'success');
-
-      } catch(err) {
-        status.className   = 'groq-status error';
-        status.textContent = 'ERREUR';
-        output.textContent = `Erreur : ${err.message}`;
-        output.className   = 'result-output visible';
-        showToast('Erreur Groq : ' + err.message, 'error');
-      } finally {
-        btn.disabled = false;
-      }
-    }
-
-    function useRewritten() {
-      const text = $('rewritten-output').textContent;
-      $('body-text').value = text;
-      const len = text.length;
-      $('body-count').textContent = `${len} / ∞`;
-      updateChecklist();
-      showToast('Texte appliqué ✓', 'success');
-      $('body-text').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    // ──────────────────────────────────
-    //  GENERATE FILES
-    // ──────────────────────────────────
-    let generatedHTML = '';
-    let generatedJSON = '';
-
-    function generateFiles() {
-      const title    = $('title').value.trim();
-      const cat      = $('category').value;
-      const coverUrl = $('cover-url').value.trim();
-      const inlineUrl = $('inline-url').value.trim();
-      const body     = $('body-text').value.trim();
-
-      if (!title || !cat || !coverUrl || !body) {
-        showToast('Remplis tous les champs obligatoires *', 'error');
-        return;
-      }
-
-      // Auto-generate excerpt from first ~180 chars of body
-      const firstPara = body.split(/\n\n/)[0].trim();
-      const excerpt   = firstPara.length > 180 ? firstPara.slice(0, 177) + '…' : firstPara;
-
-      const now     = new Date();
-      const dateStr = now.toLocaleDateString('fr-FR', { day:'2-digit', month:'short', year:'numeric' });
-      const isoDate = now.toISOString().split('T')[0];
-      const slug    = title.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '')
-        .slice(0, 60);
-
-      const wordCount = body.split(/\s+/).length;
-      const readTime  = Math.max(2, Math.ceil(wordCount / 200));
-
-      // Format body into paragraphs
-      const paragraphs = body.split(/\n\n+/).filter(p => p.trim()).map(p =>
-        `      <p>${p.trim().replace(/\n/g, '<br>')}</p>`
-      ).join('\n');
-
-      const inlineImgHTML = inlineUrl ? `
-      <figure class="article-figure">
-        <img src="${inlineUrl}" alt="${title}" loading="lazy">
-      </figure>
-` : '';
-
-      // ── HTML ARTICLE ──
-      generatedHTML = `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${title} — NewsPorto</title>
   <meta name="description" content="${excerpt}">
   <meta property="og:title" content="${title}">
@@ -909,184 +481,195 @@ Consignes :
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root { --white:#fff; --gray:rgba(255,255,255,.45); --border:rgba(255,255,255,.1); --grid:rgba(255,255,255,.055); }
+    :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     body{background:#000;color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden}
-    .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gs 12s linear infinite;pointer-events:none}
+    .gbg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gs 12s linear infinite;pointer-events:none}
     @keyframes gs{0%{background-position:0 0}100%{background-position:44px 44px}}
-    .page{position:relative;z-index:1}
+    .pg{position:relative;z-index:1}
     nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(12px)}
-    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
-    .nav-logo img{height:28px;width:auto}
-    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
-    .back-link{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
-    .back-link:hover{color:var(--white)}
+    .nlogo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
+    .nlogo img{height:28px;width:auto}
+    .nlogt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
+    .bk{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
+    .bk:hover{color:var(--white)}
     .hero{position:relative;height:60vh;min-height:400px;overflow:hidden;border-bottom:1px solid var(--border)}
-    .hero img{width:100%;height:100%;object-fit:cover;opacity:.55;display:block}
-    .hero-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 30%,rgba(0,0,0,.2))}
-    .hero-content{position:absolute;bottom:0;left:0;right:0;padding:40px 48px}
-    .article-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
-    .article-cat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
-    .article-headline{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
-    .article-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
-    .article-layout{display:grid;grid-template-columns:1fr 300px;gap:0}
-    .article-body{padding:48px 48px;border-right:1px solid var(--border)}
-    .article-body p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
-    .article-body p:first-child::first-letter{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;float:left;margin-right:10px;color:var(--white)}
-    .article-figure{margin:32px 0;border:1px solid var(--border)}
-    .article-figure img{width:100%;display:block;opacity:.85}
-    .article-excerpt-pull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
-    .article-sidebar{padding:40px 32px}
-    .sidebar-section-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
-    .sidebar-section-label::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
+    .hero img{width:100%;height:100%;object-fit:cover;opacity:.55}
+    .hov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 30%,rgba(0,0,0,.2))}
+    .hbd{position:absolute;bottom:0;left:0;right:0;padding:40px 48px}
+    .acat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+    .acat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
+    .atit{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
+    .amet{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
+    .aly{display:grid;grid-template-columns:1fr 280px}
+    .abdy{padding:48px 48px;border-right:1px solid var(--border)}
+    .abdy p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
+    .abdy p.dc::first-letter{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;float:left;margin-right:10px;color:var(--white)}
+    .apull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
+    .afig{margin:32px 0;border:1px solid var(--border)}
+    .afig img{width:100%;display:block;opacity:.85}
+    .asb{padding:40px 32px}
+    .sbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+    .sbl::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
-    .footer-logo-text{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
-    .footer-copy{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-    @media(max-width:768px){nav,footer{padding:0 20px}.nav-links{display:none}.hero-content{padding:24px 20px}.article-layout{grid-template-columns:1fr}.article-body{padding:32px 20px;border-right:none}.article-sidebar{padding:24px 20px}}
+    .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
+    .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
 <body>
-  <div class="grid-bg"></div>
-  <div class="page">
+  <div class="gbg"></div>
+  <div class="pg">
     <nav>
-      <a href="../index.html" class="nav-logo">
-        <img src="../porto_logo.png" alt="FC Porto" onerror="this.style.display='none'">
-        <span class="nav-logo-text">NewsPorto</span>
+      <a href="../index.html" class="nlogo">
+        <img src="../Logo.png" alt="NewsPorto" onerror="this.style.display='none'">
+        <span class="nlogt">NewsPorto</span>
       </a>
-      <a href="../actu.html" class="back-link">← Actualités</a>
+      <a href="../actu.html" class="bk">← Actualités</a>
     </nav>
-
     <section class="hero">
       <img src="${coverUrl}" alt="${title}" loading="eager">
-      <div class="hero-overlay"></div>
-      <div class="hero-content">
-        <p class="article-cat">${cat}</p>
-        <h1 class="article-headline">${title}</h1>
-        <div class="article-meta">
-          <span>${dateStr}</span>
-          <span>·</span>
-          <span>${readTime} min de lecture</span>
-        </div>
+      <div class="hov"></div>
+      <div class="hbd">
+        <p class="acat">${catLabel}</p>
+        <h1 class="atit">${title}</h1>
+        <div class="amet"><span>${dateStr}</span><span>·</span><span>${readTime} min de lecture</span></div>
       </div>
     </section>
-
-    <div class="article-layout">
-      <article class="article-body">
-        <div class="article-excerpt-pull">${excerpt}</div>
-${paragraphs}
-${inlineImgHTML}
+    <div class="aly">
+      <article class="abdy">
+        <div class="apull">${excerpt}</div>
+${paras}${inlineImg}
       </article>
-
-      <aside class="article-sidebar">
-        <p class="sidebar-section-label">À la une</p>
-        <script src="../ticker-dynamic.js"><\/script>
+      <aside class="asb">
+        <p class="sbl">À la une</p>
       </aside>
     </div>
-
     <footer>
-      <span class="footer-logo-text">NewsPorto</span>
-      <span class="footer-copy">© ${now.getFullYear()} NewsPorto · Fan Media</span>
+      <span class="fn">NewsPorto</span>
+      <span class="fc">© ${year} NewsPorto · Fan Media</span>
     </footer>
   </div>
 </body>
 </html>`;
+}
 
-      // ── JSON ENTRY ──
-      const jsonEntry = {
-        id: slug,
-        title: title,
-        category: cat,
-        excerpt: excerpt,
-        cover: `articles/${slug}couv.jpg`,
-        coverUrl: coverUrl,
-        date: isoDate,
-        dateLabel: dateStr,
-        readTime: `${readTime} min`,
-        file: `articles/${slug}.html`
-      };
+// ── PUBLISH ───────────────────────────────────────────────────────
+async function publish() {
+  const title     = $('f-title').value.trim();
+  const cat       = $('f-cat').value;
+  const coverUrl  = $('f-cover').value.trim();
+  const inlineUrl = $('f-inline').value.trim();
+  const body      = $('f-body').value.trim();
+  const repo      = $('f-repo').value.trim();
+  const token     = $('f-gh-token').value.trim();
 
-      generatedJSON = JSON.stringify(jsonEntry, null, 2);
+  if (!title||!cat||!coverUrl||!body) { toast('Remplis les champs obligatoires *','ko'); return; }
+  if (!repo||!repo.includes('/'))     { toast('Repo invalide (ex: user/repo)','ko'); return; }
+  if (!token)                          { toast('Token GitHub manquant','ko'); return; }
 
-      // Display JSON
-      const jsonOut = $('json-output');
-      jsonOut.textContent = generatedJSON;
-      jsonOut.className = 'json-output visible';
+  const now      = new Date();
+  const dateStr  = now.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});
+  const slug     = title.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
+  const readTime = Math.max(2,Math.ceil(body.split(/\s+/).length/200));
+  const firstPara= body.split(/\n\n/)[0].trim();
+  const excerpt  = firstPara.length>180 ? firstPara.slice(0,177)+'…' : firstPara;
+  const fileName = `${slug}.html`;
+  const filePath = `articles/${fileName}`;
 
-      // Show download buttons
-      $('download-actions').style.display = 'flex';
+  $('btn-publish').disabled=true;
+  setPill('gh-status','p-run','EN COURS…');
+  resetSteps();
 
-      showToast('Fichiers générés ✓', 'success');
-    }
+  const hdrs = {
+    'Authorization': `Bearer ${token}`,
+    'Accept': 'application/vnd.github+json',
+    'Content-Type': 'application/json',
+    'X-GitHub-Api-Version': '2022-11-28'
+  };
+  const base = `https://api.github.com/repos/${repo}`;
 
-    function downloadHTML() {
-      if (!generatedHTML) return;
-      const title = $('title').value.trim();
-      const slug  = title.toLowerCase()
-        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-        .replace(/[^a-z0-9]+/g, '-').slice(0, 60);
-      const blob = new Blob([generatedHTML], { type: 'text/html;charset=utf-8' });
-      const a    = document.createElement('a');
-      a.href     = URL.createObjectURL(blob);
-      a.download = `${slug}.html`;
-      a.click();
-      showToast(`Téléchargement : ${slug}.html`, 'success');
-    }
+  try {
+    // ÉTAPE 1 — Génération HTML
+    setStep('step-1','active');
+    const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime);
+    await delay(300);
+    setStep('step-1','done');
 
-    function copyJSON() {
-      if (!generatedJSON) return;
-      navigator.clipboard.writeText(generatedJSON).then(() => {
-        showToast('JSON copié dans le presse-papier ✓', 'success');
-      }).catch(() => {
-        showToast('Copie manuelle : sélectionnez le JSON ci-dessus', 'error');
-      });
-    }
+    // ÉTAPE 2 — Upload HTML
+    setStep('step-2','active');
+    const htmlB64 = btoa(unescape(encodeURIComponent(html)));
+    let existSHA = null;
+    try {
+      const chk = await fetch(`${base}/contents/${filePath}`,{headers:hdrs});
+      if(chk.ok){const d=await chk.json();existSHA=d.sha;}
+    } catch(_){}
+    const r2 = await fetch(`${base}/contents/${filePath}`,{
+      method:'PUT', headers:hdrs,
+      body:JSON.stringify({message:`article: ${title}`,content:htmlB64,...(existSHA&&{sha:existSHA})})
+    });
+    if(!r2.ok){const e=await r2.json();throw new Error(`Upload HTML — ${e.message}`);}
+    setStep('step-2','done');
 
-    function updateChecklist() {
-      const checks = {
-        'title':     $('title').value.trim().length > 3,
-        'category':  $('category').value !== '',
-        'cover-url': $('cover-url').value.trim().startsWith('http'),
-        'body-text': $('body-text').value.trim().length > 50
-      };
-      // Update preview excerpt from body
-      const body = $('body-text').value.trim();
-      if (body) {
-        const firstPara = body.split(/\n\n/)[0].trim();
-        $('preview-excerpt').textContent = firstPara.length > 120 ? firstPara.slice(0,117)+'…' : firstPara;
-      } else {
-        $('preview-excerpt').textContent = 'L\'extrait sera généré depuis le corps de l\'article…';
+    // ÉTAPE 3 — Lecture index.json
+    setStep('step-3','active');
+    const idxPath='articles/index.json';
+    let existArticles=[];
+    let idxSHA=null;
+    try {
+      const r3=await fetch(`${base}/contents/${idxPath}`,{headers:hdrs});
+      if(r3.ok){
+        const d3=await r3.json(); idxSHA=d3.sha;
+        const decoded=decodeURIComponent(escape(atob(d3.content.replace(/\n/g,''))));
+        existArticles=(JSON.parse(decoded).articles)||[];
       }
-      document.querySelectorAll('.check-item').forEach(item => {
-        const field = item.dataset.field;
-        const ok    = checks[field];
-        const icon  = item.querySelector('.check-icon');
-        const label = item.querySelector('span:last-child');
-        if (ok) {
-          icon.textContent  = '●';
-          icon.style.color  = '#00a86b';
-          label.style.color = 'rgba(255,255,255,0.6)';
-        } else {
-          icon.textContent  = '○';
-          icon.style.color  = 'rgba(255,255,255,0.2)';
-          label.style.color = 'rgba(255,255,255,0.3)';
-        }
-      });
-    }
+    } catch(_){}
+    setStep('step-3','done');
 
-    // ──────────────────────────────────
-    //  TOAST
-    // ──────────────────────────────────
-    function showToast(msg, type = '') {
-      const t = $('toast');
-      t.textContent  = msg;
-      t.className    = `toast ${type} show`;
-      clearTimeout(t._timer);
-      t._timer = setTimeout(() => { t.className = 'toast'; }, 3000);
-    }
+    // ÉTAPE 4 — Mise à jour index.json
+    setStep('step-4','active');
+    const newEntry = {
+      file: fileName,
+      title: title,
+      category: cat,
+      excerpt: excerpt,
+      image: coverUrl,
+      date: dateStr,
+      read_time: `${readTime} min de lecture`
+    };
+    const updated = [newEntry, ...existArticles.filter(a=>a.file!==fileName)];
+    const idxB64  = btoa(unescape(encodeURIComponent(JSON.stringify({articles:updated},null,2))));
+    const r4 = await fetch(`${base}/contents/${idxPath}`,{
+      method:'PUT', headers:hdrs,
+      body:JSON.stringify({message:`index: ${title}`,content:idxB64,...(idxSHA&&{sha:idxSHA})})
+    });
+    if(!r4.ok){const e=await r4.json();throw new Error(`index.json — ${e.message}`);}
+    setStep('step-4','done');
 
-    // Init
-    loadKey();
-    updateChecklist();
-  </script>
+    setPill('gh-status','p-ok','PUBLIÉ ✓');
+    toast('Article publié 🎉 Le site se redéploie automatiquement !','ok');
+
+  } catch(err) {
+    setPill('gh-status','p-err','ERREUR');
+    document.querySelectorAll('.step.active').forEach(s=>{s.className='step err';});
+    toast('Erreur : '+err.message,'ko');
+    console.error(err);
+  } finally {
+    $('btn-publish').disabled=false;
+  }
+}
+
+// ── UTILS ─────────────────────────────────────────────────────────
+function setPill(id,cls,txt){const e=$(id);e.className='pill '+cls;e.textContent=txt;}
+function resetSteps(){['step-1','step-2','step-3','step-4'].forEach((id,i)=>{$(id).className='step';$(id).querySelector('.step-ico').textContent=i+1;});}
+function setStep(id,state){const e=$(id);e.className='step '+state;if(state==='done')e.querySelector('.step-ico').textContent='✓';}
+function delay(ms){return new Promise(r=>setTimeout(r,ms));}
+function toast(msg,type=''){
+  const t=$('toast');t.textContent=msg;t.className=`toast ${type} show`;
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.className='toast';},3500);
+}
+</script>
 </body>
 </html>
