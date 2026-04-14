@@ -55,7 +55,7 @@ MISSION : Redige un article journalistique de qualite professionnelle.
 
 REGLES STRICTES :
 1. Nous sommes le 14/04/2026. Lis attentivement les actualites et ignore tout fait qui semble date ou qui concerne une journee de championnat deja passee depuis longtemps. Un score comme "1-0" signifie que la premiere equipe citee a marque 1 but et l'adversaire 0. Verifie toujours qui a gagne avant d'ecrire.
-2. LECTURE DES SCORES : Le score s'écrit EQUIPE_DOMICILE - EQUIPE_VISITEUR. "FC Porto 3-0 Estoril" = Porto gagne. "Estoril 1-0 Porto" = Porto perd. Si le texte dit "Porto vence" ou "Porto wins" = Porto GAGNE. Si "Porto perde" ou "Porto loses" = Porto PERD. En cas de doute sur le resultat, ne mentionne PAS le score exact et fais une analyse tactique generale.
+2. LECTURE DES SCORES : Le score s'écrit EQUIPE_DOMICILE - EQUIPE_VISITEUR. "FC Porto 2-0 Estoril" = Porto gagne. "Estoril 1-0 Porto" = Porto perd. Si le texte dit "Porto vence" ou "Porto wins" = Porto GAGNE. Si "Porto perde" ou "Porto loses" = Porto PERD. En cas de doute sur le resultat, ne mentionne PAS le score exact et fais une analyse tactique generale.
 3. VERIFICATION OBLIGATOIRE : Avant d'ecrire le resultat, repete-toi mentalement "qui a marque plus de buts ?" et "qui a gagne ?". Si tu n'es pas sur a 100%, n'ecris pas le score.
 3. Base-toi uniquement sur les faits presents dans les actualites. Si tu n'es pas certain d'un score ou d'un fait, ne l'invente pas - fais une analyse tactique ou contextuelle a la place.
 4. Enrichis l'article avec une analyse football concrete : systeme de jeu, performances individuelles, enjeux tactiques, contexte de la competition, implications au classement.
@@ -67,13 +67,11 @@ REGLES STRICTES :
 FORMAT DE REPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant ou apres.
 
 {"title": "Titre accrocheur en francais max 65 chars",
-  "category": "europe ou analyse ou transfert ou liga ou interview",
-  "excerpt": "Accroche percutante 150 chars max qui donne envie de lire",
+  "category": "CHOIX STRICT : europe = Europa/Champions League uniquement | liga = Liga Portugal | analyse = analyse tactique | transfert = mercato | interview = portrait joueur",
+  "excerpt": "Accroche percutante 150 chars max",
   "read_time": "X min de lecture",
-  "unsplash_query": "requete anglais pour image football generique ex: soccer match stadium crowd action",
-  "category": "IMPORTANT - choisis la bonne categorie : europe = match Europa League ou Champions League UNIQUEMENT, liga = match ou classement Liga Portugal, analyse = analyse tactique ou bilan, transfert = mercato ou recrutement, interview = declaration ou portrait joueur",
-  "unsplash_query": "requete PRECISE en anglais liee au SUJET de l article ex: si mercato ecrire football transfer signing, si Europa League ecrire europa league football match, si Liga Portugal ecrire portuguese football liga, si analyse tactique ecrire football tactics coach, si joueur specifique ecrire football player dribbling",
-  "content": "Article HTML complet : minimum 5 balises p avec contenu riche et analyse, 2 balises h2 comme sous-titres. Style journalistique passionne et expert. PAS de balises html/head/body."
+  "unsplash_query": "requete PRECISE anglais liee au sujet : mercato=football transfer signing | Europa League=europa league porto | Liga=portuguese football stadium | analyse=football tactics | joueur=football player action",
+  "content": "HTML : 5 balises p minimum, 2 balises h2. Style L equipe. PAS de html/head/body."
 }"""
 
     url = "https://api.groq.com/openai/v1/chat/completions"
