@@ -80,7 +80,8 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
         "model": "llama-3.3-70b-versatile",
         "messages": [{"role": "user", "content": prompt}],
         "temperature": 0.8,
-        "max_tokens": 2048
+        "max_tokens": 2048,
+        "response_format": {"type": "json_object"}
     }
     r = requests.post(url, headers=headers, json=payload)
     r.raise_for_status()
@@ -88,8 +89,14 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
     raw = re.sub(r"^```json\s*", "", raw)
     raw = re.sub(r"^```\s*", "", raw)
     raw = re.sub(r"```$", "", raw).strip()
-    # Nettoie les caractères de contrôle invalides dans le JSON
-    raw = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f]", "", raw)
+    # Extrait uniquement le bloc JSON
+    match = re.search(r'\{.*\}', raw, re.DOTALL)
+    if match:
+        raw = match.group(0)
+    # Remplace les sauts de ligne dans les valeurs JSON par des espaces
+    raw = re.sub(r'(?<!\\)\n', ' ', raw)
+    raw = re.sub(r'(?<!\\)\t', ' ', raw)
+    raw = re.sub(r'[\x00-\x08\x0b\x0c\x0e-\x1f]', '', raw)
     return json.loads(raw)
 
 def build_html(data, image, date_str):
