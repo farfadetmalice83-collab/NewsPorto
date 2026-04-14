@@ -172,70 +172,64 @@
     }
   
     /* ═══════════════════════════════════════
-       HAMBURGER MENU
+       HAMBURGER
     ═══════════════════════════════════════ */
     .hamburger {
       display: none;
       flex-direction: column;
       justify-content: center;
       gap: 5px;
-      width: 40px;
-      height: 40px;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 4px;
-      z-index: 200;
-      position: relative;
+      width: 40px; height: 40px;
+      background: none; border: none;
+      cursor: pointer; padding: 4px;
+      z-index: 200; position: relative;
     }
     .hamburger span {
-      display: block;
-      width: 100%;
-      height: 1.5px;
-      background: var(--white, #fff);
+      display: block; width: 100%; height: 1.5px;
+      background: #fff;
       transition: transform 0.35s cubic-bezier(.22,1,.36,1), opacity 0.2s;
       transform-origin: center;
     }
     .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
     .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
     .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
     .mobile-nav-overlay {
       display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 150;
+      position: fixed; inset: 0; z-index: 150;
       background: rgba(0,0,0,0.97);
       backdrop-filter: blur(12px);
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transform: translateY(-8px);
+      align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(-8px);
       transition: opacity 0.35s cubic-bezier(.22,1,.36,1), transform 0.35s cubic-bezier(.22,1,.36,1);
       pointer-events: none;
     }
     .mobile-nav-overlay.open { opacity: 1; transform: translateY(0); pointer-events: all; }
-    .mobile-nav-item {
-      font-family: Bebas Neue, sans-serif;
-      font-size: clamp(42px, 12vw, 64px);
-      letter-spacing: 4px;
-      color: rgba(255,255,255,0.25);
-      text-decoration: none;
-      transition: color 0.2s, letter-spacing 0.2s;
-      line-height: 1.15;
-      padding: 6px 0;
-    }
-    .mobile-nav-item:hover, .mobile-nav-item.active { color: #fff; letter-spacing: 6px; }
-    .mobile-nav-bottom {
-      position: absolute; bottom: 48px;
-      font-family: Barlow Condensed, sans-serif;
-      font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.18);
-    }
     .mobile-nav-overlay::before {
       content: '';
       position: absolute; top: 0; left: 0; right: 0; height: 2px;
       background: linear-gradient(90deg, transparent, #003DA5, transparent);
     }
+    .mobile-nav-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 12vw, 64px);
+      letter-spacing: 4px; color: rgba(255,255,255,0.25);
+      text-decoration: none;
+      transition: color 0.2s, letter-spacing 0.2s;
+      line-height: 1.15; padding: 6px 0;
+    }
+    .mobile-nav-item:hover, .mobile-nav-item.active { color: #fff; letter-spacing: 6px; }
+    .mobile-nav-bottom {
+      position: absolute; bottom: 48px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 4px;
+      text-transform: uppercase; color: rgba(255,255,255,0.18);
+    }
+
+    /* ═══════════════════════════════════════
+       RESPONSIVE MOBILE
+    ═══════════════════════════════════════ */
     @media (max-width: 768px) {
       .hamburger { display: flex !important; }
       .mobile-nav-overlay { display: flex !important; }
@@ -243,6 +237,8 @@
       .nav-cta { display: none !important; }
       nav { padding: 0 20px !important; height: 62px !important; }
       .nav-logo img { height: 38px !important; }
+      .nav-logo-text { font-size: 18px !important; }
+
       .hero { grid-template-columns: 1fr !important; min-height: unset !important; }
       .hero-content { padding: 48px 20px 32px !important; }
       .hero-title { font-size: clamp(44px, 13vw, 68px) !important; }
@@ -250,12 +246,15 @@
       .hero-visual { max-height: 320px !important; overflow: hidden !important; }
       .hero-logo-wrap { display: none !important; }
       .hero-team-img { max-height: 320px !important; object-fit: cover !important; object-position: top !important; }
+
       .articles-section { padding: 32px 20px !important; }
       .articles-grid { grid-template-columns: 1fr !important; }
       .article-card { min-height: 180px !important; }
       .article-card.featured .article-title { font-size: 24px !important; }
+
       .stats-grid { grid-template-columns: repeat(2, 1fr) !important; }
       .stat-num { font-size: 38px !important; }
+
       .match-section { padding: 32px 20px !important; }
       .match-card { padding: 24px 16px !important; gap: 20px !important; }
       .match-score { font-size: 48px !important; }
@@ -265,24 +264,32 @@
       .match-infos { flex-direction: column !important; }
       .match-info-item { border-right: none !important; border-bottom: 1px solid rgba(255,255,255,0.1); }
       .match-info-item:last-child { border-bottom: none !important; }
+
       .videos-section { padding: 32px 20px !important; }
       .videos-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
       .shop-header { padding: 40px 20px 24px !important; flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
       .shop-grid { grid-template-columns: 1fr !important; }
+
       .newsletter-section { padding: 48px 20px !important; }
       .newsletter-form { flex-direction: column !important; }
       .newsletter-form input { border-right: 1px solid rgba(255,255,255,0.1) !important; }
       .newsletter-form button { width: 100% !important; }
+
       footer { flex-direction: column !important; align-items: center !important; gap: 20px !important; text-align: center !important; padding: 32px 20px !important; }
       .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
+
       .page-hero { padding: 48px 20px 36px !important; flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
       .page-title { font-size: clamp(52px, 14vw, 80px) !important; }
       .hero-right { text-align: left !important; }
+
       section { padding: 32px 20px !important; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
       .match-row { grid-template-columns: 70px 1fr auto 1fr 28px !important; gap: 4px !important; padding: 10px 12px !important; }
       .upcoming-row { grid-template-columns: 100px 1fr auto 1fr !important; }
       .upcoming-venue { display: none !important; }
+
       .club-bar-eyebrow { padding: 20px 20px 16px !important; }
       .club-bar { gap: 0 !important; }
       .players-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1px !important; }
@@ -291,14 +298,19 @@
       .player-name { font-size: 14px !important; }
       .filter-bar { padding: 14px 20px !important; gap: 6px !important; flex-wrap: wrap !important; }
       .filter-btn { font-size: 10px !important; padding: 5px 10px !important; }
+
       .videos-grid-full { grid-template-columns: repeat(2, 1fr) !important; }
       .products-grid { grid-template-columns: repeat(2, 1fr) !important; }
       .shop-hero { padding: 48px 20px 36px !important; }
       .shop-hero-title { font-size: clamp(40px, 12vw, 64px) !important; }
       .filter-row { padding: 14px 20px !important; gap: 8px !important; overflow-x: auto !important; flex-wrap: nowrap !important; }
+
       .actu-grid { grid-template-columns: 1fr !important; }
       .euro-grid { grid-template-columns: 1fr 1fr !important; }
       .legal-content { padding: 40px 20px !important; }
+
+      .ticker { padding: 8px 0 !important; }
+      .ticker-item { font-size: 10px !important; letter-spacing: 2px !important; }
     }
     @media (max-width: 480px) {
       .videos-grid { grid-template-columns: 1fr !important; }
@@ -340,7 +352,7 @@
     </button>
   </nav>
 
-  <!-- MOBILE NAV OVERLAY -->
+  <!-- MOBILE NAV -->
   <div class="mobile-nav-overlay" id="mobile-nav">
     <a href="index.html" class="mobile-nav-item">Accueil</a>
     <a href="actu.html" class="mobile-nav-item">Actu</a>
@@ -350,6 +362,7 @@
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
   </div>
+
   <script>
   function toggleMobileNav() {
     var nav = document.getElementById('mobile-nav');
@@ -358,6 +371,15 @@
     btn.classList.toggle('open', isOpen);
     document.body.style.overflow = isOpen ? 'hidden' : '';
   }
+  window.addEventListener('resize', function() {
+    if (window.innerWidth > 768) {
+      var nav = document.getElementById('mobile-nav');
+      var btn = document.getElementById('hamburger-btn');
+      if (nav) { nav.classList.remove('open'); }
+      if (btn) { btn.classList.remove('open'); }
+      document.body.style.overflow = '';
+    }
+  });
   </script>
 
   <!-- HERO -->
@@ -489,15 +511,5 @@
   }, { threshold: 0.05 });
   document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 </script>
-
-  // Close mobile nav on resize
-  window.addEventListener('resize', function() {
-    if (window.innerWidth > 768) {
-      var nav = document.getElementById('mobile-nav');
-      var btn = document.getElementById('hamburger-btn');
-      if (nav) { nav.classList.remove('open'); if(btn) btn.classList.remove('open'); document.body.style.overflow = ''; }
-    }
-  });
-
 </body>
 </html>
