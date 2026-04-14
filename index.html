@@ -442,11 +442,24 @@
       position: relative;
       overflow: hidden;
     }
-    /* Image stade — cadrée sur le bas, fondue dans le quadrillage */
+    /* Image stade — en haut, fondue dans le quadrillage */
     .match-card {
       background-image: url('stade.jpg');
-      background-size: cover;
-      background-position: center bottom;
+      background-size: 110% auto;
+      background-position: center top;
+      background-origin: border-box;
+    }
+    /* ::before = filtre sur toute l'image y compris le 1mm qui dépasse */
+    .match-card::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      background: inherit;
+      background-size: 110% auto;
+      background-position: center top;
+      filter: saturate(0.2) brightness(0.5);
+      z-index: 0;
+      pointer-events: none;
     }
     .match-card::after {
       content: '';
@@ -454,25 +467,23 @@
       inset: 0;
       background:
         linear-gradient(to bottom,
-          #000 0%,
-          rgba(0,10,40,0.82) 35%,
-          rgba(0,20,70,0.55) 65%,
-          rgba(0,15,50,0.75) 85%,
+          rgba(0,5,20,0.3) 0%,
+          rgba(0,10,40,0.6) 40%,
+          rgba(0,15,55,0.75) 70%,
           #000 100%
         ),
         linear-gradient(to right, #000 0%, transparent 12%, transparent 88%, #000 100%);
-      z-index: 0;
+      z-index: 1;
       pointer-events: none;
     }
-    .match-card > * { position: relative; z-index: 1; }
+    .match-card > * { position: relative; z-index: 2; }
     .match-card.spotlight::after {
       background:
         radial-gradient(circle at var(--spotlight-x,50%) var(--spotlight-y,50%), rgba(0,61,165,0.08) 0%, transparent 55%),
         linear-gradient(to bottom,
-          #000 0%,
-          rgba(0,10,40,0.82) 35%,
-          rgba(0,20,70,0.55) 65%,
-          rgba(0,15,50,0.75) 85%,
+          rgba(0,5,20,0.3) 0%,
+          rgba(0,10,40,0.6) 40%,
+          rgba(0,15,55,0.75) 70%,
           #000 100%
         ),
         linear-gradient(to right, #000 0%, transparent 12%, transparent 88%, #000 100%);
