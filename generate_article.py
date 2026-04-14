@@ -55,7 +55,8 @@ MISSION : Redige un article journalistique de qualite professionnelle.
 
 REGLES STRICTES :
 1. Nous sommes le 14/04/2026. Lis attentivement les actualites et ignore tout fait qui semble date ou qui concerne une journee de championnat deja passee depuis longtemps. Un score comme "1-0" signifie que la premiere equipe citee a marque 1 but et l'adversaire 0. Verifie toujours qui a gagne avant d'ecrire.
-2. Si une equipe "gagne 2-0" elle a marque 2 buts et en a encaisse 0 - elle a GAGNE. Si elle "perd 0-2" elle a marque 0 et en a encaisse 2 - elle a PERDU.
+2. LECTURE DES SCORES : Le score s'écrit EQUIPE_DOMICILE - EQUIPE_VISITEUR. "FC Porto 3-0 Estoril" = Porto gagne. "Estoril 1-0 Porto" = Porto perd. Si le texte dit "Porto vence" ou "Porto wins" = Porto GAGNE. Si "Porto perde" ou "Porto loses" = Porto PERD. En cas de doute sur le resultat, ne mentionne PAS le score exact et fais une analyse tactique generale.
+3. VERIFICATION OBLIGATOIRE : Avant d'ecrire le resultat, repete-toi mentalement "qui a marque plus de buts ?" et "qui a gagne ?". Si tu n'es pas sur a 100%, n'ecris pas le score.
 3. Base-toi uniquement sur les faits presents dans les actualites. Si tu n'es pas certain d'un score ou d'un fait, ne l'invente pas - fais une analyse tactique ou contextuelle a la place.
 4. Enrichis l'article avec une analyse football concrete : systeme de jeu, performances individuelles, enjeux tactiques, contexte de la competition, implications au classement.
 5. Style passionne et expert, comme L'Equipe ou RMC Sport. Phrases courtes et percutantes.
@@ -132,6 +133,8 @@ FORMAT DE REPONSE : JSON uniquement, sans markdown, sans backticks, sans texte a
     }
 
 def get_unsplash_image(query, used_ids):
+    # Force "FC Porto" dans la query pour avoir des images pertinentes
+    query = "FC Porto " + query
     params = {"query": query, "per_page": 20, "orientation": "landscape", "client_id": UNSPLASH_KEY}
     r = requests.get("https://api.unsplash.com/search/photos", params=params)
     r.raise_for_status()
