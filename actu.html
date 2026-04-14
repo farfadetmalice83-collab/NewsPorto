@@ -258,14 +258,20 @@
       .article-featured-img { border-right: none; border-bottom: 1px solid var(--border); min-height: 200px; }
     }
     @media (max-width: 768px) {
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
+      nav { padding: 0 20px; height: 62px !important; }
+      .nav-links { display: none !important; }
+      .nav-cta { display: none !important; }
+      .hamburger { display: flex !important; }
+      .mobile-nav-overlay { display: flex !important; }
       .articles-section { padding: 32px 20px; }
       .articles-grid { grid-template-columns: 1fr; }
       .article-wide { grid-template-columns: 80px 1fr; }
       .article-wide-num { font-size: 40px; padding: 20px; }
       .page-hero { padding: 40px 20px 32px; }
-      footer { flex-direction: column; gap: 20px; text-align: center; }
+      .filter-bar { padding: 12px 20px !important; gap: 6px !important; flex-wrap: wrap !important; }
+      .filter-btn { font-size: 10px !important; padding: 5px 10px !important; }
+      footer { flex-direction: column; gap: 20px; text-align: center; padding: 28px 20px !important; }
+      .footer-links { flex-wrap: wrap; justify-content: center; }
     }
 
     /* ── FILTER JS ── */
