@@ -1,18 +1,5 @@
 {
-  "articles": [
-    {
-      "id": 1,
-      "file": "article1.html",
-      "title": "FC Porto en difficulté",
-      "excerpt": "Le FC Porto subit une défaite contre Estoril et se prépare à affronter Nottingham Forest",
-      "category": "europe",
-      "read_time": "2 min de lecture",
-      "date": "14 Avr 2026",
-      "date_iso": "2026-04-14",
-      "image": "https://images.unsplash.com/photo-1549923015-badf41b04831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHN0YWRpdW0lMjBjcm93ZHxlbnwwfDB8fHwxNzc2MjAwMzc4fDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "image_thumb": "https://images.unsplash.com/photo-1549923015-badf41b04831?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w5MjUwMzV8MHwxfHNlYXJjaHwxfHxmb290YmFsbCUyMHN0YWRpdW0lMjBjcm93ZHxlbnwwfDB8fHwxNzc2MjAwMzc4fDA&ixlib=rb-4.1.0&q=80&w=400"
-    }
-  ],
+  "articles": [],
   "used_image_ids": [
     "tHjoZcCqqPQ"
   ]
