@@ -76,8 +76,18 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.8, "maxOutputTokens": 2048}
     }
-    r = requests.post(url, json=payload)
-    r.raise_for_status()
+    import time
+    r = None
+    for attempt in range(3):
+        r = requests.post(url, json=payload)
+        if r.status_code == 429:
+            print(f"⏳ Rate limit, attente 60s (tentative {attempt+1}/3)...")
+            time.sleep(60)
+            continue
+        r.raise_for_status()
+        break
+    else:
+        r.raise_for_status()
     raw = r.json()["candidates"][0]["content"]["parts"][0]["text"].strip()
     raw = re.sub(r"^```json\s*", "", raw)
     raw = re.sub(r"^```\s*", "", raw)
