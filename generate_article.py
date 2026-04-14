@@ -71,7 +71,7 @@ RÉPONSE : JSON uniquement, sans markdown, sans backticks, sans texte avant/apr�
   "content": "HTML : minimum 5 balises <p> avec contenu riche, 2 balises <h2>. Style journalistique passionné. PAS de balises html/head/body."
 }}"""
 
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GEMINI_KEY}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_KEY}"
     payload = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"temperature": 0.8, "maxOutputTokens": 2048}
