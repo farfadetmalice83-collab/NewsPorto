@@ -325,8 +325,26 @@
       text-decoration: none;
       color: inherit;
       display: block;
+      position: relative;
+      overflow: hidden;
+      min-height: 200px;
     }
-    .article-card:hover { background: rgba(255,255,255,0.03); }
+    .article-card-bg {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center top;
+      opacity: 0.18; transition: opacity .3s;
+      z-index: 0;
+    }
+    .article-card:hover .article-card-bg { opacity: 0.28; }
+    .article-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 40%, rgba(0,0,0,0.3) 100%);
+      z-index: 1; pointer-events: none;
+    }
+    .article-cat, .article-title, .article-excerpt, .article-date {
+      position: relative; z-index: 2;
+    }
+    .article-card:hover { background: #000; }
     .article-cat {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 9px;
@@ -978,17 +996,20 @@
     </div>
     <div class="articles-grid">
       <a class="article-card featured reveal" href="articles/article1.html">
+        <div class="article-card-bg" style="background-image:url('articles/img/article1.jpg')"></div>
         <p class="article-cat">Transfert</p>
         <h2 class="article-title">Porto tient sa recrue prioritaire du mercato estival</h2>
         <p class="article-excerpt">Le club bleu et blanc a officialisé l'arrivée de son nouveau milieu offensif. Un renfort de taille pour aborder la prochaine saison avec ambition.</p>
         <p class="article-date">04 Avr 2026</p>
       </a>
       <a class="article-card" href="articles/article6.html">
+        <div class="article-card-bg" style="background-image:url('articles/img/article6.jpg')"></div>
         <p class="article-cat">Analyse</p>
         <h2 class="article-title">Tactique : Le 4-3-3 de Farioli décrypté</h2>
         <p class="article-date">01 Avr 2026</p>
       </a>
       <a class="article-card" href="articles/article3.html">
+        <div class="article-card-bg" style="background-image:url('articles/img/article3.jpg')"></div>
         <p class="article-cat">Focus</p>
         <h2 class="article-title">William Gomes : L'ascension fulgurante</h2>
         <p class="article-date">04 Avr 2026</p>
