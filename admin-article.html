@@ -271,6 +271,7 @@
             <div class="step" id="step-2"><div class="step-ico">2</div><span>Upload articles/[slug].html</span></div>
             <div class="step" id="step-3"><div class="step-ico">3</div><span>Lecture de index.json</span></div>
             <div class="step" id="step-4"><div class="step-ico">4</div><span>Mise à jour index.json</span></div>
+            <div class="step" id="step-5"><div class="step-ico">5</div><span>Mise à jour sitemap.xml</span></div>
           </div>
         </div>
       </div>
@@ -648,6 +649,41 @@ async function publish() {
     if(!r4.ok){const e=await r4.json();throw new Error(`index.json — ${e.message}`);}
     setStep('step-4','done');
 
+    // ÉTAPE 5 — Mise à jour sitemap.xml
+    setStep('step-5','active');
+    const domain = 'https://newsporto.fr';
+    const isoNow = new Date().toISOString().split('T')[0];
+    const staticPages = ['','actu','effectif','stats','videos','shop'].map(p => `
+  <url>
+    <loc>${domain}/${p ? p+'.html' : ''}</loc>
+    <changefreq>${p===''||p==='actu'?'daily':'weekly'}</changefreq>
+    <priority>${p===''?'1.0':p==='actu'?'0.9':'0.7'}</priority>
+  </url>`).join('');
+    const articlePages = updated.map(a => `
+  <url>
+    <loc>${domain}/articles/${a.file}</loc>
+    <lastmod>${isoNow}</lastmod>
+    <changefreq>never</changefreq>
+    <priority>0.8</priority>
+  </url>`).join('');
+    const sitemapXML = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${staticPages}
+${articlePages}
+</urlset>`;
+    const sitemapB64 = btoa(unescape(encodeURIComponent(sitemapXML)));
+    let smSHA = null;
+    try {
+      const smChk = await fetch(`${base}/contents/sitemap.xml`,{headers:hdrs});
+      if(smChk.ok){const d=await smChk.json();smSHA=d.sha;}
+    } catch(_){}
+    const r5 = await fetch(`${base}/contents/sitemap.xml`,{
+      method:'PUT', headers:hdrs,
+      body:JSON.stringify({message:`sitemap: ${title}`,content:sitemapB64,...(smSHA&&{sha:smSHA})})
+    });
+    if(!r5.ok){const e=await r5.json();throw new Error(`sitemap.xml — ${e.message}`);}
+    setStep('step-5','done');
+
     setPill('gh-status','p-ok','PUBLIÉ ✓');
     toast('Article publié 🎉 Le site se redéploie automatiquement !','ok');
 
@@ -663,7 +699,7 @@ async function publish() {
 
 // ── UTILS ─────────────────────────────────────────────────────────
 function setPill(id,cls,txt){const e=$(id);e.className='pill '+cls;e.textContent=txt;}
-function resetSteps(){['step-1','step-2','step-3','step-4'].forEach((id,i)=>{$(id).className='step';$(id).querySelector('.step-ico').textContent=i+1;});}
+function resetSteps(){['step-1','step-2','step-3','step-4','step-5'].forEach((id,i)=>{$(id).className='step';$(id).querySelector('.step-ico').textContent=i+1;});}
 function setStep(id,state){const e=$(id);e.className='step '+state;if(state==='done')e.querySelector('.step-ico').textContent='✓';}
 function delay(ms){return new Promise(r=>setTimeout(r,ms));}
 function toast(msg,type=''){
