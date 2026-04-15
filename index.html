@@ -48,6 +48,23 @@
       pointer-events: none;
     }
     @keyframes blink-hint { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+    /* ══ SCROLL ANIMATIONS AU DÉFILÉ ══ */
+
+    /* Match section — slide depuis le bas */
+    .match-section { opacity: 0; transform: translateY(40px); transition: opacity .8s cubic-bezier(.16,1,.3,1), transform .8s cubic-bezier(.16,1,.3,1); }
+    .match-section.anim-visible { opacity: 1; transform: translateY(0); }
+
+    /* Match card — scale depuis le centre avec délai */
+    .match-card { opacity: 0; transform: scale(0.95) translateY(20px); transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1), box-shadow .4s ease; }
+    .match-card.anim-visible { opacity: 1; transform: scale(1) translateY(0); }
+
+    /* Shop cards — slide up cascade */
+    .shop-card { opacity: 0; transform: translateY(36px); transition: opacity .65s cubic-bezier(.16,1,.3,1), transform .65s cubic-bezier(.16,1,.3,1), background .2s; }
+    .shop-card.anim-visible { opacity: 1; transform: translateY(0); }
+    .shop-card:nth-child(1).anim-visible { transition-delay: 0s; }
+    .shop-card:nth-child(2).anim-visible { transition-delay: 0.12s; }
+    .shop-card:nth-child(3).anim-visible { transition-delay: 0.24s; }
     @keyframes gridScroll {
       0%   { background-position: 0 0; }
       100% { background-position: 44px 44px; }
@@ -1757,7 +1774,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-poster-soit-portista" target="_blank" class="shop-card reveal reveal-d1">
         <div class="shop-card-img">
-          <img src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster" loading="lazy">
+          <img style="object-position:center 15%;" src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster" loading="lazy">
           <span class="shop-card-badge scb-exclu">Exclusif</span>
         </div>
         <div class="shop-card-info">
@@ -1817,6 +1834,30 @@
     var l = document.getElementById('page-loader');
     if (l) l.classList.add('hidden');
   }, 500);
+
+
+  // ── SCROLL ANIMATIONS ────────────────────────────────────────────
+  const animObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      // Match sections
+      if (e.target.classList.contains('match-section')) {
+        e.target.classList.add('anim-visible');
+        // Animate child match-card with slight delay
+        const card = e.target.querySelector('.match-card');
+        if (card) setTimeout(() => card.classList.add('anim-visible'), 150);
+      }
+      // Shop cards cascade
+      if (e.target.classList.contains('shop-section')) {
+        e.target.querySelectorAll('.shop-card').forEach((card, i) => {
+          setTimeout(() => card.classList.add('anim-visible'), i * 120);
+        });
+      }
+      animObs.unobserve(e.target);
+    });
+  }, { threshold: 0.05, rootMargin: '0px 0px 150px 0px' });
+
+  document.querySelectorAll('.match-section, .shop-section').forEach(el => animObs.observe(el));
 
   // Scroll reveal
   const ro = new IntersectionObserver((entries) => {
