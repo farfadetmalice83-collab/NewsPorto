@@ -186,12 +186,17 @@
       <div class="form-section">
         <p class="section-label">03 — Texte source</p>
         <div class="info-box">
-          <p>Collez le <strong>texte brut</strong> de l'article source. Groq le reformulera entièrement en français dans le style NewsPorto.</p>
+          <p>Collez le <strong>texte brut</strong> de l'article source. Mistral le reformulera entièrement en français dans le style NewsPorto.</p>
         </div>
         <div class="field">
           <label>Contenu source *</label>
           <textarea id="f-source" placeholder="Collez ici le texte original…" style="min-height:280px" maxlength="8000"></textarea>
           <div class="char-count" id="c-source">0 / 8000</div>
+        </div>
+        <div class="field">
+          <label>Contexte additionnel <span style="color:rgba(255,255,255,.2);font-size:9px;letter-spacing:1px;">(optionnel — faits vérifiés, scores, noms exacts…)</span></label>
+          <textarea id="f-context" placeholder="Ex : Diogo Costa est sous contrat jusqu'en 2030. João Neves a rejoint le PSG pour 70M€. Porto est 1er de Liga avec 72 pts…" style="min-height:100px" maxlength="2000"></textarea>
+          <div class="char-count" id="c-context">0 / 2000</div>
         </div>
       </div>
 
@@ -348,6 +353,7 @@ function toggleVis(id) { const f=$(id); f.type=f.type==='password'?'text':'passw
 $('f-title').addEventListener('input',  () => { cc('f-title','c-title',120); updatePreview(); updateChecklist(); });
 $('f-cat').addEventListener('change',   () => { updatePreview(); updateChecklist(); });
 $('f-source').addEventListener('input', () => cc('f-source','c-source',8000));
+$('f-context').addEventListener('input', () => cc('f-context','c-context',2000));
 $('f-body').addEventListener('input',   () => { ccInf(); updatePreview(); updateChecklist(); });
 $('f-cover').addEventListener('keydown', e => { if(e.key==='Enter') prevCover(); });
 $('f-inline').addEventListener('keydown', e => { if(e.key==='Enter') prevInline(); });
@@ -425,27 +431,34 @@ async function rewrite() {
   $('groq-output').textContent='';
   $('groq-actions').style.display='none';
 
+  const context = $('f-context').value.trim();
   const sys=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
 Style : percutant, passionné, journalistique, parfaitement en français.
 Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
 
+RÈGLES ABSOLUES — FACTUALITÉ :
+- Tu ne peux utiliser QUE les faits présents dans le texte source ou dans le contexte additionnel ci-dessous
+- Ne jamais inventer de chiffres, scores, noms de joueurs, montants de transferts ou dates
+- Si tu ne connais pas un détail avec certitude, ne le mentionne pas
+- Ne jamais citer d'exemples de transferts ou d'événements non mentionnés dans le texte source
+- En cas de doute sur un fait, utilise des formulations prudentes ("selon les informations disponibles", "d'après les sources")
+${context ? `\nCONTEXTE FACTUEL VÉRIFIÉ — utilise ces informations en priorité :\n${context}` : ''}
+
 Règles rédactionnelles :
 - Commence directement par le premier paragraphe sans titre
-- Ne jamais répéter une statistique ou une idée (ex: si tu as dit "160 matchs", ne le redis plus jamais).
-- Ne commence jamais tes phrases par "Le", "Les" de façon systématique.
-- utilise un vocabulaire journalistique
-- Pas de conclusions clichées.
-- Pour chaque idée, explique le "Pourquoi". Si tu parles des finances, explique l'impact de l'UEFA. Si tu parles de la Juventus, explique le style de Thiago Motta.
-- n'ivente rien
+- Ne jamais répéter une statistique ou une idée
+- Ne commence pas tes phrases systématiquement par "Le" ou "Les"
+- Vocabulaire journalistique, dynamique
+- Pas de conclusions clichées
+- Pour chaque idée, explique le "Pourquoi" avec du contexte
 - Paragraphes séparés par deux sauts de ligne
-- 5 à 7 paragraphes minimum (800 mots minimum) SAUF si tu n'as pas assez d'infos pour développer et que cela crée un risque de répétition
+- 5 à 7 paragraphes minimum (800 mots) SAUF si le texte source ne fournit pas assez de matière
 - Ne mentionne jamais les sources
 
-Règles SEO obligatoires :
-- Intègre naturellement les expressions "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
-- Le premier paragraphe doit contenir les mots clés principaux
-- Utilise des sous-thèmes variés pour enrichir le contenu (contexte, historique, enjeux, perspectives)
-- Termine par une phrase puissante et engageante qui incite à continuer de suivre l'actualité sur newsporto.fr. (la seul fois ou tu mentionne le site`;
+Règles SEO :
+- Intègre naturellement "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
+- Le premier paragraphe contient les mots clés principaux
+- Termine par une phrase engageante qui incite à suivre newsporto.fr (seule mention du site)`;
 
   try {
     const r = await fetch('https://api.mistral.ai/v1/chat/completions',{
@@ -729,7 +742,7 @@ async function publish() {
 // ── RESET FORM ────────────────────────────────────────────────────
 function resetForm() {
   $('f-title').value=''; $('f-cat').value=''; $('f-cover').value='';
-  $('f-inline').value=''; $('f-source').value=''; $('f-body').value='';
+  $('f-inline').value=''; $('f-source').value=''; $('f-context').value=''; $('f-body').value='';
   $('img-cover').style.display='none'; $('ph-cover').style.display='flex';
   $('img-inline').style.display='none'; $('ph-inline').style.display='flex';
   $('prev-cover').style.display='none'; $('prev-ph').style.display='flex';
