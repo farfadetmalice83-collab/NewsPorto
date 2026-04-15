@@ -1,14 +1,11 @@
 // api/porto-stats.js  ← Vercel Serverless Function
 // FC Porto (ID 503) — football-data.org
-// Returns: stats, nextMatch, liveMatch, lineup, recentMatches, upcomingMatches, standings, europeanStats
 
 const BASE      = 'https://api.football-data.org/v4';
 const PORTO_ID  = 503;
-const LIGA_CODE = 'PPL'; // Primeira Liga Portugal
+const LIGA_CODE = 'PPL';
 
-const API_HEADERS = {
-  'X-Auth-Token': process.env.FOOTBALL_API_KEY,
-};
+const API_HEADERS = { 'X-Auth-Token': process.env.FOOTBALL_API_KEY };
 
 async function fetchFD(path) {
   const res = await fetch(`${BASE}${path}`, { headers: API_HEADERS });
@@ -34,7 +31,64 @@ function extractLineup(matchDetail, competition) {
   };
 }
 
-// ── Vercel handler (remplace exports.handler de Netlify) ──────────────────────
+// Extrait les événements du match (buts, cartons, remplacements)
+function extractEvents(matchDetail) {
+  if (!matchDetail?.goals && !matchDetail?.bookings && !matchDetail?.substitutions) return [];
+  const events = [];
+
+  // Buts
+  (matchDetail.goals || []).forEach(g => {
+    events.push({
+      minute:      g.minute ?? g.regularTimeMinute ?? null,
+      type:        g.type === 'OWN_GOAL' ? 'OWN_GOAL' : g.type === 'PENALTY' ? 'PENALTY' : 'GOAL',
+      playerName:  g.scorer?.name ?? '—',
+      assistName:  g.assist?.name ?? null,
+      teamId:      g.team?.id ?? null,
+      teamName:    g.team?.shortName ?? g.team?.name ?? null,
+    });
+  });
+
+  // Cartons
+  (matchDetail.bookings || []).forEach(b => {
+    events.push({
+      minute:     b.minute ?? null,
+      type:       b.card === 'RED_CARD' ? 'RED_CARD' : 'YELLOW_CARD',
+      playerName: b.player?.name ?? '—',
+      teamId:     b.team?.id ?? null,
+      teamName:   b.team?.shortName ?? b.team?.name ?? null,
+    });
+  });
+
+  // Remplacements
+  (matchDetail.substitutions || []).forEach(s => {
+    events.push({
+      minute:        s.minute ?? null,
+      type:          'SUBSTITUTION',
+      playerName:    s.playerIn?.name ?? '—',
+      playerOutName: s.playerOut?.name ?? null,
+      teamId:        s.team?.id ?? null,
+      teamName:      s.team?.shortName ?? s.team?.name ?? null,
+    });
+  });
+
+  return events.sort((a, b) => (a.minute ?? 0) - (b.minute ?? 0));
+}
+
+// Extrait les stats du match (possession, tirs, etc.)
+function extractMatchStats(matchDetail) {
+  if (!matchDetail?.odds && !matchDetail?.referees) return [];
+  // football-data.org v4 ne fournit pas les stats détaillées sur le plan gratuit
+  // On retourne les stats disponibles depuis le score
+  const stats = [];
+  if (matchDetail.score) {
+    const ht = matchDetail.score.halfTime;
+    if (ht?.home != null) {
+      stats.push({ label: 'Score mi-temps', home: ht.home ?? 0, away: ht.away ?? 0 });
+    }
+  }
+  return stats;
+}
+
 export default async function handler(req, res) {
   try {
     // 1. Standings
@@ -87,12 +141,16 @@ export default async function handler(req, res) {
     const allMatches  = matchesData?.matches ?? [];
     const liveMatches = [...liveInPlay, ...livePaused, ...liveHalf];
 
-    // 3. Live match + lineup
+    // 3. Live match + lineup + events
     let liveMatch = null;
     let lineup    = null;
 
     if (liveMatches.length > 0) {
       const lm = liveMatches[0];
+      const detail = await fetchFD(`/matches/${lm.id}`);
+      const events = extractEvents(detail);
+      const matchStats = extractMatchStats(detail);
+
       liveMatch = {
         id:          lm.id,
         competition: lm.competition?.name ?? '—',
@@ -105,8 +163,9 @@ export default async function handler(req, res) {
         minute:      lm.minute ?? null,
         status:      lm.status,
         venue:       lm.venue ?? null,
+        events,
+        matchStats,
       };
-      const detail = await fetchFD(`/matches/${lm.id}`);
       lineup = extractLineup(detail, lm.competition?.name);
     }
 
@@ -133,6 +192,11 @@ export default async function handler(req, res) {
       if (detail) {
         const pre = extractLineup(detail, nextMatch.competition);
         if (pre?.startXI?.length > 0) lineup = pre;
+        // Add events for next match (will be empty but ready)
+        if (nextMatch) {
+          nextMatch.events = [];
+          nextMatch.matchStats = [];
+        }
       }
     }
 
