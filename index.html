@@ -1541,17 +1541,7 @@
   </section>
 
 
-  <script>
-  function closeLiveModal() {
-    document.getElementById('live-modal').style.display = 'none';
-    document.body.style.overflow = '';
-  }
-  window._openLiveModal = function() {
-    document.getElementById('live-modal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    if (window._renderLiveModal) window._renderLiveModal();
-  };
-  </script>
+
   <!-- ── LINEUP MODAL ── -->
   <div id="lineup-modal" style="
     display:none;position:fixed;inset:0;z-index:999;
@@ -2246,19 +2236,11 @@
   let liveModalData = null;
   let currentTab = 'events';
 
-
   function closeLiveModal() {
     document.getElementById('live-modal').style.display = 'none';
     document.body.style.overflow = '';
   }
-  function refreshLiveModal() {
-    fetch('/api/porto-stats').then(r=>r.json()).then(data=>{
-      liveModalData = data;
-      renderLiveModal();
-      const now = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
-      document.getElementById('ml-updated').textContent = 'Mis à jour à ' + now;
-    });
-  }
+
   function switchTab(tab) {
     currentTab = tab;
     ['events','stats','lineup'].forEach(t => {
@@ -2269,181 +2251,194 @@
     });
   }
 
-  window._renderLiveModal = function renderLiveModal() {
-    const data = liveModalData;
+  function refreshLiveModal() {
+    fetch('/api/porto-stats').then(r=>r.json()).then(data=>{
+      liveModalData = data;
+      openLiveModalContent(data);
+      const now = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      document.getElementById('ml-updated').textContent = 'Mis à jour à ' + now;
+    });
+  }
+
+  function openLiveModalContent(data) {
+    const isLive = !!data.liveMatch;
     const m = data.liveMatch || data.nextMatch;
-    if (!m) return;
-    const live = !!data.liveMatch;
+    if (!m && !data.upcomingMatches?.length) {
+      document.getElementById('modal-live-comp').textContent = 'CALENDRIER FC PORTO';
+      document.getElementById('ml-events-list').innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Aucun match programmé</p>';
+      return;
+    }
 
-    // Header
-    document.getElementById('modal-live-comp').textContent = m.competition || 'MATCH';
-    document.getElementById('ml-home').textContent = m.homeTeam || '—';
-    document.getElementById('ml-away').textContent = m.awayTeam || '—';
-    if (m.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
-    if (m.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
-
-    if (live) {
+    if (isLive) {
+      // ── MODE LIVE ──
+      document.getElementById('modal-live-comp').textContent = (m.competition || 'MATCH EN DIRECT').toUpperCase();
+      document.getElementById('ml-home').textContent = m.homeTeam || '—';
+      document.getElementById('ml-away').textContent = m.awayTeam || '—';
       document.getElementById('ml-score').textContent = (m.homeGoals??0) + ' – ' + (m.awayGoals??0);
+      if (m.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
+      if (m.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
+
       const badge = document.getElementById('ml-status-badge');
-      if (m.status === 'HALF_TIME') {
-        badge.textContent = 'MI-TEMPS';
-        badge.style.color = '#f0a500';
-      } else if (m.status === 'FINISHED') {
-        badge.textContent = 'TERMINÉ';
-        badge.style.color = 'rgba(255,255,255,0.4)';
+      if (m.status==='HALF_TIME') { badge.textContent='MI-TEMPS'; badge.style.color='#f0a500'; }
+      else if (m.status==='FINISHED') { badge.textContent='TERMINÉ'; badge.style.color='rgba(255,255,255,0.4)'; }
+      else { badge.innerHTML='<span style="color:#ff4444">🔴 LIVE</span> ' + (m.minute ? m.minute+"'" : ''); }
+
+      // Events
+      const events = m.events || [];
+      const eventsEl = document.getElementById('ml-events-list');
+      if (!events.length) {
+        eventsEl.innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Aucun événement pour l'instant</p>';
       } else {
-        badge.innerHTML = '<span style="color:#ff4444">🔴 LIVE</span> ' + (m.minute ? m.minute+"'" : '');
+        const icons = {GOAL:'⚽',YELLOW_CARD:'🟨',RED_CARD:'🟥',SUBSTITUTION:'🔄',OWN_GOAL:'⚽',PENALTY:'⚽'};
+        eventsEl.innerHTML = events.slice().reverse().map(e => {
+          const isPorto = e.teamId===503;
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);min-width:30px;">'+(e.minute||'—')+"'</span>"
+            +'<span style="font-size:16px;">'+(icons[e.type]||'•')+'</span>'
+            +'<div style="flex:1;">'
+            +'<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;color:'+(isPorto?'#fff':'rgba(255,255,255,0.5)')+';">'+(e.playerName||'—')+'</div>'
+            +(e.assistName?'<div style="font-size:10px;color:rgba(255,255,255,0.3);">Passe : '+e.assistName+'</div>':'')
+            +(e.playerOutName?'<div style="font-size:10px;color:rgba(255,255,255,0.3);">↓ '+e.playerOutName+'</div>':'')
+            +'</div>'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">'+(isPorto?'Porto':e.teamName||'')+'</span>'
+            +'</div>';
+        }).join('');
       }
+
+      // Stats
+      const matchStats = m.matchStats || [];
+      const statsEl = document.getElementById('ml-stats-list');
+      if (!matchStats.length) {
+        statsEl.innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Stats disponibles en cours de match</p>';
+      } else {
+        statsEl.innerHTML = matchStats.map(s => {
+          const total=(s.home||0)+(s.away||0);
+          const pct=total>0?Math.round((s.home/total)*100):50;
+          return '<div style="margin-bottom:16px;">'
+            +'<div style="display:flex;justify-content:space-between;margin-bottom:6px;">'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;color:#fff;">'+s.home+'</span>'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">'+s.label+'</span>'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.5);">'+s.away+'</span>'
+            +'</div>'
+            +'<div style="height:3px;background:rgba(255,255,255,0.1);">'
+            +'<div style="height:100%;width:'+pct+'%;background:#003DA5;transition:width .5s;"></div>'
+            +'</div></div>';
+        }).join('');
+      }
+
+      // Lineup
+      const lineupEl = document.getElementById('ml-lineup-content');
+      if (data.lineup?.startXI?.length) {
+        lineupEl.innerHTML = '<p style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;">'+(data.lineup.formation||'')+'</p>'
+          +'<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+          +data.lineup.startXI.map(p=>'<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.08);min-width:160px;"><span style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.3);min-width:20px;">'+(p.number||'—')+'</span><span style="font-family:Barlow Condensed,sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">'+(p.name||'—')+'</span></div>').join('')
+          +'</div>';
+      } else {
+        lineupEl.innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Composition non disponible</p>';
+      }
+
     } else {
+      // ── MODE CALENDRIER ──
+      document.getElementById('modal-live-comp').textContent = 'CALENDRIER FC PORTO';
       document.getElementById('ml-score').textContent = 'VS';
-      const date = new Date(m.date);
-      document.getElementById('ml-status-badge').textContent = date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) + ' · ' + date.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
-    }
+      document.getElementById('ml-home').textContent = m?.homeTeam || 'FC Porto';
+      document.getElementById('ml-away').textContent = m?.awayTeam || '—';
+      if (m?.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
+      if (m?.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
+      if (m?.date) {
+        const d=new Date(m.date);
+        document.getElementById('ml-status-badge').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+      }
 
-    // EVENTS
-    const eventsEl = document.getElementById('ml-events-list');
-    const events = m.events || [];
-    if (!events.length) {
-      eventsEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">' + (live ? 'Aucun événement pour l'instant' : 'Match non commencé') + '</p>';
-    } else {
-      const icons = { GOAL:'⚽', YELLOW_CARD:'🟨', RED_CARD:'🟥', SUBSTITUTION:'🔄', OWN_GOAL:'⚽', PENALTY:'⚽' };
-      eventsEl.innerHTML = events.slice().reverse().map(e => {
-        const isPorto = e.teamId === 503;
-        const icon = icons[e.type] || '•';
-        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);min-width:30px;">' + (e.minute||'—') + ''</span>'
-          + '<span style="font-size:16px;">' + icon + '</span>'
-          + '<div style="flex:1;">'
-          + '<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:' + (isPorto?'#fff':'rgba(255,255,255,0.5)') + ';">' + (e.playerName||'—') + '</div>'
-          + (e.assistName ? '<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;">Passe : ' + e.assistName + '</div>' : '')
-          + (e.playerOutName ? '<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;">↓ ' + e.playerOutName + '</div>' : '')
-          + '</div>'
-          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">' + (isPorto?'Porto':e.teamName||'') + '</span>'
-          + '</div>';
-      }).join('');
-    }
+      const upcoming = data.upcomingMatches || [];
+      const recent   = data.recentMatches   || [];
+      const eventsEl = document.getElementById('ml-events-list');
+      let html = '';
 
-    // STATS
-    const statsEl = document.getElementById('ml-stats-list');
-    const matchStats = m.matchStats || [];
-    if (!matchStats.length) {
-      statsEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Stats disponibles en cours de match</p>';
-    } else {
-      statsEl.innerHTML = matchStats.map(s => {
-        const total = (s.home||0) + (s.away||0);
-        const pct = total > 0 ? Math.round((s.home/total)*100) : 50;
-        return '<div>'
-          + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;">'
-          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:#fff;">' + s.home + '</span>'
-          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">' + s.label + '</span>'
-          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);">' + s.away + '</span>'
-          + '</div>'
-          + '<div style="height:3px;background:rgba(255,255,255,0.1);position:relative;">'
-          + '<div style="position:absolute;left:0;top:0;height:100%;width:' + pct + '%;background:#003DA5;transition:width .5s;"></div>'
-          + '</div></div>';
-      }).join('');
-    }
+      if (upcoming.length) {
+        html += '<p style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">PROCHAINS MATCHS</p>';
+        upcoming.forEach(u => {
+          const d=new Date(u.date);
+          const dateStr=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+          const timeStr=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+          html += '<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            +'<div style="min-width:90px;"><div style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);">'+dateStr+'</div><div style="font-family:Barlow Condensed,sans-serif;font-size:11px;color:rgba(255,255,255,0.25);">'+timeStr+'</div></div>'
+            +'<div style="flex:1;"><div style="font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">'+u.homeTeam+' — '+u.awayTeam+'</div>'
+            +'<div style="font-family:Barlow Condensed,sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">'+u.competition+'</div></div>'
+            +'</div>';
+        });
+      }
 
-    // LINEUP in modal
-    const lineupEl = document.getElementById('ml-lineup-content');
-    if (data.lineup && data.lineup.startXI && data.lineup.startXI.length) {
-      lineupEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;">' + (data.lineup.formation||'') + '</p>'
-        + '<div style="display:flex;flex-wrap:wrap;gap:8px;">'
-        + data.lineup.startXI.map(p => '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.08);min-width:160px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.3);min-width:20px;">' + (p.number||'—') + '</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">' + (p.name||'—') + '</span></div>').join('')
-        + '</div>';
-    } else {
-      lineupEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Composition non disponible</p>';
+      if (recent.length) {
+        html += '<p style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">DERNIERS RÉSULTATS</p>';
+        recent.forEach(r => {
+          const d=new Date(r.date);
+          const dateStr=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+          const score=r.isHome?r.portoGoals+' – '+r.oppGoals:r.oppGoals+' – '+r.portoGoals;
+          const rColor=r.result==='W'?'#00a86b':r.result==='L'?'#e74c3c':'rgba(255,255,255,0.4)';
+          html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;color:rgba(255,255,255,0.3);min-width:48px;">'+dateStr+'</span>'
+            +'<span style="font-family:Bebas Neue,sans-serif;font-size:14px;font-weight:700;color:'+rColor+';min-width:16px;">'+r.result+'</span>'
+            +'<div style="flex:1;"><div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;">Porto '+score+' vs '+r.opponentName+'</div>'
+            +'<div style="font-family:Barlow Condensed,sans-serif;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;">'+r.competition+'</div></div>'
+            +'</div>';
+        });
+      }
+
+      if (!html) html = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Aucun match programmé</p>';
+      eventsEl.innerHTML = html;
+
+      // Hide stats/lineup tabs in calendar mode
+      document.getElementById('tab-stats').style.display = 'none';
+      document.getElementById('tab-lineup').style.display = 'none';
+      document.getElementById('tab-events').style.borderBottom = '2px solid #fff';
+      document.getElementById('tab-content-events').style.display = 'block';
+      document.getElementById('tab-content-stats').style.display = 'none';
+      document.getElementById('tab-content-lineup').style.display = 'none';
     }
   }
 
-  // Hook into existing loadData to store data + make card clickable
-  const _origRenderMatch = renderMatch;
+  // Hook into existing renderMatch to store data
+  const _origRenderMatch = window.renderMatch || function(){};
   window.renderMatch = function(data) {
     _origRenderMatch(data);
     liveModalData = data;
     const mc = document.getElementById('match-card');
-    if (data.liveMatch) {
-      mc.style.cursor = 'pointer';
-      mc.title = 'Cliquer pour les stats en direct';
-    } else if (data.nextMatch) {
-      mc.style.cursor = 'pointer';
-      mc.title = 'Cliquer pour les détails';
+    if (mc) mc.style.cursor = 'pointer';
+    const hint = document.getElementById('click-hint-text');
+    if (hint) {
+      if (data.liveMatch) {
+        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
+        hint.style.color = 'rgba(255,68,68,0.7)';
+      } else {
+        hint.textContent = 'Cliquer pour le calendrier →';
+        hint.style.color = 'rgba(255,255,255,0.2)';
+      }
     }
-    // Update modal if open
     if (document.getElementById('live-modal').style.display !== 'none') {
-      renderLiveModal();
+      openLiveModalContent(data);
     }
   };
 
   window._openLiveModal = function() {
-    if (!liveModalData) return;
-    const data = liveModalData;
-    const isLive = !!data.liveMatch;
-    const m = data.liveMatch || data.nextMatch;
-
-    // Update modal title
-    document.getElementById('modal-live-comp').textContent = isLive
-      ? (m?.competition || 'MATCH EN DIRECT').toUpperCase()
-      : 'CALENDRIER FC PORTO';
-
-    document.getElementById('live-modal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-
-    if (!isLive) {
-      // Show upcoming matches instead
-      const upcoming = data.upcomingMatches || [];
-      const recent   = data.recentMatches   || [];
-
-      // Override score header for no-live state
-      document.getElementById('ml-home').textContent  = m?.homeTeam  || 'FC Porto';
-      document.getElementById('ml-away').textContent  = m?.awayTeam  || '—';
-      document.getElementById('ml-score').textContent = 'VS';
-      if (m?.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
-      if (m?.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
-      if (m?.date) {
-        const d = new Date(m.date);
-        document.getElementById('ml-status-badge').textContent = d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) + ' · ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
-      }
-
-      // Events tab → show upcoming + recent
-      const eventsEl = document.getElementById('ml-events-list');
-      let html = '';
-      if (upcoming.length) {
-        html += '<p style="font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">Prochains matchs</p>';
-        html += upcoming.map(u => {
-          const d = new Date(u.date);
-          const dateStr = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-          const timeStr = d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
-          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-            + '<div style="min-width:80px;"><div style="font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);">' + dateStr + '</div><div style="font-family:"Barlow Condensed",sans-serif;font-size:11px;color:rgba(255,255,255,0.25);">' + timeStr + '</div></div>'
-            + '<div style="flex:1;">'
-            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">' + u.homeTeam + ' — ' + u.awayTeam + '</div>'
-            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">' + u.competition + '</div>'
-            + '</div></div>';
-        }).join('');
-      }
-      if (recent.length) {
-        html += '<p style="font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">Derniers résultats</p>';
-        html += recent.map(r => {
-          const d = new Date(r.date);
-          const dateStr = d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-          const score = r.isHome ? r.portoGoals+' – '+r.oppGoals : r.oppGoals+' – '+r.portoGoals;
-          const rColor = r.result==='W'?'#00a86b':r.result==='L'?'#e74c3c':'rgba(255,255,255,0.4)';
-          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-            + '<span style="font-family:"Barlow Condensed",sans-serif;font-size:11px;color:rgba(255,255,255,0.3);min-width:48px;">' + dateStr + '</span>'
-            + '<span style="font-family:"Bebas Neue",sans-serif;font-size:11px;font-weight:700;color:'+rColor+';min-width:14px;">' + r.result + '</span>'
-            + '<div style="flex:1;">'
-            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">' + (r.isHome?'Porto':'') + ' ' + score + ' ' + (!r.isHome?'Porto':'') + ' vs ' + r.opponentName + '</div>'
-            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;">' + r.competition + '</div>'
-            + '</div></div>';
-        }).join('');
-      }
-      if (!html) html = '<p style="font-family:"Barlow Condensed",sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Aucun match programmé</p>';
-      eventsEl.innerHTML = html;
+    if (!liveModalData) {
+      // Data not loaded yet - show loading
+      document.getElementById('modal-live-comp').textContent = 'CHARGEMENT…';
+      document.getElementById('live-modal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      // Re-show stats/lineup tabs
+      document.getElementById('tab-stats').style.display = '';
+      document.getElementById('tab-lineup').style.display = '';
       return;
     }
-    renderLiveModal();
+    // Re-show tabs by default
+    document.getElementById('tab-stats').style.display = '';
+    document.getElementById('tab-lineup').style.display = '';
+    document.getElementById('live-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    openLiveModalContent(liveModalData);
   };
+
   window.closeLiveModal = closeLiveModal;
   window.switchTab = switchTab;
   window.refreshLiveModal = refreshLiveModal;
