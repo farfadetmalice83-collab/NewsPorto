@@ -47,6 +47,7 @@
       animation: gridScroll 12s linear infinite;
       pointer-events: none;
     }
+    @keyframes blink-hint { 0%,100%{opacity:1} 50%{opacity:0.4} }
     @keyframes gridScroll {
       0%   { background-position: 0 0; }
       100% { background-position: 44px 44px; }
@@ -451,7 +452,7 @@
       overflow: hidden;
     }
     .match-card > * { position: relative; z-index: 1; }
-    .match-card.spotlight { background: radial-gradient(circle at var(--spotlight-x,50%) var(--spotlight-y,50%), rgba(0,61,165,0.07) 0%, transparent 55%), #000; }
+    .match-card.spotlight { background: radial-gradient(circle at var(--spotlight-x,50%) var(--spotlight-y,50%), rgba(0,61,165,0.08) 0%, transparent 55%) !important; }
     .match-competition {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 10px;
@@ -1462,8 +1463,9 @@
 
   <!-- STATS + PROCHAIN MATCH -->
   <section class="match-section reveal">
-    <div class="section-header">
+    <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
       <span class="section-label" id="stats-label">— Stats · Liga Portugal</span>
+      <a href="stats.html" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:2px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Voir plus →</a>
     </div>
     <div class="stats-grid reveal" id="stats-grid">
       <div class="stat-cell reveal reveal-d1"><div class="stat-num">—</div><div class="stat-label">Classement</div></div>
@@ -1478,7 +1480,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card reveal-scale" id="match-card" style="cursor:default" onclick="openLiveModal()">
+    <div class="match-card reveal-scale" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1518,7 +1520,7 @@
         </div>
       </div>
       <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
-        <span id="click-hint-text" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Cliquer pour le calendrier →</span>
+        <span id="click-hint-text" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;">Cliquer pour le calendrier →</span>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1635,8 +1637,17 @@
 
     // Update click hint
     const hint = document.getElementById('click-hint-text');
-    if (hint) hint.textContent = live ? '🔴 Stats & événements en direct →' : 'Cliquer pour le calendrier →';
-    if (hint) hint.style.color = live ? 'rgba(255,68,68,0.6)' : 'rgba(255,255,255,0.2)';
+    if (hint) {
+      if (live) {
+        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
+        hint.style.color = 'rgba(255,68,68,0.7)';
+        hint.style.animation = 'blink-hint 1.5s ease infinite';
+      } else {
+        hint.textContent = 'Cliquer pour le calendrier →';
+        hint.style.color = 'rgba(255,255,255,0.2)';
+        hint.style.animation = 'none';
+      }
+    }
   }
 
   function loadData() {
@@ -2223,14 +2234,7 @@
   let liveModalData = null;
   let currentTab = 'events';
 
-  function openLiveModal() {
-    const mc = document.getElementById('match-card');
-    // Only open if live or has data
-    if (!liveModalData) return;
-    document.getElementById('live-modal').style.display = 'block';
-    document.body.style.overflow = 'hidden';
-    renderLiveModal();
-  }
+
   function closeLiveModal() {
     document.getElementById('live-modal').style.display = 'none';
     document.body.style.overflow = '';
@@ -2359,7 +2363,7 @@
     }
   };
 
-  window.openLiveModal = function() {
+  window._openLiveModal = function() {
     if (!liveModalData) return;
     const data = liveModalData;
     const isLive = !!data.liveMatch;
