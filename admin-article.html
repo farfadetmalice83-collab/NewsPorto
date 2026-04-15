@@ -186,7 +186,7 @@
       <div class="form-section">
         <p class="section-label">03 — Texte source</p>
         <div class="info-box">
-          <p>Collez le <strong>texte brut</strong> de l'article source. Groq le reformulera entièrement en français dans le style NewsPorto.</p>
+          <p>Collez le <strong>texte brut</strong> de l'article source. Gemini le reformulera entièrement en français dans le style NewsPorto.</p>
         </div>
         <div class="field">
           <label>Contenu source *</label>
@@ -199,21 +199,21 @@
 
       <!-- 04 GROQ -->
       <div class="form-section">
-        <p class="section-label">04 — Reformulation Groq</p>
+        <p class="section-label">04 — Reformulation Gemini</p>
         <div class="box">
           <div class="box-hd">
-            <span class="box-title">⚡ Groq · llama-3.3-70b</span>
+            <span class="box-title">✨ Gemini · gemini-1.5-flash</span>
             <span class="pill p-idle" id="groq-status">PRÊT</span>
           </div>
           <div class="field">
-            <label>Clé API Groq <span class="saved-badge" id="groq-saved">SAUVEGARDÉE</span></label>
+            <label>Clé API Gemini <span class="saved-badge" id="groq-saved">SAUVEGARDÉE</span></label>
             <div class="key-row">
-              <input type="password" id="f-groq-key" placeholder="gsk_…" autocomplete="off">
+              <input type="password" id="f-groq-key" placeholder="AIza…" autocomplete="off">
               <button class="btn" onclick="toggleVis('f-groq-key')">Voir</button>
               <button class="btn" onclick="saveKey('f-groq-key','groq_key','groq-saved')">Sauver</button>
             </div>
           </div>
-          <button class="btn btn-w btn-or" id="btn-rewrite" onclick="rewrite()">⚡ Reformuler avec Groq</button>
+          <button class="btn btn-w btn-or" id="btn-rewrite" onclick="rewrite()">✨ Reformuler avec Gemini</button>
         </div>
         <div class="result-text" id="groq-output"></div>
         <div id="groq-actions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap">
@@ -410,13 +410,13 @@ function updateChecklist() {
   });
 }
 
-// ── GROQ ──────────────────────────────────────────────────────────
+// ── GEMINI ────────────────────────────────────────────────────────
 async function rewrite() {
   const key    = $('f-groq-key').value.trim();
   const source = $('f-source').value.trim();
   const title  = $('f-title').value.trim();
   const cat    = $('f-cat').value;
-  if (!key)    { toast('Clé Groq manquante','ko'); return; }
+  if (!key)    { toast('Clé Gemini manquante','ko'); return; }
   if (!source) { toast('Texte source vide','ko'); return; }
 
   $('btn-rewrite').disabled=true;
@@ -425,7 +425,7 @@ async function rewrite() {
   $('groq-output').textContent='';
   $('groq-actions').style.display='none';
 
-  const sys=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
+  const prompt=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
 Style : percutant, passionné, journalistique, parfaitement en français.
 Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
 
@@ -433,10 +433,10 @@ Règles rédactionnelles :
 - Commence directement par le premier paragraphe sans titre
 - Ne jamais répéter une statistique ou une idée (ex: si tu as dit "160 matchs", ne le redis plus jamais).
 - Ne commence jamais tes phrases par "Le", "Les" de façon systématique.
-- utilise un vocabulaire journalistique
+- Utilise un vocabulaire journalistique
 - Pas de conclusions clichées.
 - Pour chaque idée, explique le "Pourquoi". Si tu parles des finances, explique l'impact de l'UEFA. Si tu parles de la Juventus, explique le style de Thiago Motta.
-- n'ivente rien
+- N'invente rien
 - Paragraphes séparés par deux sauts de ligne
 - 5 à 7 paragraphes minimum (800 mots minimum) SAUF si tu n'as pas assez d'infos pour développer et que cela crée un risque de répétition
 - Ne mentionne jamais les sources
@@ -445,18 +445,25 @@ Règles SEO obligatoires :
 - Intègre naturellement les expressions "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
 - Le premier paragraphe doit contenir les mots clés principaux
 - Utilise des sous-thèmes variés pour enrichir le contenu (contexte, historique, enjeux, perspectives)
-- Termine par une phrase puissante et engageante qui incite à continuer de suivre l'actualité sur newsporto.fr. (la seul fois ou tu mentionne le site`;
+- Termine par une phrase puissante et engageante qui incite à continuer de suivre l'actualité sur newsporto.fr. (la seule fois où tu mentionnes le site)
+
+Reformule pour NewsPorto :
+
+${source}`;
 
   try {
-    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`,{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:2048,temperature:0.72,
-        messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        contents:[{parts:[{text:prompt}]}],
+        generationConfig:{temperature:0.72,maxOutputTokens:2048}
+      })
     });
     if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`HTTP ${r.status}`);}
     const d=await r.json();
-    const text=d.choices?.[0]?.message?.content||'';
+    const text=d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+    if(!text) throw new Error('Réponse vide de Gemini');
     $('groq-output').textContent=text;
     $('groq-output').className='result-text on';
     setPill('groq-status','p-ok','TERMINÉ');
@@ -466,7 +473,7 @@ Règles SEO obligatoires :
     setPill('groq-status','p-err','ERREUR');
     $('groq-output').textContent=`Erreur : ${e.message}`;
     $('groq-output').className='result-text on';
-    toast('Erreur Groq : '+e.message,'ko');
+    toast('Erreur Gemini : '+e.message,'ko');
   } finally { $('btn-rewrite').disabled=false; }
 }
 
