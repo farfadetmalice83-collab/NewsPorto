@@ -53,6 +53,25 @@
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+
+    /* ── SIDEBAR ── */
+    /* ── COMMENTS ── */
+
+    .asb-card{border:1px solid var(--border);margin-bottom:12px;text-decoration:none;color:inherit;display:flex;gap:12px;padding:12px;transition:background .2s}
+    .asb-card:hover{background:rgba(255,255,255,.04)}
+    .asb-card-img{width:72px;height:56px;object-fit:cover;flex-shrink:0;opacity:.8}
+    .asb-card-img-ph{width:72px;height:56px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
+    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
+    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.25;color:var(--white)}
+    .art-actions{display:flex;align-items:center;gap:12px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:32px 0}
+    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s}
+    .btn-like:hover,.btn-like.liked{border-color:rgba(231,76,60,.5);color:#e74c3c}
+    .like-ico{font-size:14px;transition:transform .2s}
+    .btn-like.liked .like-ico{transform:scale(1.3)}
+    .share-btns{display:flex;gap:8px;margin-left:auto}
+    .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
+    .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
+    .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
     @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
@@ -78,26 +97,66 @@
     <div class="aly">
       <article class="abdy">
         <div class="apull">Diogo Costa, l’homme qui fait rêver la Juventus et bouscule les plans du FC Porto</div>
+
       <p class="dc">Diogo Costa, l’homme qui fait rêver la Juventus et bouscule les plans du FC Porto</p>
+
       <p>Quand Thiago Motta a pris les rênes de la Juventus, il a immédiatement posé les bases d’un projet ambitieux : une équipe capable de dominer par la possession, avec une relance propre et une défense organisée autour d’un gardien moderne. Et dans ce schéma, un nom s’impose avec insistance : Diogo Costa. Le capitaine du FC Porto incarne à lui seul cette révolution du poste de gardien, où le jeu au pied devient une arme aussi décisive que les arrêts. Avec un taux de réussite de passes dépassant les 78% en compétitions européennes cette saison, il est le relais idéal pour la philosophie de Motta, qui mise sur une construction courte et une pression haute pour étouffer l’adversaire. À Turin, on scrute chaque intervention du Portugais, chaque sortie audacieuse, chaque passe millimétrée qui relance l’attaque. Car si la Juventus veut retrouver son lustre d’antan, elle a besoin d’un numéro un capable de transformer la défense en premier maillon de l’attaque – et Diogo Costa coche toutes les cases.</p>
-      <p>Pourtant, derrière cette fascination se cache un bras de fer financier qui pourrait bien redessiner l’avenir des Dragons. André Villas-Boas, président du FC Porto, a verrouillé son joyau jusqu’en 2030, une prolongation qui donne au club portugais un avantage colossal dans les négociations. Officiellement, la clause de départ est fixée à 50 millions d’euros, mais dans les coulisses, on murmure qu’une somme bien plus élevée – proche de 75 millions – serait nécessaire pour activer son départ. Un montant qui reflète à la fois la valeur sportive du joueur et l’équilibre économique précaire du club. Car si le FC Porto domine actuellement la Liga Portugal, il reste sous la pression constante du fair-play financier, et la vente de son capitaine représenterait une manne providentielle. Jorge Mendes, l’agent omniprésent dans les transferts portugais, joue les entremetteurs, tentant de faire baisser la note en glissant des contreparties techniques – un joueur en prêt, une option sur un jeune talent – pour adoucir l’addition. Mais la Juventus n’est pas seule sur les rangs : Manchester City et le Bayern Munich observent aussi le dossier, conscients qu’Ederson et Neuer ne rajeunissent pas.</p>
-      <p>À Turin, l’arrivée de Diogo Costa bouleverserait l’échiquier interne. Michele Di Gregorio, recruté pour être le titulaire, peine à convaincre sur sa capacité à diriger une défense lors des grands rendez-vous européens. Son jeu au pied, moins précis que celui du Portugais, et ses hésitations dans les duels aériens en font un maillon faible dans une équipe qui vise le sommet. Quant à Mattia Perin, son avenir semble scellé : relégué au rang de troisième gardien, il n’a plus sa place dans un effectif où la hiérarchie doit être claire. La direction de la Vieille Dame a été claire : pour rivaliser avec l’Inter Milan en Serie A et briller en Ligue des Champions, il faut l’un des trois meilleurs gardiens du monde. Et dans cette quête, Diogo Costa s’impose comme la cible idéale, alliant leadership, technique et une maturité rare pour un joueur de 26 ans.</p>
-      <p>Mais pour le FC Porto, céder son capitaine serait un crève-cœur. Diogo Costa n’est pas qu’un gardien : il est l’héritier de Vítor Baía, une légende du club, et le symbole d’une génération qui a redonné ses lettres de noblesse aux Dragons. Les supporters voient en lui le garant d’une identité, celle d’un club qui forme des talents avant de les vendre, mais qui sait aussi garder ses pépites quand elles atteignent leur apogée. Pourtant, les réalités économiques sont implacables. Villas-Boas a été clair : le club doit "se rééquilibrer financièrement", et une offre à 50 millions d’euros – voire plus – serait une bouffée d’oxygène pour un budget sous surveillance. Le dilemme est cruel : faut-il sacrifier un joueur clé pour assurer la pérennité du club, ou risquer de le voir partir gratuitement dans deux ans, comme ce fut le cas pour tant d’autres avant lui ?</p>
-      <p>La Juventus, elle, mise sur cette urgence financière pour faire pencher la balance en sa faveur. Thiago Motta a déjà esquissé les contours d’une équipe où le gardien serait un véritable libéro, capable de relancer sous pression et d’anticiper les contre-attaques adverses. Diogo Costa, avec ses 22 clean sheets cette saison, a prouvé qu’il pouvait allier sécurité défensive et audace offensive – un équilibre parfait pour le projet turinois. Mais le FC Porto ne se laissera pas déposséder sans combattre. Entre les rumeurs de clubs anglais et allemands prêts à surenchérir et les manœuvres de Mendes pour maximiser la plus-value, les prochaines semaines s’annoncent électriques.</p>
-      <p>Une chose est sûre : quel que soit le dénouement, ce transfert marquera un tournant. Pour la Juventus, ce serait l’affirmation d’une ambition retrouvée, celle d’un club qui veut redevenir un géant européen. Pour le FC Porto, ce serait la preuve qu’il reste un vivier inépuisable de talents, mais aussi un club contraint de vendre ses meilleurs éléments pour survivre. Et pour Diogo Costa, ce serait l’occasion de passer un nouveau cap, celui d’un gardien capable de briller sous les projecteurs de la Serie A et de la Ligue des Champions.</p>
-      <p>Une chose est certaine : l’été 2026 s’annonce brûlant pour les Dragons, et les supporters feront tout pour retenir leur capitaine. Mais dans le football moderne, les émotions et les bilans comptables ne font pas toujours bon ménage. Restez connectés à newsporto.fr pour ne rien manquer de cette saga qui pourrait bien changer le visage du FC Porto.</p>
+
       <figure class="afig">
         <img src="https://madeinfoot.ouest-france.fr/photos/euro-2024/2024/zoom/euro-20240702091009-3087.jpg" alt="Diogo Costa vers la Juventus ?" loading="lazy">
       </figure>
+
+      <p>Pourtant, derrière cette fascination se cache un bras de fer financier qui pourrait bien redessiner l’avenir des Dragons. André Villas-Boas, président du FC Porto, a verrouillé son joyau jusqu’en 2030, une prolongation qui donne au club portugais un avantage colossal dans les négociations. Officiellement, la clause de départ est fixée à 50 millions d’euros, mais dans les coulisses, on murmure qu’une somme bien plus élevée – proche de 75 millions – serait nécessaire pour activer son départ. Un montant qui reflète à la fois la valeur sportive du joueur et l’équilibre économique précaire du club. Car si le FC Porto domine actuellement la Liga Portugal, il reste sous la pression constante du fair-play financier, et la vente de son capitaine représenterait une manne providentielle. Jorge Mendes, l’agent omniprésent dans les transferts portugais, joue les entremetteurs, tentant de faire baisser la note en glissant des contreparties techniques – un joueur en prêt, une option sur un jeune talent – pour adoucir l’addition. Mais la Juventus n’est pas seule sur les rangs : Manchester City et le Bayern Munich observent aussi le dossier, conscients qu’Ederson et Neuer ne rajeunissent pas.</p>
+
+      <p>À Turin, l’arrivée de Diogo Costa bouleverserait l’échiquier interne. Michele Di Gregorio, recruté pour être le titulaire, peine à convaincre sur sa capacité à diriger une défense lors des grands rendez-vous européens. Son jeu au pied, moins précis que celui du Portugais, et ses hésitations dans les duels aériens en font un maillon faible dans une équipe qui vise le sommet. Quant à Mattia Perin, son avenir semble scellé : relégué au rang de troisième gardien, il n’a plus sa place dans un effectif où la hiérarchie doit être claire. La direction de la Vieille Dame a été claire : pour rivaliser avec l’Inter Milan en Serie A et briller en Ligue des Champions, il faut l’un des trois meilleurs gardiens du monde. Et dans cette quête, Diogo Costa s’impose comme la cible idéale, alliant leadership, technique et une maturité rare pour un joueur de 26 ans.</p>
+
+      <p>Mais pour le FC Porto, céder son capitaine serait un crève-cœur. Diogo Costa n’est pas qu’un gardien : il est l’héritier de Vítor Baía, une légende du club, et le symbole d’une génération qui a redonné ses lettres de noblesse aux Dragons. Les supporters voient en lui le garant d’une identité, celle d’un club qui forme des talents avant de les vendre, mais qui sait aussi garder ses pépites quand elles atteignent leur apogée. Pourtant, les réalités économiques sont implacables. Villas-Boas a été clair : le club doit "se rééquilibrer financièrement", et une offre à 50 millions d’euros – voire plus – serait une bouffée d’oxygène pour un budget sous surveillance. Le dilemme est cruel : faut-il sacrifier un joueur clé pour assurer la pérennité du club, ou risquer de le voir partir gratuitement dans deux ans, comme ce fut le cas pour tant d’autres avant lui ?</p>
+
+      <p>La Juventus, elle, mise sur cette urgence financière pour faire pencher la balance en sa faveur. Thiago Motta a déjà esquissé les contours d’une équipe où le gardien serait un véritable libéro, capable de relancer sous pression et d’anticiper les contre-attaques adverses. Diogo Costa, avec ses 22 clean sheets cette saison, a prouvé qu’il pouvait allier sécurité défensive et audace offensive – un équilibre parfait pour le projet turinois. Mais le FC Porto ne se laissera pas déposséder sans combattre. Entre les rumeurs de clubs anglais et allemands prêts à surenchérir et les manœuvres de Mendes pour maximiser la plus-value, les prochaines semaines s’annoncent électriques.</p>
+
+      <p>Une chose est sûre : quel que soit le dénouement, ce transfert marquera un tournant. Pour la Juventus, ce serait l’affirmation d’une ambition retrouvée, celle d’un club qui veut redevenir un géant européen. Pour le FC Porto, ce serait la preuve qu’il reste un vivier inépuisable de talents, mais aussi un club contraint de vendre ses meilleurs éléments pour survivre. Et pour Diogo Costa, ce serait l’occasion de passer un nouveau cap, celui d’un gardien capable de briller sous les projecteurs de la Serie A et de la Ligue des Champions.</p>
+
+      <p>Une chose est certaine : l’été 2026 s’annonce brûlant pour les Dragons, et les supporters feront tout pour retenir leur capitaine. Mais dans le football moderne, les émotions et les bilans comptables ne font pas toujours bon ménage. Restez connectés à newsporto.fr pour ne rien manquer de cette saga qui pourrait bien changer le visage du FC Porto.</p>
       </article>
-      <aside class="asb">
-        <p class="sbl">À la une</p>
-      </aside>
+      </div>
+
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© 2026 NewsPorto · Fan Media</span>
     </footer>
   </div>
+
+  <script>
+  // ── SIDEBAR ──────────────────────────────────────────────────────
+  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+    const articles=(data.articles||[]).slice(0,5);
+    const currentFile=window.location.pathname.split('/').pop();
+    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
+    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+    const el=document.getElementById('sidebar-articles');
+    if(!el||!filtered.length)return;
+    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="" onerror="this.style.display='none'">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+  }).catch(()=>{});
+  // ── LIKE LOCAL ───────────────────────────────────────────────────
+  const likeKey='np_like_'+window.location.pathname;
+  function toggleLike(){
+    const liked=localStorage.getItem(likeKey)==='1';
+    const btn=document.getElementById('btn-like');
+    const ico=btn.querySelector('.like-ico');
+    const lbl=document.getElementById('like-label');
+    if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}
+    else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}
+  }
+  if(localStorage.getItem(likeKey)==='1'){
+    const btn=document.getElementById('btn-like');
+    if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}
+  }
+  // ── PARTAGE ───────────────────────────────────────────────────────
+  function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title)+' via @NewsPortoFR','_blank');}
+  function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
+  function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
+  function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
+  </script>
 </body>
 </html>
