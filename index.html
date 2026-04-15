@@ -1394,18 +1394,10 @@
 
   <!-- TICKER -->
   <div class="ticker reveal-fade">
-    <div class="ticker-inner">
-      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
-      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
-      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
-      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
-      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
-      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
-      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
-      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
+    <div class="ticker-inner" id="ticker-inner">
+      <span class="ticker-item"><b>NEWSPORTO</b> Chargement…</span>
     </div>
   </div>
-
   <!-- HERO -->
   <section class="hero">
 
@@ -1486,7 +1478,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card reveal-scale" id="match-card" style="cursor:default">
+    <div class="match-card reveal-scale" id="match-card" style="cursor:default" onclick="openLiveModal()">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1524,6 +1516,9 @@
           <span class="match-info-label">Heure</span>
           <span class="match-info-value" id="match-heure">—</span>
         </div>
+      </div>
+      <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
+        <span id="click-hint-text" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);">Cliquer pour le calendrier →</span>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1637,6 +1632,11 @@
     if (data.lineup) { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
     else if (live)   { document.getElementById('lineup-cta').style.display = 'block'; }
     else             { document.getElementById('lineup-cta').style.display = 'none'; }
+
+    // Update click hint
+    const hint = document.getElementById('click-hint-text');
+    if (hint) hint.textContent = live ? '🔴 Stats & événements en direct →' : 'Cliquer pour le calendrier →';
+    if (hint) hint.style.color = live ? 'rgba(255,68,68,0.6)' : 'rgba(255,255,255,0.2)';
   }
 
   function loadData() {
@@ -2152,5 +2152,303 @@
     .catch(() => {});
   </script>
   <script src="ticker-dynamic.js"></script>
+
+  <!-- ── LIVE MATCH MODAL ── -->
+  <div id="live-modal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.92);backdrop-filter:blur(10px);overflow-y:auto;" onclick="if(event.target===this)closeLiveModal()">
+    <div style="max-width:680px;margin:48px auto;border:1px solid rgba(255,255,255,0.12);background:#0a0a0a;position:relative;">
+      
+      <!-- Header -->
+      <div style="padding:28px 32px 20px;border-bottom:1px solid rgba(255,255,255,0.08);">
+        <button onclick="closeLiveModal()" style="position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,0.4);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">✕</button>
+        <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;" id="modal-live-comp">MATCH EN DIRECT</p>
+        
+        <!-- Score header -->
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;">
+            <img id="ml-logo-home" src="" style="width:40px;height:40px;object-fit:contain;display:none">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;" id="ml-home">—</span>
+          </div>
+          <div style="text-align:center;min-width:100px;">
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:-1px;line-height:1;" id="ml-score">VS</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:4px;" id="ml-status-badge"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;" id="ml-away">—</span>
+            <img id="ml-logo-away" src="" style="width:40px;height:40px;object-fit:contain;display:none">
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08);">
+        <button onclick="switchTab('events')" id="tab-events" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;color:#fff;border-bottom:2px solid #fff;cursor:pointer;">Événements</button>
+        <button onclick="switchTab('stats')" id="tab-stats" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;color:rgba(255,255,255,0.35);border-bottom:2px solid transparent;cursor:pointer;">Stats</button>
+        <button onclick="switchTab('lineup')" id="tab-lineup" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;color:rgba(255,255,255,0.35);border-bottom:2px solid transparent;cursor:pointer;">Compo</button>
+      </div>
+
+      <!-- Tab content -->
+      <div style="padding:24px 32px;min-height:200px;">
+        
+        <!-- EVENTS TAB -->
+        <div id="tab-content-events">
+          <div id="ml-events-list" style="display:flex;flex-direction:column;gap:8px;">
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Aucun événement pour l'instant</p>
+          </div>
+        </div>
+
+        <!-- STATS TAB -->
+        <div id="tab-content-stats" style="display:none;">
+          <div id="ml-stats-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+        </div>
+
+        <!-- LINEUP TAB -->
+        <div id="tab-content-lineup" style="display:none;">
+          <div id="ml-lineup-content">
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Composition non disponible</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer refresh -->
+      <div style="padding:12px 32px;border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:space-between;">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);" id="ml-updated">Actualisation toutes les 60s</span>
+        <button onclick="refreshLiveModal()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);padding:6px 14px;cursor:pointer;">↻ Actualiser</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // ── LIVE MODAL ────────────────────────────────────────────────────
+  let liveModalData = null;
+  let currentTab = 'events';
+
+  function openLiveModal() {
+    const mc = document.getElementById('match-card');
+    // Only open if live or has data
+    if (!liveModalData) return;
+    document.getElementById('live-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    renderLiveModal();
+  }
+  function closeLiveModal() {
+    document.getElementById('live-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function refreshLiveModal() {
+    fetch('/api/porto-stats').then(r=>r.json()).then(data=>{
+      liveModalData = data;
+      renderLiveModal();
+      const now = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      document.getElementById('ml-updated').textContent = 'Mis à jour à ' + now;
+    });
+  }
+  function switchTab(tab) {
+    currentTab = tab;
+    ['events','stats','lineup'].forEach(t => {
+      document.getElementById('tab-content-'+t).style.display = t===tab ? 'block' : 'none';
+      const btn = document.getElementById('tab-'+t);
+      btn.style.color = t===tab ? '#fff' : 'rgba(255,255,255,0.35)';
+      btn.style.borderBottomColor = t===tab ? '#fff' : 'transparent';
+    });
+  }
+
+  function renderLiveModal() {
+    const data = liveModalData;
+    const m = data.liveMatch || data.nextMatch;
+    if (!m) return;
+    const live = !!data.liveMatch;
+
+    // Header
+    document.getElementById('modal-live-comp').textContent = m.competition || 'MATCH';
+    document.getElementById('ml-home').textContent = m.homeTeam || '—';
+    document.getElementById('ml-away').textContent = m.awayTeam || '—';
+    if (m.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
+    if (m.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
+
+    if (live) {
+      document.getElementById('ml-score').textContent = (m.homeGoals??0) + ' – ' + (m.awayGoals??0);
+      const badge = document.getElementById('ml-status-badge');
+      if (m.status === 'HALF_TIME') {
+        badge.textContent = 'MI-TEMPS';
+        badge.style.color = '#f0a500';
+      } else if (m.status === 'FINISHED') {
+        badge.textContent = 'TERMINÉ';
+        badge.style.color = 'rgba(255,255,255,0.4)';
+      } else {
+        badge.innerHTML = '<span style="color:#ff4444">🔴 LIVE</span> ' + (m.minute ? m.minute+"'" : '');
+      }
+    } else {
+      document.getElementById('ml-score').textContent = 'VS';
+      const date = new Date(m.date);
+      document.getElementById('ml-status-badge').textContent = date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) + ' · ' + date.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+    }
+
+    // EVENTS
+    const eventsEl = document.getElementById('ml-events-list');
+    const events = m.events || [];
+    if (!events.length) {
+      eventsEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">' + (live ? 'Aucun événement pour l'instant' : 'Match non commencé') + '</p>';
+    } else {
+      const icons = { GOAL:'⚽', YELLOW_CARD:'🟨', RED_CARD:'🟥', SUBSTITUTION:'🔄', OWN_GOAL:'⚽', PENALTY:'⚽' };
+      eventsEl.innerHTML = events.slice().reverse().map(e => {
+        const isPorto = e.teamId === 503;
+        const icon = icons[e.type] || '•';
+        return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);min-width:30px;">' + (e.minute||'—') + ''</span>'
+          + '<span style="font-size:16px;">' + icon + '</span>'
+          + '<div style="flex:1;">'
+          + '<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:' + (isPorto?'#fff':'rgba(255,255,255,0.5)') + ';">' + (e.playerName||'—') + '</div>'
+          + (e.assistName ? '<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;">Passe : ' + e.assistName + '</div>' : '')
+          + (e.playerOutName ? '<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);letter-spacing:1px;">↓ ' + e.playerOutName + '</div>' : '')
+          + '</div>'
+          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">' + (isPorto?'Porto':e.teamName||'') + '</span>'
+          + '</div>';
+      }).join('');
+    }
+
+    // STATS
+    const statsEl = document.getElementById('ml-stats-list');
+    const matchStats = m.matchStats || [];
+    if (!matchStats.length) {
+      statsEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Stats disponibles en cours de match</p>';
+    } else {
+      statsEl.innerHTML = matchStats.map(s => {
+        const total = (s.home||0) + (s.away||0);
+        const pct = total > 0 ? Math.round((s.home/total)*100) : 50;
+        return '<div>'
+          + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;">'
+          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:#fff;">' + s.home + '</span>'
+          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">' + s.label + '</span>'
+          + '<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);">' + s.away + '</span>'
+          + '</div>'
+          + '<div style="height:3px;background:rgba(255,255,255,0.1);position:relative;">'
+          + '<div style="position:absolute;left:0;top:0;height:100%;width:' + pct + '%;background:#003DA5;transition:width .5s;"></div>'
+          + '</div></div>';
+      }).join('');
+    }
+
+    // LINEUP in modal
+    const lineupEl = document.getElementById('ml-lineup-content');
+    if (data.lineup && data.lineup.startXI && data.lineup.startXI.length) {
+      lineupEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;">' + (data.lineup.formation||'') + '</p>'
+        + '<div style="display:flex;flex-wrap:wrap;gap:8px;">'
+        + data.lineup.startXI.map(p => '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid rgba(255,255,255,0.08);min-width:160px;"><span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.3);min-width:20px;">' + (p.number||'—') + '</span><span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;">' + (p.name||'—') + '</span></div>').join('')
+        + '</div>';
+    } else {
+      lineupEl.innerHTML = '<p style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Composition non disponible</p>';
+    }
+  }
+
+  // Hook into existing loadData to store data + make card clickable
+  const _origRenderMatch = renderMatch;
+  window.renderMatch = function(data) {
+    _origRenderMatch(data);
+    liveModalData = data;
+    const mc = document.getElementById('match-card');
+    if (data.liveMatch) {
+      mc.style.cursor = 'pointer';
+      mc.title = 'Cliquer pour les stats en direct';
+    } else if (data.nextMatch) {
+      mc.style.cursor = 'pointer';
+      mc.title = 'Cliquer pour les détails';
+    }
+    // Update modal if open
+    if (document.getElementById('live-modal').style.display !== 'none') {
+      renderLiveModal();
+    }
+  };
+
+  window.openLiveModal = function() {
+    if (!liveModalData) return;
+    const data = liveModalData;
+    const isLive = !!data.liveMatch;
+    const m = data.liveMatch || data.nextMatch;
+
+    // Update modal title
+    document.getElementById('modal-live-comp').textContent = isLive
+      ? (m?.competition || 'MATCH EN DIRECT').toUpperCase()
+      : 'CALENDRIER FC PORTO';
+
+    document.getElementById('live-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+
+    if (!isLive) {
+      // Show upcoming matches instead
+      const upcoming = data.upcomingMatches || [];
+      const recent   = data.recentMatches   || [];
+
+      // Override score header for no-live state
+      document.getElementById('ml-home').textContent  = m?.homeTeam  || 'FC Porto';
+      document.getElementById('ml-away').textContent  = m?.awayTeam  || '—';
+      document.getElementById('ml-score').textContent = 'VS';
+      if (m?.homeCrest) { document.getElementById('ml-logo-home').src=m.homeCrest; document.getElementById('ml-logo-home').style.display='block'; }
+      if (m?.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
+      if (m?.date) {
+        const d = new Date(m.date);
+        document.getElementById('ml-status-badge').textContent = d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}) + ' · ' + d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+      }
+
+      // Events tab → show upcoming + recent
+      const eventsEl = document.getElementById('ml-events-list');
+      let html = '';
+      if (upcoming.length) {
+        html += '<p style="font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">Prochains matchs</p>';
+        html += upcoming.map(u => {
+          const d = new Date(u.date);
+          const dateStr = d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+          const timeStr = d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            + '<div style="min-width:80px;"><div style="font-family:"Barlow Condensed",sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);">' + dateStr + '</div><div style="font-family:"Barlow Condensed",sans-serif;font-size:11px;color:rgba(255,255,255,0.25);">' + timeStr + '</div></div>'
+            + '<div style="flex:1;">'
+            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">' + u.homeTeam + ' — ' + u.awayTeam + '</div>'
+            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);text-transform:uppercase;margin-top:2px;">' + u.competition + '</div>'
+            + '</div></div>';
+        }).join('');
+      }
+      if (recent.length) {
+        html += '<p style="font-family:"Barlow Condensed",sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">Derniers résultats</p>';
+        html += recent.map(r => {
+          const d = new Date(r.date);
+          const dateStr = d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+          const score = r.isHome ? r.portoGoals+' – '+r.oppGoals : r.oppGoals+' – '+r.portoGoals;
+          const rColor = r.result==='W'?'#00a86b':r.result==='L'?'#e74c3c':'rgba(255,255,255,0.4)';
+          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
+            + '<span style="font-family:"Barlow Condensed",sans-serif;font-size:11px;color:rgba(255,255,255,0.3);min-width:48px;">' + dateStr + '</span>'
+            + '<span style="font-family:"Bebas Neue",sans-serif;font-size:11px;font-weight:700;color:'+rColor+';min-width:14px;">' + r.result + '</span>'
+            + '<div style="flex:1;">'
+            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">' + (r.isHome?'Porto':'') + ' ' + score + ' ' + (!r.isHome?'Porto':'') + ' vs ' + r.opponentName + '</div>'
+            + '<div style="font-family:"Barlow Condensed",sans-serif;font-size:10px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;">' + r.competition + '</div>'
+            + '</div></div>';
+        }).join('');
+      }
+      if (!html) html = '<p style="font-family:"Barlow Condensed",sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding:20px 0;">Aucun match programmé</p>';
+      eventsEl.innerHTML = html;
+      return;
+    }
+    renderLiveModal();
+  };
+  window.closeLiveModal = closeLiveModal;
+  window.switchTab = switchTab;
+  window.refreshLiveModal = refreshLiveModal;
+  </script>
+
+
+  <script>
+  fetch('articles/articlestotal.json')
+    .then(r => r.json())
+    .then(data => {
+      const articles = (data.articles || []).slice(0, 6);
+      if (!articles.length) return;
+      const catMap = {europe:'EUROPA',analyse:'ANALYSE',transfert:'MERCATO',liga:'LIGA',interview:'INTERVIEW'};
+      const inner = document.getElementById('ticker-inner');
+      if (!inner) return;
+      const items = articles.map(a => {
+        const cat = catMap[a.category] || (a.category || 'ACTU').toUpperCase();
+        return '<span class="ticker-item"><b>' + cat + '</b> <a href="articles/' + a.file + '" style="color:inherit;text-decoration:none;">' + a.title + '</a></span>';
+      });
+      inner.innerHTML = [...items, ...items].join('');
+    }).catch(() => {});
+  </script>
 </body>
 </html>
