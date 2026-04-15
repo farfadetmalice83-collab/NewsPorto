@@ -577,15 +577,8 @@
 
   <!-- TICKER -->
   <div class="ticker">
-    <div class="ticker-inner">
-      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
-      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
-      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
-      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
-      <span class="ticker-item"><b>RÉSULTAT</b> FC Porto 3 – 1 Benfica — Classico remporté</span>
-      <span class="ticker-item"><b>MERCATO</b> Evanilson prolonge son contrat jusqu'en 2027</span>
-      <span class="ticker-item"><b>EUROPA</b> FC Porto qualifié pour les 1/4 de finale</span>
-      <span class="ticker-item"><b>LIGA NOS</b> Porto en tête du championnat · +4 pts sur Sporting</span>
+    <div class="ticker-inner" id="ticker-inner">
+      <span class="ticker-item"><b>NEWSPORTO</b> Chargement des dernières actus…</span>
     </div>
   </div>
 
@@ -851,5 +844,26 @@
   }
 </script>
 <script src="ticker-dynamic.js"></script>
+
+  <script>
+  // ── TICKER DYNAMIQUE ──────────────────────────────────────────────
+  fetch('articles/articlestotal.json')
+    .then(r => r.json())
+    .then(data => {
+      const articles = (data.articles || []).slice(0, 6);
+      if (!articles.length) return;
+      const catLabels = {europe:'EUROPA',analyse:'ANALYSE',transfert:'MERCATO',liga:'LIGA',interview:'INTERVIEW'};
+      const inner = document.getElementById('ticker-inner');
+      if (!inner) return;
+      const items = articles.map(a => {
+        const cat = catLabels[a.category] || (a.category||'ACTU').toUpperCase();
+        return '<span class="ticker-item"><b>' + cat + '</b> <a href="articles/' + a.file + '" style="color:inherit;text-decoration:none;">' + a.title + '</a></span>';
+      });
+      const doubled = [...items, ...items].join('');
+      inner.innerHTML = doubled;
+    })
+    .catch(() => {});
+  </script>
+
 </body>
 </html>
