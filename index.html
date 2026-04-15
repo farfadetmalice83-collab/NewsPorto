@@ -1821,7 +1821,7 @@
   // Scroll reveal
   const ro = new IntersectionObserver((entries) => {
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
-  }, { threshold: 0.07, rootMargin: '0px 0px -40px 0px' });
+  }, { threshold: 0.01, rootMargin: '0px 0px 300px 0px' });
   document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-fade').forEach(el => ro.observe(el));
 
   // Counter
