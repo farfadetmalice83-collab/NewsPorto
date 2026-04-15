@@ -410,53 +410,64 @@ function updateChecklist() {
   });
 }
 
-// ── GEMINI ──────────────────────────────────────────────────────────
+// ── GROQ ──────────────────────────────────────────────────────────
 async function rewrite() {
-  const key    = $('f-gemini-key').value.trim(); 
+  const key    = $('f-groq-key').value.trim();
   const source = $('f-source').value.trim();
   const title  = $('f-title').value.trim();
   const cat    = $('f-cat').value;
+  if (!key)    { toast('Clé Groq manquante','ko'); return; }
+  if (!source) { toast('Texte source vide','ko'); return; }
 
-  if (!key)    { toast('Clé API manquante','ko'); return; }
-  if (!source) { toast('Source vide','ko'); return; }
+  $('btn-rewrite').disabled=true;
+  setPill('groq-status','p-run','EN COURS…');
+  $('groq-output').className='result-text';
+  $('groq-output').textContent='';
+  $('groq-actions').style.display='none';
 
-  $('btn-rewrite').disabled = true;
-  setPill('groq-status', 'p-run', 'GEMINI EN COURS…');
-  $('groq-output').textContent = '';
+  const sys=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
+Style : percutant, passionné, journalistique, parfaitement en français.
+Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
 
-  const sys = `Tu es le rédacteur en chef de NewsPorto (newsporto.fr). Rédige un article de fond de 800 mots minimum.
-- Pas de titre, commence direct.
-- Analyse chaque fait (Explique le "Pourquoi" : tactique, finances, historique).
-- Zéro répétition d'idées ou de chiffres.
-- Vocabulaire journalistique expert (évite les phrases commençant par "Le/Les").
-- 6 à 8 paragraphes denses, séparés par deux sauts de ligne.
-- SEO : Intègre "FC Porto", "les Dragons" et "newsporto.fr" naturellement au moins 3 fois.
-- Premier paragraphe : Doit contenir le sujet, "FC Porto" et "newsporto.fr".
-- Fin : Phrase forte incitant à suivre newsporto.fr.
-Catégorie : ${catLabels[cat]||cat}. Sujet : ${title}`;
+Règles rédactionnelles :
+- Commence directement par le premier paragraphe sans titre
+- Ne jamais répéter une statistique ou une idée (ex: si tu as dit "160 matchs", ne le redis plus jamais).
+- Ne commence jamais tes phrases par "Le", "Les" de façon systématique.
+- utilise un vocabulaire journalistique
+- Pas de conclusions clichées.
+- Pour chaque idée, explique le "Pourquoi". Si tu parles des finances, explique l'impact de l'UEFA. Si tu parles de la Juventus, explique le style de Thiago Motta.
+- n'ivente rien
+- Paragraphes séparés par deux sauts de ligne
+- 5 à 7 paragraphes minimum (800 mots minimum) SAUF si tu n'as pas assez d'infos pour développer et que cela crée un risque de répétition
+- Ne mentionne jamais les sources
+
+Règles SEO obligatoires :
+- Intègre naturellement les expressions "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
+- Le premier paragraphe doit contenir les mots clés principaux
+- Utilise des sous-thèmes variés pour enrichir le contenu (contexte, historique, enjeux, perspectives)
+- Termine par une phrase puissante et engageante qui incite à continuer de suivre l'actualité sur newsporto.fr. (la seul fois ou tu mentionne le site`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${key}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: sys + "\n\nSource :\n" + source }] }],
-        generationConfig: { temperature: 0.8, maxOutputTokens: 4096 }
-      })
+    const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body:JSON.stringify({model:'llama-3.3-70b-versatile',max_tokens:2048,temperature:0.72,
+        messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
     });
-
-    const data = await response.json();
-    const text = data.candidates[0].content.parts[0].text;
-
-    $('groq-output').textContent = text;
-    setPill('groq-status', 'p-ok', 'TERMINÉ');
-    $('groq-actions').style.display = 'block';
-  } catch (err) {
-    setPill('groq-status', 'p-ko', 'ERREUR');
-    toast('Erreur API', 'ko');
-  } finally {
-    $('btn-rewrite').disabled = false;
-  }
+    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`HTTP ${r.status}`);}
+    const d=await r.json();
+    const text=d.choices?.[0]?.message?.content||'';
+    $('groq-output').textContent=text;
+    $('groq-output').className='result-text on';
+    setPill('groq-status','p-ok','TERMINÉ');
+    $('groq-actions').style.display='flex';
+    toast('Reformulation réussie ✓','ok');
+  } catch(e) {
+    setPill('groq-status','p-err','ERREUR');
+    $('groq-output').textContent=`Erreur : ${e.message}`;
+    $('groq-output').className='result-text on';
+    toast('Erreur Groq : '+e.message,'ko');
+  } finally { $('btn-rewrite').disabled=false; }
 }
 
 function useRewritten() {
