@@ -125,7 +125,7 @@
 
   <script>
   // ── SIDEBAR ──────────────────────────────────────────────────────
-  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+  fetch('articlestotal.json').then(r=>r.json()).then(data=>{
     const articles=(data.articles||[]).slice(0,5);
     const currentFile=window.location.pathname.split('/').pop();
     const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
