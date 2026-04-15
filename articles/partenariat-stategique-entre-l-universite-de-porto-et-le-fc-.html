@@ -52,6 +52,25 @@
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+
+    /* ── SIDEBAR ── */
+    /* ── COMMENTS ── */
+
+    .asb-card{border:1px solid var(--border);margin-bottom:12px;text-decoration:none;color:inherit;display:flex;gap:12px;padding:12px;transition:background .2s}
+    .asb-card:hover{background:rgba(255,255,255,.04)}
+    .asb-card-img{width:72px;height:56px;object-fit:cover;flex-shrink:0;opacity:.8}
+    .asb-card-img-ph{width:72px;height:56px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
+    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
+    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.25;color:var(--white)}
+    .art-actions{display:flex;align-items:center;gap:12px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:32px 0}
+    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s}
+    .btn-like:hover,.btn-like.liked{border-color:rgba(231,76,60,.5);color:#e74c3c}
+    .like-ico{font-size:14px;transition:transform .2s}
+    .btn-like.liked .like-ico{transform:scale(1.3)}
+    .share-btns{display:flex;gap:8px;margin-left:auto}
+    .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
+    .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
+    .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
     @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
@@ -77,24 +96,62 @@
     <div class="aly">
       <article class="abdy">
         <div class="apull">Une collaboration stratégique vient d'être scellée entre l'Université de Porto et le club pour révolutionner l'usage de la Data Science au sein de l'institution sportive.</div>
+
       <p class="dc">Le FC Porto franchit une étape décisive dans sa modernisation en signant un partenariat stratégique avec l'Université de Porto. Cette alliance ambitieuse a pour objectif de transformer radicalement la gestion et l'analyse des données au sein du club. En intégrant les compétences académiques de pointe aux besoins concrets du sport de haut niveau, l'institution entend s'imposer comme un leader technologique du football européen. Ce projet bénéficie également du soutien précieux de DareData, expert reconnu dans le domaine, qui accompagnera cette mutation vers une exploitation optimisée de l'information numérique.</p>
+
       <p>Cette initiative constitue un pilier majeur du Plan Stratégique global, visant à faire de notre emblème un modèle d'innovation et de technologie. Elle s'inscrit précisément dans le Programme de Transformation Digitale, dont la mission est d'optimiser chaque facette opérationnelle de la structure grâce aux meilleures pratiques mondiales. En collaborant étroitement avec les chercheurs universitaires, nous pourrons exploiter des outils avancés en intelligence artificielle et en apprentissage automatique. Ces technologies de pointe permettront d'affiner la prise de décision, qu'il s'agisse de détection de talents ou de gestion physique des athlètes, garantissant ainsi un avantage compétitif durable.</p>
-      <p>Au cœur de cette synergie se trouve la création d'une plateforme de données centralisée et intégrée. Cet outil permettra de compiler et de valoriser des flux d'informations provenant de sources multiples : performances athlétiques, billetterie, ou encore comportement des consommateurs de merchandising. L'analyse croisée de ces données offrira une compréhension plus fine des besoins des supporters et facilitera l'élaboration de stratégies commerciales et sportives plus performantes. L'expertise de DareData et des académiques locaux sera le moteur indispensable pour concevoir et déployer cette architecture technologique complexe, essentielle à notre croissance future.</p>
-      <p>Ce rapprochement entre le monde universitaire et le sport professionnel illustre parfaitement la capacité des grands clubs à s'ouvrir sur l'extérieur pour accroître leur excellence. Cette démarche démontre une volonté farouche de ne jamais stagner et de rester à l'avant-garde des évolutions du métier de dirigeant sportif. Pour la communauté portiste, il est réconfortant de voir le club investir dans des projets de fond qui assurent sa pérennité et sa pertinence à l'ère du tout-numérique. L'avenir se construit aujourd'hui à travers ces ponts jetés entre la recherche et le terrain de jeu.</p>
-      <p>Le déploiement de cette collaboration suivra un calendrier rigoureux, jalonné d'objectifs précis pour évaluer chaque avancée technologique. Les trois entités travailleront main dans la main pour identifier les secteurs où l'analyse prédictive peut apporter la plus forte valeur ajoutée. Les résultats seront scrutés avec la plus grande attention, et chaque réussite sera utilisée comme socle pour perfectionner les méthodes de travail de l'administration portuane. Ce processus d'amélioration continue garantit que les investissements réalisés porteront leurs fruits sur le long terme, au bénéfice de l'ensemble de la structure.</p>
-      <p>En conclusion, ce partenariat avec l'Université de Porto et DareData représente un tournant historique pour la gestion interne de nos couleurs. C'est un signal fort envoyé à la concurrence : Porto ne se contente plus de gagner sur le terrain, il entend aussi dominer par l'intelligence et l'innovation. Nous suivrons avec enthousiasme les premiers retombées de cette épopée technologique vers l'excellence. Restez connectés sur NewsPorto pour découvrir comment la science des données va transformer l'expérience du football et renforcer la puissance de notre institution préférée.</p>
+
       <figure class="afig">
         <img src="https://img.iol.pt/image/id/660c4405d34ebf9bbb3bfda7/" alt="Signature du partenariat technologique" loading="lazy">
       </figure>
+
+      <p>Au cœur de cette synergie se trouve la création d'une plateforme de données centralisée et intégrée. Cet outil permettra de compiler et de valoriser des flux d'informations provenant de sources multiples : performances athlétiques, billetterie, ou encore comportement des consommateurs de merchandising. L'analyse croisée de ces données offrira une compréhension plus fine des besoins des supporters et facilitera l'élaboration de stratégies commerciales et sportives plus performantes. L'expertise de DareData et des académiques locaux sera le moteur indispensable pour concevoir et déployer cette architecture technologique complexe, essentielle à notre croissance future.</p>
+
+      <p>Ce rapprochement entre le monde universitaire et le sport professionnel illustre parfaitement la capacité des grands clubs à s'ouvrir sur l'extérieur pour accroître leur excellence. Cette démarche démontre une volonté farouche de ne jamais stagner et de rester à l'avant-garde des évolutions du métier de dirigeant sportif. Pour la communauté portiste, il est réconfortant de voir le club investir dans des projets de fond qui assurent sa pérennité et sa pertinence à l'ère du tout-numérique. L'avenir se construit aujourd'hui à travers ces ponts jetés entre la recherche et le terrain de jeu.</p>
+
+      <p>Le déploiement de cette collaboration suivra un calendrier rigoureux, jalonné d'objectifs précis pour évaluer chaque avancée technologique. Les trois entités travailleront main dans la main pour identifier les secteurs où l'analyse prédictive peut apporter la plus forte valeur ajoutée. Les résultats seront scrutés avec la plus grande attention, et chaque réussite sera utilisée comme socle pour perfectionner les méthodes de travail de l'administration portuane. Ce processus d'amélioration continue garantit que les investissements réalisés porteront leurs fruits sur le long terme, au bénéfice de l'ensemble de la structure.</p>
+
+      <p>En conclusion, ce partenariat avec l'Université de Porto et DareData représente un tournant historique pour la gestion interne de nos couleurs. C'est un signal fort envoyé à la concurrence : Porto ne se contente plus de gagner sur le terrain, il entend aussi dominer par l'intelligence et l'innovation. Nous suivrons avec enthousiasme les premiers retombées de cette épopée technologique vers l'excellence. Restez connectés sur NewsPorto pour découvrir comment la science des données va transformer l'expérience du football et renforcer la puissance de notre institution préférée.</p>
       </article>
-      <aside class="asb">
-        <p class="sbl">À la une</p>
-      </aside>
+      </div>
+
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© 2026 NewsPorto · Fan Media</span>
     </footer>
   </div>
+
+  <script>
+  // ── SIDEBAR ──────────────────────────────────────────────────────
+  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+    const articles=(data.articles||[]).slice(0,5);
+    const currentFile=window.location.pathname.split('/').pop();
+    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
+    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+    const el=document.getElementById('sidebar-articles');
+    if(!el||!filtered.length)return;
+    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="" onerror="this.style.display='none'">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+  }).catch(()=>{});
+  // ── LIKE LOCAL ───────────────────────────────────────────────────
+  const likeKey='np_like_'+window.location.pathname;
+  function toggleLike(){
+    const liked=localStorage.getItem(likeKey)==='1';
+    const btn=document.getElementById('btn-like');
+    const ico=btn.querySelector('.like-ico');
+    const lbl=document.getElementById('like-label');
+    if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}
+    else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}
+  }
+  if(localStorage.getItem(likeKey)==='1'){
+    const btn=document.getElementById('btn-like');
+    if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}
+  }
+  // ── PARTAGE ───────────────────────────────────────────────────────
+  function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title)+' via @NewsPortoFR','_blank');}
+  function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
+  function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
+  function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
+  </script>
 </body>
 </html>
