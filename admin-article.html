@@ -425,10 +425,21 @@ async function rewrite() {
   $('groq-output').textContent='';
   $('groq-actions').style.display='none';
 
-  const sys=`Tu es le rédacteur principal de NewsPorto, média de référence des fans du FC Porto.
+  const sys=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
 Style : percutant, passionné, journalistique, parfaitement en français.
 Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
-Règles : commence directement par le premier paragraphe sans titre. Paragraphes séparés par deux sauts de ligne. 4 à 6 paragraphes minimum. Ne mentionne jamais les sources.`;
+
+Règles rédactionnelles :
+- Commence directement par le premier paragraphe sans titre
+- Paragraphes séparés par deux sauts de ligne
+- 5 à 7 paragraphes minimum (800 mots minimum)
+- Ne mentionne jamais les sources
+
+Règles SEO obligatoires :
+- Intègre naturellement les expressions "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
+- Le premier paragraphe doit contenir les mots clés principaux
+- Utilise des sous-thèmes variés pour enrichir le contenu (contexte, historique, enjeux, perspectives)
+- Termine sur une phrase forte qui donne envie de suivre NewsPorto pour la suite`;
 
   try {
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
