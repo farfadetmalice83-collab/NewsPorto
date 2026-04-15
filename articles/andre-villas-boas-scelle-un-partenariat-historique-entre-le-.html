@@ -53,6 +53,25 @@
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+
+    /* ── SIDEBAR ── */
+    /* ── COMMENTS ── */
+
+    .asb-card{border:1px solid var(--border);margin-bottom:12px;text-decoration:none;color:inherit;display:flex;gap:12px;padding:12px;transition:background .2s}
+    .asb-card:hover{background:rgba(255,255,255,.04)}
+    .asb-card-img{width:72px;height:56px;object-fit:cover;flex-shrink:0;opacity:.8}
+    .asb-card-img-ph{width:72px;height:56px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
+    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
+    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.25;color:var(--white)}
+    .art-actions{display:flex;align-items:center;gap:12px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:32px 0}
+    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s}
+    .btn-like:hover,.btn-like.liked{border-color:rgba(231,76,60,.5);color:#e74c3c}
+    .like-ico{font-size:14px;transition:transform .2s}
+    .btn-like.liked .like-ico{transform:scale(1.3)}
+    .share-btns{display:flex;gap:8px;margin-left:auto}
+    .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
+    .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
+    .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
     @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
@@ -78,25 +97,64 @@
     <div class="aly">
       <article class="abdy">
         <div class="apull">Le président André Villas-Boas a récemment rendu visite à l'Association Commerciale du Porto (ACP-CCIP), posant les jalons d'une alliance stratégique avec l'élite économique locale.</div>
+
       <p class="dc">Le président du FC Porto, André Villas-Boas, a récemment franchi les portes de l'Association Commerciale du Porto (ACP-CCIP). Ce déplacement marque une alliance stratégique entre les Dragons et l'une des institutions les plus influentes de la région septentrionale. Cette rencontre, largement commentée dans la sphère portiste, renforce les liens de proximité et ouvre des perspectives inédites pour le rayonnement économique, social et sportif de la métropole. Notre club franchit ici un cap institutionnel majeur en s'alliant à une entité qui partage son ambition de croissance et son dynamisme légendaire.</p>
+
       <p>L'entrevue avec Nuno Botelho s'est tenue au Palais de la Bourse, véritable joyau architectural de la cité. Les deux dirigeants ont instauré un dialogue résolument tourné vers demain, abordant des thématiques essentielles comme l'attractivité territoriale et la coopération entre les forces vives de la société civile. Cette vision de développement mutuel vise à exalter les atouts régionaux. Les observateurs attentifs du quotidien de l'Invicta notent une volonté claire des Dragons de s'impliquer davantage dans le tissu local pour solidifier leur ancrage hors des pelouses.</p>
-      <p>Cet échange protocolaire a également permis de sceller symboliquement cet engagement mutuel. André Villas-Boas a remis à l'organisation un maillot personnalisé, geste fort reconnaissant le rôle prépondérant de l'institution dans la vitalité commerciale de la ville. Ce présent illustre la détermination de notre direction à œuvrer main dans la main avec les acteurs de terrain. Pour la communauté portiste, voir le club s'investir dans de telles initiatives citoyennes est une source de fierté supplémentaire qui témoigne de la nouvelle ère entamée par la présidence actuelle.</p>
-      <p>Pour ancrer durablement ce rapprochement, le dirigeant des bleus et blancs a annoncé son intention de devenir membre actif de l'ACP-CCIP. Cet engagement personnel garantit une collaboration étroite et pérenne entre les deux structures. La nouvelle a été accueillie avec ferveur, y voyant une opportunité en or pour l'institution sportive de peser davantage dans les décisions structurantes de la cité. Cette démarche souligne la polyvalence de notre stratégie actuelle, qui ne se limite plus aux seuls résultats du week-end mais s'étend à une gestion globale et visionnaire.</p>
-      <p>L'intérêt suscité par ce rapprochement montre à quel point l'avenir de Porto dépend d'une synergie parfaite entre sport et économie. Les passionnés du club voient en cette union un levier puissant pour le développement des infrastructures et de l'image de marque de la région. NewsPorto s'impose comme le relais privilégié pour suivre ces mutations institutionnelles de premier plan, offrant une lecture précise des mouvements de coulisses qui façonnent le futur de notre emblème favori.</p>
-      <p>Cette coopération exemplaire démontre que les pôles de puissance du Nord peuvent travailler de concert pour l'intérêt général. Les Dragons, gardiens d'un héritage centenaire, prouvent qu'ils sont prêts à innover pour rester compétitifs sur tous les fronts. La promotion de la ville passe par des accords de ce calibre, où la passion sportive rencontre l'expertise commerciale pour créer une valeur ajoutée unique au Portugal.</p>
-      <p>En résumé, cette signature historique inaugure un chapitre prometteur. André Villas-Boas dessine les contours d'un club moderne, influent et respecté par ses pairs locaux. Nous restons mobilisés pour vous transmettre chaque détail de cette évolution majeure. L'avenir s'annonce radieux pour l'institution, alors ne manquez rien des prochaines étapes de cette collaboration sur notre plateforme dédiée à l'actualité de l'Invicta.</p>
+
       <figure class="afig">
         <img src="https://www.heyporto.com/wp-content/uploads/2017/03/Palacio_da_Bolsa_Porto.jpg" alt="Le Palais de la Bourse, lieu du partenariat" loading="lazy">
       </figure>
+
+      <p>Cet échange protocolaire a également permis de sceller symboliquement cet engagement mutuel. André Villas-Boas a remis à l'organisation un maillot personnalisé, geste fort reconnaissant le rôle prépondérant de l'institution dans la vitalité commerciale de la ville. Ce présent illustre la détermination de notre direction à œuvrer main dans la main avec les acteurs de terrain. Pour la communauté portiste, voir le club s'investir dans de telles initiatives citoyennes est une source de fierté supplémentaire qui témoigne de la nouvelle ère entamée par la présidence actuelle.</p>
+
+      <p>Pour ancrer durablement ce rapprochement, le dirigeant des bleus et blancs a annoncé son intention de devenir membre actif de l'ACP-CCIP. Cet engagement personnel garantit une collaboration étroite et pérenne entre les deux structures. La nouvelle a été accueillie avec ferveur, y voyant une opportunité en or pour l'institution sportive de peser davantage dans les décisions structurantes de la cité. Cette démarche souligne la polyvalence de notre stratégie actuelle, qui ne se limite plus aux seuls résultats du week-end mais s'étend à une gestion globale et visionnaire.</p>
+
+      <p>L'intérêt suscité par ce rapprochement montre à quel point l'avenir de Porto dépend d'une synergie parfaite entre sport et économie. Les passionnés du club voient en cette union un levier puissant pour le développement des infrastructures et de l'image de marque de la région. NewsPorto s'impose comme le relais privilégié pour suivre ces mutations institutionnelles de premier plan, offrant une lecture précise des mouvements de coulisses qui façonnent le futur de notre emblème favori.</p>
+
+      <p>Cette coopération exemplaire démontre que les pôles de puissance du Nord peuvent travailler de concert pour l'intérêt général. Les Dragons, gardiens d'un héritage centenaire, prouvent qu'ils sont prêts à innover pour rester compétitifs sur tous les fronts. La promotion de la ville passe par des accords de ce calibre, où la passion sportive rencontre l'expertise commerciale pour créer une valeur ajoutée unique au Portugal.</p>
+
+      <p>En résumé, cette signature historique inaugure un chapitre prometteur. André Villas-Boas dessine les contours d'un club moderne, influent et respecté par ses pairs locaux. Nous restons mobilisés pour vous transmettre chaque détail de cette évolution majeure. L'avenir s'annonce radieux pour l'institution, alors ne manquez rien des prochaines étapes de cette collaboration sur notre plateforme dédiée à l'actualité de l'Invicta.</p>
       </article>
-      <aside class="asb">
-        <p class="sbl">À la une</p>
-      </aside>
+      </div>
+
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© 2026 NewsPorto · Fan Media</span>
     </footer>
   </div>
+
+  <script>
+  // ── SIDEBAR ──────────────────────────────────────────────────────
+  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+    const articles=(data.articles||[]).slice(0,5);
+    const currentFile=window.location.pathname.split('/').pop();
+    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
+    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+    const el=document.getElementById('sidebar-articles');
+    if(!el||!filtered.length)return;
+    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="" onerror="this.style.display='none'">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+  }).catch(()=>{});
+  // ── LIKE LOCAL ───────────────────────────────────────────────────
+  const likeKey='np_like_'+window.location.pathname;
+  function toggleLike(){
+    const liked=localStorage.getItem(likeKey)==='1';
+    const btn=document.getElementById('btn-like');
+    const ico=btn.querySelector('.like-ico');
+    const lbl=document.getElementById('like-label');
+    if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}
+    else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}
+  }
+  if(localStorage.getItem(likeKey)==='1'){
+    const btn=document.getElementById('btn-like');
+    if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}
+  }
+  // ── PARTAGE ───────────────────────────────────────────────────────
+  function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title)+' via @NewsPortoFR','_blank');}
+  function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
+  function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
+  function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
+  </script>
 </body>
 </html>
