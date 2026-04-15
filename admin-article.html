@@ -431,18 +431,18 @@ Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`
 
 Règles rédactionnelles :
 - Commence directement par le premier paragraphe sans titre
-- Ne fais jammais de répétitions, ne répéte pas deux fois la même chose dans l'article.
+- Ne répète jamais une information ou une idée déjà exprimée. Varie les formulations.
 - utilise un vocabulaire journalistique
 - n'ivente rieb
 - Paragraphes séparés par deux sauts de ligne
-- 5 à 7 paragraphes minimum (800 mots minimum)
+- 5 à 7 paragraphes minimum (800 mots minimum) SAUF si tu n'as pas assez d'infos pour développer et que cela crée un risque de répétition
 - Ne mentionne jamais les sources
 
 Règles SEO obligatoires :
 - Intègre naturellement les expressions "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
 - Le premier paragraphe doit contenir les mots clés principaux
 - Utilise des sous-thèmes variés pour enrichir le contenu (contexte, historique, enjeux, perspectives)
-- Termine sur une phrase forte qui donne envie de suivre NewsPorto pour la suite`;
+- Termine par une phrase puissante et engageante qui incite à continuer de suivre l'actualité sur newsporto.fr. (la seul fois ou tu mentionne le site`;
 
   try {
     const r = await fetch('https://api.groq.com/openai/v1/chat/completions',{
