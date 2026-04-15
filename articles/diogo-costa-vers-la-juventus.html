@@ -118,8 +118,23 @@
 
       <p>Une chose est certaine : l’été 2026 s’annonce brûlant pour les Dragons, et les supporters feront tout pour retenir leur capitaine. Mais dans le football moderne, les émotions et les bilans comptables ne font pas toujours bon ménage. Restez connectés à newsporto.fr pour ne rien manquer de cette saga qui pourrait bien changer le visage du FC Porto.</p>
       </article>
+      <div class="art-actions">
+        <button class="btn-like" id="btn-like" onclick="toggleLike()">
+          <span class="like-ico">🤍</span>
+          <span id="like-label">J'aime</span>
+        </button>
+        <div class="share-btns">
+          <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="X">𝕏</a>
+          <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="WhatsApp">💬</a>
+          <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Facebook">f</a>
+          <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
+        </div>
       </div>
-
+      <aside class="asb">
+        <p class="sbl">À la une</p>
+        <div id="sidebar-articles"></div>
+        <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
+      </aside>
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
@@ -129,7 +144,7 @@
 
   <script>
   // ── SIDEBAR ──────────────────────────────────────────────────────
-  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+  fetch('articlestotal.json').then(r=>r.json()).then(data=>{
     const articles=(data.articles||[]).slice(0,5);
     const currentFile=window.location.pathname.split('/').pop();
     const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
