@@ -1520,7 +1520,7 @@
         </div>
       </div>
       <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
-        <span id="click-hint-text" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;">Cliquer pour le calendrier →</span>
+        <button id="click-hint-text" onclick="event.stopPropagation();if(window._openLiveModal)window._openLiveModal();" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1540,6 +1540,18 @@
     </div>
   </section>
 
+
+  <script>
+  function closeLiveModal() {
+    document.getElementById('live-modal').style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  window._openLiveModal = function() {
+    document.getElementById('live-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    if (window._renderLiveModal) window._renderLiveModal();
+  };
+  </script>
   <!-- ── LINEUP MODAL ── -->
   <div id="lineup-modal" style="
     display:none;position:fixed;inset:0;z-index:999;
@@ -2257,7 +2269,7 @@
     });
   }
 
-  function renderLiveModal() {
+  window._renderLiveModal = function renderLiveModal() {
     const data = liveModalData;
     const m = data.liveMatch || data.nextMatch;
     if (!m) return;
