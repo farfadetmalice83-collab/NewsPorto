@@ -52,6 +52,25 @@
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
+
+    /* ── SIDEBAR ── */
+    /* ── COMMENTS ── */
+
+    .asb-card{border:1px solid var(--border);margin-bottom:12px;text-decoration:none;color:inherit;display:flex;gap:12px;padding:12px;transition:background .2s}
+    .asb-card:hover{background:rgba(255,255,255,.04)}
+    .asb-card-img{width:72px;height:56px;object-fit:cover;flex-shrink:0;opacity:.8}
+    .asb-card-img-ph{width:72px;height:56px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
+    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
+    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.25;color:var(--white)}
+    .art-actions{display:flex;align-items:center;gap:12px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:32px 0}
+    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s}
+    .btn-like:hover,.btn-like.liked{border-color:rgba(231,76,60,.5);color:#e74c3c}
+    .like-ico{font-size:14px;transition:transform .2s}
+    .btn-like.liked .like-ico{transform:scale(1.3)}
+    .share-btns{display:flex;gap:8px;margin-left:auto}
+    .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
+    .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
+    .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
     @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
@@ -77,24 +96,62 @@
     <div class="aly">
       <article class="abdy">
         <div class="apull">Les rumeurs de transfert s'intensifient autour du Dragão, et le nom d'Oskar Pietuszewski fait désormais trembler les travées du stade face à l'intérêt bavarois.</div>
+
       <p class="dc">L'agitation du mercato commence déjà à se faire ressentir au cœur de l'Invicta, et les fidèles de l'institution bleue et blanche ont de quoi être alertés. En effet, l'ogre allemand du Bayern Munich surveille désormais avec insistance l'un des espoirs les plus brillants de notre effectif : le jeune prodige Oskar Pietuszewski. À seulement 17 ans, l'attaquant s'est déjà forgé une réputation flatteuse sur la scène continentale, attirant inexorablement les regards des recruteurs les plus influents d'Europe.</p>
+
       <p>La fenêtre estivale s'annonce particulièrement mouvementée en Bavière, où la direction cherche à rajeunir ses cadres avec des profils à très haut potentiel. L'international espoir semble cocher toutes les cases du profil recherché par les Munichois. Arrivé en janvier 2026 en provenance du Jagiellonia Białystok pour un montant avoisinant les 10 millions d'euros, il a immédiatement conquis le staff technique par sa pointe de vitesse, sa finesse technique et un sang-froid impressionnant malgré son inexpérience du haut niveau.</p>
-      <p>L'état-major du Bayern est particulièrement séduit par la malléabilité tactique du joueur, capable d'animer les couloirs ou de peser dans l'axe de l'attaque. Sa faculté de percussion et son agilité à éliminer en un-contre-un constituent des atouts majeurs qui ne laissent pas les décideurs germaniques indifférents. Cependant, l'opération s'annonce onéreuse : le joueur est lié au club jusqu'en 2029 et dispose d'une clause libératoire fixée à 60 millions d'euros, un rempart financier solide pour nos finances.</p>
-      <p>La crainte de voir filer un tel diamant brut est légitime pour la communauté portiste, tant son apport offensif est devenu prometteur. Il convient néanmoins de rappeler notre savoir-faire historique en matière de détection et de renouvellement permanent des talents. Si une offre irrefusable venait à se matérialiser, la direction devra se tenir prête à réinvestir intelligemment pour maintenir la compétitivité de l'attaque. La perte d'un tel atout serait un défi de taille pour les ambitions sportives de la saison prochaine.</p>
-      <p>Les prochaines semaines seront déterminantes pour clarifier les intentions réelles des deux parties et sceller l'avenir de l'ailier polonais. Les dirigeants de l'Invicta font face à des choix cruciaux pour préserver l'équilibre du groupe tout en assurant la pérennité financière de la structure. Quoi qu'il advienne, le club demeure une vitrine d'exception pour les talents mondiaux, conservant son statut d'étape incontournable pour quiconque aspire à l'élite du football européen contemporain.</p>
-      <p>Le bras de fer entre les deux institutions pourrait s'avérer long et complexe, mais le Bayern semble prêt à déployer des moyens conséquents pour empocher la mise. Les partisans bleus et blancs devront rester vigilants sur l'évolution de ce dossier brûlant, espérant secrètement conserver leur joyau une saison supplémentaire. L'ADN de notre maison repose sur cette capacité à polir des joyaux avant de les voir briller au firmament, garantissant ainsi un avenir toujours aussi ambitieux et rayonnant.</p>
+
       <figure class="afig">
         <img src="https://www.les-transferts.com/wp-content/uploads/2026/04/3E5XNGT.webp" alt="Oskar Pietuszewski sous les couleurs de Porto" loading="lazy">
       </figure>
+
+      <p>L'état-major du Bayern est particulièrement séduit par la malléabilité tactique du joueur, capable d'animer les couloirs ou de peser dans l'axe de l'attaque. Sa faculté de percussion et son agilité à éliminer en un-contre-un constituent des atouts majeurs qui ne laissent pas les décideurs germaniques indifférents. Cependant, l'opération s'annonce onéreuse : le joueur est lié au club jusqu'en 2029 et dispose d'une clause libératoire fixée à 60 millions d'euros, un rempart financier solide pour nos finances.</p>
+
+      <p>La crainte de voir filer un tel diamant brut est légitime pour la communauté portiste, tant son apport offensif est devenu prometteur. Il convient néanmoins de rappeler notre savoir-faire historique en matière de détection et de renouvellement permanent des talents. Si une offre irrefusable venait à se matérialiser, la direction devra se tenir prête à réinvestir intelligemment pour maintenir la compétitivité de l'attaque. La perte d'un tel atout serait un défi de taille pour les ambitions sportives de la saison prochaine.</p>
+
+      <p>Les prochaines semaines seront déterminantes pour clarifier les intentions réelles des deux parties et sceller l'avenir de l'ailier polonais. Les dirigeants de l'Invicta font face à des choix cruciaux pour préserver l'équilibre du groupe tout en assurant la pérennité financière de la structure. Quoi qu'il advienne, le club demeure une vitrine d'exception pour les talents mondiaux, conservant son statut d'étape incontournable pour quiconque aspire à l'élite du football européen contemporain.</p>
+
+      <p>Le bras de fer entre les deux institutions pourrait s'avérer long et complexe, mais le Bayern semble prêt à déployer des moyens conséquents pour empocher la mise. Les partisans bleus et blancs devront rester vigilants sur l'évolution de ce dossier brûlant, espérant secrètement conserver leur joyau une saison supplémentaire. L'ADN de notre maison repose sur cette capacité à polir des joyaux avant de les voir briller au firmament, garantissant ainsi un avenir toujours aussi ambitieux et rayonnant.</p>
       </article>
-      <aside class="asb">
-        <p class="sbl">À la une</p>
-      </aside>
+      </div>
+
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© 2026 NewsPorto · Fan Media</span>
     </footer>
   </div>
+
+  <script>
+  // ── SIDEBAR ──────────────────────────────────────────────────────
+  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
+    const articles=(data.articles||[]).slice(0,5);
+    const currentFile=window.location.pathname.split('/').pop();
+    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
+    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+    const el=document.getElementById('sidebar-articles');
+    if(!el||!filtered.length)return;
+    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="" onerror="this.style.display='none'">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+  }).catch(()=>{});
+  // ── LIKE LOCAL ───────────────────────────────────────────────────
+  const likeKey='np_like_'+window.location.pathname;
+  function toggleLike(){
+    const liked=localStorage.getItem(likeKey)==='1';
+    const btn=document.getElementById('btn-like');
+    const ico=btn.querySelector('.like-ico');
+    const lbl=document.getElementById('like-label');
+    if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}
+    else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}
+  }
+  if(localStorage.getItem(likeKey)==='1'){
+    const btn=document.getElementById('btn-like');
+    if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}
+  }
+  // ── PARTAGE ───────────────────────────────────────────────────────
+  function shareTwitter(){window.open('https://twitter.com/intent/tweet?url='+encodeURIComponent(location.href)+'&text='+encodeURIComponent(document.title)+' via @NewsPortoFR','_blank');}
+  function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
+  function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
+  function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
+  </script>
 </body>
 </html>
