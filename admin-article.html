@@ -452,8 +452,8 @@ Règles rédactionnelles :
 - Pas de conclusions clichées
 - Pour chaque idée, explique le "Pourquoi" avec du contexte
 - Paragraphes séparés par deux sauts de ligne
-- 5 à 7 paragraphes minimum (800 mots) SAUF si le texte source ne fournit pas assez de matière
-- Ne mentionne jamais les sources
+- OBLIGATOIREMENT 800 mots minimum — compte tes mots, ne termine pas avant d'avoir atteint 800 mots
+- FORMAT TEXTE BRUT UNIQUEMENT : pas de Markdown, pas de **, pas de *, pas de #, pas de tirets de liste, pas de tirets longs (—) entre deux phrases ou en début de phrase. Texte brut uniquement, paragraphes séparés par une ligne vide.
 
 Règles SEO :
 - Intègre naturellement "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
@@ -469,7 +469,8 @@ Règles SEO :
     });
     if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`HTTP ${r.status}`);}
     const d=await r.json();
-    const text=d.choices?.[0]?.message?.content||'';
+    const raw=d.choices?.[0]?.message?.content||'';
+    const text=raw.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s+/gm,'').replace(/^[-*]\s+/gm,'');
     $('groq-output').textContent=text;
     $('groq-output').className='result-text on';
     setPill('groq-status','p-ok','TERMINÉ');
