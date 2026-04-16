@@ -51,7 +51,7 @@
       border-radius: 50%;
       background: radial-gradient(circle, var(--blue-glow) 0%, transparent 65%);
       transform: translate(-50%, -50%);
-      transition: left .12s ease, top .12s ease;
+      transition: none;
     }
 
     .page { position: relative; z-index: 1; }
@@ -800,7 +800,7 @@
     btn.disabled = true;
 
     try {
-      const res = await fetch('https://formspree.io/f/https://formspree.io/f/xyklepwr', {
+      const res = await fetch('https://formspree.io/f/xyklepwr', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({ name, email, subject: subject || 'Sans sujet', message: msg })
