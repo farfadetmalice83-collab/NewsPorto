@@ -72,6 +72,9 @@
     .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
     .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
     .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
+    .abdy h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(20px,2.5vw,30px);letter-spacing:1px;text-transform:uppercase;color:var(--white);margin:36px 0 12px;border-left:3px solid rgba(255,255,255,.25);padding-left:14px}
+    .sbk{display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s}
+    .sbk:hover{color:#fff}
     @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
   </style>
 </head>
@@ -86,7 +89,7 @@
       <a href="../actu.html" class="bk">← Actualités</a>
     </nav>
     <section class="hero">
-      <img src="https://editorial.uefa.com/resources/02a4-205b4128cdcf-e59863bd8f5d-1000/fc_porto_v_nottingham_forest_fc_-_uefa_europa_league_2025_26_quarter-final_first_leg.jpeg" alt="Choc européen au City Ground" loading="eager">
+      <img src="https://editorial.uefa.com/resources/02a4-205b4128cdcf-e59863bd8f5d-1000/fc_porto_v_nottingham_forest_fc_-_uefa_europa_league_2025_26_quarter-final_first_leg.jpeg" alt="Choc européen au City Ground" loading="eager" fetchpriority="high">
       <div class="hov"></div>
       <div class="hbd">
         <p class="acat">Europa League</p>
@@ -117,7 +120,7 @@
       <aside class="asb">
         <p class="sbl">À la une</p>
         <div id="sidebar-articles"></div>
-        <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
+        <a href="../actu.html" class="sbk">Toutes les actus →</a>
       </aside>
     </div>
     <div class="art-actions" style="padding:20px 48px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
