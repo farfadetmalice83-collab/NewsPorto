@@ -1774,7 +1774,7 @@
 
       <a href="https://newsporto-shop.fourthwall.com/en-eur/products/newsporto-poster-soit-portista" target="_blank" class="shop-card reveal reveal-d1">
         <div class="shop-card-img">
-          <img style="object-position:center 15%;" src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster" loading="lazy">
+          <img style="object-position:center 25%;" src="https://imgproxy.fourthwall.com/NGRuVkEYs47eoS8AV2Zt2kyIhsqbyROmUVUSEAiOyJg/w:1920/sm:1/enc/Y9LmuatpofindKFt/8iGBU_1cnck7VlPl/Oqv6c0mXUT0e9kzX/4Lq9YkxTt5bFtugu/F0TCb5P3vQndCyDw/BQbtjvPpmsGNIpay/ONypAvgNRrO135vI/nBpMzKq6tSitbJX_/g6zyhYIjmNWNegWT/q4F7rgL7p_TppotG/6OIFy6G1ol5AFlyz/9bsjpMYF3m4wkKOO/hyR36kgWyJZTX6Ks/s7S53qbL7tuBxGjL/yUtw-CFr8zk" alt="Poster" loading="lazy">
           <span class="shop-card-badge scb-exclu">Exclusif</span>
         </div>
         <div class="shop-card-info">
@@ -1837,27 +1837,26 @@
 
 
   // ── SCROLL ANIMATIONS ────────────────────────────────────────────
-  const animObs = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (!e.isIntersecting) return;
-      // Match sections
-      if (e.target.classList.contains('match-section')) {
-        e.target.classList.add('anim-visible');
-        // Animate child match-card with slight delay
-        const card = e.target.querySelector('.match-card');
-        if (card) setTimeout(() => card.classList.add('anim-visible'), 150);
-      }
-      // Shop cards cascade
-      if (e.target.classList.contains('shop-section')) {
-        e.target.querySelectorAll('.shop-card').forEach((card, i) => {
-          setTimeout(() => card.classList.add('anim-visible'), i * 120);
-        });
-      }
-      animObs.unobserve(e.target);
-    });
-  }, { threshold: 0.05, rootMargin: '0px 0px 150px 0px' });
-
-  document.querySelectorAll('.match-section, .shop-section').forEach(el => animObs.observe(el));
+  // Delay observer setup so elements are below viewport when observed
+  setTimeout(() => {
+    const animObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (!e.isIntersecting) return;
+        if (e.target.classList.contains('match-section')) {
+          e.target.classList.add('anim-visible');
+          const card = e.target.querySelector('.match-card');
+          if (card) setTimeout(() => card.classList.add('anim-visible'), 180);
+        }
+        if (e.target.classList.contains('shop-section')) {
+          e.target.querySelectorAll('.shop-card').forEach((card, i) => {
+            setTimeout(() => card.classList.add('anim-visible'), i * 130);
+          });
+        }
+        animObs.unobserve(e.target);
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.match-section, .shop-section').forEach(el => animObs.observe(el));
+  }, 100);
 
   // Scroll reveal
   const ro = new IntersectionObserver((entries) => {
