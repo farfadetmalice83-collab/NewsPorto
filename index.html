@@ -2632,12 +2632,24 @@
   #push-fab.show { display: flex; }
   #push-fab:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(0,61,165,0.7); }
 
-  @media (max-width: 480px) {
-    .popup-box { padding: 36px 24px; }
-    .popup-title { font-size: 28px; }
+  @media (max-width: 600px) {
+    #notif-popup { align-items: flex-end; }
+    .popup-box {
+      width: 100%; max-width: 100%;
+      padding: 32px 20px 40px;
+      border-left: none; border-right: none; border-bottom: none;
+      border-radius: 16px 16px 0 0;
+      animation: slideUpPopup .35s cubic-bezier(.22,1,.36,1);
+    }
+    .popup-title { font-size: 26px; }
     .popup-form { flex-direction: column; }
-    .popup-input { border-right: 1px solid rgba(255,255,255,0.15); border-bottom: none; }
-    .popup-submit { padding: 13px; }
+    .popup-input {
+      border-right: 1px solid rgba(255,255,255,0.15);
+      border-bottom: none;
+      font-size: 16px;
+    }
+    .popup-submit { padding: 14px; font-size: 12px; }
+    .popup-perks { gap: 8px; }
   }
 </style>
 
@@ -2687,7 +2699,6 @@
 
   // ── Afficher le popup après délai ──────────────────────────────────────
   function maybeShowPopup() {
-    // Ne plus jamais afficher si email déjà soumis
     if (localStorage.getItem(EMAIL_KEY)) return;
     setTimeout(() => {
       const popup = document.getElementById('notif-popup');
@@ -2734,11 +2745,11 @@
         body: JSON.stringify({ email }),
       });
       if (!r.ok) throw new Error();
-      msg.textContent = '✓ Abonnement confirmé — check tes emails !';
+      msg.innerHTML = '✓ Abonnement confirmé ! <br><span style="font-size:11px;opacity:0.7;">Si tu ne vois pas notre email, vérifie tes spams et marque-le comme "Non spam" pour ne rien rater.</span>';
       msg.className   = 'popup-msg ok';
-      localStorage.setItem(EMAIL_KEY, '1'); // ne plus jamais montrer le popup
+      localStorage.setItem(EMAIL_KEY, '1');
       input.value = '';
-      setTimeout(() => window.closePopup(), 2500);
+      setTimeout(() => window.closePopup(), 4000);
     } catch {
       msg.textContent = 'Erreur, réessaie dans un instant.';
       msg.className   = 'popup-msg err';
