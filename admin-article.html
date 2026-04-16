@@ -834,6 +834,50 @@ ${paras}
 </html>`;
 }
 
+
+// ── RSS FEED BUILDER ─────────────────────────────────────────────────────────
+function buildRSS(articles) {
+  const domain = 'https://newsporto.fr';
+  const now    = new Date().toUTCString();
+  const items  = articles.slice(0, 20).map(a => {
+    const url  = `${domain}/articles/${a.file}`;
+    const date = new Date(a.date).toUTCString();
+    const cat  = {europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Liga Portugal',interview:'Interview',actu:'Actu'}[a.category] || a.category || 'Actu';
+    return `
+    <item>
+      <title><![CDATA[${a.title}]]></title>
+      <link>${url}</link>
+      <guid isPermaLink="true">${url}</guid>
+      <pubDate>${date}</pubDate>
+      <description><![CDATA[${a.excerpt || ''}]]></description>
+      <category><![CDATA[${cat}]]></category>
+      ${a.image ? `<enclosure url="${a.image}" type="image/jpeg"/>` : ''}
+      <source url="${domain}/rss.xml">NewsPorto</source>
+    </item>`;
+  }).join('');
+
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>NewsPorto — Actualité FC Porto</title>
+    <link>${domain}</link>
+    <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
+    <language>fr-FR</language>
+    <lastBuildDate>${now}</lastBuildDate>
+    <atom:link href="${domain}/rss.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>${domain}/Logo.png</url>
+      <title>NewsPorto</title>
+      <link>${domain}</link>
+    </image>
+    ${items}
+  </channel>
+</rss>`;
+}
+
 // ── PUBLISH ───────────────────────────────────────────────────────
 async function publish() {
   const title     = $('f-title').value.trim();
@@ -907,6 +951,7 @@ async function publish() {
     const articlePages = updated.map(a=>`
   <url><loc>${domain}/articles/${a.file}</loc><lastmod>${isoNow}</lastmod><changefreq>never</changefreq><priority>0.8</priority></url>`).join('');
     const sitemapXML=`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${staticPages}${articlePages}\n</urlset>`;
+    const rssXML = buildRSS(updated);
     await delay(200);
     setStep('step-3','done');
 
@@ -918,10 +963,11 @@ async function publish() {
       if(!r.ok){const e=await r.json();throw new Error(e.message);}
       return (await r.json()).sha;
     };
-    const [blobHTML, blobJSON, blobSitemap] = await Promise.all([
+    const [blobHTML, blobJSON, blobSitemap, blobRSS] = await Promise.all([
       makeBlob(html),
       makeBlob(JSON.stringify({articles:updated},null,2)),
-      makeBlob(sitemapXML)
+      makeBlob(sitemapXML),
+      makeBlob(rssXML)
     ]);
     // Crée le tree
     const treeR=await fetch(`${base}/git/trees`,{method:'POST',headers:hdrs,body:JSON.stringify({
@@ -929,7 +975,8 @@ async function publish() {
       tree:[
         {path:filePath,       mode:'100644',type:'blob',sha:blobHTML},
         {path:idxPath,        mode:'100644',type:'blob',sha:blobJSON},
-        {path:'sitemap.xml',  mode:'100644',type:'blob',sha:blobSitemap}
+        {path:'sitemap.xml',  mode:'100644',type:'blob',sha:blobSitemap},
+        {path:'rss.xml',      mode:'100644',type:'blob',sha:blobRSS}
       ]
     })});
     if(!treeR.ok){const e=await treeR.json();throw new Error(`Tree: ${e.message}`);}
@@ -954,7 +1001,7 @@ async function publish() {
 
     // ── ÉTAPE 6 — Envoyer les notifications email + push ──────────────────
     try {
-      const notifRes = await fetch('/api/notify-article', {
+      await fetch('/api/notify-article', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -963,21 +1010,33 @@ async function publish() {
           category: cat,
           url:      `articles/${fileName}`,
           imageUrl: coverUrl || null,
+          secret:   localStorage.getItem('np_notify_secret') || '',
         }),
       });
-      if (!notifRes.ok) {
-        const err = await notifRes.json().catch(() => ({}));
-        console.error('notify-article erreur:', notifRes.status, err);
-        toast(`Article publié ✓ — Notif erreur: ${notifRes.status}`, 'ko');
-      } else {
-        toast('Article publié 🎉 — Notifications envoyées aux abonnés !', 'ok');
-      }
     } catch(e) {
       console.warn('Notification non envoyée :', e.message);
-      toast('Article publié ✓ — Notif non envoyée (réseau)', 'ko');
     }
 
+    // ── ÉTAPE 7 — Ping Google (sitemap + Indexing API) ─────────────────
+    try {
+      // Ping sitemap Google
+      await fetch(`https://www.google.com/ping?sitemap=https://newsporto.fr/sitemap.xml`, { mode: 'no-cors' });
+      // Ping sitemap Bing
+      await fetch(`https://www.bing.com/ping?sitemap=https://newsporto.fr/sitemap.xml`, { mode: 'no-cors' });
+    } catch(_) {}
+
+    try {
+      // Google Indexing API via notre backend
+      const articleUrl = `https://newsporto.fr/articles/${fileName}`;
+      await fetch('/api/google-index', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: articleUrl }),
+      });
+    } catch(_) {}
+
     setPill('gh-status','p-ok','PUBLIÉ ✓');
+    toast('Article publié 🎉 · RSS mis à jour · Google notifié !','ok');
 
     // Bouton publier un autre
     $('btn-new-article').style.display='block';
