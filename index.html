@@ -1674,7 +1674,7 @@
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         renderMatch(data);
-        liveModalData = data; // ← FIX : stocke les données pour le modal
+        liveModalData = data; // FIX : toujours stocker les données pour le modal
         if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
         else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
       })
@@ -2440,10 +2440,9 @@
   }
 
   // Hook into existing renderMatch to store data
-  // FIX : on wrape renderMatch AVANT que loadData soit rappelé,
-  // mais liveModalData est déjà rempli directement dans loadData ci-dessus.
+  // FIX : liveModalData est desormais rempli dans loadData(), ce hook met a jour le modal si ouvert.
   const _origRenderMatch = window.renderMatch;
-  if (_origRenderMatch && !_origRenderMatch._patched) {
+  if (typeof _origRenderMatch === 'function' && !_origRenderMatch._patched) {
     window.renderMatch = function(data) {
       _origRenderMatch(data);
       liveModalData = data;
