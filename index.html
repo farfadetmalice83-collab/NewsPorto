@@ -1497,7 +1497,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card reveal-scale" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
+    <div class="match-card" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1678,7 +1678,17 @@
         if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
         else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
       })
-      .catch(() => { document.getElementById('match-competition').textContent = 'Données indisponibles'; });
+      .catch((err) => {
+        console.error('porto-stats fetch error:', err);
+        document.getElementById('match-competition').textContent = 'Données indisponibles';
+        document.getElementById('match-score').textContent = 'API';
+        document.getElementById('team-home').textContent = 'FC Porto';
+        document.getElementById('team-away').textContent = '—';
+        document.getElementById('match-date').textContent = 'Non disponible';
+        document.getElementById('click-hint-text').textContent = 'Voir le calendrier →';
+        // Permettre quand même l'ouverture du modal vide
+        liveModalData = { upcomingMatches: [], recentMatches: [] };
+      });
   }
   loadData();
 
