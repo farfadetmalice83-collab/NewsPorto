@@ -1,8 +1,8 @@
 {
-  "version": 2,
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 30
+  "crons": [
+    {
+      "path": "/api/cron-match",
+      "schedule": "0 8 * * *"
     }
-  }
+  ]
 }
