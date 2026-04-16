@@ -60,6 +60,14 @@
       padding:8px 20px; cursor:pointer; text-decoration:none; transition:.2s;
     }
     .nav-cta:hover { background:#fff; color:#000; }
+    .nav-back {
+      font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700;
+      letter-spacing:2.5px; text-transform:uppercase;
+      color:rgba(255,255,255,0.45); text-decoration:none;
+      border:1px solid rgba(255,255,255,0.2); padding:8px 20px;
+      transition:.2s;
+    }
+    .nav-back:hover { color:#fff; border-color:#fff; }
 
     /* Layout */
     .page { position:relative; z-index:1; }
@@ -272,30 +280,10 @@
     <img src="Logo.png" alt="NewsPorto">
     <span class="nav-logo-text">NewsPorto</span>
   </a>
-  <ul class="nav-links">
-    <li><a href="actu.html">Actu</a></li>
-    <li><a href="effectif.html">Effectif</a></li>
-    <li><a href="stats.html">Stats</a></li>
-    <li><a href="match.html" class="active">Matchs</a></li>
-    <li><a href="videos.html">Vidéos</a></li>
-    <li><a href="shop.html">Shop</a></li>
-  </ul>
-  <a href="shop.html" class="nav-cta">Shop →</a>
-  <button class="hamburger" id="hamburger-btn" onclick="toggleMenu()">
-    <span></span><span></span><span></span>
-  </button>
+  <a href="index.html" class="nav-back">← Retour</a>
 </nav>
 
-<!-- MOBILE MENU -->
-<div class="mobile-overlay" id="mobile-menu">
-  <a href="index.html" class="mobile-nav-item">Accueil</a>
-  <a href="actu.html" class="mobile-nav-item">Actu</a>
-  <a href="effectif.html" class="mobile-nav-item">Effectif</a>
-  <a href="stats.html" class="mobile-nav-item">Stats</a>
-  <a href="match.html" class="mobile-nav-item active">Matchs</a>
-  <a href="videos.html" class="mobile-nav-item">Vidéos</a>
-  <a href="shop.html" class="mobile-nav-item">Shop</a>
-</div>
+
 
 <div class="page">
   <div class="page-inner">
@@ -465,11 +453,11 @@
     return new Date(iso).toLocaleDateString('fr-FR', { day:'numeric', month:'short', timeZone:TZ });
   }
   function setCrest(imgId, phId, src) {
+    const ph = document.getElementById(phId);
+    if (ph) ph.style.display = 'none'; // toujours cacher le placeholder
     if (src) {
       const img = document.getElementById(imgId);
       img.src = src; img.style.display = 'block';
-    } else {
-      document.getElementById(phId).style.display = 'block';
     }
   }
   function crestHTML(src, name) {
