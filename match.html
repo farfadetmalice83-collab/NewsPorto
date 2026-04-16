@@ -567,7 +567,7 @@
     const matchStats = m.matchStats || [];
     if (statsEl) {
       if (!matchStats.length) {
-        statsEl.innerHTML = '<p class="no-events">Stats disponibles dès le coup d'envoi</p>';
+        statsEl.innerHTML = '<p class="no-events">Stats disponibles d&#39;envoi</p>';
       } else {
         statsEl.innerHTML = matchStats.map(s => {
           const total = (s.home || 0) + (s.away || 0);
