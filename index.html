@@ -1497,7 +1497,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card reveal-scale" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
+    <div class="match-card reveal-scale" id="match-card" style="cursor:pointer" onclick="handleMatchCardClick()">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1537,7 +1537,7 @@
         </div>
       </div>
       <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
-        <button id="click-hint-text" onclick="event.stopPropagation();if(window._openLiveModal)window._openLiveModal();" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
+        <button id="click-hint-text" onclick="event.stopPropagation();handleMatchCardClick();" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1616,6 +1616,7 @@
 
     const m    = data.liveMatch || data.nextMatch;
     const live = !!data.liveMatch;
+    _isLiveActive = live; // met à jour le flag pour handleMatchCardClick
     if (!m) { document.getElementById('match-competition').textContent = 'Aucun match programmé'; return; }
 
     document.getElementById('match-section-label').textContent = live ? '— Match en cours 🔴' : '— Prochain match';
@@ -1669,8 +1670,11 @@
     }
   }
 
+  // URL absolue Vercel — le site est sur GitHub Pages, les API sur Vercel
+  const VERCEL_API = 'https://newsporto.vercel.app';
+
   function loadData() {
-    fetch('/api/porto-stats')
+    fetch(VERCEL_API + '/api/porto-stats')
       .then(r => r.json())
       .then(data => {
         renderMatch(data);
@@ -2292,7 +2296,7 @@
   }
 
   function refreshLiveModal() {
-    fetch('/api/porto-stats').then(r=>r.json()).then(data=>{
+    fetch(VERCEL_API + '/api/porto-stats').then(r=>r.json()).then(data=>{
       liveModalData = data;
       openLiveModalContent(data);
       const now = new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
@@ -2457,6 +2461,17 @@
     }
     if (document.getElementById('live-modal').style.display !== 'none') {
       openLiveModalContent(data);
+    }
+  };
+
+  // Gestion du clic sur la match card :
+  // → modal live si match en cours, sinon redirection vers match.html
+  let _isLiveActive = false;
+  window.handleMatchCardClick = function() {
+    if (_isLiveActive && window._openLiveModal) {
+      window._openLiveModal();
+    } else {
+      window.location.href = 'match.html';
     }
   };
 
@@ -2716,7 +2731,7 @@
     }
     btn.disabled = true; btn.textContent = '…';
     try {
-      const r = await fetch('/api/subscribe', {
+      const r = await fetch('https://newsporto.vercel.app/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -2770,7 +2785,7 @@
       });
 
       // Envoyer au backend
-      await fetch('/api/subscribe', {
+      await fetch('https://newsporto.vercel.app/api/subscribe', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ pushSubscription: sub.toJSON() }),
