@@ -677,7 +677,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <title>${titleTag}</title>
   <meta name="description" content="${metaDesc}">
   <meta name="keywords" content="${keywords}">
-  <meta name="robots" content="index, follow">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="NewsPorto">
   <meta property="og:title" content="${title} — NewsPorto">
   <meta property="og:description" content="${metaDesc}">
@@ -1017,22 +1017,30 @@ async function publish() {
       console.warn('Notification non envoyée :', e.message);
     }
 
-    // ── ÉTAPE 7 — Ping Google (sitemap + Indexing API) ─────────────────
+    // ── ÉTAPE 7 — Ping Google + agrégateurs + Discover ─────────────────
     try {
-      // Ping sitemap Google
-      await fetch(`https://www.google.com/ping?sitemap=https://newsporto.fr/sitemap.xml`, { mode: 'no-cors' });
-      // Ping sitemap Bing
-      await fetch(`https://www.bing.com/ping?sitemap=https://newsporto.fr/sitemap.xml`, { mode: 'no-cors' });
-    } catch(_) {}
-
-    try {
-      // Google Indexing API via notre backend
       const articleUrl = `https://newsporto.fr/articles/${fileName}`;
+      const sitemapUrl = `https://newsporto.fr/sitemap.xml`;
+      const rssUrl     = `https://newsporto.fr/rss.xml`;
+
+      // Ping sitemap Google + Bing
+      await fetch(`https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`, { mode: 'no-cors' });
+      await fetch(`https://www.bing.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`, { mode: 'no-cors' });
+
+      // Ping Pingomatic (agrège 20+ moteurs dont Technorati, Bloglines, etc.)
+      await fetch(`https://rpc.pingomatic.com/RPC2`, {
+        method: 'POST', mode: 'no-cors',
+        headers: { 'Content-Type': 'text/xml' },
+        body: `<?xml version="1.0"?><methodCall><methodName>weblogUpdates.extendedPing</methodName><params><param><value>NewsPorto</value></param><param><value>https://newsporto.fr</value></param><param><value>${articleUrl}</value></param><param><value>${rssUrl}</value></param></params></methodCall>`
+      });
+
+      // Google Indexing API
       await fetch('/api/google-index', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: articleUrl }),
       });
+
     } catch(_) {}
 
     setPill('gh-status','p-ok','PUBLIÉ ✓');
