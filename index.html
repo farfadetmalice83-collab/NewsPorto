@@ -2689,13 +2689,10 @@
   function maybeShowPopup() {
     // Ne plus jamais afficher si email déjà soumis
     if (localStorage.getItem(EMAIL_KEY)) return;
-    // Pas deux fois dans la même session
-    if (sessionStorage.getItem('np_popup_session')) return;
     setTimeout(() => {
       const popup = document.getElementById('notif-popup');
       if (!popup) return;
       popup.classList.add('show');
-      sessionStorage.setItem('np_popup_session', '1');
       if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
         const pushBtn = document.getElementById('popup-push-btn');
         if (pushBtn) pushBtn.style.display = 'flex';
@@ -2740,7 +2737,6 @@
       msg.textContent = '✓ Abonnement confirmé — check tes emails !';
       msg.className   = 'popup-msg ok';
       localStorage.setItem(EMAIL_KEY, '1'); // ne plus jamais montrer le popup
-      sessionStorage.setItem('np_popup_session', '1');
       input.value = '';
       setTimeout(() => window.closePopup(), 2500);
     } catch {
