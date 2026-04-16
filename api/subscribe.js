@@ -39,7 +39,7 @@ export default async function handler(req, res) {
           subject: '✅ Tu es abonné(e) à NewsPorto !',
           html: `
             <div style="background:#000;color:#fff;font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:40px 32px;">
-              <h1 style="font-family:Georgia,serif;font-size:32px;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">NewsPorto</h1>
+              <div style="text-align:center;margin-bottom:16px;"><img src="https://newsporto.fr/Logo.png" alt="NewsPorto" style="height:64px;width:auto;"></div>
               <p style="color:rgba(255,255,255,0.4);font-size:11px;letter-spacing:3px;text-transform:uppercase;margin-bottom:32px;">Le média FC Porto en français</p>
               <h2 style="font-size:22px;margin-bottom:16px;">Bienvenue dans la communauté 🐉</h2>
               <p style="color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:24px;">
