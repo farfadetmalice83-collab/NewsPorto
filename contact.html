@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+
   <style>
     :root {
       --white: #ffffff;
@@ -688,7 +689,7 @@
       <div class="form-success" id="form-success">
         <div class="form-success-icon">🔵</div>
         <p class="form-success-title">Message envoyé !</p>
-        <p class="form-success-text">Merci pour votre message. Luis le lira dès que possible et vous répondra personnellement sous 48h. Força Porto !</p>
+        <p class="form-success-text">Merci pour votre message. NewsPorto vous répondra personnellement sous 48h. Força Porto !</p>
       </div>
     </div>
 
@@ -783,16 +784,38 @@
   document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
 
   // ── FORM ──
-  function handleSubmit() {
+  async function handleSubmit() {
     const name = document.getElementById('contact-name').value.trim();
     const email = document.getElementById('contact-email').value.trim();
+    const subject = document.getElementById('contact-subject').value;
     const msg = document.getElementById('contact-msg').value.trim();
+
     if (!name || !email || !msg) {
       showToast('Veuillez remplir tous les champs requis.', 'error');
       return;
     }
-    document.getElementById('contact-form-wrapper').style.display = 'none';
-    document.getElementById('form-success').classList.add('visible');
+
+    const btn = document.querySelector('.form-submit');
+    btn.textContent = 'Envoi en cours…';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('https://formspree.io/f/https://formspree.io/f/xyklepwr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name, email, subject: subject || 'Sans sujet', message: msg })
+      });
+      if (res.ok) {
+        document.getElementById('contact-form-wrapper').style.display = 'none';
+        document.getElementById('form-success').classList.add('visible');
+      } else {
+        throw new Error('Erreur serveur');
+      }
+    } catch(e) {
+      btn.textContent = 'Envoyer le message →';
+      btn.disabled = false;
+      showToast("Erreur lors de l'envoi. Réessayez.", 'error');
+    }
   }
 
   // ── MAP LEAFLET + KV ──
