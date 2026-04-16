@@ -30,7 +30,7 @@ async function fetchFD(path) {
 
 async function fetchAF(path) {
   const res = await fetch(`${AF_BASE}${path}`, {
-    headers: { 'x-apisports-key': process.env.API_FOOTBALL_KEY }
+    headers: { 'x-apisports-key': process.env.AF_KEY }
   });
   if (!res.ok) throw new Error(`api-football ${res.status} ${path}`);
   return res.json();
