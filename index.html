@@ -2664,19 +2664,23 @@
 <!-- JS popup + push -->
 <script>
 (function() {
-  const POPUP_DELAY_MS = 4000; // 35 secondes
-  const POPUP_KEY      = 'np_popup_seen';
-  const EMAIL_KEY      = 'np_email_subscribed';
+  const POPUP_DELAY_MS = 4000;
+  const EMAIL_KEY      = 'np_email_subscribed'; // mis à 1 seulement si email soumis
   const PUSH_KEY       = 'np_push_subscribed';
+  // PAS de POPUP_KEY persistant : on utilise sessionStorage pour la session en cours
+  // → le popup revient à chaque nouvelle visite TANT QUE l'email n'est pas enregistré
 
   // ── Afficher le popup après délai ──────────────────────────────────────
   function maybeShowPopup() {
-    if (localStorage.getItem(POPUP_KEY)) return; // déjà vu
+    // Ne plus jamais afficher si email déjà soumis
+    if (localStorage.getItem(EMAIL_KEY)) return;
+    // Pas deux fois dans la même session
+    if (sessionStorage.getItem('np_popup_session')) return;
     setTimeout(() => {
       const popup = document.getElementById('notif-popup');
       if (!popup) return;
       popup.classList.add('show');
-      // Afficher le bouton push si supporté et pas encore activé
+      sessionStorage.setItem('np_popup_session', '1');
       if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
         const pushBtn = document.getElementById('popup-push-btn');
         if (pushBtn) pushBtn.style.display = 'flex';
@@ -2684,12 +2688,11 @@
     }, POPUP_DELAY_MS);
   }
 
-  // ── Fermer le popup ────────────────────────────────────────────────────
+  // ── Fermer le popup (Non merci) ─────────────────────────────────────────
+  // Ne stocke rien en localStorage → reviendra à la prochaine visite
   window.closePopup = function() {
     const popup = document.getElementById('notif-popup');
     if (popup) popup.classList.remove('show');
-    localStorage.setItem(POPUP_KEY, '1');
-    // Afficher le FAB push si push pas encore activé
     if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
       const fab = document.getElementById('push-fab');
       if (fab) fab.classList.add('show');
@@ -2721,7 +2724,8 @@
       if (!r.ok) throw new Error();
       msg.textContent = '✓ Abonnement confirmé — check tes emails !';
       msg.className   = 'popup-msg ok';
-      localStorage.setItem(EMAIL_KEY, '1');
+      localStorage.setItem(EMAIL_KEY, '1'); // ne plus jamais montrer le popup
+      sessionStorage.setItem('np_popup_session', '1');
       input.value = '';
       setTimeout(() => window.closePopup(), 2500);
     } catch {
