@@ -636,7 +636,7 @@
     document.getElementById('state-error').style.display   = 'none';
     document.getElementById('state-content').style.display = 'none';
 
-    fetch('https://newsporto.vercel.app/api/porto-stats')
+    fetch('https://news-porto.vercel.app/api/porto-stats')
       .then(r => { if (!r.ok) throw new Error(`Erreur serveur (HTTP ${r.status})`); return r.json(); })
       .then(data => {
         document.getElementById('state-loading').style.display = 'none';
