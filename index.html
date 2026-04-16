@@ -2327,7 +2327,7 @@
       const events = m.events || [];
       const eventsEl = document.getElementById('ml-events-list');
       if (!events.length) {
-        eventsEl.innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Aucun événement pour l'instant</p>';
+        eventsEl.innerHTML = '<p style="text-align:center;padding:20px 0;font-family:Barlow Condensed,sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">Aucun événement pour l&#39;instant</p>';
       } else {
         const icons = {GOAL:'⚽',YELLOW_CARD:'🟨',RED_CARD:'🟥',SUBSTITUTION:'🔄',OWN_GOAL:'⚽',PENALTY:'⚽'};
         eventsEl.innerHTML = events.slice().reverse().map(e => {
@@ -2727,7 +2727,7 @@
     } catch {
       msg.textContent = 'Erreur, réessaie dans un instant.';
       msg.className   = 'popup-msg err';
-      btn.disabled    = false; btn.textContent = 'S'abonner';
+      btn.disabled    = false; btn.textContent = 'S\'abonner';
     }
   };
 
