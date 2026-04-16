@@ -954,7 +954,7 @@ async function publish() {
 
     // ── ÉTAPE 6 — Envoyer les notifications email + push ──────────────────
     try {
-      await fetch('/api/notify-article', {
+      const notifRes = await fetch('/api/notify-article', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -963,15 +963,21 @@ async function publish() {
           category: cat,
           url:      `articles/${fileName}`,
           imageUrl: coverUrl || null,
-          secret:   localStorage.getItem('np_notify_secret') || '',
         }),
       });
+      if (!notifRes.ok) {
+        const err = await notifRes.json().catch(() => ({}));
+        console.error('notify-article erreur:', notifRes.status, err);
+        toast(`Article publié ✓ — Notif erreur: ${notifRes.status}`, 'ko');
+      } else {
+        toast('Article publié 🎉 — Notifications envoyées aux abonnés !', 'ok');
+      }
     } catch(e) {
       console.warn('Notification non envoyée :', e.message);
+      toast('Article publié ✓ — Notif non envoyée (réseau)', 'ko');
     }
 
     setPill('gh-status','p-ok','PUBLIÉ ✓');
-    toast('Article publié 🎉 — Notifications envoyées aux abonnés !','ok');
 
     // Bouton publier un autre
     $('btn-new-article').style.display='block';
