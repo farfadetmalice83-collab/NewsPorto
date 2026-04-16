@@ -1671,9 +1671,10 @@
 
   function loadData() {
     fetch('/api/porto-stats')
-      .then(r => r.json())
+      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         renderMatch(data);
+        liveModalData = data; // ← FIX : stocke les données pour le modal
         if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
         else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
       })
@@ -2439,26 +2440,31 @@
   }
 
   // Hook into existing renderMatch to store data
-  const _origRenderMatch = window.renderMatch || function(){};
-  window.renderMatch = function(data) {
-    _origRenderMatch(data);
-    liveModalData = data;
-    const mc = document.getElementById('match-card');
-    if (mc) mc.style.cursor = 'pointer';
-    const hint = document.getElementById('click-hint-text');
-    if (hint) {
-      if (data.liveMatch) {
-        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
-        hint.style.color = 'rgba(255,68,68,0.7)';
-      } else {
-        hint.textContent = 'Cliquer pour le calendrier →';
-        hint.style.color = 'rgba(255,255,255,0.2)';
+  // FIX : on wrape renderMatch AVANT que loadData soit rappelé,
+  // mais liveModalData est déjà rempli directement dans loadData ci-dessus.
+  const _origRenderMatch = window.renderMatch;
+  if (_origRenderMatch && !_origRenderMatch._patched) {
+    window.renderMatch = function(data) {
+      _origRenderMatch(data);
+      liveModalData = data;
+      const mc = document.getElementById('match-card');
+      if (mc) mc.style.cursor = 'pointer';
+      const hint = document.getElementById('click-hint-text');
+      if (hint) {
+        if (data.liveMatch) {
+          hint.textContent = '🔴 Cliquer ici pour les stats en direct';
+          hint.style.color = 'rgba(255,68,68,0.7)';
+        } else {
+          hint.textContent = 'Cliquer pour le calendrier →';
+          hint.style.color = 'rgba(255,255,255,0.2)';
+        }
       }
-    }
-    if (document.getElementById('live-modal').style.display !== 'none') {
-      openLiveModalContent(data);
-    }
-  };
+      if (document.getElementById('live-modal').style.display !== 'none') {
+        openLiveModalContent(data);
+      }
+    };
+    window.renderMatch._patched = true;
+  }
 
   window._openLiveModal = function() {
     if (!liveModalData) {
