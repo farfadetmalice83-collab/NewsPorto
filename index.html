@@ -1671,7 +1671,7 @@
   }
 
   // URL absolue Vercel — le site est sur GitHub Pages, les API sur Vercel
-  const VERCEL_API = 'https://newsporto.vercel.app';
+  const VERCEL_API = 'https://news-porto.vercel.app';
 
   function loadData() {
     fetch(VERCEL_API + '/api/porto-stats')
@@ -2731,7 +2731,7 @@
     }
     btn.disabled = true; btn.textContent = '…';
     try {
-      const r = await fetch('https://newsporto.vercel.app/api/subscribe', {
+      const r = await fetch('https://news-porto.vercel.app/api/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -2785,7 +2785,7 @@
       });
 
       // Envoyer au backend
-      await fetch('https://newsporto.vercel.app/api/subscribe', {
+      await fetch('https://news-porto.vercel.app/api/subscribe', {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify({ pushSubscription: sub.toJSON() }),
