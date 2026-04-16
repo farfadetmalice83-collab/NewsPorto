@@ -656,7 +656,7 @@ ${paras}${inlineImg}
   function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
   function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
   function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
-  </script>
+  <\/script>
 </body>
 </html>`;
 }
@@ -779,8 +779,26 @@ async function publish() {
     await delay(400);
     setStep('step-5','done');
 
+    // ── ÉTAPE 6 — Envoyer les notifications email + push ──────────────────
+    try {
+      await fetch('/api/notify-article', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          excerpt,
+          category: cat,
+          url:      `articles/${fileName}`,
+          imageUrl: coverUrl || null,
+          secret:   localStorage.getItem('np_notify_secret') || '',
+        }),
+      });
+    } catch(e) {
+      console.warn('Notification non envoyée :', e.message);
+    }
+
     setPill('gh-status','p-ok','PUBLIÉ ✓');
-    toast('Article publié 🎉 1 seul déploiement déclenché !','ok');
+    toast('Article publié 🎉 — Notifications envoyées aux abonnés !','ok');
 
     // Bouton publier un autre
     $('btn-new-article').style.display='block';
