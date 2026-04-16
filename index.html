@@ -1497,7 +1497,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card" id="match-card" style="cursor:pointer" onclick="window.location.href='match.html';">
+    <div class="match-card reveal-scale" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1537,7 +1537,7 @@
         </div>
       </div>
       <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
-        <button id="click-hint-text" onclick="event.stopPropagation();window.location.href='match.html';" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
+        <button id="click-hint-text" onclick="event.stopPropagation();if(window._openLiveModal)window._openLiveModal();" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1603,7 +1603,6 @@
   let lineupData   = null;
 
   function renderMatch(data) {
-    // ── Stats Liga ──
     const s = data.stats;
     if (s) {
       const gap = s.gapPoints > 0 ? `+${s.gapPoints} pts sur ${s.secondTeam}` : `${s.gapPoints} pts vs ${s.secondTeam}`;
@@ -1615,15 +1614,9 @@
         <div class="stat-cell"><div class="stat-num">${s.points}</div><div class="stat-label">Points</div><div class="stat-sub">Liga Portugal</div></div>`;
     }
 
-    // ── Match card ──
     const m    = data.liveMatch || data.nextMatch;
     const live = !!data.liveMatch;
-
-    if (!m) {
-      document.getElementById('match-competition').textContent = 'Aucun match programmé';
-      document.getElementById('match-score').textContent = '—';
-      return;
-    }
+    if (!m) { document.getElementById('match-competition').textContent = 'Aucun match programmé'; return; }
 
     document.getElementById('match-section-label').textContent = live ? '— Match en cours 🔴' : '— Prochain match';
     document.getElementById('match-competition').textContent = m.competition;
@@ -1636,72 +1629,55 @@
     if (m.homeCrest) { logoHome.src = m.homeCrest; logoHome.style.display = 'block'; }
     if (m.awayCrest) { logoAway.src = m.awayCrest; logoAway.style.display = 'block'; }
 
-    const scoreEl   = document.getElementById('match-score');
+    const scoreEl  = document.getElementById('match-score');
     const liveBadge = document.getElementById('live-badge');
     const liveMin   = document.getElementById('live-minute');
 
     if (live) {
-      // ── LIVE : afficher le score mis à jour ──
       scoreEl.textContent = `${m.homeGoals ?? 0} – ${m.awayGoals ?? 0}`;
-      scoreEl.style.color = '#fff';
-      if (m.status === 'FINISHED') {
-        liveBadge.style.display = 'none';
-        document.getElementById('match-status').textContent = 'Terminé';
-      } else if (m.status === 'HALF_TIME') {
-        liveBadge.style.display = 'block';
-        liveMin.textContent = 'Mi-temps';
-      } else {
+      if (m.status !== 'FINISHED') {
         liveBadge.style.display = 'block';
         liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
+      } else {
+        liveBadge.style.display = 'none';
+        document.getElementById('match-status').textContent = 'Terminé';
       }
-      // Hint → lien match.html
-      const hint = document.getElementById('click-hint-text');
-      if (hint) {
-        hint.textContent = '🔴 Voir les détails →';
-        hint.style.color = 'rgba(255,68,68,0.8)';
-        hint.style.animation = 'blink-hint 1.5s ease infinite';
-      }
-      document.getElementById('match-date').textContent  = '';
-      document.getElementById('match-heure').textContent = '';
     } else {
-      // ── PAS DE MATCH : afficher date/heure du prochain ──
       scoreEl.textContent = 'VS';
-      scoreEl.style.color = '';
       liveBadge.style.display = 'none';
-      document.getElementById('match-status').textContent = '';
       const date = new Date(m.date);
       document.getElementById('match-date').textContent  = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Lisbon' });
       document.getElementById('match-heure').textContent = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
-      const hint = document.getElementById('click-hint-text');
-      if (hint) {
-        hint.textContent = 'Voir le calendrier →';
-        hint.style.color = 'rgba(255,255,255,0.2)';
-        hint.style.animation = 'none';
-      }
     }
 
     if (data.lineup) { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
     else if (live)   { document.getElementById('lineup-cta').style.display = 'block'; }
     else             { document.getElementById('lineup-cta').style.display = 'none'; }
+
+    // Update click hint
+    const hint = document.getElementById('click-hint-text');
+    if (hint) {
+      if (live) {
+        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
+        hint.style.color = 'rgba(255,68,68,0.7)';
+        hint.style.animation = 'blink-hint 1.5s ease infinite';
+      } else {
+        hint.textContent = 'Cliquer pour le calendrier →';
+        hint.style.color = 'rgba(255,255,255,0.2)';
+        hint.style.animation = 'none';
+      }
+    }
   }
 
   function loadData() {
     fetch('/api/porto-stats')
-      .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(r => r.json())
       .then(data => {
         renderMatch(data);
-        // Polling 60s seulement si match en cours (pas terminé)
-        const isLive = data.liveMatch && data.liveMatch.status !== 'FINISHED';
-        if (isLive && !pollInterval) {
-          pollInterval = setInterval(loadData, 60000);
-        } else if (!isLive && pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = null;
-        }
+        if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
+        else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
       })
-      .catch(() => {
-        document.getElementById('match-competition').textContent = 'Données indisponibles';
-      });
+      .catch(() => { document.getElementById('match-competition').textContent = 'Données indisponibles'; });
   }
   loadData();
 
@@ -2525,5 +2501,300 @@
       inner.innerHTML = [...items, ...items].join('');
     }).catch(() => {});
   </script>
+
+<!-- ══ POPUP ABONNEMENT + PUSH NOTIFICATIONS ══════════════════════════════ -->
+
+<!-- CSS popup -->
+<style>
+  /* Popup overlay */
+  #notif-popup {
+    display: none;
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(6px);
+    align-items: center; justify-content: center;
+    animation: fadeInOverlay .3s ease;
+  }
+  #notif-popup.show { display: flex; }
+  @keyframes fadeInOverlay { from{opacity:0} to{opacity:1} }
+
+  .popup-box {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.12);
+    max-width: 480px; width: calc(100% - 40px);
+    padding: 48px 40px;
+    position: relative;
+    animation: slideUpPopup .35s cubic-bezier(.22,1,.36,1);
+  }
+  @keyframes slideUpPopup { from{transform:translateY(24px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  .popup-close {
+    position: absolute; top: 16px; right: 20px;
+    background: none; border: none; color: rgba(255,255,255,0.3);
+    font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+    cursor: pointer; transition: color .2s; line-height: 1;
+  }
+  .popup-close:hover { color: #fff; }
+
+  .popup-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 700;
+    letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.35);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 16px;
+  }
+  .popup-eyebrow::before { content:''; width:16px; height:1px; background:rgba(255,255,255,0.35); }
+
+  .popup-title {
+    font-family: 'Bebas Neue', sans-serif; font-size: 36px; letter-spacing: 1px;
+    line-height: .95; margin-bottom: 14px;
+  }
+  .popup-title span { -webkit-text-stroke: 1.5px rgba(255,255,255,0.4); color: transparent; }
+
+  .popup-desc {
+    font-family: 'Barlow', sans-serif; font-size: 14px; line-height: 1.65;
+    color: rgba(255,255,255,0.55); margin-bottom: 28px;
+  }
+
+  .popup-perks {
+    display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px;
+  }
+  .popup-perk {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 1px; color: rgba(255,255,255,0.7);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .popup-perk-icon { font-size: 16px; }
+
+  .popup-form { display: flex; gap: 0; margin-bottom: 16px; }
+  .popup-input {
+    flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
+    border-right: none; color: #fff; padding: 13px 16px;
+    font-family: 'Barlow', sans-serif; font-size: 14px; outline: none;
+    transition: border-color .2s;
+  }
+  .popup-input::placeholder { color: rgba(255,255,255,0.3); }
+  .popup-input:focus { border-color: rgba(255,255,255,0.4); }
+  .popup-submit {
+    background: #fff; color: #000; border: none; padding: 13px 24px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: .2s;
+    white-space: nowrap;
+  }
+  .popup-submit:hover { background: #e8e8e8; }
+  .popup-submit:disabled { opacity: .5; cursor: not-allowed; }
+
+  .popup-push-btn {
+    width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.6); padding: 12px; cursor: pointer; transition: .2s;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; display: flex;
+    align-items: center; justify-content: center; gap: 8px;
+  }
+  .popup-push-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+
+  .popup-msg {
+    font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 1px;
+    text-transform: uppercase; text-align: center; margin-top: 12px; min-height: 18px;
+  }
+  .popup-msg.ok  { color: #00a86b; }
+  .popup-msg.err { color: #e74c3c; }
+
+  .popup-skip {
+    display: block; text-align: center; margin-top: 16px;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(255,255,255,0.2); cursor: pointer;
+    background: none; border: none;
+  }
+  .popup-skip:hover { color: rgba(255,255,255,0.4); }
+
+  /* Bouton flottant push (affiché après fermeture si push pas activé) */
+  #push-fab {
+    display: none; position: fixed; bottom: 24px; right: 24px; z-index: 9000;
+    background: #003DA5; color: #fff; border: none; border-radius: 50px;
+    padding: 12px 20px; cursor: pointer; gap: 8px; align-items: center;
+    font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 4px 24px rgba(0,61,165,0.5);
+    transition: transform .2s, box-shadow .2s;
+  }
+  #push-fab.show { display: flex; }
+  #push-fab:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(0,61,165,0.7); }
+
+  @media (max-width: 480px) {
+    .popup-box { padding: 36px 24px; }
+    .popup-title { font-size: 28px; }
+    .popup-form { flex-direction: column; }
+    .popup-input { border-right: 1px solid rgba(255,255,255,0.15); border-bottom: none; }
+    .popup-submit { padding: 13px; }
+  }
+</style>
+
+<!-- Popup HTML -->
+<div id="notif-popup">
+  <div class="popup-box">
+    <button class="popup-close" onclick="closePopup()">✕</button>
+
+    <p class="popup-eyebrow">NewsPorto · Rester informé</p>
+    <h2 class="popup-title">Ne rate <span>aucun</span> moment Porto</h2>
+    <p class="popup-desc">Reçois chaque nouvel article et un rappel avant chaque match directement dans ta boîte mail.</p>
+
+    <div class="popup-perks">
+      <div class="popup-perk"><span class="popup-perk-icon">📰</span> Chaque nouvel article publié</div>
+      <div class="popup-perk"><span class="popup-perk-icon">⚽</span> Rappel la veille et le jour du match</div>
+      <div class="popup-perk"><span class="popup-perk-icon">🐉</span> Força Porto, rien d'autre</div>
+    </div>
+
+    <div class="popup-form">
+      <input type="email" id="popup-email" class="popup-input" placeholder="ton@email.com" autocomplete="email">
+      <button class="popup-submit" id="popup-submit-btn" onclick="subscribeEmail()">S'abonner</button>
+    </div>
+
+    <!-- Bouton push (caché sur iOS) -->
+    <button class="popup-push-btn" id="popup-push-btn" onclick="subscribePush()" style="display:none">
+      🔔 Activer les notifications push
+    </button>
+
+    <p class="popup-msg" id="popup-msg"></p>
+    <button class="popup-skip" onclick="closePopup()">Non merci, continuer sans</button>
+  </div>
+</div>
+
+<!-- Bouton flottant push -->
+<button id="push-fab" onclick="subscribePush()">
+  🔔 Notifications
+</button>
+
+<!-- JS popup + push -->
+<script>
+(function() {
+  const POPUP_DELAY_MS = 35000; // 35 secondes
+  const POPUP_KEY      = 'np_popup_seen';
+  const EMAIL_KEY      = 'np_email_subscribed';
+  const PUSH_KEY       = 'np_push_subscribed';
+
+  // ── Afficher le popup après délai ──────────────────────────────────────
+  function maybeShowPopup() {
+    if (localStorage.getItem(POPUP_KEY)) return; // déjà vu
+    setTimeout(() => {
+      const popup = document.getElementById('notif-popup');
+      if (!popup) return;
+      popup.classList.add('show');
+      // Afficher le bouton push si supporté et pas encore activé
+      if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
+        const pushBtn = document.getElementById('popup-push-btn');
+        if (pushBtn) pushBtn.style.display = 'flex';
+      }
+    }, POPUP_DELAY_MS);
+  }
+
+  // ── Fermer le popup ────────────────────────────────────────────────────
+  window.closePopup = function() {
+    const popup = document.getElementById('notif-popup');
+    if (popup) popup.classList.remove('show');
+    localStorage.setItem(POPUP_KEY, '1');
+    // Afficher le FAB push si push pas encore activé
+    if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
+      const fab = document.getElementById('push-fab');
+      if (fab) fab.classList.add('show');
+    }
+  };
+
+  // Fermer en cliquant l'overlay
+  document.getElementById('notif-popup')?.addEventListener('click', function(e) {
+    if (e.target === this) window.closePopup();
+  });
+
+  // ── S'abonner par email ─────────────────────────────────────────────────
+  window.subscribeEmail = async function() {
+    const input = document.getElementById('popup-email');
+    const btn   = document.getElementById('popup-submit-btn');
+    const msg   = document.getElementById('popup-msg');
+    const email = input?.value?.trim();
+
+    if (!email || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+      msg.textContent = 'Adresse email invalide'; msg.className = 'popup-msg err'; return;
+    }
+    btn.disabled = true; btn.textContent = '…';
+    try {
+      const r = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!r.ok) throw new Error();
+      msg.textContent = '✓ Abonnement confirmé — check tes emails !';
+      msg.className   = 'popup-msg ok';
+      localStorage.setItem(EMAIL_KEY, '1');
+      input.value = '';
+      setTimeout(() => window.closePopup(), 2500);
+    } catch {
+      msg.textContent = 'Erreur, réessaie dans un instant.';
+      msg.className   = 'popup-msg err';
+      btn.disabled    = false; btn.textContent = 'S'abonner';
+    }
+  };
+
+  // Soumettre avec Entrée
+  document.getElementById('popup-email')?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') window.subscribeEmail();
+  });
+
+  // ── Activer les notifications push ─────────────────────────────────────
+  window.subscribePush = async function() {
+    const btn = document.getElementById('popup-push-btn') || document.getElementById('push-fab');
+    const msg = document.getElementById('popup-msg');
+
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+      if (msg) { msg.textContent = 'Push non supporté sur ce navigateur.'; msg.className = 'popup-msg err'; }
+      return;
+    }
+
+    try {
+      // Demander permission
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') {
+        if (msg) { msg.textContent = 'Permission refusée.'; msg.className = 'popup-msg err'; }
+        return;
+      }
+
+      // Enregistrer le service worker
+      const reg = await navigator.serviceWorker.register('/sw.js');
+      await navigator.serviceWorker.ready;
+
+      // Souscrire au push
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly:      true,
+        applicationServerKey: urlBase64ToUint8Array('BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjZkr8Zs4Wd-2oUleSvf5f7z0amc0'),
+        // ↑ Remplacer par ta VAPID_PUBLIC_KEY une fois générée
+      });
+
+      // Envoyer au backend
+      await fetch('/api/subscribe', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ pushSubscription: sub.toJSON() }),
+      });
+
+      localStorage.setItem(PUSH_KEY, '1');
+      if (msg) { msg.textContent = '✓ Notifications activées !'; msg.className = 'popup-msg ok'; }
+      document.getElementById('popup-push-btn').style.display = 'none';
+      document.getElementById('push-fab').classList.remove('show');
+
+    } catch (err) {
+      console.error('Push error:', err);
+      if (msg) { msg.textContent = 'Erreur push : ' + err.message; msg.className = 'popup-msg err'; }
+    }
+  };
+
+  // Helper VAPID
+  function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - base64String.length % 4) % 4);
+    const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw     = atob(base64);
+    return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+  }
+
+  // ── Init ────────────────────────────────────────────────────────────────
+  maybeShowPopup();
+})();
+</script>
+
 </body>
 </html>
