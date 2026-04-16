@@ -220,6 +220,25 @@
           </div>
           <button class="btn btn-w btn-or" id="btn-rewrite" onclick="rewrite()">🌟 Reformuler avec Mistral</button>
         </div>
+
+        <!-- TITRE SEO SUGGÉRÉ -->
+        <div id="seo-title-box" style="display:none;margin-top:16px;border:1px solid rgba(0,168,107,.25);background:rgba(0,168,107,.04);padding:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--green);">💡 Titre SEO conseillé par Mistral</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);">Optimisé 50-60 car. · Mots-clés · Audience FR</span>
+          </div>
+          <div id="seo-title-output" style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:.5px;color:var(--white);padding:12px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);line-height:1.2;"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;flex-wrap:wrap;gap:8px;">
+            <span id="seo-title-len" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);">0 caractères</span>
+            <button class="btn" style="font-size:10px;padding:8px 16px;" onclick="useSuggestedTitle()">Utiliser ce titre ✓</button>
+          </div>
+          <!-- Alternatives -->
+          <div id="seo-alts-box" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+            <p style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:10px;">Alternatives :</p>
+            <div id="seo-alts-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+        </div>
+
         <div class="result-text" id="groq-output"></div>
         <div id="groq-actions" style="display:none;margin-top:12px;gap:8px;flex-wrap:wrap">
           <button class="btn" onclick="useRewritten()">Utiliser ce texte ✓</button>
@@ -422,7 +441,7 @@ async function rewrite() {
   const source = $('f-source').value.trim();
   const title  = $('f-title').value.trim();
   const cat    = $('f-cat').value;
-  if (!key)    { toast('Clé Groq manquante','ko'); return; }
+  if (!key)    { toast('Clé Mistral manquante','ko'); return; }
   if (!source) { toast('Texte source vide','ko'); return; }
 
   $('btn-rewrite').disabled=true;
@@ -430,8 +449,11 @@ async function rewrite() {
   $('groq-output').className='result-text';
   $('groq-output').textContent='';
   $('groq-actions').style.display='none';
+  $('seo-title-box').style.display='none';
 
   const context = $('f-context').value.trim();
+
+  // ── PROMPT PRINCIPAL (texte article) ──
   const sys=`Tu es le rédacteur principal de NewsPorto, le média de référence des fans du FC Porto en France.
 Style : percutant, passionné, journalistique, parfaitement en français.
 Catégorie : ${catLabels[cat]||cat||'Actualité'}.${title?` Titre : "${title}".`:''}
@@ -454,34 +476,114 @@ Règles rédactionnelles :
 - Paragraphes séparés par deux sauts de ligne
 - OBLIGATOIREMENT 800 mots minimum — compte tes mots, ne termine pas avant d'avoir atteint 800 mots
 - FORMAT TEXTE BRUT UNIQUEMENT : pas de Markdown, pas de **, pas de *, pas de #, pas de tirets de liste, pas de tirets longs (—) entre deux phrases ou en début de phrase. Texte brut uniquement, paragraphes séparés par une ligne vide.
+- STRUCTURE SEO OBLIGATOIRE : organise l'article en blocs thématiques clairs. Avant chaque nouveau bloc thématique (tous les 2-3 paragraphes environ), insère une ligne contenant UNIQUEMENT un titre de section entre balises [H2]Titre du bloc[/H2] ou [H3]Sous-titre[/H3]. Ces balises seront converties en vrais titres HTML.
 
 Règles SEO :
 - Intègre naturellement "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
 - Le premier paragraphe contient les mots clés principaux
 - Termine par une phrase engageante qui incite à suivre newsporto.fr (seule mention du site)`;
 
+  // ── PROMPT TITRE SEO ──
+  const sysTitre=`Tu es expert SEO pour newsporto.fr, média foot francophone sur le FC Porto.
+Ta mission : générer des titres d'articles optimisés SEO pour un public français passionné de foot.
+
+RÈGLES POUR LE TITRE PRINCIPAL :
+- Entre 50 et 65 caractères MAXIMUM (compte précisément)
+- Contient le mot-clé principal (nom joueur, compétition, ou sujet)
+- Contient "FC Porto" ou "Porto" si pertinent
+- Accrocheur, donne envie de cliquer
+- Style titre de presse sportive française
+- PAS de point final
+- PAS de guillemets
+
+RÈGLES POUR LES ALTERNATIVES :
+- Génère exactement 2 alternatives
+- Chacune entre 45 et 65 caractères
+- Styles différents (une factuelle, une émotionnelle)
+
+FORMAT DE RÉPONSE — JSON STRICT, rien d'autre :
+{"principal":"Titre principal ici","alternatives":["Alternative 1","Alternative 2"]}`;
+
   try {
-    const r = await fetch('https://api.mistral.ai/v1/chat/completions',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
-      body:JSON.stringify({model:'mistral-large-latest',max_tokens:2048,temperature:0.72,
-        messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
-    });
-    if(!r.ok){const e=await r.json();throw new Error(e.error?.message||`HTTP ${r.status}`);}
-    const d=await r.json();
-    const raw=d.choices?.[0]?.message?.content||'';
+    // Appels parallèles : texte + titre
+    const [rText, rTitle] = await Promise.all([
+      fetch('https://api.mistral.ai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({model:'mistral-large-latest',max_tokens:2048,temperature:0.72,
+          messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
+      }),
+      fetch('https://api.mistral.ai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({model:'mistral-large-latest',max_tokens:256,temperature:0.6,
+          messages:[{role:'system',content:sysTitre},{role:'user',content:`Sujet de l'article :\nCatégorie : ${catLabels[cat]||cat}\n${title?`Titre actuel : "${title}"\n`:''}Résumé source :\n${source.slice(0,600)}`}]})
+      })
+    ]);
+
+    // Traitement texte
+    if(!rText.ok){const e=await rText.json();throw new Error(e.error?.message||`HTTP ${rText.status}`);}
+    const dText=await rText.json();
+    const raw=dText.choices?.[0]?.message?.content||'';
     const text=raw.replace(/\*\*(.*?)\*\*/g,'$1').replace(/\*(.*?)\*/g,'$1').replace(/^#{1,6}\s+/gm,'').replace(/^[-*]\s+/gm,'');
     $('groq-output').textContent=text;
     $('groq-output').className='result-text on';
-    setPill('groq-status','p-ok','TERMINÉ');
     $('groq-actions').style.display='flex';
-    toast('Reformulation Mistral réussie ✓','ok');
+
+    // Traitement titre SEO
+    if(rTitle.ok) {
+      const dTitle=await rTitle.json();
+      const rawTitle=(dTitle.choices?.[0]?.message?.content||'').trim();
+      try {
+        const clean=rawTitle.replace(/```json|```/g,'').trim();
+        const parsed=JSON.parse(clean);
+        const principal=parsed.principal||'';
+        const alts=parsed.alternatives||[];
+
+        // Afficher le titre principal
+        $('seo-title-output').textContent=principal;
+        $('seo-title-len').textContent=`${principal.length} caractères ${principal.length<=65?'✓':'⚠ trop long'}`;
+        $('seo-title-len').style.color=principal.length<=65?'rgba(0,168,107,.8)':'rgba(240,165,0,.8)';
+        $('seo-title-box').style.display='block';
+
+        // Afficher les alternatives
+        if(alts.length) {
+          $('seo-alts-list').innerHTML=alts.map((a,i)=>`
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.03);border:1px solid var(--border);">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);flex-shrink:0;">Option ${i+2}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,.7);flex:1;">${a}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,.25);">${a.length} car.</span>
+              <button class="btn" style="font-size:9px;padding:5px 10px;flex-shrink:0;" onclick="useSuggestedTitleAlt('${a.replace(/'/g,"\\'")}')">Utiliser</button>
+            </div>`).join('');
+          $('seo-alts-box').style.display='block';
+        }
+      } catch(_) {
+        // Si JSON invalide, afficher brut
+        $('seo-title-output').textContent=rawTitle.slice(0,80);
+        $('seo-title-len').textContent=`${rawTitle.length} caractères`;
+        $('seo-title-box').style.display='block';
+      }
+    }
+
+    setPill('groq-status','p-ok','TERMINÉ');
+    toast('Reformulation + titre SEO générés ✓','ok');
   } catch(e) {
     setPill('groq-status','p-err','ERREUR');
     $('groq-output').textContent=`Erreur : ${e.message}`;
     $('groq-output').className='result-text on';
     toast('Erreur Mistral : '+e.message,'ko');
   } finally { $('btn-rewrite').disabled=false; }
+}
+
+function useSuggestedTitle() {
+  const t=$('seo-title-output').textContent.trim();
+  if(!t)return;
+  $('f-title').value=t; cc('f-title','c-title',120); updatePreview(); updateChecklist();
+  toast('Titre SEO appliqué ✓','ok');
+}
+function useSuggestedTitleAlt(t) {
+  $('f-title').value=t; cc('f-title','c-title',120); updatePreview(); updateChecklist();
+  toast('Titre alternatif appliqué ✓','ok');
 }
 
 function useRewritten() {
@@ -496,36 +598,102 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   const catLabel=catLabels[cat]||cat;
   const year=new Date().getFullYear();
   const isoDate=new Date().toISOString();
+
+  // ── SEO : title tag enrichi (50-65 car.) ──
+  const titleTag=`${title} — FC Porto · NewsPorto`;
+
+  // ── SEO : meta description enrichie ──
+  const metaDesc=excerpt.length>155?excerpt.slice(0,152)+'…':excerpt;
+
+  // ── SEO : mots-clés keywords ──
+  const keywords=`FC Porto, Porto, ${catLabel}, newsporto.fr, Liga Portugal, football portugais, Dragons`;
+
+  // ── SEO : Schema.org NewsArticle complet ──
   const schema=JSON.stringify({
     "@context":"https://schema.org","@type":"NewsArticle",
-    "headline":title,"description":excerpt,"image":[coverUrl],
+    "headline":title,
+    "description":metaDesc,
+    "image":[coverUrl],
     "datePublished":isoDate,"dateModified":isoDate,
-    "author":[{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
-    "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png"}},
+    "author":[{"@type":"Person","name":"Luis","url":"https://newsporto.fr/contact.html"},{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
+    "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png","width":200,"height":60}},
     "mainEntityOfPage":{"@type":"WebPage","@id":"https://newsporto.fr/articles/"+slug+".html"},
-    "articleSection":catLabel,"inLanguage":"fr-FR"
+    "articleSection":catLabel,
+    "inLanguage":"fr-FR",
+    "keywords":keywords,
+    "wordCount":body.split(/\s+/).length,
+    "timeRequired":"PT"+readTime+"M"
   });
   const schemaTag='<script type="application/ld+json">'+schema+'<\/script>';
-  const parasArr=body.split(/\n\n+/).filter(p=>p.trim()).map((p,i)=>
-    `      <p${i===0?' class="dc"':''}>${p.trim().replace(/\n/g,'<br>')}</p>`
-  );
-  const inlineFig=inlineUrl?`\n      <figure class="afig">\n        <img src="${inlineUrl}" alt="${title}" loading="lazy">\n      </figure>`:'';
-  if(inlineFig){parasArr.splice(Math.min(3,parasArr.length-1),0,inlineFig);}
+
+  // ── SEO : BreadcrumbList schema ──
+  const breadcrumbSchema=JSON.stringify({
+    "@context":"https://schema.org","@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"Accueil","item":"https://newsporto.fr/"},
+      {"@type":"ListItem","position":2,"name":"Actualités","item":"https://newsporto.fr/actu.html"},
+      {"@type":"ListItem","position":3,"name":title,"item":"https://newsporto.fr/articles/"+slug+".html"}
+    ]
+  });
+  const breadcrumbTag='<script type="application/ld+json">'+breadcrumbSchema+'<\/script>';
+
+  // ── Traitement corps : conversion [H2]…[/H2] et [H3]…[/H3] en vrais titres HTML ──
+  // Puis séparation en paragraphes
+  const bodyWithHeaders = body
+    .replace(/\[H2\](.*?)\[\/H2\]/g, '\n\n__H2__$1__/H2__\n\n')
+    .replace(/\[H3\](.*?)\[\/H3\]/g, '\n\n__H3__$1__/H3__\n\n');
+
+  const blocksRaw = bodyWithHeaders.split(/\n\n+/).filter(p=>p.trim());
+  let parasArr = [];
+  let imgInserted = false;
+
+  blocksRaw.forEach((block, i) => {
+    const trimmed = block.trim();
+    if (trimmed.startsWith('__H2__') && trimmed.endsWith('__/H2__')) {
+      const headText = trimmed.replace('__H2__','').replace('__/H2__','').trim();
+      parasArr.push(`      <h2 class="a-h2">${headText}</h2>`);
+    } else if (trimmed.startsWith('__H3__') && trimmed.endsWith('__/H3__')) {
+      const headText = trimmed.replace('__H3__','').replace('__/H3__','').trim();
+      parasArr.push(`      <h3 class="a-h3">${headText}</h3>`);
+    } else {
+      parasArr.push(`      <p${i===0?' class="dc"':''}>${trimmed.replace(/\n/g,'<br>')}</p>`);
+      // Insérer l'image inline après le 3e paragraphe de texte (pas header)
+      if (!imgInserted && inlineUrl) {
+        const textParas = parasArr.filter(p => p.trim().startsWith('<p')).length;
+        if (textParas === 3) {
+          parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${title} — FC Porto" loading="lazy">\n      </figure>`);
+          imgInserted = true;
+        }
+      }
+    }
+  });
+
   const paras=parasArr.join('\n');
-  const inlineImg='';
 
   return `<!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title} — NewsPorto</title>
-  <meta name="description" content="${excerpt}">
-  <meta property="og:title" content="${title}">
-  <meta property="og:description" content="${excerpt}">
+  <title>${titleTag}</title>
+  <meta name="description" content="${metaDesc}">
+  <meta name="keywords" content="${keywords}">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="NewsPorto">
+  <meta property="og:title" content="${title} — NewsPorto">
+  <meta property="og:description" content="${metaDesc}">
   <meta property="og:image" content="${coverUrl}">
+  <meta property="og:image:alt" content="${title} — FC Porto">
   <meta property="og:type" content="article">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="NewsPorto">
+  <meta property="og:url" content="https://newsporto.fr/articles/${slug}.html">
+  <meta property="article:published_time" content="${isoDate}">
+  <meta property="article:section" content="${catLabel}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@NewsPortoFR">
+  <meta name="twitter:title" content="${title} — NewsPorto">
+  <meta name="twitter:description" content="${metaDesc}">
+  <meta name="twitter:image" content="${coverUrl}">
   <link rel="canonical" href="https://newsporto.fr/articles/${slug}.html">
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -535,6 +703,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   ${schemaTag}
+  ${breadcrumbTag}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -556,10 +725,15 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     .acat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
     .atit{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
     .amet{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
+    .abread{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+    .abread a{color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}.abread a:hover{color:rgba(255,255,255,.6)}
+    .abread span{color:rgba(255,255,255,.15)}
     .aly{display:grid;grid-template-columns:1fr 320px}
     .abdy{padding:48px 48px;border-right:1px solid var(--border)}
     .abdy p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
     .abdy p.dc::first-letter{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;float:left;margin-right:10px;color:var(--white)}
+    .a-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,3vw,36px);letter-spacing:.5px;line-height:1;color:var(--white);margin:40px 0 20px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
+    .a-h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.75);margin:28px 0 14px}
     .apull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
     .afig{float:left;margin:8px 28px 16px 0;border:1px solid var(--border);max-width:420px;width:45%}
     .afig img{width:100%;display:block;opacity:.85}
@@ -588,7 +762,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}}
+    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.abread{padding:12px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}}
   </style>
 </head>
 <body>
@@ -596,13 +770,22 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <div class="pg">
     <nav>
       <a href="../index.html" class="nlogo">
-        <img src="../Logo.png" alt="NewsPorto" onerror="this.style.display='none'">
+        <img src="../Logo.png" alt="NewsPorto — Actualité FC Porto" onerror="this.style.display='none'">
         <span class="nlogt">NewsPorto</span>
       </a>
       <a href="../actu.html" class="bk">← Actualités</a>
     </nav>
+    <nav class="abread" aria-label="Fil d'Ariane">
+      <a href="../index.html">Accueil</a>
+      <span>›</span>
+      <a href="../actu.html">Actualités</a>
+      <span>›</span>
+      <span>${catLabel}</span>
+      <span>›</span>
+      <span style="color:rgba(255,255,255,.5)">${title.length>50?title.slice(0,47)+'…':title}</span>
+    </nav>
     <section class="hero">
-      <img src="${coverUrl}" alt="${title}" loading="eager">
+      <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager" width="1200" height="630">
       <div class="hov"></div>
       <div class="hbd">
         <p class="acat">${catLabel}</p>
@@ -611,42 +794,49 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       </div>
     </section>
     <div class="aly">
-      <article class="abdy">
+      <article class="abdy" itemscope itemtype="https://schema.org/NewsArticle">
+        <meta itemprop="headline" content="${title}">
+        <meta itemprop="datePublished" content="${isoDate}">
+        <meta itemprop="author" content="NewsPorto">
+        <meta itemprop="publisher" content="NewsPorto">
         <div class="apull">${excerpt}</div>
-${paras}${inlineImg}
+${paras}
+        <div class="afig-clear"></div>
       </article>
-      <div class="art-actions">
-        <button class="btn-like" id="btn-like" onclick="toggleLike()">
-          <span class="like-ico">🤍</span>
-          <span id="like-label">J'aime</span>
-        </button>
-        <div class="share-btns">
-          <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="X">𝕏</a>
-          <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="WhatsApp">💬</a>
-          <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Facebook">f</a>
-          <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
+      <div>
+        <div class="art-actions">
+          <button class="btn-like" id="btn-like" onclick="toggleLike()">
+            <span class="like-ico">🤍</span>
+            <span id="like-label">J'aime</span>
+          </button>
+          <div class="share-btns">
+            <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="Partager sur X">𝕏</a>
+            <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="Partager sur WhatsApp">💬</a>
+            <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Partager sur Facebook">f</a>
+            <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
+          </div>
         </div>
+        <aside class="asb" aria-label="Articles recommandés">
+          <p class="sbl">À la une</p>
+          <div id="sidebar-articles"></div>
+          <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
+        </aside>
       </div>
-      <aside class="asb">
-        <p class="sbl">À la une</p>
-        <div id="sidebar-articles"></div>
-        <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
-      </aside>
     </div>
     <footer>
       <span class="fn">NewsPorto</span>
-      <span class="fc">© ${year} NewsPorto · Fan Media</span>
+      <span class="fc">© ${year} NewsPorto · Fan Media Indépendant FC Porto</span>
     </footer>
   </div>
   <script>
-  fetch('articlestotal.json').then(r=>r.json()).then(data=>{
+  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
     const articles=(data.articles||[]).slice(0,5);
     const currentFile=window.location.pathname.split('/').pop();
     const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
     const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
     const el=document.getElementById('sidebar-articles');
     if(!el||!filtered.length)return;
-    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
     el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
   }).catch(()=>{});
   const likeKey='np_like_'+window.location.pathname;
@@ -825,6 +1015,7 @@ function resetForm() {
   $('prev-excerpt').textContent="L'extrait apparaîtra ici…";
   $('groq-output').className='result-text'; $('groq-output').textContent='';
   $('groq-actions').style.display='none';
+  $('seo-title-box').style.display='none'; $('seo-title-output').textContent=''; $('seo-alts-box').style.display='none'; $('seo-alts-list').innerHTML='';
   $('btn-new-article').style.display='none';
   setPill('gh-status','p-idle','EN ATTENTE');
   setPill('groq-status','p-idle','PRÊT');
