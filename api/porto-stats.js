@@ -157,6 +157,10 @@ async function findAFFixtureId(lm) {
 // ── Handler principal ────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.status(200).end();
   try {
 
     // ── 1. Données football-data.org (classement + matchs) ──────────────────
@@ -309,7 +313,6 @@ export default async function handler(req, res) {
     // Cache : 120s si match en cours (aligne avec le poll frontend), 300s sinon
     const isLive = liveMatch && liveMatch.status !== 'FINISHED';
     res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Cache-Control', `public, max-age=${isLive ? 120 : 300}, s-maxage=${isLive ? 120 : 300}`);
 
     res.status(200).json({
