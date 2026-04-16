@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsPorto — Contact & À propos</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #ffffff;
+      --off-white: #e8e8e8;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.1);
+      --grid-color: rgba(255,255,255,0.055);
+      --blue: #003DA5;
+      --blue-glow: rgba(0,61,165,0.25);
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: #000;
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BG ── */
+    .grid-bg {
+      position: fixed; inset: 0; z-index: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px;
+      animation: gridScroll 12s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridScroll {
+      0%   { background-position: 0 0; }
+      100% { background-position: 44px 44px; }
+    }
+
+    /* ── CURSOR GLOW ── */
+    #cursor-glow {
+      position: fixed; pointer-events: none; z-index: 0;
+      width: 480px; height: 480px;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--blue-glow) 0%, transparent 65%);
+      transform: translate(-50%, -50%);
+      transition: left .12s ease, top .12s ease;
+    }
+
+    .page { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 48px; height: 72px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.5);
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text {
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      letter-spacing: 3px; color: var(--white);
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+      font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--gray); text-decoration: none; transition: color .2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--white); }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--white); color: var(--white);
+      background: transparent; padding: 8px 20px; cursor: pointer;
+      text-decoration: none; transition: background .2s, color .2s;
+    }
+    .nav-cta:hover { background: var(--white); color: #000; }
+
+    /* ── HAMBURGER MOBILE ── */
+    .nav-hamburger {
+      display: none; flex-direction: column; gap: 5px;
+      background: none; border: none; cursor: pointer; padding: 4px;
+    }
+    .nav-hamburger span { width: 24px; height: 2px; background: var(--white); display: block; transition: .3s; }
+
+    /* ── REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── PAGE HEADER ── */
+    .page-header {
+      padding: 80px 48px 64px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      opacity: 0.5;
+    }
+    .page-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 18px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .page-eyebrow::before {
+      content: ''; display: block; width: 28px; height: 1px; background: var(--gray);
+    }
+    .page-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 7vw, 96px);
+      line-height: .92; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .page-title .outline {
+      -webkit-text-stroke: 1.5px var(--white); color: transparent;
+    }
+    .page-subtitle {
+      font-size: 16px; line-height: 1.65; color: rgba(255,255,255,0.55);
+      max-width: 560px;
+      font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+      font-size: 13px; text-transform: uppercase; font-weight: 600;
+    }
+
+    /* ── MAIN WRAPPER ── */
+    .contact-wrapper {
+      max-width: 1200px; margin: 0 auto;
+      padding: 80px 48px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+
+    /* ── À PROPOS ── */
+    .about-section {}
+    .section-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 4px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 24px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::before { content: ''; width: 28px; height: 1px; background: var(--gray); display: block; }
+
+    .about-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 42px;
+      letter-spacing: 1px; line-height: 1; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    .about-title .outline { -webkit-text-stroke: 1px var(--white); color: transparent; }
+
+    /* Luis card */
+    .luis-card {
+      border: 1px solid var(--border);
+      padding: 28px;
+      margin-bottom: 32px;
+      background: rgba(255,255,255,0.02);
+      position: relative;
+      overflow: hidden;
+    }
+    .luis-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--blue), transparent);
+    }
+    .luis-header {
+      display: flex; align-items: center; gap: 18px; margin-bottom: 20px;
+    }
+    .luis-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, #001f5c, #003DA5);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Bebas Neue', sans-serif; font-size: 22px;
+      color: var(--white); flex-shrink: 0;
+    }
+    .luis-info {}
+    .luis-name {
+      font-family: 'Bebas Neue', sans-serif; font-size: 24px;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .luis-role {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gray);
+    }
+    .luis-text {
+      font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.65);
+      margin-bottom: 16px;
+    }
+    .tasks-list {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px;
+    }
+    .task-tag {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--border); padding: 5px 12px;
+      color: var(--gray); background: rgba(255,255,255,0.03);
+    }
+
+    /* Survival block */
+    .survival-block {
+      border: 1px solid rgba(0,61,165,0.35);
+      background: rgba(0,61,165,0.06);
+      padding: 28px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .survival-block::before {
+      content: '';
+      position: absolute; top: 0; left: 0; bottom: 0; width: 2px;
+      background: var(--blue);
+    }
+    .survival-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .survival-title svg { opacity: 0.7; }
+    .survival-text {
+      font-size: 14px; line-height: 1.75; color: rgba(255,255,255,0.65);
+      margin-bottom: 20px;
+    }
+    .survival-actions {
+      display: flex; gap: 12px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 14px 28px; background: var(--white); color: #000;
+      text-decoration: none; border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      flex-shrink: 0;
+    }
+    .btn-primary:hover { background: var(--off-white); transform: translateY(-1px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 13px 28px; background: transparent; color: var(--white);
+      text-decoration: none; border: 1px solid var(--white); cursor: pointer;
+      transition: background .2s, color .2s, transform .15s;
+      flex-shrink: 0;
+    }
+    .btn-secondary:hover { background: var(--white); color: #000; transform: translateY(-1px); }
+    .btn-donate {
+      background: linear-gradient(135deg, #003DA5, #0050cc);
+      color: var(--white) !important;
+      border: none !important;
+      box-shadow: 0 0 20px rgba(0,61,165,0.4);
+    }
+    .btn-donate:hover { background: linear-gradient(135deg, #0050cc, #0062e6) !important; color: var(--white) !important; }
+
+    /* Stats row */
+    .media-stats {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+    .media-stat {
+      padding: 20px; border-right: 1px solid var(--border);
+      text-align: center;
+    }
+    .media-stat:last-child { border-right: none; }
+    .media-stat-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+      letter-spacing: 1px; display: block; margin-bottom: 4px;
+    }
+    .media-stat-label {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    /* ── CONTACT FORM ── */
+    .contact-section {}
+    .contact-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 42px;
+      letter-spacing: 1px; line-height: 1; text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-group label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 10px;
+      font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: var(--gray); margin-bottom: 8px;
+    }
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%; background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border); color: var(--white);
+      font-family: 'Barlow', sans-serif; font-size: 14px;
+      padding: 14px 16px;
+      transition: border-color .2s, background .2s;
+      outline: none; appearance: none;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      border-color: rgba(0,61,165,0.6);
+      background: rgba(0,61,165,0.05);
+    }
+    .form-group textarea { resize: vertical; min-height: 120px; }
+    .form-group select option { background: #111; color: var(--white); }
+
+    .form-submit {
+      width: 100%;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+      padding: 16px; background: var(--white); color: #000;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+    }
+    .form-submit:hover { background: var(--off-white); transform: translateY(-1px); }
+
+    .form-note {
+      font-size: 12px; color: var(--gray); margin-top: 14px;
+      font-family: 'Barlow Condensed', sans-serif; letter-spacing: 1px;
+      line-height: 1.5;
+    }
+
+    /* Socials */
+    .socials-row {
+      display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;
+    }
+    .social-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      border: 1px solid var(--border); padding: 8px 16px;
+      color: var(--gray); text-decoration: none;
+      transition: color .2s, border-color .2s;
+    }
+    .social-pill:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+    .social-pill svg { flex-shrink: 0; }
+
+    /* ── MAP SECTION ── */
+    .survival-map-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+      margin-top: 48px;
+    }
+    .map-right { position: relative; }
+    @media (max-width: 900px) {
+      .survival-map-grid { grid-template-columns: 1fr; }
+    }
+    .map-header {
+      max-width: 1200px; margin: 0 auto 48px;
+      display: flex; align-items: flex-end; justify-content: space-between; gap: 24px;
+    }
+    .map-title-block {}
+    .map-main-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 4vw, 56px);
+      letter-spacing: 1px; text-transform: uppercase; line-height: 1;
+    }
+    .map-main-title .outline { -webkit-text-stroke: 1px var(--white); color: transparent; }
+    .map-desc {
+      font-size: 14px; line-height: 1.7; color: rgba(255,255,255,0.55); margin-top: 12px;
+      max-width: 480px;
+    }
+    .map-info {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray); text-align: right;
+    }
+    .map-info strong { color: var(--white); font-size: 28px; font-family: 'Bebas Neue', sans-serif; display: block; letter-spacing: 1px; }
+
+    .map-container {
+      max-width: 1200px; margin: 0 auto;
+      position: relative;
+      border: 1px solid var(--border);
+      background: rgba(0,20,60,0.15);
+      overflow: hidden;
+    }
+    .map-container::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--blue), transparent);
+      z-index: 2;
+    }
+
+    #world-map-svg {
+      width: 100%; height: auto; display: block;
+    }
+    #world-map-svg .land {
+      fill: rgba(255,255,255,0.07);
+      stroke: rgba(255,255,255,0.15);
+      stroke-width: 0.5;
+      transition: fill .2s;
+    }
+    #world-map-svg .land:hover { fill: rgba(0,61,165,0.2); }
+
+    .map-pin {
+      position: absolute;
+      width: 10px; height: 10px;
+      transform: translate(-50%, -50%);
+      cursor: default;
+    }
+    .map-pin-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 8px rgba(0,61,165,0.8), 0 0 2px rgba(0,61,165,1);
+      position: relative; z-index: 1;
+      animation: pinPulse 2.5s ease-in-out infinite;
+    }
+    .map-pin-dot::after {
+      content: '';
+      position: absolute; inset: -4px;
+      border-radius: 50%;
+      border: 1px solid rgba(0,61,165,0.4);
+      animation: pinRing 2.5s ease-in-out infinite;
+    }
+    @keyframes pinPulse {
+      0%, 100% { box-shadow: 0 0 8px rgba(0,61,165,0.8); }
+      50% { box-shadow: 0 0 16px rgba(0,61,165,1), 0 0 4px #fff; }
+    }
+    @keyframes pinRing {
+      0% { transform: scale(1); opacity: 0.8; }
+      100% { transform: scale(2.5); opacity: 0; }
+    }
+
+    /* Click ripple */
+    .map-click-zone {
+      position: absolute; inset: 0; z-index: 5; cursor: crosshair;
+    }
+    .map-ripple {
+      position: absolute; width: 40px; height: 40px;
+      border-radius: 50%; border: 1px solid rgba(255,255,255,0.5);
+      transform: translate(-50%,-50%) scale(0);
+      animation: rippleOut .5s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes rippleOut {
+      to { transform: translate(-50%,-50%) scale(1); opacity: 0; }
+    }
+
+    /* Toast */
+    .map-toast {
+      position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(20px);
+      background: rgba(0,0,0,0.9); border: 1px solid var(--border);
+      padding: 14px 24px; z-index: 9999;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 13px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      opacity: 0; transition: opacity .3s, transform .3s; pointer-events: none;
+      backdrop-filter: blur(8px);
+    }
+    .map-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .map-toast.error { border-color: rgba(255,60,60,0.4); color: #ff8080; }
+    .map-toast.success { border-color: rgba(0,61,165,0.6); color: #80aaff; }
+
+    .map-legend {
+      max-width: 1200px; margin: 20px auto 0;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .map-legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray);
+    }
+    .legend-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
+    .map-cta-reset {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray); background: none; border: 1px solid var(--border);
+      padding: 6px 14px; cursor: pointer; transition: color .2s, border-color .2s;
+    }
+    .map-cta-reset:hover { color: var(--white); border-color: rgba(255,255,255,0.3); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 20px;
+      background: rgba(0,0,0,0.4);
+    }
+    .footer-logo { display: flex; align-items: center; gap: 10px; }
+    .footer-logo img { height: 36px; width: auto; }
+    .footer-logo-text {
+      font-family: 'Bebas Neue', sans-serif; font-size: 18px;
+      letter-spacing: 3px; color: var(--white);
+    }
+    .footer-copy { font-size: 12px; color: var(--gray); letter-spacing: 1px; font-family: 'Barlow Condensed', sans-serif; text-transform: uppercase; }
+    .footer-links { display: flex; gap: 28px; list-style: none; }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 12px;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--gray); text-decoration: none; transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links, .nav-cta { display: none; }
+      .nav-hamburger { display: flex; }
+      .page-header { padding: 50px 20px 44px; }
+      .contact-wrapper { grid-template-columns: 1fr; gap: 48px; padding: 48px 20px; }
+      .map-section { padding: 48px 20px; }
+      .map-header { flex-direction: column; align-items: flex-start; }
+      .map-info { text-align: left; }
+      .survival-actions { flex-direction: column; }
+      .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
+      footer { padding: 28px 20px; flex-direction: column; align-items: flex-start; gap: 14px; }
+      .footer-links { flex-wrap: wrap; gap: 14px; }
+      .media-stats { grid-template-columns: repeat(3,1fr); }
+    }
+
+    /* ── SUCCESS STATE ── */
+    .form-success {
+      display: none; text-align: center; padding: 40px 20px;
+    }
+    .form-success.visible { display: block; }
+    .form-success-icon {
+      font-size: 40px; margin-bottom: 16px;
+    }
+    .form-success-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 32px;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+    }
+    .form-success-text { font-size: 14px; color: var(--gray); line-height: 1.7; }
+  </style>
+</head>
+<body>
+
+<div id="cursor-glow"></div>
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actualités</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="shop.html">Boutique</a></li>
+      <li><a href="contact.html" class="active">Contact</a></li>
+    </ul>
+    <a href="shop.html" class="nav-cta">La Boutique</a>
+    <button class="nav-hamburger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <header class="page-header reveal">
+    <p class="page-eyebrow">Média indépendant · Porto passion</p>
+    <h1 class="page-title">Contact &amp; <span class="outline">À propos</span></h1>
+    <p class="page-subtitle">Qui sommes-nous · Nous contacter · Soutenir le projet</p>
+  </header>
+
+  <!-- MAIN -->
+  <div class="contact-wrapper">
+
+    <!-- LEFT : À PROPOS -->
+    <div class="about-section reveal">
+      <p class="section-label">Le projet</p>
+      <h2 class="about-title">Un média fait <span class="outline">avec passion</span></h2>
+
+      <!-- Luis card -->
+      <div class="luis-card">
+        <div class="luis-header">
+          <div class="luis-avatar">L</div>
+          <div class="luis-info">
+            <p class="luis-name">Luis</p>
+            <p class="luis-role">Fondateur · Créateur de contenu · Fan de Porto</p>
+          </div>
+        </div>
+        <p class="luis-text">
+          NewsPorto, c'est l'histoire d'une passion qui est devenue un projet. Je m'appelle Luis, et depuis 
+          que je suis en âge de suivre le foot, le FC Porto occupe une place à part dans ma vie. 
+          Ce club, cette ville, cette intensité — je voulais en parler comme personne d'autre ne le fait.
+        </p>
+        <p class="luis-text">
+          Alors j'ai tout construit seul, sans rédaction, sans budget marketing, sans investisseurs. 
+          Juste un écran, des idées, et des heures passées à écrire, monter, coder, poster. 
+          Chaque article, chaque vidéo, chaque page de ce site — c'est moi.
+        </p>
+        <div class="tasks-list">
+          <span class="task-tag">✍ Articles</span>
+          <span class="task-tag">🎬 Vidéos</span>
+          <span class="task-tag">💻 Site web</span>
+          <span class="task-tag">📊 Stats</span>
+          <span class="task-tag">📱 Réseaux</span>
+          <span class="task-tag">🛒 Boutique</span>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="media-stats reveal">
+        <div class="media-stat">
+          <span class="media-stat-num">1</span>
+          <span class="media-stat-label">Personne derrière tout ça</span>
+        </div>
+        <div class="media-stat">
+          <span class="media-stat-num">100%</span>
+          <span class="media-stat-label">Indépendant</span>
+        </div>
+        <div class="media-stat">
+          <span class="media-stat-num">∞</span>
+          <span class="media-stat-label">Passion Porto</span>
+        </div>
+      </div>
+
+      <!-- Socials -->
+      <div class="reveal">
+        <p class="section-label">Nous suivre</p>
+        <div class="socials-row">
+          <a href="https://discord.gg/YCcuMHmGcH" target="_blank" class="social-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.11 18.102.132 18.116a19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.107a13.201 13.201 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.108c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+            Discord
+          </a>
+          <a href="https://twitter.com" target="_blank" class="social-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.257 5.632zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Twitter / X
+          </a>
+          <a href="https://youtube.com" target="_blank" class="social-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+            YouTube
+          </a>
+          <a href="https://instagram.com" target="_blank" class="social-pill">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="3.5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+            Instagram
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT : FORMULAIRE -->
+    <div class="contact-section reveal">
+      <p class="section-label">Nous écrire</p>
+      <h2 class="contact-title">Envoyer un <span style="-webkit-text-stroke:1px var(--white);color:transparent;">Message</span></h2>
+
+      <div id="contact-form-wrapper">
+        <div class="form-group">
+          <label for="contact-name">Votre nom</label>
+          <input type="text" id="contact-name" placeholder="Ex : Pedro Silva">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Votre email</label>
+          <input type="email" id="contact-email" placeholder="vous@email.com">
+        </div>
+        <div class="form-group">
+          <label for="contact-subject">Sujet</label>
+          <select id="contact-subject">
+            <option value="">Choisir un sujet…</option>
+            <option value="suggestion">Suggestion de contenu</option>
+            <option value="erreur">Signaler une erreur</option>
+            <option value="partenariat">Partenariat / Collaboration</option>
+            <option value="soutien">Soutenir le projet</option>
+            <option value="autre">Autre</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contact-msg">Message</label>
+          <textarea id="contact-msg" placeholder="Écrivez votre message ici…"></textarea>
+        </div>
+        <button class="form-submit" onclick="handleSubmit()">Envoyer le message →</button>
+        <p class="form-note">📬 Luis lit tous les messages personnellement et répond sous 48h. Pas de bots, pas de template — juste lui.</p>
+      </div>
+
+      <div class="form-success" id="form-success">
+        <div class="form-success-icon">🔵</div>
+        <p class="form-success-title">Message envoyé !</p>
+        <p class="form-success-text">Merci pour votre message. Luis le lira dès que possible et vous répondra personnellement sous 48h. Força Porto !</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SURVIVAL + CARTE — pleine largeur -->
+  <section style="border-top:1px solid rgba(255,255,255,0.08);padding:64px 48px;max-width:1200px;margin:0 auto;">
+    <div class="survival-map-grid reveal">
+
+      <!-- GAUCHE : Soutenir -->
+      <div class="survival-block">
+        <p class="survival-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          Soutenir ce média indépendant
+        </p>
+        <p class="survival-text">
+          NewsPorto n'a pas de publicités qui clignotent, pas de sponsor qui dicte le contenu, 
+          pas de groupe de presse derrière. Ce que vous lisez et regardez ici est <strong>100% libre et indépendant</strong>. 
+          Mais faire vivre un média coûte du temps, de l'énergie, et quelques euros.
+        </p>
+        <p class="survival-text">
+          Si NewsPorto vous apporte quelque chose — une info, un sourire, une analyse — 
+          vous pouvez nous aider à continuer : <strong>acheter dans la boutique</strong> ou <strong>faire un don libre</strong>. 
+          Chaque contribution fait une vraie différence. Merci. 🔵⚪
+        </p>
+        <div class="survival-actions">
+          <a href="shop.html" class="btn-primary">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
+            Voir la boutique
+          </a>
+          <a href="https://www.paypal.com/donate" target="_blank" class="btn-secondary btn-donate" id="donate-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            Faire un don ❤️
+          </a>
+        </div>
+      </div>
+
+      <!-- DROITE : Carte communauté -->
+      <div class="map-right">
+        <div style="margin-bottom:16px;">
+          <p class="section-label" style="margin-bottom:8px;">Communauté mondiale</p>
+          <div style="display:flex;align-items:baseline;gap:8px;">
+            <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;" id="pin-count">0</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">Portistas dans le monde</span>
+          </div>
+          <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-top:4px;">Clique sur la carte pour marquer ta position · 1 pin par visiteur</p>
+        </div>
+        <div id="leaflet-map" style="width:100%;height:380px;border:1px solid rgba(255,255,255,0.1);"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#003DA5;"></div>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Position d'un lecteur</span>
+          </div>
+          <button onclick="resetMyPin()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.3);padding:6px 14px;cursor:pointer;transition:color .2s,border-color .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.3)';this.style.borderColor='rgba(255,255,255,0.15)'">Effacer mon pin</button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="footer-logo-text">NewsPorto</span>
+    </div>
+    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <ul class="footer-links">
+      <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="mentions-legales.html">Mentions légales</a></li>
+    </ul>
+  </footer>
+</div>
+
+<div class="map-toast" id="map-toast"></div>
+
+<script>
+  // ── CURSOR GLOW ──
+  const cg = document.getElementById("cursor-glow");
+  if (cg) {
+    document.addEventListener("mousemove", e => {
+      cg.style.left = e.clientX + "px";
+      cg.style.top = e.clientY + "px";
+    });
+  }
+
+  // ── REVEAL OBSERVER ──
+  const ro = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); ro.unobserve(e.target); } });
+  }, { threshold: 0.07, rootMargin: '0px 0px -30px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+  // ── FORM ──
+  function handleSubmit() {
+    const name = document.getElementById('contact-name').value.trim();
+    const email = document.getElementById('contact-email').value.trim();
+    const msg = document.getElementById('contact-msg').value.trim();
+    if (!name || !email || !msg) {
+      showToast('Veuillez remplir tous les champs requis.', 'error');
+      return;
+    }
+    document.getElementById('contact-form-wrapper').style.display = 'none';
+    document.getElementById('form-success').classList.add('visible');
+  }
+
+  // ── MAP LEAFLET + KV ──
+  const VISITOR_KEY = 'newsporto_visitor_id';
+
+  // Génère un ID unique par visiteur
+  function getVisitorId() {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) {
+      id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+      localStorage.setItem(VISITOR_KEY, id);
+    }
+    return id;
+  }
+
+  let leafletMap = null;
+  let myMarker = null;
+
+  const pinIcon = (isMe = false) => L.divIcon({
+    className: '',
+    html: `<div style="width:${isMe?14:10}px;height:${isMe?14:10}px;border-radius:50%;background:${isMe?'#fff':'rgba(0,61,165,0.9)'};border:2px solid ${isMe?'#003DA5':'rgba(0,100,255,0.5)'};box-shadow:0 0 ${isMe?8:4}px rgba(0,61,165,0.6);"></div>`,
+    iconSize: [isMe?14:10, isMe?14:10], iconAnchor: [isMe?7:5, isMe?7:5]
+  });
+
+  async function loadAndRenderPins() {
+    try {
+      const r = await fetch('/api/pins');
+      const data = await r.json();
+      const pins = data.pins || [];
+      document.getElementById('pin-count').textContent = pins.length;
+
+      const visitorId = getVisitorId();
+      leafletMap.eachLayer(l => { if (l._isPin) leafletMap.removeLayer(l); });
+
+      pins.forEach(pin => {
+        const isMe = pin.visitorId === visitorId;
+        const m = L.marker([pin.lat, pin.lng], { icon: pinIcon(isMe) }).addTo(leafletMap);
+        m._isPin = true;
+        if (isMe) myMarker = m;
+      });
+    } catch(e) { console.error('loadPins error', e); }
+  }
+
+  async function resetMyPin() {
+    const visitorId = getVisitorId();
+    try {
+      await fetch('/api/pins', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorId })
+      });
+      if (myMarker) { leafletMap.removeLayer(myMarker); myMarker = null; }
+      await loadAndRenderPins();
+    } catch(e) {}
+  }
+  window.resetMyPin = resetMyPin;
+
+  function initMap() {
+    leafletMap = L.map('leaflet-map', {
+      center: [20, 0], zoom: 2, minZoom: 1, maxZoom: 6,
+      zoomControl: true, attributionControl: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19
+    }).addTo(leafletMap);
+
+    loadAndRenderPins();
+
+    leafletMap.on('click', async function(e) {
+      const visitorId = getVisitorId();
+      if (myMarker) return; // déjà un pin
+      try {
+        const r = await fetch('/api/pins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            visitorId
+          })
+        });
+        const data = await r.json();
+        if (r.status === 409) return; // déjà existant
+        if (data.ok) {
+          myMarker = L.marker([e.latlng.lat, e.latlng.lng], { icon: pinIcon(true) }).addTo(leafletMap);
+          myMarker._isPin = true;
+          document.getElementById('pin-count').textContent = data.count;
+        }
+      } catch(err) {}
+    });
+  }
+
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  s.onload = initMap;
+  document.head.appendChild(s);
+</script>
+</body>
+</html>
