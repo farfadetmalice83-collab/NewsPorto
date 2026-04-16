@@ -725,9 +725,6 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     .acat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
     .atit{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
     .amet{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
-    .abread{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);padding:14px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-    .abread a{color:rgba(255,255,255,.3);text-decoration:none;transition:color .2s}.abread a:hover{color:rgba(255,255,255,.6)}
-    .abread span{color:rgba(255,255,255,.15)}
     .aly{display:grid;grid-template-columns:1fr 320px}
     .abdy{padding:48px 48px;border-right:1px solid var(--border)}
     .abdy p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
@@ -756,13 +753,10 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
     .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
     .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
-    .art-comments{margin-top:40px;padding-top:32px;border-top:1px solid var(--border)}
-    .art-comments-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:24px;display:flex;align-items:center;gap:8px}
-    .art-comments-label::before{content:'';display:block;width:12px;height:1px;background:rgba(255,255,255,.35)}
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.abread{padding:12px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}}
+    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}}
   </style>
 </head>
 <body>
@@ -774,15 +768,6 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
         <span class="nlogt">NewsPorto</span>
       </a>
       <a href="../actu.html" class="bk">← Actualités</a>
-    </nav>
-    <nav class="abread" aria-label="Fil d'Ariane">
-      <a href="../index.html">Accueil</a>
-      <span>›</span>
-      <a href="../actu.html">Actualités</a>
-      <span>›</span>
-      <span>${catLabel}</span>
-      <span>›</span>
-      <span style="color:rgba(255,255,255,.5)">${title.length>50?title.slice(0,47)+'…':title}</span>
     </nav>
     <section class="hero">
       <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager" width="1200" height="630">
@@ -803,24 +788,22 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
 ${paras}
         <div class="afig-clear"></div>
       </article>
-      <div>
-        <div class="art-actions">
-          <button class="btn-like" id="btn-like" onclick="toggleLike()">
-            <span class="like-ico">🤍</span>
-            <span id="like-label">J'aime</span>
-          </button>
-          <div class="share-btns">
-            <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="Partager sur X">𝕏</a>
-            <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="Partager sur WhatsApp">💬</a>
-            <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Partager sur Facebook">f</a>
-            <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
-          </div>
-        </div>
-        <aside class="asb" aria-label="Articles recommandés">
-          <p class="sbl">À la une</p>
-          <div id="sidebar-articles"></div>
-          <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
-        </aside>
+      <aside class="asb" aria-label="Articles recommandés">
+        <p class="sbl">À la une</p>
+        <div id="sidebar-articles"></div>
+        <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
+      </aside>
+    </div>
+    <div class="art-actions" style="padding:20px 48px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+      <button class="btn-like" id="btn-like" onclick="toggleLike()">
+        <span class="like-ico">🤍</span>
+        <span id="like-label">J'aime</span>
+      </button>
+      <div class="share-btns" style="margin-left:auto;display:flex;gap:8px;">
+        <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="Partager sur X">𝕏</a>
+        <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="Partager sur WhatsApp">💬</a>
+        <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Partager sur Facebook">f</a>
+        <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
       </div>
     </div>
     <footer>
