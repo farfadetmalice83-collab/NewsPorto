@@ -1497,7 +1497,7 @@
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
-    <div class="match-card" id="match-card" style="cursor:pointer" onclick="if(window._openLiveModal)window._openLiveModal();">
+    <div class="match-card" id="match-card" style="cursor:pointer" onclick="window.location.href='match.html';">
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
@@ -1537,7 +1537,7 @@
         </div>
       </div>
       <div id="click-hint" style="width:100%;text-align:center;margin-top:14px;">
-        <button id="click-hint-text" onclick="event.stopPropagation();if(window._openLiveModal)window._openLiveModal();" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
+        <button id="click-hint-text" onclick="event.stopPropagation();window.location.href='match.html';" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.2);cursor:pointer;background:none;border:none;padding:6px 0;">Cliquer pour le calendrier →</button>
       </div>
       <div id="lineup-cta" style="display:none;width:100%;text-align:center;margin-top:8px">
         <button onclick="openLineupModal()" style="
@@ -1603,6 +1603,7 @@
   let lineupData   = null;
 
   function renderMatch(data) {
+    // ── Stats Liga ──
     const s = data.stats;
     if (s) {
       const gap = s.gapPoints > 0 ? `+${s.gapPoints} pts sur ${s.secondTeam}` : `${s.gapPoints} pts vs ${s.secondTeam}`;
@@ -1614,9 +1615,15 @@
         <div class="stat-cell"><div class="stat-num">${s.points}</div><div class="stat-label">Points</div><div class="stat-sub">Liga Portugal</div></div>`;
     }
 
+    // ── Match card ──
     const m    = data.liveMatch || data.nextMatch;
     const live = !!data.liveMatch;
-    if (!m) { document.getElementById('match-competition').textContent = 'Aucun match programmé'; return; }
+
+    if (!m) {
+      document.getElementById('match-competition').textContent = 'Aucun match programmé';
+      document.getElementById('match-score').textContent = '—';
+      return;
+    }
 
     document.getElementById('match-section-label').textContent = live ? '— Match en cours 🔴' : '— Prochain match';
     document.getElementById('match-competition').textContent = m.competition;
@@ -1629,44 +1636,53 @@
     if (m.homeCrest) { logoHome.src = m.homeCrest; logoHome.style.display = 'block'; }
     if (m.awayCrest) { logoAway.src = m.awayCrest; logoAway.style.display = 'block'; }
 
-    const scoreEl  = document.getElementById('match-score');
+    const scoreEl   = document.getElementById('match-score');
     const liveBadge = document.getElementById('live-badge');
     const liveMin   = document.getElementById('live-minute');
 
     if (live) {
+      // ── LIVE : afficher le score mis à jour ──
       scoreEl.textContent = `${m.homeGoals ?? 0} – ${m.awayGoals ?? 0}`;
-      if (m.status !== 'FINISHED') {
-        liveBadge.style.display = 'block';
-        liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
-      } else {
+      scoreEl.style.color = '#fff';
+      if (m.status === 'FINISHED') {
         liveBadge.style.display = 'none';
         document.getElementById('match-status').textContent = 'Terminé';
+      } else if (m.status === 'HALF_TIME') {
+        liveBadge.style.display = 'block';
+        liveMin.textContent = 'Mi-temps';
+      } else {
+        liveBadge.style.display = 'block';
+        liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
       }
+      // Hint → lien match.html
+      const hint = document.getElementById('click-hint-text');
+      if (hint) {
+        hint.textContent = '🔴 Voir les détails →';
+        hint.style.color = 'rgba(255,68,68,0.8)';
+        hint.style.animation = 'blink-hint 1.5s ease infinite';
+      }
+      document.getElementById('match-date').textContent  = '';
+      document.getElementById('match-heure').textContent = '';
     } else {
+      // ── PAS DE MATCH : afficher date/heure du prochain ──
       scoreEl.textContent = 'VS';
+      scoreEl.style.color = '';
       liveBadge.style.display = 'none';
+      document.getElementById('match-status').textContent = '';
       const date = new Date(m.date);
       document.getElementById('match-date').textContent  = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Lisbon' });
       document.getElementById('match-heure').textContent = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
+      const hint = document.getElementById('click-hint-text');
+      if (hint) {
+        hint.textContent = 'Voir le calendrier →';
+        hint.style.color = 'rgba(255,255,255,0.2)';
+        hint.style.animation = 'none';
+      }
     }
 
     if (data.lineup) { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
     else if (live)   { document.getElementById('lineup-cta').style.display = 'block'; }
     else             { document.getElementById('lineup-cta').style.display = 'none'; }
-
-    // Update click hint
-    const hint = document.getElementById('click-hint-text');
-    if (hint) {
-      if (live) {
-        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
-        hint.style.color = 'rgba(255,68,68,0.7)';
-        hint.style.animation = 'blink-hint 1.5s ease infinite';
-      } else {
-        hint.textContent = 'Cliquer pour le calendrier →';
-        hint.style.color = 'rgba(255,255,255,0.2)';
-        hint.style.animation = 'none';
-      }
-    }
   }
 
   function loadData() {
@@ -1674,20 +1690,17 @@
       .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
       .then(data => {
         renderMatch(data);
-        liveModalData = data; // FIX : toujours stocker les données pour le modal
-        if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
-        else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        // Polling 60s seulement si match en cours (pas terminé)
+        const isLive = data.liveMatch && data.liveMatch.status !== 'FINISHED';
+        if (isLive && !pollInterval) {
+          pollInterval = setInterval(loadData, 60000);
+        } else if (!isLive && pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
+        }
       })
-      .catch((err) => {
-        console.error('porto-stats fetch error:', err);
+      .catch(() => {
         document.getElementById('match-competition').textContent = 'Données indisponibles';
-        document.getElementById('match-score').textContent = 'API';
-        document.getElementById('team-home').textContent = 'FC Porto';
-        document.getElementById('team-away').textContent = '—';
-        document.getElementById('match-date').textContent = 'Non disponible';
-        document.getElementById('click-hint-text').textContent = 'Voir le calendrier →';
-        // Permettre quand même l'ouverture du modal vide
-        liveModalData = { upcomingMatches: [], recentMatches: [] };
       });
   }
   loadData();
@@ -2450,30 +2463,26 @@
   }
 
   // Hook into existing renderMatch to store data
-  // FIX : liveModalData est desormais rempli dans loadData(), ce hook met a jour le modal si ouvert.
-  const _origRenderMatch = window.renderMatch;
-  if (typeof _origRenderMatch === 'function' && !_origRenderMatch._patched) {
-    window.renderMatch = function(data) {
-      _origRenderMatch(data);
-      liveModalData = data;
-      const mc = document.getElementById('match-card');
-      if (mc) mc.style.cursor = 'pointer';
-      const hint = document.getElementById('click-hint-text');
-      if (hint) {
-        if (data.liveMatch) {
-          hint.textContent = '🔴 Cliquer ici pour les stats en direct';
-          hint.style.color = 'rgba(255,68,68,0.7)';
-        } else {
-          hint.textContent = 'Cliquer pour le calendrier →';
-          hint.style.color = 'rgba(255,255,255,0.2)';
-        }
+  const _origRenderMatch = window.renderMatch || function(){};
+  window.renderMatch = function(data) {
+    _origRenderMatch(data);
+    liveModalData = data;
+    const mc = document.getElementById('match-card');
+    if (mc) mc.style.cursor = 'pointer';
+    const hint = document.getElementById('click-hint-text');
+    if (hint) {
+      if (data.liveMatch) {
+        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
+        hint.style.color = 'rgba(255,68,68,0.7)';
+      } else {
+        hint.textContent = 'Cliquer pour le calendrier →';
+        hint.style.color = 'rgba(255,255,255,0.2)';
       }
-      if (document.getElementById('live-modal').style.display !== 'none') {
-        openLiveModalContent(data);
-      }
-    };
-    window.renderMatch._patched = true;
-  }
+    }
+    if (document.getElementById('live-modal').style.display !== 'none') {
+      openLiveModalContent(data);
+    }
+  };
 
   window._openLiveModal = function() {
     if (!liveModalData) {
