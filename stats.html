@@ -128,14 +128,8 @@
       align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.15);
     }
-    .ticker-inner {
-      display: flex;
-      gap: 80px;
-      white-space: nowrap;
-      animation: tickerScroll 30s linear infinite;
-    }
-    @keyframes tickerScroll {
-      0%   { transform: translateX(0); }
+    
+    
       100% { transform: translateX(-50%); }
     }
     .ticker-item {
@@ -944,7 +938,33 @@
       .shop-grid { grid-template-columns: 1fr !important; }
     }
 
-  </style>
+  
+    /* ── TICKER FIX (mobile/tablette) ── */
+    .ticker {
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 64px;
+      width: max-content;
+      will-change: transform;
+      animation: ticker-scroll 30s linear infinite;
+    }
+    .ticker:hover .ticker-inner { animation-play-state: paused; }
+    @keyframes ticker-scroll {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    @media (max-width: 768px) {
+      .ticker-inner {
+        gap: 40px;
+        animation-duration: 22s;
+      }
+    }
+
+    </style>
+  <script defer src="/_vercel/insights/script.js"></script>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
