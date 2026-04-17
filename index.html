@@ -1358,16 +1358,18 @@
       gap: 64px;
       width: max-content;
       will-change: transform;
+      /* Pas d animation au départ — JS la lance après injection du contenu */
+      animation: none;
+    }
+    .ticker-inner.ready {
       animation: ticker-scroll 28s linear infinite;
     }
-    /* Pause on hover */
     @keyframes ticker-scroll {
       0%   { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-50%, 0, 0); }
     }
-    /* Mobile : vitesse réduite pour lisibilité */
     @media (max-width: 768px) {
-      .ticker-inner {
+      .ticker-inner.ready {
         gap: 40px;
         animation-duration: 22s;
       }
@@ -1436,9 +1438,7 @@
 
   <!-- TICKER -->
   <div class="ticker reveal-fade">
-    <div class="ticker-inner" id="ticker-inner">
-      <span class="ticker-item"><b>NEWSPORTO</b> Chargement…</span>
-    </div>
+    <div class="ticker-inner" id="ticker-inner"></div>
   </div>
   <!-- HERO -->
   <section class="hero">
@@ -2537,7 +2537,12 @@
         const cat = catMap[a.category] || (a.category || 'ACTU').toUpperCase();
         return '<span class="ticker-item"><b>' + cat + '</b> <a href="articles/' + a.file + '" style="color:inherit;text-decoration:none;">' + a.title + '</a></span>';
       });
+      // Injecter le contenu dupliqué
       inner.innerHTML = [...items, ...items].join('');
+      // Forcer reflow puis lancer l animation proprement
+      inner.classList.remove('ready');
+      void inner.offsetWidth; // reflow
+      inner.classList.add('ready');
     }).catch(() => {});
   </script>
 
