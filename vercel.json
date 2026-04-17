@@ -4,8 +4,5 @@
       "path": "/api/cron-match",
       "schedule": "0 8 * * *"
     }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "404": "/404.html"
+  ]
 }
