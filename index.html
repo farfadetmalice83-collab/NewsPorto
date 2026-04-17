@@ -2679,7 +2679,7 @@
     letter-spacing: 2px; text-transform: uppercase; box-shadow: 0 4px 24px rgba(0,61,165,0.5);
     transition: transform .2s, box-shadow .2s;
   }
-  #push-fab.show { display: flex; }
+  #push-fab { display: flex !important; }
   #push-fab:hover { transform: translateY(-2px); box-shadow: 0 6px 32px rgba(0,61,165,0.7); }
 
   @media (max-width: 600px) {
@@ -2734,8 +2734,8 @@
 </div>
 
 <!-- Bouton flottant push -->
-<button id="push-fab" onclick="subscribePush()">
-  🔔 Notifications
+<button id="push-fab" onclick="reopenPopup()">
+  📬 Newsletter
 </button>
 
 <!-- JS popup + push -->
@@ -2780,7 +2780,16 @@
   // ── Rouvrir le popup depuis la cloche ───────────────────────────────────
   window.reopenPopup = function() {
     const popup = document.getElementById('notif-popup');
-    if (popup) { popup.classList.add('show'); initPushBtn(); }
+    if (!popup) return;
+    // Reset formulaire
+    const input = document.getElementById('popup-email');
+    const btn   = document.getElementById('popup-submit-btn');
+    const msg   = document.getElementById('popup-msg');
+    if (input) input.value = '';
+    if (btn)   { btn.disabled = false; btn.textContent = "S'abonner"; }
+    if (msg)   { msg.textContent = ''; msg.className = 'popup-msg'; }
+    popup.classList.add('show');
+    initPushBtn();
   };
 
   // ── Fermer le popup (Non merci) ─────────────────────────────────────────
@@ -2788,10 +2797,7 @@
   window.closePopup = function() {
     const popup = document.getElementById('notif-popup');
     if (popup) popup.classList.remove('show');
-    if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
-      const fab = document.getElementById('push-fab');
-      if (fab) fab.classList.add('show');
-    }
+
   };
 
   // Fermer en cliquant l'overlay
@@ -2874,7 +2880,7 @@
       if (msg) { msg.textContent = '✓ Notifications activées !'; msg.className = 'popup-msg ok'; }
       const pushBtn = document.getElementById('popup-push-btn');
       if (pushBtn) { pushBtn.textContent = '✓ Notifications activées'; pushBtn.classList.add('done'); }
-      document.getElementById('push-fab').classList.remove('show');
+
 
     } catch (err) {
       console.error('Push error:', err);
