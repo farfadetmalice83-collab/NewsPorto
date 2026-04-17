@@ -11,14 +11,12 @@
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
   <style>
-    :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055);--green:#00a86b;--orange:#f0a500;--red:#e74c3c;--blue:#003DA5}
+    :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055);--green:#00a86b;--blue:#003DA5}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
     body{background:#000;color:var(--white);font-family:'Barlow',sans-serif;overflow-x:hidden;min-height:100vh}
     .grid-bg{position:fixed;inset:0;z-index:0;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gs 12s linear infinite;pointer-events:none}
     @keyframes gs{0%{background-position:0 0}100%{background-position:44px 44px}}
     .page{position:relative;z-index:1}
-
-    /* ── NAV ── */
     nav{display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:56px;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(0,0,0,.92);backdrop-filter:blur(12px)}
     .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit}
     .nav-logo img{height:28px;width:auto}
@@ -26,135 +24,57 @@
     .nav-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:rgba(255,255,255,.08);border:1px solid var(--border);padding:3px 10px;color:var(--gray)}
     .nav-back{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
     .nav-back:hover{color:var(--white)}
-
-    /* ── PAGE HEADER ── */
     .page-header{padding:48px 48px 40px;border-bottom:1px solid var(--border)}
     .page-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
     .page-label::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
     .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5vw,72px);letter-spacing:1px;line-height:.95}
     .page-subtitle{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-top:14px}
-
-    /* ── TOKEN SETUP ── */
-    .setup-box{margin:40px 48px;border:1px solid var(--border);padding:32px;background:rgba(255,255,255,.02);display:none}
-    .setup-box.visible{display:block}
-    .setup-title{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:16px}
-    .setup-desc{font-size:13px;line-height:1.7;color:rgba(255,255,255,.4);margin-bottom:20px}
-    .setup-desc a{color:rgba(255,255,255,.6);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2)}
-    .setup-desc a:hover{color:#fff}
-    .token-row{display:flex;gap:8px}
-    .token-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;padding:12px 16px;outline:none;transition:border-color .2s}
-    .token-input:focus{border-color:rgba(255,255,255,.35)}
-    .token-input::placeholder{color:rgba(255,255,255,.2)}
-    .btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:1px solid var(--border);color:var(--gray);background:transparent;padding:12px 24px;cursor:pointer;transition:border-color .2s,color .2s,background .2s;white-space:nowrap}
+    .setup{padding:32px 48px;border-bottom:1px solid var(--border);background:rgba(255,255,255,.02)}
+    .setup-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .setup-label::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
+    .setup-hint{font-size:12px;color:rgba(255,255,255,.3);margin-bottom:14px;line-height:1.6}
+    .setup-row{display:flex;gap:8px;max-width:480px}
+    .setup-input{flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;padding:11px 16px;outline:none;transition:border-color .2s}
+    .setup-input:focus{border-color:rgba(255,255,255,.35)}
+    .setup-input::placeholder{color:rgba(255,255,255,.2)}
+    .btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;border:1px solid var(--border);color:var(--gray);background:transparent;padding:11px 22px;cursor:pointer;transition:.2s;white-space:nowrap}
     .btn:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
     .btn-gr{border-color:rgba(0,168,107,.4);color:var(--green);background:rgba(0,168,107,.05)}
     .btn-gr:hover{border-color:rgba(0,168,107,.8);background:rgba(0,168,107,.1);color:#00c47e}
-
-    /* ── PERIOD SELECTOR ── */
-    .controls{display:flex;align-items:center;justify-content:space-between;padding:24px 48px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:12px}
-    .period-tabs{display:flex;gap:0}
-    .period-tab{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border:1px solid var(--border);color:var(--gray);background:transparent;cursor:pointer;transition:.2s;margin-right:-1px}
-    .period-tab:hover{color:var(--white);background:rgba(255,255,255,.04)}
-    .period-tab.active{color:var(--white);background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.3)}
-    .last-refresh{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2)}
-    .refresh-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);background:none;border:1px solid var(--border);padding:7px 14px;cursor:pointer;transition:.2s}
-    .refresh-btn:hover{color:var(--white);border-color:rgba(255,255,255,.3)}
-
-    /* ── KPI CARDS ── */
-    .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid var(--border)}
-    .kpi-card{padding:32px 40px;border-right:1px solid var(--border)}
-    .kpi-card:last-child{border-right:none}
-    .kpi-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:12px;display:flex;align-items:center;gap:6px}
-    .kpi-value{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4vw,56px);letter-spacing:1px;line-height:1;margin-bottom:8px}
-    .kpi-delta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;text-transform:uppercase}
-    .kpi-delta.up{color:var(--green)}
-    .kpi-delta.down{color:var(--red)}
-    .kpi-delta.neutral{color:var(--gray)}
-    .kpi-loading{width:80px;height:48px;background:rgba(255,255,255,.05);animation:shimmer 1.5s ease infinite}
-    @keyframes shimmer{0%,100%{opacity:.5}50%{opacity:1}}
-
-    /* ── MAIN CONTENT ── */
-    .stats-layout{display:grid;grid-template-columns:1fr 340px;min-height:calc(100vh - 400px)}
-    .stats-main{padding:40px 48px;border-right:1px solid var(--border)}
-    .stats-side{padding:40px 32px}
-    .section-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:24px;display:flex;align-items:center;gap:8px}
+    .cards-section{padding:40px 48px}
+    .section-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
     .section-title::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
-
-    /* Graphique visiteurs */
-    .chart-wrap{border:1px solid var(--border);background:rgba(255,255,255,.02);padding:24px;margin-bottom:32px}
-    #visitors-chart{width:100%;height:160px;display:block}
-
-    /* Table pages */
-    .pages-table{width:100%;border-collapse:collapse}
-    .pages-table th{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.25);padding:0 0 12px;text-align:left;border-bottom:1px solid var(--border)}
-    .pages-table th:last-child{text-align:right}
-    .pages-table td{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05);color:rgba(255,255,255,.7)}
-    .pages-table td:last-child{text-align:right;color:var(--white);font-weight:700}
-    .pages-table tr:last-child td{border-bottom:none}
-    .page-bar{height:2px;background:rgba(0,61,165,.5);margin-top:4px;transition:width .6s cubic-bezier(.16,1,.3,1)}
-
-    /* Referrers */
-    .ref-item{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-    .ref-item:last-child{border-bottom:none}
-    .ref-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;color:rgba(255,255,255,.7)}
-    .ref-count{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)}
-
-    /* Devices */
-    .device-row{margin-bottom:16px}
-    .device-label{display:flex;justify-content:space-between;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:6px}
-    .device-bar-bg{height:2px;background:rgba(255,255,255,.08)}
-    .device-bar-fill{height:2px;background:rgba(0,61,165,.8);transition:width .8s cubic-bezier(.16,1,.3,1)}
-
-    /* Countries */
-    .country-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05)}
-    .country-item:last-child{border-bottom:none}
-    .country-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;color:rgba(255,255,255,.7);display:flex;align-items:center;gap:8px}
-    .country-pct{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white)}
-
-    /* Error / empty state */
-    .state-box{padding:48px;text-align:center;color:rgba(255,255,255,.2)}
-    .state-box p{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;margin-top:8px}
-
-    /* Token badge */
-    .token-badge{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border:1px solid rgba(0,168,107,.3);color:var(--green);display:inline-flex;align-items:center;gap:6px}
-
-    /* Footer */
-    footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);margin-top:40px}
+    .cards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:48px}
+    .stat-card{background:#000;padding:28px 32px;text-decoration:none;color:inherit;transition:background .2s;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+    .stat-card:hover{background:rgba(255,255,255,.04)}
+    .stat-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--blue);transform:scaleY(0);transition:transform .25s cubic-bezier(.22,1,.36,1)}
+    .stat-card:hover::before{transform:scaleY(1)}
+    .stat-card::after{content:'↗';position:absolute;top:20px;right:20px;font-family:'Barlow Condensed',sans-serif;font-size:14px;color:rgba(255,255,255,.15);transition:color .2s,transform .2s}
+    .stat-card:hover::after{color:rgba(255,255,255,.5);transform:translate(2px,-2px)}
+    .card-icon{font-size:20px}
+    .card-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px}
+    .card-desc{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--gray);line-height:1.5}
+    .card-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.2);align-self:flex-start;margin-top:2px}
+    footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-
-    /* Toast */
-    .toast{position:fixed;bottom:32px;right:48px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 24px;border:1px solid var(--border);background:#000;color:var(--white);z-index:9999;pointer-events:none;opacity:0;transform:translateY(12px);transition:opacity .3s,transform .3s}
-    .toast.show{opacity:1;transform:translateY(0)}
-    .toast.ok{border-color:rgba(0,168,107,.5);color:var(--green)}
-    .toast.ko{border-color:rgba(231,76,60,.5);color:var(--red)}
-
-    /* Responsive */
-    @media(max-width:1024px){
-      .kpi-grid{grid-template-columns:repeat(2,1fr)}
-      .kpi-card{border-bottom:1px solid var(--border)}
-      .stats-layout{grid-template-columns:1fr}
-      .stats-main{border-right:none;border-bottom:1px solid var(--border)}
-      nav,.page-header,.controls,.stats-main,.stats-side,.setup-box,footer{padding-left:24px;padding-right:24px}
-    }
-    @media(max-width:640px){
-      .kpi-grid{grid-template-columns:1fr 1fr}
-      nav,.page-header,.controls,.stats-main,.stats-side,.setup-box,footer{padding-left:16px;padding-right:16px}
-      .kpi-card{padding:24px 20px}
-      .period-tabs{flex-wrap:wrap}
+    @media(max-width:900px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:600px){
+      .cards-grid{grid-template-columns:1fr}
+      nav,.page-header,.setup,.cards-section,footer{padding-left:20px;padding-right:20px}
     }
   </style>
 </head>
 <body>
 
-<!-- ── MOT DE PASSE (si accès direct sans passer par admin) ── -->
+<!-- ── MOT DE PASSE ── -->
 <style>
   #pw-gate{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;overflow:hidden}
   #pw-gate.hidden{display:none}
   #pw-gate-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px;animation:gs 14s linear infinite}
   #pw-gate-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,61,165,.2) 0%,transparent 70%);animation:glowP 4s ease-in-out infinite}
   @keyframes glowP{0%,100%{transform:scale(1);opacity:.7}50%{transform:scale(1.15);opacity:1}}
-  #pw-gate-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:0;animation:pwE .9s cubic-bezier(.16,1,.3,1) both}
+  #pw-gate-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;animation:pwE .9s cubic-bezier(.16,1,.3,1) both}
   @keyframes pwE{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
   #pw-gate-logo{width:72px;height:auto;margin-bottom:24px;filter:drop-shadow(0 0 24px rgba(0,61,165,.5));animation:logoF 3s ease-in-out infinite}
   @keyframes logoF{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
@@ -174,7 +94,6 @@
   #pw-gate.unlocking #pw-gate-content{animation:unlC .5s cubic-bezier(.16,1,.3,1) forwards}
   @keyframes unlC{to{opacity:0;transform:translateY(-20px) scale(.97)}}
 </style>
-
 <div id="pw-gate">
   <div id="pw-gate-grid"></div>
   <div id="pw-gate-glow"></div>
@@ -188,30 +107,25 @@
     <button id="pw-gate-btn" onclick="checkGate()">Accéder →</button>
   </div>
 </div>
-
 <script>
-  // Si on vient de l'admin → pas de mdp
-  if (sessionStorage.getItem('np_admin') === '1' || sessionStorage.getItem('np_stats_from_admin') === '1') {
+  if (sessionStorage.getItem('np_admin')==='1'||sessionStorage.getItem('np_stats_from_admin')==='1') {
     document.getElementById('pw-gate').classList.add('hidden');
   }
   function checkGate() {
     const val = document.getElementById('pw-gate-input').value;
-    if (val === '1418') {
-      const gate = document.getElementById('pw-gate');
-      gate.classList.add('unlocking');
-      setTimeout(() => gate.classList.add('hidden'), 1000);
-      sessionStorage.setItem('np_admin', '1');
+    if (val==='1418') {
+      const g = document.getElementById('pw-gate');
+      g.classList.add('unlocking');
+      setTimeout(()=>g.classList.add('hidden'),1000);
+      sessionStorage.setItem('np_admin','1');
     } else {
-      const input = document.getElementById('pw-gate-input');
-      const err   = document.getElementById('pw-gate-err');
-      input.classList.remove('shake'); void input.offsetWidth;
-      input.classList.add('shake');
-      err.textContent = 'Code incorrect';
-      input.value = '';
-      setTimeout(() => { input.classList.remove('shake'); err.textContent = ''; }, 2200);
+      const i=document.getElementById('pw-gate-input'), e=document.getElementById('pw-gate-err');
+      i.classList.remove('shake'); void i.offsetWidth; i.classList.add('shake');
+      e.textContent='Code incorrect'; i.value='';
+      setTimeout(()=>{i.classList.remove('shake');e.textContent='';},2200);
     }
   }
-  document.getElementById('pw-gate-input').addEventListener('keydown', e => { if (e.key === 'Enter') checkGate(); });
+  document.getElementById('pw-gate-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkGate();});
 </script>
 
 <div class="grid-bg"></div>
@@ -226,111 +140,68 @@
     <a href="admin-article.html" class="nav-back">← Retour admin</a>
   </nav>
 
-  <!-- PAGE HEADER -->
   <div class="page-header">
     <p class="page-label">Administration</p>
-    <h1 class="page-title">Analytiques<br>& Audience</h1>
-    <p class="page-subtitle" id="token-status">Connecte ton token Vercel pour charger les données</p>
+    <h1 class="page-title">Statistiques<br>& Audience</h1>
+    <p class="page-subtitle">Accès direct aux dashboards Vercel</p>
   </div>
 
-  <!-- TOKEN SETUP -->
-  <div class="setup-box visible" id="setup-box">
-    <p class="setup-title">Token Vercel requis</p>
-    <p class="setup-desc">
-      Génère un token sur <a href="https://vercel.com/account/tokens" target="_blank">vercel.com/account/tokens</a> avec le scope <strong>Read</strong>.<br>
-      Il est sauvegardé localement dans ton navigateur — jamais envoyé ailleurs.
-    </p>
-    <div class="token-row">
-      <input type="password" id="token-input" class="token-input" placeholder="vercel_token_…">
-      <button class="btn btn-gr" onclick="saveToken()">Sauvegarder</button>
+  <!-- SLUG INPUT -->
+  <div class="setup">
+    <p class="setup-label">Slug de ton projet Vercel</p>
+    <p class="setup-hint">Trouve-le dans l'URL de ton projet Vercel : vercel.com/<b>ton-team</b>/<b>news-porto</b> — entre le dernier segment ici.</p>
+    <div class="setup-row">
+      <input type="text" id="slug-input" class="setup-input" placeholder="ex: news-porto">
+      <button class="btn btn-gr" id="save-btn" onclick="saveSlug()">Sauvegarder</button>
     </div>
   </div>
 
-  <!-- CONTROLS -->
-  <div class="controls" id="controls" style="display:none">
-    <div class="period-tabs">
-      <button class="period-tab active" data-period="1d" onclick="setPeriod('1d',this)">24h</button>
-      <button class="period-tab" data-period="7d" onclick="setPeriod('7d',this)">7 jours</button>
-      <button class="period-tab" data-period="30d" onclick="setPeriod('30d',this)">30 jours</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="last-refresh" id="last-refresh">—</span>
-      <button class="refresh-btn" onclick="loadAll()">↻ Actualiser</button>
-      <button class="btn" onclick="clearToken()" style="font-size:9px;padding:7px 12px;color:var(--red);border-color:rgba(231,76,60,.3)">Changer token</button>
-    </div>
-  </div>
+  <div class="cards-section">
 
-  <!-- KPI CARDS -->
-  <div class="kpi-grid" id="kpi-grid">
-    <div class="kpi-card">
-      <p class="kpi-label">👁 Visiteurs uniques</p>
-      <div class="kpi-loading" id="kpi-visitors-load"></div>
-      <div class="kpi-value" id="kpi-visitors" style="display:none">—</div>
-      <p class="kpi-delta neutral" id="kpi-visitors-delta"></p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">📄 Pages vues</p>
-      <div class="kpi-loading" id="kpi-views-load"></div>
-      <div class="kpi-value" id="kpi-views" style="display:none">—</div>
-      <p class="kpi-delta neutral" id="kpi-views-delta"></p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">↩ Bounce Rate</p>
-      <div class="kpi-loading" id="kpi-bounce-load"></div>
-      <div class="kpi-value" id="kpi-bounce" style="display:none">—</div>
-      <p class="kpi-delta neutral" id="kpi-bounce-delta"></p>
-    </div>
-    <div class="kpi-card">
-      <p class="kpi-label">⏱ Durée moy.</p>
-      <div class="kpi-loading" id="kpi-duration-load"></div>
-      <div class="kpi-value" id="kpi-duration" style="display:none">—</div>
-      <p class="kpi-delta neutral" id="kpi-duration-delta"></p>
-    </div>
-  </div>
-
-  <!-- STATS LAYOUT -->
-  <div class="stats-layout">
-
-    <!-- MAIN -->
-    <div class="stats-main">
-
-      <!-- Graphique -->
-      <p class="section-title">Visiteurs dans le temps</p>
-      <div class="chart-wrap">
-        <canvas id="visitors-chart"></canvas>
-        <p class="state-box" id="chart-empty" style="display:none"><p>Pas de données</p></p>
-      </div>
-
-      <!-- Pages les plus vues -->
-      <p class="section-title">Pages les plus visitées</p>
-      <div id="pages-wrap">
-        <div class="state-box"><p>Chargement…</p></div>
-      </div>
-
+    <p class="section-title">Analytics</p>
+    <div class="cards-grid">
+      <a class="stat-card" id="link-analytics" href="https://vercel.com" target="_blank">
+        <span class="card-icon">📊</span>
+        <span class="card-title">Vue d'ensemble</span>
+        <span class="card-desc">Visiteurs · Pages vues · Bounce rate · Temps réel</span>
+        <span class="card-tag">Analytics</span>
+      </a>
+      <a class="stat-card" id="link-pages" href="https://vercel.com" target="_blank">
+        <span class="card-icon">📄</span>
+        <span class="card-title">Pages</span>
+        <span class="card-desc">Pages les plus visitées · Routes · Hostnames</span>
+        <span class="card-tag">Analytics</span>
+      </a>
+      <a class="stat-card" id="link-referrers" href="https://vercel.com" target="_blank">
+        <span class="card-icon">🔗</span>
+        <span class="card-title">Sources</span>
+        <span class="card-desc">D'où viennent tes visiteurs · Referrers</span>
+        <span class="card-tag">Analytics</span>
+      </a>
     </div>
 
-    <!-- SIDEBAR -->
-    <div class="stats-side">
-
-      <!-- Referrers -->
-      <p class="section-title">Sources de trafic</p>
-      <div id="referrers-wrap" style="margin-bottom:40px">
-        <div class="state-box"><p>Chargement…</p></div>
-      </div>
-
-      <!-- Appareils -->
-      <p class="section-title">Appareils</p>
-      <div id="devices-wrap" style="margin-bottom:40px">
-        <div class="state-box"><p>Chargement…</p></div>
-      </div>
-
-      <!-- Pays -->
-      <p class="section-title">Pays</p>
-      <div id="countries-wrap">
-        <div class="state-box"><p>Chargement…</p></div>
-      </div>
-
+    <p class="section-title">Performance & Déploiements</p>
+    <div class="cards-grid">
+      <a class="stat-card" id="link-speed" href="https://vercel.com" target="_blank">
+        <span class="card-icon">⚡</span>
+        <span class="card-title">Speed Insights</span>
+        <span class="card-desc">Score RES · LCP · CLS · INP · TTFB</span>
+        <span class="card-tag">Performance</span>
+      </a>
+      <a class="stat-card" id="link-deployments" href="https://vercel.com" target="_blank">
+        <span class="card-icon">🚀</span>
+        <span class="card-title">Déploiements</span>
+        <span class="card-desc">Historique · Logs · Statuts · Erreurs build</span>
+        <span class="card-tag">Vercel</span>
+      </a>
+      <a class="stat-card" id="link-logs" href="https://vercel.com" target="_blank">
+        <span class="card-icon">📋</span>
+        <span class="card-title">Logs Runtime</span>
+        <span class="card-desc">Logs en temps réel · Requêtes API · Erreurs</span>
+        <span class="card-tag">Vercel</span>
+      </a>
     </div>
+
   </div>
 
   <footer>
@@ -340,241 +211,35 @@
 
 </div>
 
-<div id="toast" class="toast"></div>
-
 <script>
-// ── HELPERS ────────────────────────────────────────────────────────────────
-const $ = id => document.getElementById(id);
-let currentPeriod = '1d';
-let vercelToken   = null;
-let projectId     = null;
+  let team = 'luisdasilva8331-s-team';
+  let slug = localStorage.getItem('np_vercel_slug') || '';
 
-function toast(msg, type='') {
-  const t = $('toast'); t.textContent = msg; t.className = `toast ${type} show`;
-  clearTimeout(t._t); t._t = setTimeout(() => t.className = 'toast', 3500);
-}
-
-function fmt(n) {
-  if (n === null || n === undefined) return '—';
-  if (n >= 1000000) return (n/1000000).toFixed(1) + 'M';
-  if (n >= 1000)    return (n/1000).toFixed(1) + 'K';
-  return String(Math.round(n));
-}
-
-function setPeriod(p, el) {
-  currentPeriod = p;
-  document.querySelectorAll('.period-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  loadAll();
-}
-
-// ── TOKEN ──────────────────────────────────────────────────────────────────
-function saveToken() {
-  const val = $('token-input').value.trim();
-  if (!val) { toast('Token vide', 'ko'); return; }
-  localStorage.setItem('np_vercel_token', val);
-  vercelToken = val;
-  $('setup-box').classList.remove('visible');
-  $('controls').style.display = '';
-  $('token-status').innerHTML = '<span style="color:var(--green)">✓ Token connecté</span>';
-  loadAll();
-}
-
-function clearToken() {
-  localStorage.removeItem('np_vercel_token');
-  localStorage.removeItem('np_vercel_project');
-  vercelToken = null; projectId = null;
-  $('setup-box').classList.add('visible');
-  $('controls').style.display = 'none';
-  $('token-status').textContent = 'Connecte ton token Vercel pour charger les données';
-  toast('Token supprimé');
-}
-
-// ── PERIOD → dates ─────────────────────────────────────────────────────────
-function getPeriodDates() {
-  const now  = new Date();
-  const from = new Date(now);
-  if      (currentPeriod === '1d')  from.setDate(now.getDate() - 1);
-  else if (currentPeriod === '7d')  from.setDate(now.getDate() - 7);
-  else if (currentPeriod === '30d') from.setDate(now.getDate() - 30);
-  return {
-    from: from.toISOString().split('T')[0],
-    to:   now.toISOString().split('T')[0]
-  };
-}
-
-// ── VERCEL API ─────────────────────────────────────────────────────────────
-async function apiGet(path) {
-  const r = await fetch('https://api.vercel.com' + path, {
-    headers: { Authorization: `Bearer ${vercelToken}` }
-  });
-  if (!r.ok) throw new Error(`API ${r.status}`);
-  return r.json();
-}
-
-async function getProjectId() {
-  if (projectId) return projectId;
-  const cached = localStorage.getItem('np_vercel_project');
-  if (cached) { projectId = cached; return projectId; }
-  const data = await apiGet('/v9/projects/news-porto');
-  projectId = data.id;
-  localStorage.setItem('np_vercel_project', projectId);
-  return projectId;
-}
-
-// ── ANALYTICS DATA ─────────────────────────────────────────────────────────
-async function fetchAnalytics(type) {
-  const pid = await getProjectId();
-  const { from, to } = getPeriodDates();
-  const url = `/v1/analytics/stats?projectId=${pid}&from=${from}&to=${to}&type=${type}&limit=10`;
-  return apiGet(url);
-}
-
-// ── LOAD ALL ───────────────────────────────────────────────────────────────
-async function loadAll() {
-  if (!vercelToken) return;
-  $('last-refresh').textContent = 'Actualisation…';
-
-  // Show loaders
-  ['visitors','views','bounce','duration'].forEach(k => {
-    $(`kpi-${k}-load`).style.display = 'block';
-    $(`kpi-${k}`).style.display      = 'none';
-  });
-
-  try {
-    await Promise.all([loadKPIs(), loadPages(), loadReferrers(), loadDevices(), loadCountries()]);
-    const now = new Date();
-    $('last-refresh').textContent = `Mis à jour ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;
-  } catch(e) {
-    console.error(e);
-    toast('Erreur API Vercel — vérifie ton token', 'ko');
-    $('last-refresh').textContent = 'Erreur';
+  function buildLinks(s) {
+    const base = `https://vercel.com/${team}/${s}/`;
+    document.getElementById('link-analytics').href   = base + 'analytics';
+    document.getElementById('link-pages').href       = base + 'analytics?tab=pages';
+    document.getElementById('link-referrers').href   = base + 'analytics?tab=referrers';
+    document.getElementById('link-speed').href       = base + 'speed-insights';
+    document.getElementById('link-deployments').href = base + 'deployments';
+    document.getElementById('link-logs').href        = base + 'logs';
   }
-}
 
-async function loadKPIs() {
-  try {
-    const data = await fetchAnalytics('visitors');
-    const visitors = data?.totalUniqueVisitors ?? data?.total ?? null;
-    const views    = data?.totalPageViews      ?? null;
-    const bounce   = data?.bounceRate          ?? null;
-    const duration = data?.avgDuration         ?? null;
-
-    showKPI('visitors', visitors, null);
-    showKPI('views',    views,    null);
-    showKPI('bounce',   bounce !== null ? Math.round(bounce) + '%' : null, null, true);
-    showKPI('duration', duration !== null ? fmtDuration(duration) : null, null);
-  } catch(e) {
-    ['visitors','views','bounce','duration'].forEach(k => showKPI(k, null, null));
+  function saveSlug() {
+    const val = document.getElementById('slug-input').value.trim();
+    if (!val) return;
+    localStorage.setItem('np_vercel_slug', val);
+    slug = val;
+    buildLinks(val);
+    const btn = document.getElementById('save-btn');
+    btn.textContent = '✓ Sauvegardé';
+    setTimeout(() => btn.textContent = 'Sauvegarder', 2000);
   }
-}
 
-function showKPI(key, val, delta, isPercent=false) {
-  $(`kpi-${key}-load`).style.display = 'none';
-  const el = $(`kpi-${key}`);
-  el.style.display = 'block';
-  el.textContent   = val !== null ? val : '—';
-}
-
-function fmtDuration(ms) {
-  if (!ms) return '—';
-  const s = Math.round(ms / 1000);
-  if (s < 60) return s + 's';
-  return Math.floor(s/60) + 'm ' + (s%60) + 's';
-}
-
-async function loadPages() {
-  try {
-    const data = await fetchAnalytics('pages');
-    const pages = data?.data || data?.pages || [];
-    if (!pages.length) { $('pages-wrap').innerHTML = '<div class="state-box"><p>Pas de données</p></div>'; return; }
-    const max = Math.max(...pages.map(p => p.count || p.pageViews || 0));
-    const rows = pages.slice(0,10).map(p => {
-      const url   = p.path || p.page || '—';
-      const count = p.count || p.pageViews || 0;
-      const pct   = max > 0 ? Math.round((count/max)*100) : 0;
-      return `<tr>
-        <td><span style="color:rgba(255,255,255,.5)">${url}</span><div class="page-bar" style="width:${pct}%"></div></td>
-        <td>${fmt(count)}</td>
-      </tr>`;
-    }).join('');
-    $('pages-wrap').innerHTML = `<table class="pages-table">
-      <thead><tr><th>Page</th><th>Vues</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>`;
-  } catch(e) {
-    $('pages-wrap').innerHTML = '<div class="state-box"><p>Erreur chargement</p></div>';
+  if (slug) {
+    document.getElementById('slug-input').value = slug;
+    buildLinks(slug);
   }
-}
-
-async function loadReferrers() {
-  try {
-    const data = await fetchAnalytics('referrers');
-    const refs = data?.data || data?.referrers || [];
-    if (!refs.length) { $('referrers-wrap').innerHTML = '<div class="state-box"><p>Pas de données</p></div>'; return; }
-    const html = refs.slice(0,8).map(r => `
-      <div class="ref-item">
-        <span class="ref-name">${r.referrer || r.source || '(direct)'}</span>
-        <span class="ref-count">${fmt(r.count || r.pageViews || 0)}</span>
-      </div>`).join('');
-    $('referrers-wrap').innerHTML = html;
-  } catch(e) {
-    $('referrers-wrap').innerHTML = '<div class="state-box"><p>Erreur chargement</p></div>';
-  }
-}
-
-async function loadDevices() {
-  try {
-    const data = await fetchAnalytics('devices');
-    const devs = data?.data || data?.devices || [];
-    if (!devs.length) { $('devices-wrap').innerHTML = '<div class="state-box"><p>Pas de données</p></div>'; return; }
-    const total = devs.reduce((s,d) => s + (d.count || 0), 0);
-    const html = devs.slice(0,4).map(d => {
-      const pct = total > 0 ? Math.round((d.count/total)*100) : 0;
-      return `<div class="device-row">
-        <div class="device-label"><span>${d.device || d.type || '—'}</span><span>${pct}%</span></div>
-        <div class="device-bar-bg"><div class="device-bar-fill" style="width:${pct}%"></div></div>
-      </div>`;
-    }).join('');
-    $('devices-wrap').innerHTML = html;
-  } catch(e) {
-    $('devices-wrap').innerHTML = '<div class="state-box"><p>Erreur chargement</p></div>';
-  }
-}
-
-async function loadCountries() {
-  try {
-    const data = await fetchAnalytics('countries');
-    const countries = data?.data || data?.countries || [];
-    if (!countries.length) { $('countries-wrap').innerHTML = '<div class="state-box"><p>Pas de données</p></div>'; return; }
-    const total = countries.reduce((s,c) => s + (c.count || 0), 0);
-    const flags = {France:'🇫🇷','United States':'🇺🇸','United Kingdom':'🇬🇧',Portugal:'🇵🇹',Germany:'🇩🇪',Spain:'🇪🇸',Belgium:'🇧🇪',Switzerland:'🇨🇭',Italy:'🇮🇹','Hong Kong':'🇭🇰'};
-    const html = countries.slice(0,8).map(c => {
-      const pct  = total > 0 ? Math.round((c.count/total)*100) : 0;
-      const name = c.country || c.name || '—';
-      const flag = flags[name] || '🌍';
-      return `<div class="country-item">
-        <span class="country-name">${flag} ${name}</span>
-        <span class="country-pct">${pct}%</span>
-      </div>`;
-    }).join('');
-    $('countries-wrap').innerHTML = html;
-  } catch(e) {
-    $('countries-wrap').innerHTML = '<div class="state-box"><p>Erreur chargement</p></div>';
-  }
-}
-
-// ── INIT ───────────────────────────────────────────────────────────────────
-(function init() {
-  const saved = localStorage.getItem('np_vercel_token');
-  if (saved) {
-    vercelToken = saved;
-    $('setup-box').classList.remove('visible');
-    $('controls').style.display = '';
-    $('token-status').innerHTML = '<span style="color:var(--green)">✓ Token connecté</span>';
-    loadAll();
-  }
-})();
 </script>
 
 </body>
