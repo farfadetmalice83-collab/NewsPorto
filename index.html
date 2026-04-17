@@ -1376,57 +1376,6 @@
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
-
-  <!-- Schema.org : Organization (Knowledge Graph Google) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "NewsPorto",
-    "url": "https://newsporto.fr",
-    "logo": {
-      "@type": "ImageObject",
-      "url": "https://newsporto.fr/Logo.png",
-      "width": 200,
-      "height": 200
-    },
-    "description": "NewsPorto, le média de référence des fans du FC Porto en France. Actualités, transferts, résultats, Europa League et Liga Portugal.",
-    "foundingDate": "2024",
-    "inLanguage": "fr-FR",
-    "sameAs": [
-      "https://discord.gg/YCcuMHmGcH"
-    ],
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "contactType": "customer support",
-      "url": "https://newsporto.fr/contact.html"
-    },
-    "knowsAbout": [
-      "FC Porto",
-      "Liga Portugal",
-      "Football portugais",
-      "Europa League"
-    ]
-  }
-  </script>
-
-  <!-- Schema.org : WebSite (SearchAction pour sitelinks Google) -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "NewsPorto",
-    "url": "https://newsporto.fr",
-    "description": "NewsPorto, le média de référence des fans du FC Porto en France.",
-    "inLanguage": "fr-FR",
-    "publisher": {
-      "@type": "Organization",
-      "name": "NewsPorto",
-      "url": "https://newsporto.fr"
-    }
-  }
-  </script>
-
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
@@ -1497,9 +1446,10 @@
     <!-- GAUCHE : article à la une -->
     <div class="hero-content" id="hero-content">
       <p class="hero-eyebrow" id="hero-eyebrow">À la une · Chargement...</p>
-      <h1 class="hero-title" id="hero-title" style="opacity:0;transition:opacity .5s ease .2s">
-        <span class="hero-title-line"><span></span></span>
-        <span class="hero-title-line"><span><span class="outline"></span></span></span>
+      <h1 class="hero-title" id="hero-title">
+        <span class="hero-title-line"><span>Dernière</span></span>
+        <span class="hero-title-line"><span><span class="outline">Actu</span></span></span>
+        <span class="hero-title-line"><span>Porto</span></span>
       </h1>
       <div class="hero-meta">
         <span id="hero-cat">—</span>
@@ -1895,36 +1845,6 @@
     </ul>
   </footer>
 
-  <!-- Bouton cloche flottant -->
-  <style>
-    #notif-bell {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 900;
-      width: 44px;
-      height: 44px;
-      background: rgba(0,0,0,0.85);
-      border: 1px solid rgba(255,255,255,0.12);
-      backdrop-filter: blur(12px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: border-color .2s, transform .2s;
-      font-size: 17px;
-    }
-    #notif-bell:hover {
-      border-color: rgba(255,255,255,0.35);
-      transform: scale(1.08);
-    }
-    #notif-bell:active { transform: scale(0.95); }
-    @media (max-width: 768px) {
-      #notif-bell { bottom: 20px; right: 20px; width: 40px; height: 40px; }
-    }
-  </style>
-  <button id="notif-bell" onclick="reopenPopup()" aria-label="Notifications" title="Gérer les notifications">🔔</button>
-
 </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
@@ -2289,7 +2209,6 @@
       document.getElementById('hero-title').innerHTML = `
         <span class="hero-title-line"><span>${line1}</span></span>
         <span class="hero-title-line"><span><span class="outline">${line2}</span></span></span>`;
-      document.getElementById('hero-title').style.opacity = '1';
       document.getElementById('hero-cat').textContent = catLabel0;
       document.getElementById('hero-read').textContent = a0.read_time;
       document.getElementById('hero-lead').textContent = a0.excerpt;
@@ -2703,12 +2622,38 @@
 
   .popup-push-btn {
     width: 100%; background: transparent; border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.6); padding: 12px; cursor: pointer; transition: .2s;
+    color: rgba(255,255,255,0.7); padding: 13px; cursor: pointer; transition: .2s;
     font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700;
     letter-spacing: 2px; text-transform: uppercase; display: flex;
     align-items: center; justify-content: center; gap: 8px;
   }
-  .popup-push-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; }
+  .popup-push-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.04); }
+  .popup-push-btn.done { border-color: #00a86b; color: #00a86b; pointer-events: none; }
+
+  .popup-section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; font-weight: 700; letter-spacing: 3px;
+    text-transform: uppercase; color: rgba(255,255,255,0.3);
+    margin-bottom: 10px;
+  }
+
+  .popup-or {
+    display: flex; align-items: center; gap: 12px;
+    margin: 16px 0;
+    color: rgba(255,255,255,0.2);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+  }
+  .popup-or::before, .popup-or::after {
+    content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.08);
+  }
+
+  .popup-push-hint {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px; letter-spacing: 1.5px;
+    color: rgba(255,255,255,0.2); text-align: center;
+    margin-top: 8px; text-transform: uppercase;
+  }
 
   .popup-msg {
     font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 1px;
@@ -2765,23 +2710,23 @@
 
     <p class="popup-eyebrow">NewsPorto · Rester informé</p>
     <h2 class="popup-title">Ne rate <span>aucun</span> moment Porto</h2>
-    <p class="popup-desc">Reçois chaque nouvel article et un rappel avant chaque match directement dans ta boîte mail.</p>
+    <p class="popup-desc">Choisis comment tu veux recevoir les actus du FC Porto.</p>
 
-    <div class="popup-perks">
-      <div class="popup-perk"><span class="popup-perk-icon">📰</span> Chaque nouvel article publié</div>
-      <div class="popup-perk"><span class="popup-perk-icon">⚽</span> Rappel la veille et le jour du match</div>
-      <div class="popup-perk"><span class="popup-perk-icon">🐉</span> Força Porto, rien d'autre</div>
-    </div>
-
+    <!-- EMAIL -->
+    <div class="popup-section-label">📬 Par email</div>
     <div class="popup-form">
       <input type="email" id="popup-email" class="popup-input" placeholder="ton@email.com" autocomplete="email">
       <button class="popup-submit" id="popup-submit-btn" onclick="subscribeEmail()">S'abonner</button>
     </div>
 
-    <!-- Bouton push (caché sur iOS) -->
-    <button class="popup-push-btn" id="popup-push-btn" onclick="subscribePush()" style="display:none">
-      🔔 Activer les notifications push
+    <!-- SÉPARATEUR -->
+    <div class="popup-or"><span>ou</span></div>
+
+    <!-- PUSH -->
+    <button class="popup-push-btn" id="popup-push-btn" onclick="subscribePush()">
+      🔔 Activer les notifications du navigateur
     </button>
+    <p class="popup-push-hint" id="popup-push-hint">Reçois une alerte instantanée à chaque article</p>
 
     <p class="popup-msg" id="popup-msg"></p>
     <button class="popup-skip" onclick="closePopup()">Non merci, continuer sans</button>
@@ -2809,12 +2754,34 @@
       const popup = document.getElementById('notif-popup');
       if (!popup) return;
       popup.classList.add('show');
-      if ('serviceWorker' in navigator && 'PushManager' in window && !localStorage.getItem(PUSH_KEY)) {
-        const pushBtn = document.getElementById('popup-push-btn');
-        if (pushBtn) pushBtn.style.display = 'flex';
-      }
+      initPushBtn();
     }, POPUP_DELAY_MS);
   }
+
+  // ── Init état du bouton push ────────────────────────────────────────────
+  function initPushBtn() {
+    const pushBtn  = document.getElementById('popup-push-btn');
+    const pushHint = document.getElementById('popup-push-hint');
+    if (!pushBtn) return;
+    // iOS ne supporte pas Push API → cacher proprement
+    const isIOS = /iP(hone|ad|od)/.test(navigator.userAgent) && !window.MSStream;
+    if (isIOS || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+      pushBtn.style.display = 'none';
+      if (pushHint) pushHint.style.display = 'none';
+      return;
+    }
+    // Déjà activé → montrer l'état
+    if (localStorage.getItem(PUSH_KEY)) {
+      pushBtn.textContent = '✓ Notifications activées';
+      pushBtn.classList.add('done');
+    }
+  }
+
+  // ── Rouvrir le popup depuis la cloche ───────────────────────────────────
+  window.reopenPopup = function() {
+    const popup = document.getElementById('notif-popup');
+    if (popup) { popup.classList.add('show'); initPushBtn(); }
+  };
 
   // ── Fermer le popup (Non merci) ─────────────────────────────────────────
   // Ne stocke rien en localStorage → reviendra à la prochaine visite
@@ -2825,12 +2792,6 @@
       const fab = document.getElementById('push-fab');
       if (fab) fab.classList.add('show');
     }
-  };
-
-  // ── Rouvrir le popup depuis le footer ───────────────────────────────────
-  window.reopenPopup = function() {
-    const popup = document.getElementById('notif-popup');
-    if (popup) popup.classList.add('show');
   };
 
   // Fermer en cliquant l'overlay
@@ -2911,7 +2872,8 @@
 
       localStorage.setItem(PUSH_KEY, '1');
       if (msg) { msg.textContent = '✓ Notifications activées !'; msg.className = 'popup-msg ok'; }
-      document.getElementById('popup-push-btn').style.display = 'none';
+      const pushBtn = document.getElementById('popup-push-btn');
+      if (pushBtn) { pushBtn.textContent = '✓ Notifications activées'; pushBtn.classList.add('done'); }
       document.getElementById('push-fab').classList.remove('show');
 
     } catch (err) {
