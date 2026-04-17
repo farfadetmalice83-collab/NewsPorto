@@ -102,7 +102,15 @@
     <p id="pw-gate-sub">NewsPorto</p>
     <p id="pw-gate-title">Stats Admin</p>
     <div id="pw-gate-line"></div>
-    <input id="pw-gate-input" type="password" placeholder="••••" maxlength="10" autofocus>
+    <div style="position:relative;width:280px">
+      <input id="pw-gate-input" type="password" placeholder="••••" maxlength="10" autofocus style="padding-right:48px">
+      <button onclick="toggleGateEye()" type="button" tabindex="-1" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:rgba(255,255,255,.25);padding:0;display:flex;align-items:center;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.25)'">
+        <svg id="gate-eye-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+      </button>
+    </div>
     <p id="pw-gate-err"></p>
     <button id="pw-gate-btn" onclick="checkGate()">Accéder →</button>
   </div>
@@ -126,6 +134,7 @@
     }
   }
   document.getElementById('pw-gate-input').addEventListener('keydown',e=>{if(e.key==='Enter')checkGate();});
+  function toggleGateEye(){const i=document.getElementById('pw-gate-input'),ic=document.getElementById('gate-eye-icon'),h=i.type==='password';i.type=h?'text':'password';ic.innerHTML=h?'<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>':'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';}
 </script>
 
 <div class="grid-bg"></div>
