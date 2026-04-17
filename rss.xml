@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"
+  xmlns:content="http://purl.org/rss/1.0/modules/content/"
+  xmlns:atom="http://www.w3.org/2005/Atom"
+  xmlns:media="http://search.yahoo.com/mrss/">
+  <channel>
+    <title>NewsPorto — Actualité FC Porto</title>
+    <link>https://newsporto.fr</link>
+    <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
+    <language>fr-FR</language>
+    <lastBuildDate>Fri, 17 Apr 2026 18:26:31 GMT</lastBuildDate>
+    <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
+    <image>
+      <url>https://newsporto.fr/Logo.png</url>
+      <title>NewsPorto</title>
+      <link>https://newsporto.fr</link>
+    </image>
+    
+    <item>
+      <title><![CDATA[Farioli revait de mieux en europa league !]]></title>
+      <link>https://newsporto.fr/articles/farioli-revait-de-mieux-en-europa-league.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/farioli-revait-de-mieux-en-europa-league.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le FC Porto a vécu une soirée cauchemardesque au City Ground, où l’élimination en quarts de finale de la Ligue des Champions laisse un goût d’inachevé. Malgré une domination écr…]]></description>
+      <category><![CDATA[Interview]]></category>
+      <enclosure url="https://www.sportenstrategie.nl/uploads/_792x476_crop_center-center_none/Farioli_KIVNL_shutterstock_2543635103.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[De Rennes à Porto, la renaissance folle de Seko Fofana sous Farioli]]></title>
+      <link>https://newsporto.fr/articles/de-rennes-a-porto-la-renaissance-folle-de-seko-fofana-sous-f.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/de-rennes-a-porto-la-renaissance-folle-de-seko-fofana-sous-f.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Seko Fofana, l’homme providentiel qui redonne des couleurs au FC Porto. Arrivé en janvier sous la forme d’un prêt discret après une période compliquée au Stade Rennais, l’intern…]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://livesport-ott-images.ssl.cdn.cra.cz/r1200xfq60/421e5ce1-3a80-4ec8-bcf4-feddc2c5d221.jpeg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Adieu l'Europe pour Thiago Silva Porto échoue dans son dernier défi]]></title>
+      <link>https://newsporto.fr/articles/adieu-l-europe-pour-thiago-silva-porto-echoue-dans-son-derni.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/adieu-l-europe-pour-thiago-silva-porto-echoue-dans-son-derni.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Fin du rêve européen pour Thiago Silva : "C’était l’un des derniers"]]></description>
+      <category><![CDATA[Interview]]></category>
+      <enclosure url="https://bordalo.observador.pt/v2/q:60/rs:fill:980/c:1500:842:nowe:0:44/plain/https://s3.observador.pt/wp-content/uploads/2026/01/14231241/thiago-silva.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Europa League : Porto éliminé mais héroïque face à Nottingham]]></title>
+      <link>https://newsporto.fr/articles/europa-league-porto-elimine-mais-heroique-face-a-nottingham.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/europa-league-porto-elimine-mais-heroique-face-a-nottingham.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le siège de Nottingham restera comme l’une de ces défaites qui en disent plus long qu’une victoire. Ce jeudi soir, au City Ground, le FC Porto a plié sous le score de 1-0 face à…]]></description>
+      <category><![CDATA[Europa League]]></category>
+      <enclosure url="https://img-s-msn-com.akamaized.net/tenant/amp/entityid/AA20xy1e.img?w=768&h=512&m=6&x=516&y=176&s=37&d=37" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Cauchemar au City Ground : Le naufrage Bednarek et le fantôme de Moffi condamnent les Dragons !]]></title>
+      <link>https://newsporto.fr/articles/cauchemar-au-city-ground-le-naufrage-bednarek-et-le-fantome-.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/cauchemar-au-city-ground-le-naufrage-bednarek-et-le-fantome-.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Cauchemar au City Ground : quand les erreurs individuelles enterrent les Dragons en Europa League]]></description>
+      <category><![CDATA[Europa League]]></category>
+      <enclosure url="https://229foot.com/wp-content/uploads/2026/04/Nottingham-vs-Porto4.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Diogo Costa vers la Juventus ?]]></title>
+      <link>https://newsporto.fr/articles/diogo-costa-vers-la-juventus.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/diogo-costa-vers-la-juventus.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Diogo Costa, l’homme qui fait rêver la Juventus et bouscule les plans du FC Porto]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://trivela.fr/wp-content/uploads/2025/05/GettyImages-2180861127.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Accusations d’empoisonnement : Le FC Porto dénonce une calomnie]]></title>
+      <link>https://newsporto.fr/articles/accusations-d-empoisonnement-le-fc-porto-denonce-une-campagn.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/accusations-d-empoisonnement-le-fc-porto-denonce-une-campagn.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le duel de handball entre le FC Porto et le Sporting vire à la polémique après des accusations d'empoisonnement jugées ridicules par la direction des Dragons. Le club réagit fermement.]]></description>
+      <category><![CDATA[Liga Portugal]]></category>
+      <enclosure url="https://yop.l-frii.com/wp-content/uploads/2026/02/Portugal-un-gros-scandale-eclate-apres-le-match-entre-FC-Porto-et-Sporting-CP-1024x609.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[André Villas-Boas scelle un partenariat historique avec l'Association Commerciale du Porto]]></title>
+      <link>https://newsporto.fr/articles/andre-villas-boas-scelle-un-partenariat-historique-entre-le-.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/andre-villas-boas-scelle-un-partenariat-historique-entre-le-.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le président André Villas-Boas a officialisé un partenariat entre le club et l'Association Commerciale du Porto (ACP). Une alliance ancrée dans l'histoire et le développement économique de la ville.]]></description>
+      <category><![CDATA[Analyse]]></category>
+      <enclosure url="https://cdn-s-www.ledauphine.com/images/9438FD0D-2EA7-4CAA-8B3F-2BD77DA6E12F/NW_raw/andre-villas-boas-a-detrone-l-ancien-president-du-fc-porto-a-la-tete-du-club-depuis-42-ans-photo-sipa-pedro-granadeiro-1714296257.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Le FC Porto et l'Université de Porto s'unissent pour l'innovation numérique]]></title>
+      <link>https://newsporto.fr/articles/partenariat-stategique-entre-l-universite-de-porto-et-le-fc-.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/partenariat-stategique-entre-l-universite-de-porto-et-le-fc-.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Une collaboration stratégique vient d'être scellée pour révolutionner l'usage de la Data Science au sein du club. Cette alliance promet de moderniser l'analyse des performances sportives.]]></description>
+      <category><![CDATA[Analyse]]></category>
+      <enclosure url="https://www.eugloh.eu/fileadmin/_processed_/2/b/csm_University-of-Porto_b117dc0d54.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Nottingham Forest – FC Porto : Le grand soir européen approche au City Ground]]></title>
+      <link>https://newsporto.fr/articles/nottingham-forest-fc-porto-jeudi-a-21h-les-compos-probables.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/nottingham-forest-fc-porto-jeudi-a-21h-les-compos-probables.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Les Dragons défient Nottingham Forest en quart de finale retour d'Europa League. Découvrez les compositions probables, les forces en présence et les enjeux de ce choc décisif.]]></description>
+      <category><![CDATA[Europa League]]></category>
+      <enclosure url="https://editorial.uefa.com/resources/02a4-205b4128cdcf-e59863bd8f5d-1000/fc_porto_v_nottingham_forest_fc_-_uefa_europa_league_2025_26_quarter-final_first_leg.jpeg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
+      <title><![CDATA[Mercato : Le Bayern Munich s'intéresse de près à une pépite du FC Porto]]></title>
+      <link>https://newsporto.fr/articles/la-bayern-se-penche-sur-une-pepite-du-fc-porto.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/la-bayern-se-penche-sur-une-pepite-du-fc-porto.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le géant bavarois aurait ciblé l'un des jeunes talents les plus prometteurs des Dragons pour le prochain mercato estival. Une offre record pourrait bientôt arriver sur la table.]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://images.impresa.pt/sicnot/2026-01-07-oskar-pietuszewski--7686bc06/original" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+  </channel>
+</rss>
