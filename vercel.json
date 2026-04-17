@@ -5,8 +5,7 @@
       "schedule": "0 8 * * *"
     }
   ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/404.html", "status": 404 }
-  ]
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "404": "/404.html"
 }
