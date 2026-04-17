@@ -1892,9 +1892,38 @@
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
       <li><a href="/cdn-cgi/l/email-protection#412d342832252032282d3720797272707101262c20282d6f222e2c">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
-      <li><a href="#" onclick="reopenPopup();return false;" style="opacity:0.5">Notifications</a></li>
     </ul>
   </footer>
+
+  <!-- Bouton cloche flottant -->
+  <style>
+    #notif-bell {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 900;
+      width: 44px;
+      height: 44px;
+      background: rgba(0,0,0,0.85);
+      border: 1px solid rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: border-color .2s, transform .2s;
+      font-size: 17px;
+    }
+    #notif-bell:hover {
+      border-color: rgba(255,255,255,0.35);
+      transform: scale(1.08);
+    }
+    #notif-bell:active { transform: scale(0.95); }
+    @media (max-width: 768px) {
+      #notif-bell { bottom: 20px; right: 20px; width: 40px; height: 40px; }
+    }
+  </style>
+  <button id="notif-bell" onclick="reopenPopup()" aria-label="Notifications" title="Gérer les notifications">🔔</button>
 
 </div>
 
