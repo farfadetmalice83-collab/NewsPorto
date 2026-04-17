@@ -526,16 +526,17 @@
       gap: 64px;
       width: max-content;
       will-change: transform;
+      animation: none;
+    }
+    .ticker-inner.ready {
       animation: ticker-scroll 28s linear infinite;
     }
-    /* Pause on hover */
     @keyframes ticker-scroll {
       0%   { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-50%, 0, 0); }
     }
-    /* Mobile : vitesse réduite pour lisibilité */
     @media (max-width: 768px) {
-      .ticker-inner {
+      .ticker-inner.ready {
         gap: 40px;
         animation-duration: 22s;
       }
@@ -888,6 +889,7 @@
       });
       const doubled = [...items, ...items].join('');
       inner.innerHTML = doubled;
+      inner.classList.remove('ready'); void inner.offsetWidth; inner.classList.add('ready');
     })
     .catch(() => {});
   </script>
