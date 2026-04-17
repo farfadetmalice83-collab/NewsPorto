@@ -355,291 +355,293 @@
     if (e.key === 'Enter') checkPw();
   });
 
-  // ── Oeil géant canvas ────────────────────────────────────────────────
+  // ── Oeil géant canvas ──────────────────────────────────────────────
   (function() {
     const canvas = document.getElementById('eye-canvas');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    let W, H, mx = window.innerWidth/2, my = window.innerHeight/2;
-    let blinkProgress = 0; // 0=ouvert, 1=fermé
-    let isBlinking = false;
-    let angryLevel = 0;
-    let angryTarget = 0;
+    let W, H, mx, my;
     let smx, smy;
+    let blinkProgress = 0, isBlinking = false;
+    let angryLevel = 0, angryTarget = 0;
 
     function resize() {
       W = canvas.width  = window.innerWidth;
       H = canvas.height = window.innerHeight;
-      smx = smx || W/2; smy = smy || H/2;
+      if (!smx) { smx = W/2; smy = H/2; mx = W/2; my = H/2; }
     }
     resize();
     window.addEventListener('resize', resize);
     document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
 
-    // Cils pré-calculés — fixes pour éviter le flickering
-    const LASHES_TOP = Array.from({length: 18}, (_, i) => {
-      const t = i / 17;
-      const curl  = 0.3 + Math.random() * 0.5;
-      const spread = (Math.random() - 0.5) * 0.08;
-      const len   = 0.22 + Math.random() * 0.22;
-      const thick = 1.0 + Math.random() * 1.2;
-      return { t, curl, spread, len, thick };
-    });
-    const LASHES_BOT = Array.from({length: 10}, (_, i) => {
-      const t = i / 9;
-      return { t, len: 0.08 + Math.random() * 0.10, thick: 0.6 + Math.random() * 0.5 };
+    // Pré-calcul des cils (stable, pas de random dans la boucle)
+    const LASHES = Array.from({length: 20}, (_, i) => {
+      const t  = (i / 19) * 0.84 + 0.08; // évite les coins extrêmes
+      const curl   = 0.25 + Math.random() * 0.55;
+      const offset = (Math.random() - 0.5) * 0.012;
+      const length = 0.18 + Math.random() * 0.20;
+      const width  = 1.2  + Math.random() * 1.4;
+      return { t, curl, offset, length, width };
     });
 
-    // Veines pré-calculées
-    const VEINS = Array.from({length: 12}, () => ({
-      sx: (Math.random()-0.5)*0.7, sy: (Math.random()-0.5)*0.5,
-      ex: (Math.random()-0.5)*0.35, ey: (Math.random()-0.5)*0.25,
-      side: Math.random() > 0.5 ? 1 : -1
+    const VEINS = Array.from({length: 10}, () => ({
+      ax: (Math.random()-0.5)*0.85, ay: (Math.random()-0.5)*0.55,
+      bx: (Math.random()-0.5)*0.4,  by: (Math.random()-0.5)*0.3,
+      mx: (Math.random()-0.5)*0.6,  my: (Math.random()-0.5)*0.4,
     }));
 
-    function drawEye() {
-      // Smooth mouse tracking
-      smx += (mx - smx) * 0.06;
-      smy += (my - smy) * 0.06;
+    // ── Fonction forme de l'oeil (path réutilisable) ──────────────────
+    function buildEyePath(cx, cy, ew, eh, topClose, botClose) {
+      // topClose: 0=ouvert → 1=fermé (paupière descend)
+      // botClose: 0=ouvert → 1=fermé (paupière monte)
+      const topH = eh * (1.0 - topClose);
+      const botH = eh * (0.65 - botClose * 0.65);
+      ctx.moveTo(cx - ew/2, cy);
+      // Paupière supérieure : courbe en amande, plus arquée au centre
+      ctx.bezierCurveTo(
+        cx - ew*0.22, cy - topH * 1.08,
+        cx + ew*0.22, cy - topH * 1.08,
+        cx + ew/2, cy
+      );
+      // Paupière inférieure : moins courbée
+      ctx.bezierCurveTo(
+        cx + ew*0.22, cy + botH,
+        cx - ew*0.22, cy + botH,
+        cx - ew/2, cy
+      );
+    }
 
-      // Angry lerp
-      angryLevel += (angryTarget - angryLevel) * 0.05;
+    function drawEye() {
+      smx += (mx - smx) * 0.065;
+      smy += (my - smy) * 0.065;
+      angryLevel += (angryTarget - angryLevel) * 0.045;
 
       ctx.clearRect(0, 0, W, H);
 
-      const cx = W / 2, cy = H / 2;
-      const ew = Math.min(W * 0.80, H * 1.6);
-      const eh = ew * 0.36;
+      const cx = W/2, cy = H/2;
+      const ew = Math.min(W * 0.78, H * 1.55);
+      const eh = ew * 0.34;
 
-      // Paupière supérieure descend en clignant
-      const topLid  = blinkProgress;       // 0=ouvert→ 1=fermé
-      const botLid  = blinkProgress * 0.3; // paupière inf remonte un peu
+      const topClose  = blinkProgress;
+      const botClose  = blinkProgress * 0.28;
+      const squint    = angryLevel * 0.45; // paupière sup s'abaisse si angry
 
-      // Angry: paupière sup s'abaisse partiellement → regard plissé
-      const angrySqint = angryLevel * 0.42;
+      // ── Glow ambiant ──
+      const glowR = angryLevel > 0.05 ? `rgba(${Math.round(160*angryLevel)},10,5,${0.07*angryLevel})` : 'rgba(0,30,100,0.05)';
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, ew*0.62);
+      glow.addColorStop(0, glowR); glow.addColorStop(1, 'transparent');
+      ctx.beginPath(); ctx.ellipse(cx, cy, ew*0.62, eh*1.2, 0, 0, Math.PI*2);
+      ctx.fillStyle = glow; ctx.fill();
 
-      // Points clés de la forme de l'oeil
-      function eyePath(top, bot) {
-        ctx.moveTo(cx - ew/2, cy);
-        ctx.bezierCurveTo(
-          cx - ew*0.25, cy - eh*(1.0 - top)*1.05,
-          cx + ew*0.25, cy - eh*(1.0 - top)*1.05,
-          cx + ew/2, cy
-        );
-        ctx.bezierCurveTo(
-          cx + ew*0.25, cy + eh*(0.72 - bot),
-          cx - ew*0.25, cy + eh*(0.72 - bot),
-          cx - ew/2, cy
-        );
-      }
-
-      // ── Ambient glow ──
-      const ambientColor = angryLevel > 0.05
-        ? `rgba(${Math.round(180*angryLevel)},${Math.round(20*(1-angryLevel))},${Math.round(10*(1-angryLevel))},${0.08*angryLevel})`
-        : 'rgba(0,40,120,0.06)';
-      const ambGlow = ctx.createRadialGradient(cx, cy, 0, cx, cy, ew*0.6);
-      ambGlow.addColorStop(0, ambientColor);
-      ambGlow.addColorStop(1, 'transparent');
-      ctx.beginPath(); ctx.ellipse(cx, cy, ew*0.6, eh*1.1, 0, 0, Math.PI*2);
-      ctx.fillStyle = ambGlow; ctx.fill();
-
-      // ── CLIP sur la forme de l'oeil ──
+      // ── ZONE 1 : CLIP sur la forme de l'oeil → scléra + veines ──
       ctx.save();
       ctx.beginPath();
-      eyePath(topLid + angrySqint, botLid);
+      buildEyePath(cx, cy, ew, eh, topClose + squint, botClose);
       ctx.clip();
 
-      // Scléra (blanc de l'oeil)
-      const scleraR = angryLevel > 0.1
-        ? `rgba(${Math.round(245 + 10*angryLevel)},${Math.round(228 - 40*angryLevel)},${Math.round(220 - 60*angryLevel)},0.20)`
-        : 'rgba(242,238,230,0.18)';
-      ctx.fillStyle = scleraR;
-      ctx.fillRect(0, 0, W, H);
+      // Scléra
+      const sc = angryLevel > 0.1
+        ? `rgba(${Math.round(248+7*angryLevel)},${Math.round(230-45*angryLevel)},${Math.round(220-65*angryLevel)},0.22)`
+        : 'rgba(244,240,232,0.19)';
+      ctx.fillStyle = sc; ctx.fillRect(0, 0, W, H);
+      const scGrad = ctx.createRadialGradient(cx, cy-eh*0.08, 0, cx, cy, ew*0.5);
+      scGrad.addColorStop(0, 'rgba(255,253,250,0.13)');
+      scGrad.addColorStop(0.7,'rgba(228,222,210,0.07)');
+      scGrad.addColorStop(1,  'rgba(170,160,148,0.04)');
+      ctx.fillStyle = scGrad; ctx.fillRect(0, 0, W, H);
 
-      // Gradient scléra (plus sombre sur les bords)
-      const scleraGrad = ctx.createRadialGradient(cx, cy-eh*0.1, 0, cx, cy, ew*0.52);
-      scleraGrad.addColorStop(0,   'rgba(255,252,248,0.14)');
-      scleraGrad.addColorStop(0.65,'rgba(230,225,215,0.08)');
-      scleraGrad.addColorStop(1,   'rgba(180,170,155,0.04)');
-      ctx.fillStyle = scleraGrad; ctx.fillRect(0,0,W,H);
-
-      // ── Veines ──
-      const veinAlpha = 0.04 + angryLevel * 0.22;
-      const veinColor = angryLevel > 0.2
-        ? `rgba(220,40,40,${veinAlpha})`
-        : `rgba(200,80,80,${veinAlpha})`;
+      // Veines
+      const va = 0.035 + angryLevel * 0.20;
       VEINS.forEach(v => {
-        const sx = cx + ew * v.sx * v.side;
-        const sy = cy + eh * v.sy;
-        const ex = cx + ew * v.ex * v.side;
-        const ey2 = cy + eh * v.ey;
         ctx.beginPath();
-        ctx.moveTo(sx, sy);
-        ctx.quadraticCurveTo(
-          (sx+ex)/2 + (Math.random()-0.5)*20, (sy+ey2)/2 + (Math.random()-0.5)*10,
-          ex, ey2
-        );
-        ctx.strokeStyle = veinColor;
-        ctx.lineWidth = angryLevel > 0.3 ? 1.2 + angryLevel*1.5 : 0.8;
+        ctx.moveTo(cx + ew*v.ax, cy + eh*v.ay);
+        ctx.quadraticCurveTo(cx + ew*v.mx, cy + eh*v.my, cx + ew*v.bx, cy + eh*v.by);
+        ctx.strokeStyle = angryLevel > 0.2 ? `rgba(210,30,30,${va})` : `rgba(195,75,75,${va})`;
+        ctx.lineWidth = angryLevel > 0.3 ? 0.9 + angryLevel*1.8 : 0.7;
         ctx.stroke();
       });
 
-      ctx.restore(); // fin clip
+      ctx.restore(); // fin clip scléra
 
-      // ── Mouvement du regard ──
+      // ── ZONE 2 : Iris + pupille, clipé AUSSI dans l'oeil ──
+      // Calcul position du regard
       const dx = smx - cx, dy = smy - cy;
-      const ang = Math.atan2(dy, dx);
-      const dist = Math.hypot(dx, dy);
-      const maxMove = ew * 0.10;
-      const move = Math.min(dist / (Math.min(W,H)*0.35), 1) * maxMove;
-      const px = cx + Math.cos(ang) * move;
-      const py = cy + Math.sin(ang) * move * 0.55;
+      const angle = Math.atan2(dy, dx);
+      const dist  = Math.hypot(dx, dy);
+      const maxMove = ew * 0.095;
+      const move = Math.min(dist / (Math.min(W,H)*0.38), 1) * maxMove;
+      const px = cx + Math.cos(angle) * move;
+      const py = cy + Math.sin(angle) * move * 0.52;
 
-      const irisR = ew * 0.152;
-      const pupilMult = angryLevel > 0 ? 0.44 + angryLevel*0.22 : 0.44;
-      const pupR = irisR * pupilMult;
+      const irisR = ew * 0.148;
+      const pupR  = irisR * (0.42 + angryLevel * 0.20);
 
-      // ── Iris ──
+      // Double clip : forme de l'oeil ET cercle iris
       ctx.save();
-      ctx.beginPath(); ctx.arc(px, py, irisR, 0, Math.PI*2); ctx.clip();
+      // Clip 1 : forme de l'oeil
+      ctx.beginPath();
+      buildEyePath(cx, cy, ew, eh, topClose + squint, botClose);
+      ctx.clip();
+      // Clip 2 : cercle iris (évite que l'iris dépasse)
+      ctx.beginPath();
+      ctx.arc(px, py, irisR, 0, Math.PI*2);
+      ctx.clip();
 
-      // Couleur de base iris
-      const h1 = angryLevel > 0.1 ? `rgba(${Math.round(180*angryLevel+10)},${Math.round(20*(1-angryLevel))},${Math.round(15*(1-angryLevel))},0.92)` : 'rgba(18,52,170,0.90)';
-      const h2 = angryLevel > 0.1 ? `rgba(${Math.round(140*angryLevel)},0,0,0.88)` : 'rgba(8,28,120,0.86)';
-      const irisGrad = ctx.createRadialGradient(px-irisR*0.2, py-irisR*0.2, 0, px, py, irisR);
-      irisGrad.addColorStop(0,    h1);
-      irisGrad.addColorStop(0.45, h2);
-      irisGrad.addColorStop(0.85, angryLevel > 0.1 ? 'rgba(60,0,0,0.82)' : 'rgba(4,15,80,0.80)');
-      irisGrad.addColorStop(1,    'rgba(0,0,0,0.85)');
-      ctx.fillStyle = irisGrad; ctx.fillRect(px-irisR, py-irisR, irisR*2, irisR*2);
+      // Fond iris
+      const ic1 = angryLevel > 0.1
+        ? `rgba(${Math.round(185*angryLevel+12)},${Math.round(18*(1-angryLevel))},${Math.round(12*(1-angryLevel))},0.93)`
+        : 'rgba(16,50,168,0.91)';
+      const ic2 = angryLevel > 0.1 ? `rgba(${Math.round(130*angryLevel)},0,0,0.89)` : 'rgba(7,26,118,0.87)';
+      const ic3 = angryLevel > 0.1 ? 'rgba(55,0,0,0.84)' : 'rgba(3,13,76,0.82)';
+      const ig = ctx.createRadialGradient(px-irisR*0.18, py-irisR*0.18, 0, px, py, irisR);
+      ig.addColorStop(0, ic1); ig.addColorStop(0.42, ic2);
+      ig.addColorStop(0.82, ic3); ig.addColorStop(1, 'rgba(0,0,0,0.88)');
+      ctx.fillStyle = ig; ctx.fillRect(px-irisR, py-irisR, irisR*2, irisR*2);
 
       // Fibres radiaires
-      const fiberColor = angryLevel > 0.2 ? 'rgba(255,120,80,' : 'rgba(80,130,255,';
-      for (let i = 0; i < 48; i++) {
-        const a = (i/48)*Math.PI*2;
-        const r0 = pupR*1.05, r1 = irisR*0.9;
+      const fc = angryLevel > 0.2 ? 'rgba(255,110,70,' : 'rgba(75,125,255,';
+      for (let i = 0; i < 52; i++) {
+        const a = (i/52)*Math.PI*2;
         ctx.beginPath();
-        ctx.moveTo(px+Math.cos(a)*r0, py+Math.sin(a)*r0);
-        ctx.lineTo(px+Math.cos(a)*r1, py+Math.sin(a)*r1);
-        ctx.strokeStyle = i%4===0 ? fiberColor+'0.28)' : fiberColor+'0.12)';
-        ctx.lineWidth = i%3===0 ? 0.9 : 0.5;
+        ctx.moveTo(px + Math.cos(a)*pupR*1.06, py + Math.sin(a)*pupR*1.06);
+        ctx.lineTo(px + Math.cos(a)*irisR*0.91, py + Math.sin(a)*irisR*0.91);
+        ctx.strokeStyle = i%4===0 ? fc+'0.30)' : fc+'0.13)';
+        ctx.lineWidth = i%3===0 ? 0.85 : 0.45;
         ctx.stroke();
       }
+      ctx.restore(); // fin double clip
+
+      // Anneau limbique (dessiné sans clip, arc normal)
+      ctx.beginPath(); ctx.arc(px, py, irisR, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(0,0,0,0.78)'; ctx.lineWidth = irisR*0.09; ctx.stroke();
+
+      // ── Pupille (clipée dans l'oeil) ──
+      ctx.save();
+      ctx.beginPath(); buildEyePath(cx, cy, ew, eh, topClose+squint, botClose); ctx.clip();
+      const pg = ctx.createRadialGradient(px, py, 0, px, py, pupR);
+      pg.addColorStop(0, 'rgba(6,6,6,1)'); pg.addColorStop(1, 'rgba(0,0,0,1)');
+      ctx.beginPath(); ctx.arc(px, py, pupR, 0, Math.PI*2);
+      ctx.fillStyle = pg; ctx.fill();
+      // Reflet principal
+      const rg = ctx.createRadialGradient(px-pupR*0.4, py-pupR*0.48, 0, px-pupR*0.4, py-pupR*0.48, pupR*0.4);
+      rg.addColorStop(0, 'rgba(255,255,255,0.94)'); rg.addColorStop(0.55,'rgba(255,255,255,0.28)'); rg.addColorStop(1,'transparent');
+      ctx.beginPath(); ctx.ellipse(px-pupR*0.4, py-pupR*0.48, pupR*0.4, pupR*0.26, -0.3, 0, Math.PI*2);
+      ctx.fillStyle = rg; ctx.fill();
+      // Petit reflet secondaire
+      ctx.beginPath(); ctx.arc(px+pupR*0.32, py+pupR*0.34, pupR*0.09, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.26)'; ctx.fill();
       ctx.restore();
 
-      // Anneau limbique
-      ctx.beginPath(); ctx.arc(px, py, irisR, 0, Math.PI*2);
-      ctx.strokeStyle = 'rgba(0,0,0,0.75)'; ctx.lineWidth = irisR*0.1; ctx.stroke();
-
-      // ── Pupille ──
-      const pupGrad = ctx.createRadialGradient(px, py, 0, px, py, pupR);
-      pupGrad.addColorStop(0, 'rgba(8,8,8,1)');
-      pupGrad.addColorStop(1, 'rgba(0,0,0,1)');
-      ctx.beginPath(); ctx.arc(px, py, pupR, 0, Math.PI*2);
-      ctx.fillStyle = pupGrad; ctx.fill();
-
-      // ── Reflets ──
-      const refGrad = ctx.createRadialGradient(
-        px-pupR*0.42, py-pupR*0.5, 0,
-        px-pupR*0.42, py-pupR*0.5, pupR*0.42
-      );
-      refGrad.addColorStop(0, 'rgba(255,255,255,0.95)');
-      refGrad.addColorStop(0.6,'rgba(255,255,255,0.3)');
-      refGrad.addColorStop(1, 'transparent');
+      // ── Paupières dessinées PAR-DESSUS (masquent l'iris si nécessaire) ──
+      // Paupière supérieure : remplissage noir depuis le haut
+      ctx.save();
+      // Zone au-dessus de la paupière sup
       ctx.beginPath();
-      ctx.ellipse(px-pupR*0.42, py-pupR*0.5, pupR*0.42, pupR*0.28, -0.35, 0, Math.PI*2);
-      ctx.fillStyle = refGrad; ctx.fill();
-      ctx.beginPath(); ctx.arc(px+pupR*0.3, py+pupR*0.35, pupR*0.1, 0, Math.PI*2);
-      ctx.fillStyle = 'rgba(255,255,255,0.28)'; ctx.fill();
-
-      // ── Paupières ──
-      // Paupière supérieure (avec épaisseur)
-      ctx.beginPath();
+      ctx.rect(0, 0, W, cy); // demi-écran haut
       ctx.moveTo(cx - ew/2, cy);
-      ctx.bezierCurveTo(cx-ew*0.25, cy-eh*(1.0-topLid-angrySqint)*1.05, cx+ew*0.25, cy-eh*(1.0-topLid-angrySqint)*1.05, cx+ew/2, cy);
-      const lidGrad = ctx.createLinearGradient(cx, cy-eh, cx, cy);
-      lidGrad.addColorStop(0, 'rgba(10,8,6,0.95)');
-      lidGrad.addColorStop(1, 'rgba(10,8,6,0)');
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-      ctx.lineWidth = 2.2; ctx.stroke();
+      ctx.bezierCurveTo(cx-ew*0.22, cy-eh*(1.0-topClose-squint)*1.08, cx+ew*0.22, cy-eh*(1.0-topClose-squint)*1.08, cx+ew/2, cy);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.97)'; ctx.fill();
+      ctx.restore();
 
-      // Paupière inférieure
+      // Paupière inférieure : remplissage noir depuis le bas
+      ctx.save();
       ctx.beginPath();
-      ctx.moveTo(cx-ew/2, cy);
-      ctx.bezierCurveTo(cx-ew*0.25, cy+eh*(0.72-botLid), cx+ew*0.25, cy+eh*(0.72-botLid), cx+ew/2, cy);
-      ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 1.4; ctx.stroke();
+      ctx.rect(0, cy, W, H);
+      ctx.moveTo(cx - ew/2, cy);
+      ctx.bezierCurveTo(cx-ew*0.22, cy+eh*(0.65-botClose*0.65), cx+ew*0.22, cy+eh*(0.65-botClose*0.65), cx+ew/2, cy);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.97)'; ctx.fill();
+      ctx.restore();
 
-      // ── Cils supérieurs ──
-      LASHES_TOP.forEach(l => {
+      // Bords de l'oeil (contour fin)
+      ctx.beginPath();
+      buildEyePath(cx, cy, ew, eh, topClose+squint, botClose);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)'; ctx.lineWidth = 1.8; ctx.stroke();
+
+      // ── Cils (dessinés AU-DESSUS des paupières) ──
+      LASHES.forEach(l => {
+        // Point de départ : sur la paupière supérieure
         const bx = cx - ew/2 + l.t * ew;
-        const topY = cy - eh * (1.0-topLid-angrySqint) * 4*l.t*(1-l.t);
-        const nx = -(1-2*l.t)*0.3, ny = -1;
-        const nl = Math.hypot(nx,ny);
-        const lx = nx/nl, ly = ny/nl;
-        const len = eh * l.len * (1 - topLid*0.7);
+        // Hauteur du point sur la courbe supérieure
+        const topOpen = 1.0 - topClose - squint;
+        // Formule bezier évaluée à t (approximation)
+        const t2 = l.t;
+        const by = cy - eh * topOpen * 1.08 * 4*t2*(1-t2); // hauteur du bord
+
+        // Normale à la paupière (vers l'extérieur = vers le haut)
+        // Dérivée de la courbe en t
+        const dt  = 0.01;
+        const bx2 = cx - ew/2 + (l.t+dt) * ew;
+        const by2 = cy - eh * topOpen * 1.08 * 4*(t2+dt)*(1-t2-dt);
+        const tangX = bx2 - bx, tangY = by2 - by;
+        const nLen  = Math.hypot(tangX, tangY) || 1;
+        // Normale perpendiculaire (rotée -90°)
+        const nx = tangY/nLen, ny = -tangX/nLen;
+
+        const len = eh * l.length;
+        // Pointe du cil avec courbure
+        const tipX = bx + nx*len + l.curl * eh * 0.18;
+        const tipY = by + ny*len - l.curl * eh * 0.06;
+
         ctx.beginPath();
-        ctx.moveTo(bx + l.spread*ew*0.5, topY);
-        ctx.bezierCurveTo(
-          bx + lx*len*0.35 + l.spread*ew*0.3, topY + ly*len*0.35,
-          bx + lx*len*0.7  + l.curl*eh*0.25, topY + ly*len*0.7,
-          bx + lx*len      + l.curl*eh*0.45, topY + ly*len
+        ctx.moveTo(bx, by);
+        ctx.quadraticCurveTo(
+          bx + nx*len*0.55 + l.curl*eh*0.08,
+          by + ny*len*0.55 - l.curl*eh*0.03,
+          tipX, tipY
         );
-        ctx.strokeStyle = 'rgba(255,255,255,0.32)';
-        ctx.lineWidth = l.thick; ctx.lineCap = 'round'; ctx.stroke();
+        ctx.strokeStyle = 'rgba(255,255,255,0.38)';
+        ctx.lineWidth = l.width * (1 - topClose*0.8);
+        ctx.lineCap = 'round'; ctx.stroke();
       });
 
-      // Cils inférieurs
-      LASHES_BOT.forEach(l => {
-        const bx = cx - ew/2 + l.t * ew;
-        const botY = cy + eh * (0.72-botLid) * 4*l.t*(1-l.t)*0.7;
-        ctx.beginPath();
-        ctx.moveTo(bx, botY);
-        ctx.lineTo(bx + (l.t-0.5)*eh*0.1, botY + eh*l.len);
-        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
-        ctx.lineWidth = l.thick; ctx.lineCap='round'; ctx.stroke();
-      });
-
-      // ── Angry : sourcils froncés ──
-      if (angryLevel > 0.05) {
+      // ── Sourcils froncés (angry) ──
+      if (angryLevel > 0.04) {
         const a = angryLevel;
-        const browY = cy - eh*(1.2 - angrySqint*0.5);
-        // Sourcil gauche
+        const browBaseY = cy - eh*(1.18 - squint*0.6);
+        // Sourcil gauche — s'abaisse à l'intérieur
         ctx.beginPath();
-        ctx.moveTo(cx - ew*0.42, browY + eh*0.18*a);
-        ctx.bezierCurveTo(cx-ew*0.22, browY+eh*0.05*a, cx-ew*0.08, browY-eh*0.12*a, cx-ew*0.01, browY-eh*0.08*a);
-        ctx.strokeStyle = `rgba(255,${Math.round(220*(1-a))},${Math.round(200*(1-a))},${0.55*a+0.1})`;
-        ctx.lineWidth = 3.5 + a*4; ctx.lineCap='round'; ctx.stroke();
+        ctx.moveTo(cx - ew*0.40, browBaseY + eh*0.20*a);
+        ctx.bezierCurveTo(
+          cx - ew*0.20, browBaseY + eh*0.04*a,
+          cx - ew*0.06, browBaseY - eh*0.14*a,
+          cx - ew*0.00, browBaseY - eh*0.10*a
+        );
+        ctx.strokeStyle = `rgba(255,${Math.round(210*(1-a))},${Math.round(190*(1-a))},${0.6*a+0.08})`;
+        ctx.lineWidth = 4 + a*5; ctx.lineCap = 'round'; ctx.stroke();
         // Sourcil droit
         ctx.beginPath();
-        ctx.moveTo(cx + ew*0.42, browY + eh*0.18*a);
-        ctx.bezierCurveTo(cx+ew*0.22, browY+eh*0.05*a, cx+ew*0.08, browY-eh*0.12*a, cx+ew*0.01, browY-eh*0.08*a);
-        ctx.strokeStyle = `rgba(255,${Math.round(220*(1-a))},${Math.round(200*(1-a))},${0.55*a+0.1})`;
-        ctx.lineWidth = 3.5 + a*4; ctx.stroke();
+        ctx.moveTo(cx + ew*0.40, browBaseY + eh*0.20*a);
+        ctx.bezierCurveTo(
+          cx + ew*0.20, browBaseY + eh*0.04*a,
+          cx + ew*0.06, browBaseY - eh*0.14*a,
+          cx + ew*0.00, browBaseY - eh*0.10*a
+        );
+        ctx.strokeStyle = `rgba(255,${Math.round(210*(1-a))},${Math.round(190*(1-a))},${0.6*a+0.08})`;
+        ctx.lineWidth = 4 + a*5; ctx.stroke();
       }
 
       requestAnimationFrame(drawEye);
     }
 
-    // ── Clignement ──
+    // ── Clignement ──────────────────────────────────────────────────────
     function scheduleBlink() {
       setTimeout(() => {
         if (isBlinking) { scheduleBlink(); return; }
         isBlinking = true;
-        // Fermeture rapide
         let t = 0;
-        const down = setInterval(() => {
-          t += 0.18; blinkProgress = Math.min(1, t);
+        const dn = setInterval(() => {
+          t += 0.20; blinkProgress = Math.min(1, t);
           if (blinkProgress >= 1) {
-            clearInterval(down);
+            clearInterval(dn);
             setTimeout(() => {
               let t2 = 0;
               const up = setInterval(() => {
-                t2 += 0.14; blinkProgress = Math.max(0, 1-t2);
-                if (blinkProgress <= 0) {
-                  clearInterval(up); isBlinking = false; scheduleBlink();
-                }
+                t2 += 0.15; blinkProgress = Math.max(0, 1-t2);
+                if (blinkProgress <= 0) { clearInterval(up); isBlinking = false; scheduleBlink(); }
               }, 16);
-            }, 55);
+            }, 50);
           }
         }, 16);
       }, 2800 + Math.random()*4500);
@@ -648,17 +650,15 @@
     drawEye();
     scheduleBlink();
 
-    // ── Angry trigger ──
+    // ── Angry ───────────────────────────────────────────────────────────
     window.triggerAngryEye = function() {
       angryTarget = 1;
-      // Clignements énervés rapides x4
       let count = 0;
       function angryBlink() {
         if (count >= 4) {
-          // Retour progressif au calme après 1.8s
           setTimeout(() => {
             const calm = setInterval(() => {
-              angryTarget = Math.max(0, angryTarget - 0.03);
+              angryTarget = Math.max(0, angryTarget - 0.025);
               if (angryTarget <= 0) { angryTarget = 0; clearInterval(calm); }
             }, 40);
           }, 1800);
@@ -666,18 +666,16 @@
         }
         let t = 0;
         const dn = setInterval(() => {
-          t += 0.35; blinkProgress = Math.min(1, t);
+          t += 0.38; blinkProgress = Math.min(1, t);
           if (blinkProgress >= 1) {
             clearInterval(dn);
             setTimeout(() => {
               let t2 = 0;
               const up = setInterval(() => {
-                t2 += 0.28; blinkProgress = Math.max(0, 1-t2);
-                if (blinkProgress <= 0) {
-                  clearInterval(up); count++; setTimeout(angryBlink, 80);
-                }
+                t2 += 0.30; blinkProgress = Math.max(0, 1-t2);
+                if (blinkProgress <= 0) { clearInterval(up); count++; setTimeout(angryBlink, 75); }
               }, 16);
-            }, 40);
+            }, 38);
           }
         }, 16);
       }
