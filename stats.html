@@ -949,6 +949,9 @@
       gap: 64px;
       width: max-content;
       will-change: transform;
+      animation: none;
+    }
+    .ticker-inner.ready {
       animation: ticker-scroll 30s linear infinite;
     }
     @keyframes ticker-scroll {
@@ -956,7 +959,7 @@
       100% { transform: translate3d(-50%, 0, 0); }
     }
     @media (max-width: 768px) {
-      .ticker-inner {
+      .ticker-inner.ready {
         gap: 40px;
         animation-duration: 22s;
       }
@@ -1549,5 +1552,11 @@ fetch('/api/porto-stats')
   })();
   </script>
 <script src="ticker-dynamic.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var t = document.getElementById('ticker-inner');
+  if (t) { void t.offsetWidth; t.classList.add('ready'); }
+});
+</script>
 </body>
 </html>
