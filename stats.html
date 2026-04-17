@@ -128,9 +128,25 @@
       align-items: center;
       border-bottom: 1px solid rgba(255,255,255,0.15);
     }
-    
-    
-      100% { transform: translateX(-50%); }
+    .ticker-inner {
+      display: flex;
+      gap: 64px;
+      width: max-content;
+      will-change: transform;
+      animation: none;
+    }
+    .ticker-inner.ready {
+      animation: ticker-scroll 30s linear infinite;
+    }
+    @keyframes ticker-scroll {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    @media (max-width: 768px) {
+      .ticker-inner.ready {
+        gap: 40px;
+        animation-duration: 22s;
+      }
     }
     .ticker-item {
       font-family: 'Barlow Condensed', sans-serif;
@@ -944,26 +960,7 @@
       overflow: hidden;
       position: relative;
     }
-    .ticker-inner {
-      display: flex;
-      gap: 64px;
-      width: max-content;
-      will-change: transform;
-      animation: none;
-    }
-    .ticker-inner.ready {
-      animation: ticker-scroll 30s linear infinite;
-    }
-    @keyframes ticker-scroll {
-      0%   { transform: translate3d(0, 0, 0); }
-      100% { transform: translate3d(-50%, 0, 0); }
-    }
-    @media (max-width: 768px) {
-      .ticker-inner.ready {
-        gap: 40px;
-        animation-duration: 22s;
-      }
-    }
+
 
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
