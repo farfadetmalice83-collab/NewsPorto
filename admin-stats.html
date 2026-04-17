@@ -133,6 +133,84 @@
     85%  { filter: brightness(1.4) saturate(2); }
     100% { filter: none; }
   }
+  /* Crack CSS */
+  #pw-crack.crack-appear {
+    animation: crackAppear 0.12s ease forwards;
+  }
+  @keyframes crackAppear {
+    0%  { opacity: 0; transform: scale(0.3); filter: brightness(3); }
+    40% { opacity: 1; transform: scale(1.06); filter: brightness(2); }
+    100%{ opacity: 1; transform: scale(1);    filter: brightness(1); }
+  }
+  #pw-crack.crack-visible { opacity: 1; }
+
+  /* ── CASSURE ── */
+  #pw-top-half.break-top {
+    animation: breakTop 1.4s cubic-bezier(.4,0,.6,1) forwards;
+  }
+  @keyframes breakTop {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+    8%   { transform: translateY(-12px) rotate(-1.5deg); }
+    15%  { transform: translateY(0) rotate(0deg);   } /* recul avant élan */
+    25%  { transform: translateY(8px) rotate(1deg); } /* impact */
+    35%  { transform: translateY(-4px) rotate(-0.5deg); }
+    50%  { transform: translateY(0) rotate(0deg);   }
+    60%  { transform: translateY(-6px) rotate(-2deg) skewX(-1deg); opacity:1; }
+    100% { transform: translateY(-130vh) rotate(-8deg) skewX(-2deg); opacity:0; }
+  }
+  #pw-bot-half.break-bot {
+    animation: breakBot 1.4s cubic-bezier(.4,0,.6,1) forwards;
+  }
+  @keyframes breakBot {
+    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
+    8%   { transform: translateY(8px) rotate(1deg); }
+    15%  { transform: translateY(0) rotate(0deg);   }
+    25%  { transform: translateY(-6px) rotate(-0.8deg); }
+    35%  { transform: translateY(3px) rotate(0.3deg); }
+    50%  { transform: translateY(0) rotate(0deg);   }
+    60%  { transform: translateY(5px) rotate(2deg) skewX(1deg); opacity:1; }
+    100% { transform: translateY(130vh) rotate(10deg) skewX(3deg); opacity:0; }
+  }
+  #pw-overlay.final-flash {
+    animation: finalFlash 0.35s ease forwards;
+  }
+  @keyframes finalFlash {
+    0%  { filter: brightness(1); }
+    20% { filter: brightness(4) saturate(0); }
+    50% { filter: brightness(2) saturate(0.5); }
+    100%{ filter: brightness(1) saturate(1); }
+  }
+  #pw-overlay.big-shake {
+    animation: bigShake 0.6s cubic-bezier(.36,.07,.19,.97);
+  }
+  @keyframes bigShake {
+    0%,100%{ transform:translate(0,0) rotate(0); }
+    10%    { transform:translate(-20px,-8px) rotate(-1.5deg); }
+    20%    { transform:translate(22px,10px) rotate(1.2deg); }
+    30%    { transform:translate(-18px,6px) rotate(-1deg); }
+    40%    { transform:translate(20px,-10px) rotate(1.5deg); }
+    55%    { transform:translate(-14px,7px) rotate(-0.8deg); }
+    68%    { transform:translate(15px,-6px) rotate(0.9deg); }
+    80%    { transform:translate(-10px,5px) rotate(-0.5deg); }
+    90%    { transform:translate(8px,-4px) rotate(0.3deg); }
+  }
+
+  #pw-overlay.punch-shake {
+    animation: punchShake 0.55s cubic-bezier(.36,.07,.19,.97);
+  }
+  @keyframes punchShake {
+    0%,100% { transform: translate(0,0) rotate(0deg); }
+    8%  { transform: translate(-14px,-6px) rotate(-1deg); }
+    16% { transform: translate(16px, 7px) rotate(0.8deg); }
+    24% { transform: translate(-13px, 4px) rotate(-0.7deg); }
+    32% { transform: translate(14px,-7px) rotate(1deg); }
+    44% { transform: translate(-10px, 5px) rotate(-0.5deg); }
+    56% { transform: translate(11px,-4px) rotate(0.6deg); }
+    68% { transform: translate(-8px, 3px) rotate(-0.4deg); }
+    80% { transform: translate(7px,-3px) rotate(0.3deg); }
+    90% { transform: translate(-5px, 2px) rotate(-0.2deg); }
+  }
+
   #pw-overlay.screen-shake {
     animation: screenShake 0.45s cubic-bezier(.36,.07,.19,.97);
   }
@@ -339,26 +417,72 @@
   <div id="pw-scan"></div>
   <div id="pw-flash" style="position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%);transition:opacity 0.15s ease;"></div>
 
+  <!-- Crack d'écran -->
+  <svg id="pw-crack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"
+    style="position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:0;transition:opacity 0.05s ease;">
+    <!-- Impact central -->
+    <circle cx="200" cy="200" r="18" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
+    <circle cx="200" cy="200" r="8"  fill="rgba(255,255,255,0.6)"/>
+    <!-- Fissures principales rayonnantes -->
+    <path d="M200 200 L148 88"  fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M200 200 L82  155" fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M200 200 L70  268" fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M200 200 L155 345" fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M200 200 L255 358" fill="none" stroke="rgba(255,255,255,0.83)" stroke-width="1.6" stroke-linecap="round"/>
+    <path d="M200 200 L335 290" fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.7" stroke-linecap="round"/>
+    <path d="M200 200 L345 175" fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M200 200 L268 82"  fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="1.6" stroke-linecap="round"/>
+    <!-- Fissures secondaires avec branches -->
+    <path d="M200 200 L148 88 L120 55 M148 88 L105 95" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.0" stroke-linecap="round"/>
+    <path d="M200 200 L82 155 L40 130 M82 155 L65 195" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="0.9" stroke-linecap="round"/>
+    <path d="M200 200 L70 268 L35 295 M70 268 L55 245" fill="none" stroke="rgba(255,255,255,0.50)" stroke-width="1.0" stroke-linecap="round"/>
+    <path d="M200 200 L155 345 L130 395 M155 345 L185 390" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="0.9" stroke-linecap="round"/>
+    <path d="M200 200 L255 358 L245 400 M255 358 L310 380" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="1.0" stroke-linecap="round"/>
+    <path d="M200 200 L335 290 L385 300 M335 290 L360 255" fill="none" stroke="rgba(255,255,255,0.50)" stroke-width="0.9" stroke-linecap="round"/>
+    <path d="M200 200 L345 175 L395 160 M345 175 L365 210" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.0" stroke-linecap="round"/>
+    <path d="M200 200 L268 82 L295 45 M268 82 L310 100" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="0.9" stroke-linecap="round"/>
+    <!-- Micro fissures tertiaires -->
+    <path d="M148 88 L135 72 M120 55 L108 42" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.7"/>
+    <path d="M82 155 L62 148 M40 130 L22 120" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.6"/>
+    <path d="M335 290 L355 310 M385 300 L400 308" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.6"/>
+    <path d="M268 82 L280 65 M310 100 L325 88" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.7"/>
+    <!-- Zones d'éclats (polygones flous) -->
+    <path d="M200 200 L148 88 L82 155 Z"  fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
+    <path d="M200 200 L268 82 L345 175 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
+    <path d="M200 200 L335 290 L255 358 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.16)" stroke-width="0.5"/>
+    <path d="M200 200 L70 268 L155 345 Z"  fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.16)" stroke-width="0.5"/>
+  </svg>
+
   <!-- Oeil géant en fond -->
   <canvas id="eye-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 
-  <div id="pw-content">
+  <!-- Moitié HAUTE (logo + titre) -->
+  <div id="pw-top-half" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:0;">
     <img id="pw-logo-img" src="Logo.png" alt="NewsPorto">
     <p id="pw-title">NewsPorto</p>
     <p id="pw-subtitle">Administration</p>
     <div id="pw-line"></div>
+  </div>
+
+  <!-- Moitié BASSE (formulaire) -->
+  <div id="pw-bot-half" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:0;">
     <div class="pw-box">
       <input id="pw-input" type="password" placeholder="••••" maxlength="10" autofocus>
       <p id="pw-error"></p>
       <button id="pw-btn" onclick="checkPw()">Accéder →</button>
     </div>
   </div>
+
+  <!-- Ligne de fracture horizontale (cachée au départ) -->
+  <div id="pw-fracture-line" style="position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.9) 20%,white 50%,rgba(255,255,255,0.9) 80%,transparent 100%);opacity:0;z-index:10;box-shadow:0 0 18px 4px rgba(255,255,255,0.6),0 0 40px 8px rgba(200,220,255,0.3);pointer-events:none;"></div>
 </div>
 
 <script>
   if (sessionStorage.getItem('np_admin') === '1') {
     document.getElementById('pw-overlay').classList.add('hidden');
   }
+
+  let wrongAttempts = 0;
 
   function checkPw() {
     const val = document.getElementById('pw-input').value;
@@ -368,39 +492,124 @@
       setTimeout(() => overlay.classList.add('hidden'), 1000);
       sessionStorage.setItem('np_admin', '1');
     } else {
+      wrongAttempts++;
       const input   = document.getElementById('pw-input');
       const err     = document.getElementById('pw-error');
       const overlay = document.getElementById('pw-overlay');
       const flash   = document.getElementById('pw-flash');
+      const crack   = document.getElementById('pw-crack');
 
       // Shake input
       input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
-      err.textContent = 'Code incorrect';
+      err.textContent = wrongAttempts >= 2 ? '💥 ACCÈS REFUSÉ' : 'Code incorrect';
       input.value = '';
 
-      // Shake tout l'écran
-      overlay.classList.remove('screen-shake'); void overlay.offsetWidth;
-      overlay.classList.add('screen-shake');
+      if (wrongAttempts >= 3) {
+        // ── CASSURE FINALE : la page se brise en deux ──
+        err.textContent = '💀 SYSTÈME DÉTRUIT';
 
-      // Flash rouge
-      overlay.classList.remove('alert-flash'); void overlay.offsetWidth;
-      overlay.classList.add('alert-flash');
+        const topHalf = document.getElementById('pw-top-half');
+        const botHalf = document.getElementById('pw-bot-half');
+        const fracture = document.getElementById('pw-fracture-line');
 
-      // Halo rouge en fond
-      if (flash) {
-        flash.style.opacity = '1';
-        setTimeout(() => { flash.style.opacity = '0'; }, 600);
+        // Désactiver input
+        input.disabled = true;
+        document.getElementById('pw-btn').disabled = true;
+
+        // Shake violent + flash aveuglant
+        overlay.classList.remove('big-shake'); void overlay.offsetWidth;
+        overlay.classList.add('big-shake');
+        overlay.classList.remove('final-flash'); void overlay.offsetWidth;
+        overlay.classList.add('final-flash');
+
+        // Flash rouge total
+        if (flash) {
+          flash.style.background = 'rgba(255,30,0,0.6)';
+          flash.style.opacity = '1';
+          setTimeout(() => { flash.style.opacity = '0'; flash.style.background = 'radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%)'; }, 300);
+        }
+
+        // Oeil FURIEUX max
+        if (window.triggerAngryEye) window.triggerAngryEye();
+
+        // Ligne de fracture au milieu
+        setTimeout(() => {
+          if (fracture) {
+            const rect = botHalf ? botHalf.getBoundingClientRect() : null;
+            fracture.style.top = (rect ? rect.top - 8 : window.innerHeight/2) + 'px';
+            fracture.style.opacity = '1';
+            fracture.style.animation = 'none';
+          }
+        }, 180);
+
+        // Les deux moitiés s'écartent et tombent
+        setTimeout(() => {
+          if (topHalf) { topHalf.classList.add('break-top'); }
+          if (botHalf) { botHalf.classList.add('break-bot'); }
+          if (fracture) { fracture.style.opacity = '0'; }
+        }, 350);
+
+        // Fond noir total après la chute
+        setTimeout(() => {
+          overlay.style.background = '#000';
+          overlay.style.transition = 'background 0.5s ease';
+        }, 1200);
+
+      } else if (wrongAttempts >= 2) {
+        // ── COUP DE POING : effets max ──
+        // 1. Vibration violente
+        overlay.classList.remove('punch-shake'); void overlay.offsetWidth;
+        overlay.classList.add('punch-shake');
+
+        // 2. Flash blanc aveuglant puis rouge
+        overlay.classList.remove('alert-flash'); void overlay.offsetWidth;
+        overlay.classList.add('alert-flash');
+        if (flash) {
+          flash.style.background = 'radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, rgba(255,50,0,0.35) 40%, rgba(180,0,0,0.12) 70%, transparent 100%)';
+          flash.style.opacity = '1';
+          setTimeout(() => {
+            flash.style.background = 'radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%)';
+            flash.style.opacity = '0';
+          }, 250);
+        }
+
+        // 3. Crack qui apparaît avec impact
+        if (crack) {
+          crack.style.opacity = '0';
+          crack.classList.remove('crack-appear');
+          void crack.offsetWidth;
+          setTimeout(() => {
+            crack.classList.add('crack-appear', 'crack-visible');
+          }, 80); // léger délai après le punch
+        }
+
+        // 4. Oeil furieux
+        if (window.triggerAngryEye) window.triggerAngryEye();
+
+        // Nettoyage partiel (crack reste visible)
+        setTimeout(() => {
+          input.classList.remove('shake');
+          overlay.classList.remove('punch-shake', 'alert-flash');
+          // err reste rouge
+        }, 2500);
+
+      } else {
+        // ── PREMIÈRE ERREUR : effets normaux ──
+        overlay.classList.remove('screen-shake'); void overlay.offsetWidth;
+        overlay.classList.add('screen-shake');
+        overlay.classList.remove('alert-flash'); void overlay.offsetWidth;
+        overlay.classList.add('alert-flash');
+        if (flash) {
+          flash.style.opacity = '1';
+          setTimeout(() => { flash.style.opacity = '0'; }, 600);
+        }
+        if (window.triggerAngryEye) window.triggerAngryEye();
+        setTimeout(() => {
+          input.classList.remove('shake');
+          err.textContent = '';
+          overlay.classList.remove('screen-shake', 'alert-flash');
+        }, 2200);
       }
-
-      // Oeil énervé
-      if (window.triggerAngryEye) window.triggerAngryEye();
-
-      // Nettoyage
-      setTimeout(() => {
-        input.classList.remove('shake');
-        err.textContent = '';
-        overlay.classList.remove('screen-shake', 'alert-flash');
-      }, 2200);
     }
   }
   document.getElementById('pw-input').addEventListener('keydown', e => {
