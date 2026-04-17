@@ -49,10 +49,10 @@
     .nav-cta { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border: 1px solid var(--white); color: var(--white); background: transparent; padding: 8px 20px; cursor: pointer; text-decoration: none; transition: background .2s, color .2s; }
     .nav-cta:hover { background: var(--white); color: #000; }
     .ticker { border-bottom: 1px solid var(--border); overflow: hidden; padding: 10px 0; background: rgba(255,255,255,0.02); }
-    .ticker-inner { display: flex; gap: 64px; animation: ticker 28s linear infinite; width: max-content; }
+    
     .ticker-item { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); white-space: nowrap; }
     .ticker-item b { color: var(--white); margin-right: 8px; }
-    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+     100% { transform: translateX(-50%); } }
     .page-hero { padding: 72px 48px 56px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; }
     .page-eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); margin-bottom: 14px; display: flex; align-items: center; gap: 10px; }
     .page-eyebrow::before { content: ''; display: block; width: 28px; height: 1px; background: var(--gray); }
@@ -459,7 +459,35 @@
     .player-card.in-view { opacity: 1; transform: translateY(0); }
     .player-card.in-view:hover { transform: translateY(-3px) !important; }
 
-  </style>
+  
+    /* ── TICKER FIX (mobile/tablette) ── */
+    .ticker {
+      overflow: hidden;
+      position: relative;
+    }
+    .ticker-inner {
+      display: flex;
+      gap: 64px;
+      width: max-content;
+      will-change: transform;
+      animation: ticker-scroll 28s linear infinite;
+    }
+    /* Pause on hover */
+    @keyframes ticker-scroll {
+      0%   { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-50%, 0, 0); }
+    }
+    /* Mobile : vitesse réduite pour lisibilité */
+    @media (max-width: 768px) {
+      .ticker-inner {
+        gap: 40px;
+        animation-duration: 22s;
+      }
+    }
+
+    </style>
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
