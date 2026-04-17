@@ -1376,6 +1376,57 @@
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
+
+  <!-- Schema.org : Organization (Knowledge Graph Google) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "NewsPorto",
+    "url": "https://newsporto.fr",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://newsporto.fr/Logo.png",
+      "width": 200,
+      "height": 200
+    },
+    "description": "NewsPorto, le média de référence des fans du FC Porto en France. Actualités, transferts, résultats, Europa League et Liga Portugal.",
+    "foundingDate": "2024",
+    "inLanguage": "fr-FR",
+    "sameAs": [
+      "https://discord.gg/YCcuMHmGcH"
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "customer support",
+      "url": "https://newsporto.fr/contact.html"
+    },
+    "knowsAbout": [
+      "FC Porto",
+      "Liga Portugal",
+      "Football portugais",
+      "Europa League"
+    ]
+  }
+  </script>
+
+  <!-- Schema.org : WebSite (SearchAction pour sitelinks Google) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "NewsPorto",
+    "url": "https://newsporto.fr",
+    "description": "NewsPorto, le média de référence des fans du FC Porto en France.",
+    "inLanguage": "fr-FR",
+    "publisher": {
+      "@type": "Organization",
+      "name": "NewsPorto",
+      "url": "https://newsporto.fr"
+    }
+  }
+  </script>
+
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
@@ -1446,10 +1497,9 @@
     <!-- GAUCHE : article à la une -->
     <div class="hero-content" id="hero-content">
       <p class="hero-eyebrow" id="hero-eyebrow">À la une · Chargement...</p>
-      <h1 class="hero-title" id="hero-title">
-        <span class="hero-title-line"><span>Dernière</span></span>
-        <span class="hero-title-line"><span><span class="outline">Actu</span></span></span>
-        <span class="hero-title-line"><span>Porto</span></span>
+      <h1 class="hero-title" id="hero-title" style="opacity:0;transition:opacity .5s ease .2s">
+        <span class="hero-title-line"><span></span></span>
+        <span class="hero-title-line"><span><span class="outline"></span></span></span>
       </h1>
       <div class="hero-meta">
         <span id="hero-cat">—</span>
@@ -1842,6 +1892,7 @@
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
       <li><a href="/cdn-cgi/l/email-protection#412d342832252032282d3720797272707101262c20282d6f222e2c">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
+      <li><a href="#" onclick="reopenPopup();return false;" style="opacity:0.5">Notifications</a></li>
     </ul>
   </footer>
 
@@ -2209,6 +2260,7 @@
       document.getElementById('hero-title').innerHTML = `
         <span class="hero-title-line"><span>${line1}</span></span>
         <span class="hero-title-line"><span><span class="outline">${line2}</span></span></span>`;
+      document.getElementById('hero-title').style.opacity = '1';
       document.getElementById('hero-cat').textContent = catLabel0;
       document.getElementById('hero-read').textContent = a0.read_time;
       document.getElementById('hero-lead').textContent = a0.excerpt;
@@ -2744,6 +2796,12 @@
       const fab = document.getElementById('push-fab');
       if (fab) fab.classList.add('show');
     }
+  };
+
+  // ── Rouvrir le popup depuis le footer ───────────────────────────────────
+  window.reopenPopup = function() {
+    const popup = document.getElementById('notif-popup');
+    if (popup) popup.classList.add('show');
   };
 
   // Fermer en cliquant l'overlay
