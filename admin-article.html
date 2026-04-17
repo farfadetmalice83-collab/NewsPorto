@@ -311,24 +311,8 @@
   <div id="pw-glow"></div>
   <div id="pw-scan"></div>
 
-  <!-- Grand oeil humoristique -->
-  <svg id="big-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 120" style="position:absolute;bottom:0;right:0;width:min(380px,55vw);opacity:0.07;pointer-events:none;z-index:0">
-    <!-- Paupière / contour oeil -->
-    <path d="M10 60 Q100 -20 190 60 Q100 140 10 60Z" fill="none" stroke="white" stroke-width="3"/>
-    <!-- Iris -->
-    <circle cx="100" cy="60" r="32" fill="none" stroke="white" stroke-width="3"/>
-    <!-- Pupille -->
-    <circle id="big-pupil" cx="100" cy="60" r="14" fill="white"/>
-    <!-- Reflet -->
-    <circle cx="110" cy="52" r="5" fill="black"/>
-    <!-- Cils humoristiques -->
-    <line x1="40" y1="28" x2="33" y2="16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="62" y1="16" x2="59" y2="3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="86" y1="10" x2="86" y2="-3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="110" y1="10" x2="112" y2="-3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="134" y1="16" x2="138" y2="3" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-    <line x1="155" y1="28" x2="163" y2="16" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
-  </svg>
+  <!-- Oeil géant en fond -->
+  <canvas id="eye-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 
   <div id="pw-content">
     <img id="pw-logo-img" src="Logo.png" alt="NewsPorto">
@@ -370,43 +354,163 @@
     if (e.key === 'Enter') checkPw();
   });
 
-  // ── Oeil qui suit la souris ──────────────────────────────────────────
+  // ── Oeil géant canvas ────────────────────────────────────────────────
   (function() {
-    const pupil = document.getElementById('big-pupil');
-    const eyeSvg = document.getElementById('big-eye');
-    if (!pupil || !eyeSvg) return;
+    const canvas = document.getElementById('eye-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let W, H, mx = 0, my = 0;
+    let blinkScale = 1, isBlinking = false;
 
-    // Centre de l'iris dans le SVG (viewBox coords)
-    const CX = 100, CY = 60, MAX_MOVE = 10;
-
-    document.addEventListener('mousemove', function(e) {
-      const rect = eyeSvg.getBoundingClientRect();
-      // Centre de l'oeil en coords écran
-      const ecx = rect.left + rect.width  * (CX / 200);
-      const ecy = rect.top  + rect.height * (CY / 120);
-      const dx = e.clientX - ecx;
-      const dy = e.clientY - ecy;
-      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
-      const move = Math.min(dist / 60, 1) * MAX_MOVE;
-      pupil.setAttribute('cx', CX + (dx/dist)*move);
-      pupil.setAttribute('cy', CY + (dy/dist)*move);
-    });
-
-    // Clignement aléatoire
-    function blink() {
-      eyeSvg.style.transform = 'scaleY(0.05)';
-      eyeSvg.style.transformOrigin = 'center 50%';
-      eyeSvg.style.transition = 'transform 0.08s ease';
-      setTimeout(() => {
-        eyeSvg.style.transform = 'scaleY(1)';
-        eyeSvg.style.transition = 'transform 0.12s ease';
-        setTimeout(() => {
-          const next = 2000 + Math.random() * 4000;
-          setTimeout(blink, next);
-        }, 150);
-      }, 80);
+    function resize() {
+      W = canvas.width  = window.innerWidth;
+      H = canvas.height = window.innerHeight;
     }
-    setTimeout(blink, 1500 + Math.random() * 2000);
+    resize();
+    window.addEventListener('resize', resize);
+
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+
+    function drawEye() {
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2, cy = H / 2;
+      const ew = Math.min(W * 0.82, H * 1.6);  // largeur oeil
+      const eh = ew * 0.42;                      // hauteur oeil
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(1, blinkScale);
+      ctx.translate(-cx, -cy);
+
+      // ── Lueur extérieure bleue ──
+      const glowGrad = ctx.createRadialGradient(cx, cy, eh*0.1, cx, cy, ew*0.55);
+      glowGrad.addColorStop(0, 'rgba(0,61,165,0.10)');
+      glowGrad.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, ew*0.55, eh*0.9, 0, 0, Math.PI*2);
+      ctx.fillStyle = glowGrad;
+      ctx.fill();
+
+      // ── Blanc de l'oeil ──
+      ctx.beginPath();
+      ctx.moveTo(cx - ew/2, cy);
+      ctx.quadraticCurveTo(cx, cy - eh, cx + ew/2, cy);
+      ctx.quadraticCurveTo(cx, cy + eh, cx - ew/2, cy);
+      ctx.fillStyle = 'rgba(255,255,255,0.06)';
+      ctx.fill();
+
+      // ── Contour de l'oeil ──
+      ctx.beginPath();
+      ctx.moveTo(cx - ew/2, cy);
+      ctx.quadraticCurveTo(cx, cy - eh, cx + ew/2, cy);
+      ctx.quadraticCurveTo(cx, cy + eh, cx - ew/2, cy);
+      ctx.strokeStyle = 'rgba(255,255,255,0.18)';
+      ctx.lineWidth = 2.5;
+      ctx.stroke();
+
+      // ── Direction pupille vers souris ──
+      const dx = mx - cx, dy = my - cy;
+      const dist = Math.sqrt(dx*dx + dy*dy) || 1;
+      const maxR = ew * 0.18;
+      const move = Math.min(dist / 3, maxR);
+      const px = cx + (dx/dist)*move;
+      const py = cy + (dy/dist)*move;
+
+      const irisR = ew * 0.14;
+
+      // Iris
+      const irisGrad = ctx.createRadialGradient(px - irisR*0.3, py - irisR*0.3, irisR*0.05, px, py, irisR);
+      irisGrad.addColorStop(0, 'rgba(40,80,200,0.55)');
+      irisGrad.addColorStop(0.6, 'rgba(0,40,140,0.45)');
+      irisGrad.addColorStop(1, 'rgba(0,20,80,0.35)');
+      ctx.beginPath();
+      ctx.arc(px, py, irisR, 0, Math.PI*2);
+      ctx.fillStyle = irisGrad;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // Pupille
+      const pupR = irisR * 0.52;
+      ctx.beginPath();
+      ctx.arc(px, py, pupR, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.fill();
+
+      // Reflet
+      ctx.beginPath();
+      ctx.arc(px + pupR*0.4, py - pupR*0.4, pupR*0.28, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.fill();
+
+      // Petit reflet
+      ctx.beginPath();
+      ctx.arc(px - pupR*0.3, py + pupR*0.3, pupR*0.12, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fill();
+
+      // ── Cils du haut ──
+      const lashCount = 9;
+      for (let i = 0; i < lashCount; i++) {
+        const t = (i / (lashCount-1)) * 0.72 + 0.14;
+        const bx = cx - ew/2 + t * ew;
+        // Point sur la courbe du haut
+        const by = cy - eh * 4 * t * (1 - t);
+        const nx = -(cy - by);
+        const ny = bx - cx;
+        const nl = Math.sqrt(nx*nx + ny*ny) || 1;
+        const lx = nx/nl, ly = ny/nl;
+        const len = eh * (0.25 + 0.12*Math.sin(i*1.3));
+        const curve = (Math.random() - 0.5) * 0.3;
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.quadraticCurveTo(
+          bx + lx*len*0.5 + ly*len*curve,
+          by + ly*len*0.5 - lx*len*curve,
+          bx + lx*len, by + ly*len
+        );
+        ctx.strokeStyle = 'rgba(255,255,255,0.22)';
+        ctx.lineWidth = 1.8;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+      }
+
+      ctx.restore();
+      requestAnimationFrame(drawEye);
+    }
+
+    // ── Clignement aléatoire ──
+    function scheduleBlink() {
+      const delay = 2500 + Math.random() * 4000;
+      setTimeout(() => {
+        if (isBlinking) { scheduleBlink(); return; }
+        isBlinking = true;
+        let t = 0;
+        const down = setInterval(() => {
+          t += 0.15;
+          blinkScale = Math.max(0.04, 1 - t);
+          if (blinkScale <= 0.04) {
+            clearInterval(down);
+            setTimeout(() => {
+              let t2 = 0;
+              const up = setInterval(() => {
+                t2 += 0.12;
+                blinkScale = Math.min(1, 0.04 + t2);
+                if (blinkScale >= 1) {
+                  clearInterval(up);
+                  isBlinking = false;
+                  scheduleBlink();
+                }
+              }, 16);
+            }, 60);
+          }
+        }, 16);
+      }, delay);
+    }
+
+    drawEye();
+    scheduleBlink();
   })();
 
 </script>
