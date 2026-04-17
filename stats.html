@@ -951,7 +951,6 @@
       will-change: transform;
       animation: ticker-scroll 30s linear infinite;
     }
-    .ticker:hover .ticker-inner { animation-play-state: paused; }
     @keyframes ticker-scroll {
       0%   { transform: translate3d(0, 0, 0); }
       100% { transform: translate3d(-50%, 0, 0); }
@@ -965,6 +964,7 @@
 
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
