@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 — Page introuvable | NewsPorto</title>
+  <meta name="description" content="Cette page n'existe pas ou a été déplacée.">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <script defer src="/_vercel/insights/script.js"></script>
+  <script defer src="/_vercel/speed-insights/script.js"></script>
+  <style>
+    :root {
+      --white: #ffffff;
+      --gray: rgba(255,255,255,0.45);
+      --border: rgba(255,255,255,0.1);
+      --grid-color: rgba(255,255,255,0.055);
+      --blue: #003DA5;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: #000;
+      color: var(--white);
+      font-family: 'Barlow', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* ── GRID BG ── */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+      background-size: 44px 44px;
+      animation: gridScroll 12s linear infinite;
+      pointer-events: none;
+    }
+    @keyframes gridScroll {
+      0%   { background-position: 0 0; }
+      100% { background-position: 44px 44px; }
+    }
+
+    .page { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 48px;
+      height: 72px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(6px);
+      background: rgba(0,0,0,0.5);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 46px; width: auto; }
+    .nav-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 3px;
+      color: var(--white);
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      text-decoration: none;
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 1px; background: #fff;
+      transition: width 0.3s cubic-bezier(.22,1,.36,1);
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border: 1px solid var(--white);
+      color: var(--white);
+      background: transparent;
+      padding: 8px 20px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+    .nav-cta:hover { background: var(--white); color: #000; }
+
+    /* ── HAMBURGER ── */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      gap: 5px;
+      width: 32px; height: 32px;
+      background: none; border: none; cursor: pointer; padding: 2px;
+    }
+    .hamburger span {
+      display: block; width: 100%; height: 1px;
+      background: var(--white);
+      transition: transform .3s, opacity .2s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* ── MOBILE NAV ── */
+    .mobile-nav-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 150;
+      background: rgba(0,0,0,0.97); backdrop-filter: blur(12px);
+      flex-direction: column; align-items: center; justify-content: center;
+      opacity: 0; transform: translateY(-8px);
+      transition: opacity 0.35s cubic-bezier(.22,1,.36,1), transform 0.35s cubic-bezier(.22,1,.36,1);
+      pointer-events: none;
+    }
+    .mobile-nav-overlay.open { opacity: 1; transform: translateY(0); pointer-events: all; }
+    .mobile-nav-overlay::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, #003DA5, transparent);
+    }
+    .mobile-nav-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 12vw, 64px);
+      letter-spacing: 4px; color: rgba(255,255,255,0.25);
+      text-decoration: none;
+      transition: color 0.2s, letter-spacing 0.2s;
+      line-height: 1.15; padding: 6px 0;
+    }
+    .mobile-nav-item:hover { color: #fff; letter-spacing: 6px; }
+    .mobile-nav-bottom {
+      position: absolute; bottom: 48px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: rgba(255,255,255,0.18);
+    }
+
+    /* ── 404 HERO ── */
+    .hero-404 {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glow bleu derrière le 404 */
+    .hero-404::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(0,61,165,0.18) 0%, transparent 70%);
+      pointer-events: none;
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.6; transform: translate(-50%, -50%) scale(1); }
+      50%       { opacity: 1;   transform: translate(-50%, -50%) scale(1.1); }
+    }
+
+    /* Numéro 404 géant */
+    .num-404 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(160px, 28vw, 340px);
+      line-height: 0.85;
+      letter-spacing: -4px;
+      position: relative;
+      z-index: 1;
+      /* Effet outline + rempli en alternance */
+      background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.08) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: fadeDown 0.7s cubic-bezier(.16,1,.3,1) both;
+      user-select: none;
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Ligne décorative bleue */
+    .divider-404 {
+      width: 64px; height: 2px;
+      background: var(--blue);
+      margin: 28px auto 28px;
+      position: relative; z-index: 1;
+      animation: expandLine 0.6s cubic-bezier(.22,1,.36,1) 0.3s both;
+    }
+    @keyframes expandLine {
+      from { width: 0; opacity: 0; }
+      to   { width: 64px; opacity: 1; }
+    }
+
+    .label-404 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      color: var(--gray);
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) 0.15s both;
+    }
+
+    .title-404 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 5vw, 48px);
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-top: 12px;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) 0.25s both;
+    }
+
+    .desc-404 {
+      font-size: 15px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.5);
+      max-width: 400px;
+      margin: 16px auto 0;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) 0.35s both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── BOUTONS ── */
+    .btns-404 {
+      display: flex;
+      gap: 14px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+      justify-content: center;
+      position: relative; z-index: 1;
+      animation: fadeUp 0.6s cubic-bezier(.16,1,.3,1) 0.45s both;
+    }
+    .btn-primary-404 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      background: var(--white);
+      color: #000;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+      display: inline-block;
+    }
+    .btn-primary-404:hover { background: #e0e0e0; transform: translateY(-1px); }
+
+    .btn-secondary-404 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      padding: 14px 32px;
+      background: transparent;
+      color: var(--white);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      transition: border-color .2s, color .2s, transform .15s;
+      display: inline-block;
+    }
+    .btn-secondary-404:hover { border-color: rgba(255,255,255,0.4); color: var(--white); transform: translateY(-1px); }
+
+    /* ── FOOTER ── */
+    footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 48px;
+      border-top: 1px solid var(--border);
+      position: relative; z-index: 1;
+    }
+    .footer-logo { display: flex; align-items: center; gap: 8px; }
+    .footer-logo img { height: 32px; width: auto; }
+    .footer-logo-text {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 3px;
+      color: rgba(255,255,255,0.4);
+    }
+    .footer-copy {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+    }
+    .footer-links { display: flex; gap: 24px; list-style: none; }
+    .footer-links a {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .footer-links a:hover { color: var(--white); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      nav { padding: 0 20px !important; height: 62px !important; }
+      .nav-logo img { height: 36px !important; }
+      .nav-logo-text { font-size: 18px !important; }
+      .nav-links { display: none !important; }
+      .nav-cta { display: none !important; }
+      .hamburger { display: flex !important; }
+      .mobile-nav-overlay { display: flex !important; }
+
+      .num-404 { letter-spacing: -2px; }
+
+      footer {
+        flex-direction: column;
+        gap: 12px;
+        text-align: center;
+        padding: 24px 20px;
+      }
+      .footer-links { justify-content: center; flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<div class="page">
+
+  <nav>
+    <a class="nav-logo" href="index.html">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actu</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <a href="shop.html" class="nav-cta">Shop →</a>
+    <button class="hamburger" id="hamburger-btn" aria-label="Menu" onclick="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <div class="mobile-nav-overlay" id="mobile-nav">
+    <a href="index.html" class="mobile-nav-item">Accueil</a>
+    <a href="actu.html" class="mobile-nav-item">Actu</a>
+    <a href="effectif.html" class="mobile-nav-item">Effectif</a>
+    <a href="stats.html" class="mobile-nav-item">Stats</a>
+    <a href="videos.html" class="mobile-nav-item">Vidéos</a>
+    <a href="shop.html" class="mobile-nav-item">Shop</a>
+    <a href="contact.html" class="mobile-nav-item">Contact</a>
+    <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
+  </div>
+
+  <!-- ── 404 CONTENT ── -->
+  <main class="hero-404">
+
+    <div class="num-404">404</div>
+
+    <div class="divider-404"></div>
+
+    <p class="label-404">Page introuvable</p>
+    <h1 class="title-404">Hors Jeu.</h1>
+    <p class="desc-404">Cette page n'existe pas ou a été déplacée. Retourne en jeu et explore le reste du site.</p>
+
+    <div class="btns-404">
+      <a href="index.html" class="btn-primary-404">← Retour à l'accueil</a>
+      <a href="actu.html" class="btn-secondary-404">Dernières actus</a>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="footer-logo-text">NewsPorto</span>
+    </div>
+    <p class="footer-copy">© 2026 NewsPorto FR — Tous droits réservés</p>
+    <ul class="footer-links">
+      <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="mentions-legales.html">Mentions légales</a></li>
+    </ul>
+  </footer>
+
+</div>
+
+<script>
+  function toggleMobileNav() {
+    const nav = document.getElementById('mobile-nav');
+    const btn = document.getElementById('hamburger-btn');
+    const isOpen = nav.classList.toggle('open');
+    btn.classList.toggle('open', isOpen);
+    document.body.style.overflow = isOpen ? 'hidden' : '';
+  }
+  // Fermer sur clic sur un lien
+  document.querySelectorAll('.mobile-nav-item').forEach(el => {
+    el.addEventListener('click', () => {
+      document.getElementById('mobile-nav').classList.remove('open');
+      document.getElementById('hamburger-btn').classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+</script>
+
+</body>
+</html>
