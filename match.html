@@ -439,7 +439,7 @@
 
   // ── Helpers ──
   const PORTO_ID = 503;
-  const TZ = 'Europe/Lisbon';
+  const TZ = 'Europe/Paris';
 
   function fmtFull(iso) {
     return new Date(iso).toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', year:'numeric', timeZone:TZ })
@@ -521,6 +521,8 @@
     } else if (m.status === 'HALF_TIME' || m.status === 'PAUSED') {
       statusEl.textContent = 'MI-TEMPS'; statusEl.className = 'score-min halftime';
       minEl.textContent = 'MI-TEMPS';
+      // Indiquer clairement mi-temps dans le header du live
+      document.getElementById('live-sec-label').textContent = 'Mi-temps';
     } else {
       const min = m.minute ? `${m.minute}'` : 'LIVE';
       statusEl.textContent = min; statusEl.className = 'score-min';
@@ -536,15 +538,16 @@
     } else {
       evEl.innerHTML = events.map(e => {
         const isPorto = e.teamId === PORTO_ID;
+        const isGoal = e.type==='GOAL'||e.type==='OWN_GOAL'||e.type==='PENALTY';
         let detail = '';
-        if (e.type === 'OWN_GOAL') detail = 'CSC';
-        else if (e.assistName) detail = `Passe : ${e.assistName}`;
-        else if (e.playerOutName) detail = `↓ ${e.playerOutName}`;
-        return `<div class="event-item">
-          <span class="ev-min">${e.minute ?? '—'}'</span>
+        if (e.type === 'OWN_GOAL') detail = `<span style="font-size:9px;letter-spacing:1px;color:#e74c3c;text-transform:uppercase;">CSC</span>`;
+        else if (e.assistName) detail = `<span style="font-size:11px;color:rgba(255,255,255,0.4);">⚡ ${e.assistName}</span>`;
+        else if (e.playerOutName) detail = `<span style="font-size:11px;color:rgba(255,255,255,0.3);">↓ ${e.playerOutName}</span>`;
+        return `<div class="event-item${isGoal && isPorto ? ' ev-goal-porto' : ''}">
+          <span class="ev-min${isGoal ? ' ev-min-goal' : ''}">${e.minute ?? '—'}'</span>
           <span class="ev-icon">${ICONS[e.type] || '•'}</span>
           <div class="ev-body">
-            <div class="ev-player ${isPorto ? '' : 'opp'}">${e.playerName}</div>
+            <div class="ev-player ${isPorto ? '' : 'opp'}">${e.playerName || '—'}</div>
             ${detail ? `<div class="ev-detail">${detail}</div>` : ''}
           </div>
           <span class="ev-team">${isPorto ? 'Porto' : (e.teamName || '')}</span>
@@ -554,19 +557,27 @@
 
     // ── Stats live (possession, tirs, corners…) ──
     const statsEl = document.getElementById('lv-stats');
+    const tabStatsBtn = document.getElementById('tab-btn-stats');
     const matchStats = m.matchStats || [];
     if (statsEl) {
       if (!matchStats.length) {
-        statsEl.innerHTML = '<p class="no-events">Stats disponibles d&#39;envoi</p>';
+        statsEl.innerHTML = '<p class="no-events">Stats en attente de données…</p>';
+        if (tabStatsBtn) tabStatsBtn.style.opacity = '0.4';
       } else {
+        if (tabStatsBtn) { tabStatsBtn.style.opacity = '1'; tabStatsBtn.style.color = '#fff'; }
+        // Construire le HTML des stats avec label de l'équipe adverse
+        const awayLabel = document.getElementById('lv-away-stats-label');
         statsEl.innerHTML = matchStats.map(s => {
           const total = (s.home || 0) + (s.away || 0);
           const pct   = total > 0 ? Math.round((s.home / total) * 100) : 50;
+          const portoWins = s.home > s.away;
+          const portoColor = portoWins ? '#4d82d4' : '#fff';
+          const awayColor  = s.away > s.home ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.4)';
           return `<div style="margin-bottom:18px;">
             <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:7px;">
-              <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;">${s.home}</span>
-              <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.35);">${s.label}</span>
-              <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:rgba(255,255,255,0.4);">${s.away}</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:${portoColor};">${s.home}</span>
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);">${s.label}</span>
+              <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:${awayColor};">${s.away}</span>
             </div>
             <div style="height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;">
               <div style="height:100%;width:${pct}%;background:#003DA5;transition:width .6s ease;border-radius:2px;"></div>
