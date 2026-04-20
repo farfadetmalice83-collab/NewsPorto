@@ -328,7 +328,7 @@
 
           <div class="match-row">
             <div class="team-block">
-              <img id="lv-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('lv-ph-home').style.display='block'">
+              <img loading="lazy" id="lv-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('lv-ph-home').style.display='block'">
               <div id="lv-ph-home" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="lv-home">—</div>
             </div>
@@ -337,7 +337,7 @@
               <div class="score-min" id="lv-status">LIVE</div>
             </div>
             <div class="team-block">
-              <img id="lv-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('lv-ph-away').style.display='block'">
+              <img loading="lazy" id="lv-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('lv-ph-away').style.display='block'">
               <div id="lv-ph-away" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="lv-away">—</div>
             </div>
@@ -383,7 +383,7 @@
           </div>
           <div class="match-row">
             <div class="team-block">
-              <img id="nx-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-home').style.display='block'">
+              <img loading="lazy" id="nx-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-home').style.display='block'">
               <div id="nx-ph-home" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="nx-home">—</div>
             </div>
@@ -392,7 +392,7 @@
               <div class="vs-comp" id="nx-comp">—</div>
             </div>
             <div class="team-block">
-              <img id="nx-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-away').style.display='block'">
+              <img loading="lazy" id="nx-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-away').style.display='block'">
               <div id="nx-ph-away" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="nx-away">—</div>
             </div>
@@ -463,7 +463,7 @@
     }
   }
   function crestHTML(src, name) {
-    if (src) return `<img class="ml-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=ml-crest-ph></div>'">`;
+    if (src) return `<img loading="lazy" class="ml-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=ml-crest-ph></div>'">`;
     return `<div class="ml-crest-ph"></div>`;
   }
 
