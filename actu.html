@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
+  <meta name="theme-color" content="#000000">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="Toute l'actualité du FC Porto en temps réel : résultats, transferts, Europa League, Liga Portugal. NewsPorto, le média des fans des Dragons.">
   <meta property="og:title" content="Actu FC Porto 2026 — Toute l'actualité du FC Porto | NewsPorto">
@@ -10,6 +11,11 @@
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="NewsPorto">
   <meta property="og:image" content="https://newsporto.fr/Logo.png">
+    <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@NewsPortoFR">
+  <meta name="twitter:title" content="Actu FC Porto 2026 — Toute l'actualité du FC Porto | NewsPorto">
+  <meta name="twitter:description" content="Toute l'actualité du FC Porto en temps réel : résultats, transferts, Europa League, Liga Portugal. NewsPorto, le média des fans des Dragons.">
+  <meta name="twitter:image" content="https://newsporto.fr/Logo.png">
   <link rel="canonical" href="https://newsporto.fr/actu.html">
   <title>Actu — NewsPorto · FC Porto</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -573,12 +579,194 @@
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
+
+  <!-- NEWSPORTO ENHANCEMENTS v2 -->
+  <link rel="stylesheet" href="enhancements.css">
+  <style>
+  /* ─ Extra inline upgrades ─ */
+  #nav-progress { position:fixed;top:0;left:0;height:2px;z-index:200;background:linear-gradient(90deg,#003DA5,#4d82d4);width:0%;box-shadow:0 0 8px rgba(0,61,165,0.5); }
+  </style>
+
+  <style>
+/* ACTU — Improved article grid */
+.article-featured {
+  border-color: rgba(0,61,165,0.2) !important;
+  transition: background .2s, box-shadow .3s !important;
+}
+.article-featured:hover {
+  background: rgba(0,20,80,0.08) !important;
+  box-shadow: 0 0 40px rgba(0,61,165,0.1) !important;
+}
+.img-cat-badge { background: var(--blue) !important; }
+
+/* Article grid items */
+.articles-list-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 1px; background: rgba(0,61,165,0.15);
+}
+
+/* Filter bar upgrade */
+.filter-bar {
+  position: sticky; top: 72px; z-index: 50;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(12px);
+}
+
+/* Page hero blue gradient */
+.page-hero {
+  background: linear-gradient(135deg, rgba(0,20,80,0.05) 0%, transparent 60%);
+}
+
+/* Loading state */
+.articles-loading {
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 0; gap: 16px; flex-direction: column;
+}
+.loading-ring {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.08);
+  border-top-color: var(--blue);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 768px) {
+  .filter-bar { top: 62px !important; }
+  .articles-section { padding: 32px 20px !important; }
+  .articles-list-grid { grid-template-columns: 1fr !important; }
+  .article-featured { grid-template-columns: 1fr !important; display: flex !important; flex-direction: column !important; }
+  .article-featured-img { border-right: none !important; border-bottom: 1px solid var(--border) !important; min-height: 200px !important; }
+}
+</style>
+
+  <style>
+/* ════════════════════════════════════════
+   ADVANCED UX ENHANCEMENTS
+════════════════════════════════════════ */
+
+/* ─── BACK TO TOP ─── */
+#back-to-top {
+  position: fixed; bottom: 28px; right: 28px; z-index: 500;
+  width: 44px; height: 44px;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(0,61,165,0.5);
+  color: rgba(255,255,255,0.7);
+  font-size: 18px; line-height: 1;
+  cursor: pointer; display: none;
+  align-items: center; justify-content: center;
+  transition: background .25s, color .25s, border-color .25s, transform .25s;
+  backdrop-filter: blur(8px);
+}
+#back-to-top.visible { display: flex; animation: fadeInUp .3s ease; }
+#back-to-top:hover { background: var(--blue); color: #fff; border-color: var(--blue); transform: translateY(-3px); }
+@keyframes fadeInUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+/* ─── TOAST NOTIFICATIONS ─── */
+#toast-container {
+  position: fixed; bottom: 28px; left: 28px; z-index: 600;
+  display: flex; flex-direction: column; gap: 10px;
+  pointer-events: none;
+}
+.toast {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  padding: 12px 20px;
+  background: rgba(0,10,40,0.95); border: 1px solid rgba(0,61,165,0.45);
+  color: rgba(255,255,255,0.85); backdrop-filter: blur(12px);
+  animation: toastIn .35s cubic-bezier(.22,1,.36,1), toastOut .3s ease 3s forwards;
+  pointer-events: all;
+}
+.toast.success { border-color: rgba(34,197,94,0.5); color: #86efac; }
+.toast.error   { border-color: rgba(239,68,68,0.5);  color: #fca5a5; }
+@keyframes toastIn  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes toastOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(8px)} }
+
+/* ─── IMAGE LOADING SHIMMER ─── */
+.img-shimmer {
+  position: relative; background: #0a0a0a; overflow: hidden;
+}
+.img-shimmer::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(0,61,165,0.08) 50%, transparent 100%);
+  animation: shimmer 1.8s ease-in-out infinite;
+  transform: translateX(-100%);
+}
+@keyframes shimmer { to { transform: translateX(100%); } }
+
+/* ─── HOVER BLUE SCAN LINE ─── */
+.blue-scan { position: relative; overflow: hidden; }
+.blue-scan::after {
+  content: '';
+  position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(0,61,165,0.06), transparent);
+  transition: left 0.6s ease; pointer-events: none;
+}
+.blue-scan:hover::after { left: 140%; }
+
+/* ─── SKIP TO CONTENT (accessibilité) ─── */
+.skip-to-content {
+  position: absolute; top: -100%; left: 20px; z-index: 9999;
+  padding: 8px 16px;
+  font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+  background: var(--blue); color: #fff;
+  transition: top .2s;
+}
+.skip-to-content:focus { top: 8px; }
+
+/* ─── SMOOTH IMAGE REVEAL ─── */
+img[loading="lazy"] { opacity: 0; transition: opacity .5s ease; }
+img[loading="lazy"].loaded { opacity: 1; }
+
+/* ─── IMPROVED POPUP OVERLAY ─── */
+#notif-popup {
+  background: rgba(0,5,20,0.88) !important;
+  backdrop-filter: blur(20px) !important;
+}
+.popup-box {
+  border-color: rgba(0,61,165,0.35) !important;
+  background: #030510 !important;
+}
+.popup-box::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,61,165,0.3), transparent);
+}
+.popup-title span { color: var(--blue-light) !important; }
+.popup-submit { background: var(--blue) !important; transition: background .25s, transform .2s !important; }
+.popup-submit:hover { background: var(--blue-mid) !important; transform: translateY(-1px) !important; }
+.popup-push-btn { border-color: rgba(0,61,165,0.35) !important; transition: background .25s, border-color .25s !important; }
+.popup-push-btn:hover { background: rgba(0,61,165,0.15) !important; border-color: rgba(0,61,165,0.6) !important; }
+
+/* ─── PUSH FAB BUTTON ─── */
+#push-fab {
+  background: rgba(0,0,0,0.9) !important;
+  border: 1px solid rgba(0,61,165,0.45) !important;
+  color: rgba(255,255,255,0.7) !important;
+  backdrop-filter: blur(8px) !important;
+  transition: background .25s, border-color .25s, transform .25s !important;
+}
+#push-fab:hover { background: var(--blue) !important; color: #fff !important; border-color: var(--blue) !important; transform: translateY(-2px) !important; }
+
+/* ─── MOBILE-SPECIFIC IMPROVEMENTS ─── */
+@media (max-width: 768px) {
+  #back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 16px; }
+  #toast-container { bottom: 20px; left: 20px; right: 20px; }
+  .toast { font-size: 11px; }
+}
+
+/* ─── PRINT STYLES (SEO bonus) ─── */
+@media print {
+  .grid-bg, #cursor-glow, nav, #back-to-top, #push-fab, #notif-popup { display: none !important; }
+  body { background: #fff !important; color: #000 !important; }
+}
+</style>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
 <div class="grid-bg"></div>
   <div id="cursor-glow"></div>
-<div class="page">
+<div class="page" id="main-content">
 
   <!-- NAV -->
   <nav>
@@ -630,6 +818,21 @@
     }
   });
   </script>
+
+  <!-- BREADCRUMB (SEO + UX) -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <a href="index.html" itemprop="item"><span itemprop="name">Accueil</span></a>
+        <meta itemprop="position" content="1">
+      </li>
+      <span class="breadcrumb-sep">›</span>
+      <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
+        <span itemprop="name">Actualités</span>
+        <meta itemprop="position" content="2">
+      </li>
+    </ol>
+  </nav>
 
   <!-- TICKER -->
   <div class="ticker">
@@ -921,6 +1124,131 @@
     })
     .catch(() => {});
   </script>
+
+  <script src="enhancements.js"></script>
+
+<script>
+(function() {
+  // ── BACK TO TOP ──────────────────────────
+  const btn = document.createElement('button');
+  btn.id = 'back-to-top';
+  btn.setAttribute('aria-label', 'Retour en haut');
+  btn.innerHTML = '↑';
+  document.body.appendChild(btn);
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 400);
+  }, { passive: true });
+
+  // ── SKIP TO CONTENT ────────────────────
+  const skip = document.createElement('a');
+  skip.href = '#main-content'; skip.className = 'skip-to-content';
+  skip.textContent = 'Aller au contenu';
+  document.body.prepend(skip);
+
+  // ── LAZY IMAGE REVEAL ──────────────────
+  const imgObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const img = e.target;
+      if (img.complete) { img.classList.add('loaded'); }
+      else { img.addEventListener('load', () => img.classList.add('loaded'), { once: true }); }
+      imgObs.unobserve(img);
+    });
+  }, { rootMargin: '100px' });
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => imgObs.observe(img));
+  // Already loaded images
+  document.querySelectorAll('img[loading="lazy"]').forEach(img => {
+    if (img.complete) img.classList.add('loaded');
+  });
+
+  // ── TOAST UTILITY ─────────────────────
+  window.showToast = function(msg, type = '') {
+    let container = document.getElementById('toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'toast-container';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = 'toast' + (type ? ' ' + type : '');
+    toast.textContent = msg;
+    container.appendChild(toast);
+    setTimeout(() => toast.remove(), 3500);
+  };
+
+  // ── BLUE SCAN on shop/article cards ───
+  document.querySelectorAll('.shop-card, .article-card, .player-card').forEach(el => {
+    el.classList.add('blue-scan');
+  });
+
+  // ── SHIMMER on image containers ───────
+  document.querySelectorAll('.shop-card-img, .article-featured-img, .video-thumb-wrap').forEach(el => {
+    el.classList.add('img-shimmer');
+  });
+
+  // ── INTERSECTION OBSERVER pour counters ──
+  // On rewatches stat-nums after API injection via MutationObserver
+  function watchAndAnimate(el, value) {
+    if (el.dataset.animated) return;
+    el.dataset.animated = '1';
+    const isFloat = String(value).includes('.');
+    const dur = Math.min(1400, Math.max(500, value * 140));
+    const t0 = performance.now();
+    const suffix = el.dataset.suffix || '';
+    el.classList.add('counting');
+    const tick = (now) => {
+      const p = Math.min((now - t0) / dur, 1);
+      const ease = 1 - Math.pow(1 - p, 3);
+      el.textContent = (isFloat ? (value * ease).toFixed(1) : Math.floor(value * ease)) + suffix;
+      if (p < 1) requestAnimationFrame(tick);
+      else { el.textContent = (isFloat ? value.toFixed(1) : value) + suffix; el.classList.remove('counting'); }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  const counterObs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      const el = e.target;
+      const raw = el.textContent.trim();
+      const num = parseFloat(raw.replace(/[^0-9.]/g, ''));
+      if (!isNaN(num) && num > 0 && !el.dataset.animated) {
+        const suffix = /^\d+er$/.test(raw) ? 'er' : /^\d+e$/.test(raw) ? 'e' : '';
+        el.dataset.suffix = suffix;
+        watchAndAnimate(el, num);
+      }
+      counterObs.unobserve(el);
+    });
+  }, { threshold: 0.3 });
+  document.querySelectorAll('.stat-num, .kpi-num, .club-stat-num').forEach(el => counterObs.observe(el));
+
+  // Re-observe after API injection
+  const grids = ['stats-grid','kpi-grid'];
+  grids.forEach(id => {
+    const g = document.getElementById(id);
+    if (!g) return;
+    new MutationObserver(() => {
+      g.querySelectorAll('.stat-num, .kpi-num').forEach(el => {
+        if (!el.dataset.animated) counterObs.observe(el);
+      });
+    }).observe(g, { childList: true, subtree: true });
+  });
+
+  // ── KEYBOARD TRAP in modal ─────────────
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      const modal = document.querySelector('[id$="-modal"][style*="block"], #notif-popup.show');
+      if (modal) {
+        if (modal.id === 'notif-popup') window.closePopup && window.closePopup();
+        else modal.style.display = 'none';
+        document.body.style.overflow = '';
+      }
+    }
+  });
+
+})();
+</script>
 
 </body>
 </html>
