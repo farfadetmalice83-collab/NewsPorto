@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Mon, 20 Apr 2026 16:20:23 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Apr 2026 16:28:15 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[Liga Portugal : Porto creuse l'écart, le titre à portée de main]]></title>
+      <link>https://newsporto.fr/articles/liga-portugal-porto-creuse-l-ecart-le-titre-a-portee-de-main.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/liga-portugal-porto-creuse-l-ecart-le-titre-a-portee-de-main.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Porto file tout droit vers un nouveau sacre en Liga Portugal, et le scénario idéal se dessine sous les yeux ébahis des supporters. Sept points d’avance à quatre journées de la f…]]></description>
+      <category><![CDATA[Liga Portugal]]></category>
+      <enclosure url="https://assets.goal.com/images/v3/getty-2248141338/crop/MM5DENBUHA5DCMZXG45G433XMU5DGNZSHIYTIOI=/GettyImages-2248141338.jpg?auto=webp&format=pjpg&width=3840&quality=60" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[FC Porto forme les jeunes Français à Blain son savoir-faire d'élite]]></title>
       <link>https://newsporto.fr/articles/fc-porto-forme-les-jeunes-francais-a-blain-son-savoir-faire-.html</link>
