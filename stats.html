@@ -813,10 +813,11 @@
       flex-direction: column;
       justify-content: center;
       gap: 5px;
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       background: none; border: none;
-      cursor: pointer; padding: 4px;
+      cursor: pointer; padding: 6px;
       z-index: 200; position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
     .hamburger span {
       display: block; width: 100%; height: 1.5px;
@@ -917,8 +918,8 @@
       .page-title { font-size: clamp(52px, 14vw, 80px) !important; }
       .hero-right { text-align: left !important; }
 
-      section { padding: 32px 20px !important; }
-      .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      section { padding: 28px 16px !important; }
+      .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 1px !important; }
 
       .match-row { grid-template-columns: 70px 1fr auto 1fr 28px !important; gap: 4px !important; padding: 10px 12px !important; }
       .upcoming-row { grid-template-columns: 100px 1fr auto 1fr !important; }
@@ -962,6 +963,20 @@
     }
 
 
+
+    /* ── TOUCH / MOBILE PERFORMANCE ── */
+    @media (hover: none) and (pointer: coarse) {
+      .article-card:hover { transform: none !important; box-shadow: none !important; }
+      .video-card:hover { transform: none !important; }
+      .stat-cell:hover::before { transform: scaleX(0) !important; }
+      #cursor-glow { display: none !important; }
+      .grid-bg { animation: none; }
+    }
+    /* Prevent text-size adjust on iOS */
+    input, button, select, textarea { font-size: 16px; } /* évite le zoom auto iOS */
+    @media (max-width: 480px) {
+      .mobile-nav-item { font-size: clamp(36px, 10vw, 52px) !important; }
+    }
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -1180,11 +1195,11 @@ function fmtTime(iso) {
   });
 }
 function teamLogo(src, name) {
-  if (src) return `<img class="match-team-logo" src="${src}" alt="${name}" onerror="this.style.display='none'">`;
+  if (src) return `<img loading="lazy" class="match-team-logo" src="${src}" alt="${name}" onerror="this.style.display='none'">`;
   return `<div class="match-team-logo placeholder">${name[0]}</div>`;
 }
 function crestImg(src, name) {
-  if (src) return `<img class="team-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=team-crest-placeholder></div>'">`;
+  if (src) return `<img loading="lazy" class="team-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=team-crest-placeholder></div>'">`;
   return `<div class="team-crest-placeholder"></div>`;
 }
 function diffClass(val) {
