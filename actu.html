@@ -120,7 +120,7 @@
     .filter-btn.active { color: #000; background: var(--white); }
 
     /* ── ARTICLES GRID ── */
-    .articles-section { padding: 48px 48px; }
+    .articles-section { padding: 48px; }
 
     /* Featured top article */
     .article-featured {
@@ -138,6 +138,7 @@
       border-right: 1px solid var(--border);
       overflow: hidden; position: relative;
     }
+    .article-featured-img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
     .article-featured-img .img-placeholder {
       font-family: 'Bebas Neue', sans-serif;
       font-size: 120px; letter-spacing: -4px;
@@ -224,8 +225,11 @@
       border-right: 1px solid var(--border); padding: 32px;
       font-family: 'Bebas Neue', sans-serif; font-size: 72px;
       color: rgba(255,255,255,0.06); letter-spacing: -2px;
+      /* Hauteur min pour que l'image absolue soit visible */
+      min-height: 120px;
+      position: relative;
     }
-    .article-wide-body { padding: 28px 32px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+    .article-wide-body { padding: 22px 28px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
     .article-title-wide {
       font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: .5px; line-height: 1;
     }
@@ -268,10 +272,19 @@
       .nav-cta { display: none !important; }
       .hamburger { display: flex !important; }
       .mobile-nav-overlay { display: flex !important; }
-      .articles-section { padding: 32px 20px; }
+      .articles-section { padding: 24px 16px !important; }
       .articles-grid { grid-template-columns: 1fr; }
-      .article-wide { grid-template-columns: 80px 1fr; }
-      .article-wide-num { font-size: 40px; padding: 20px; }
+      /* article-wide : layout vertical sur mobile */
+      .article-wide { grid-template-columns: 1fr !important; }
+      .article-wide-num { 
+        min-height: 160px !important; 
+        border-right: none !important; 
+        border-bottom: 1px solid var(--border) !important; 
+        padding: 0 !important;
+        font-size: 40px;
+      }
+      .article-wide-num img { opacity: 0.7 !important; }
+      .article-wide-body { padding: 18px 16px 22px !important; }
       .page-hero { padding: 40px 20px 32px; }
       .filter-bar { padding: 12px 20px !important; gap: 6px !important; flex-wrap: wrap !important; }
       .filter-btn { font-size: 10px !important; padding: 5px 10px !important; }
@@ -734,8 +747,8 @@
       const cat = catLabels[a.category] || a.category;
       html += `
       <a href="articles/${a.file}" class="article-wide article-item" data-cat="${a.category}">
-        <div class="article-wide-num" style="position:relative;overflow:hidden;padding:0;min-width:200px;">
-          ${a.image ? `<img loading="lazy" src="${a.image}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.5;position:absolute;inset:0;">` : ''}
+        <div class="article-wide-num" style="position:relative;overflow:hidden;padding:0;min-width:200px;min-height:140px;">
+          ${a.image ? `<img loading="lazy" src="${a.image}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.65;position:absolute;inset:0;display:block;">` : ''}
         </div>
         <div class="article-wide-body">
           <p class="article-cat">${cat}</p>
