@@ -38,7 +38,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"NewsArticle","headline":"Roony Bardghji vers Porto pour un prêt salvateur en 2026","description":"","image":["https://www.fcbarcelona.com/photo-resources/2026/01/08/4620ccc3-7b8c-469c-9028-f5c49849eebf/mini_roony_3200x2000.jpg?width=1200&height=750"],"datePublished":"2026-04-20T17:08:18.898Z","dateModified":"2026-04-20T17:08:18.898Z","author":[{"@type":"Person","name":"Luis","url":"https://newsporto.fr/contact.html"},{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],"publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png","width":200,"height":60}},"mainEntityOfPage":{"@type":"WebPage","@id":"https://newsporto.fr/articles/roony-bardghji-vers-porto-pour-un-pret-salvateur-en-2026.html"},"articleSection":"Mercato","inLanguage":"fr-FR","keywords":"FC Porto, Porto, Mercato, newsporto.fr, Liga Portugal, football portugais, Dragons","wordCount":1185,"timeRequired":"PT6M"}</script>
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Accueil","item":"https://newsporto.fr/"},{"@type":"ListItem","position":2,"name":"Actualités","item":"https://newsporto.fr/actu.html"},{"@type":"ListItem","position":3,"name":"Roony Bardghji vers Porto pour un prêt salvateur en 2026","item":"https://newsporto.fr/articles/roony-bardghji-vers-porto-pour-un-pret-salvateur-en-2026.html"}]}</script>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Pourquoi Roony Bardghji pourrait-il quitter le FC Barcelone en 2026 ?","acceptedAnswer":{"@type":"Answer","text":"Roony Bardghji cherche une porte de sortie en raison d'un manque de temps de jeu, barré par l'émergence de Lamine Yamal, ce qui limite son développement."}},{"@type":"Question","name":"Quelles sont les statistiques de Bardghji au Barça avant le mercato 2026 ?","acceptedAnswer":{"@type":"Answer","text":"Il a cumulé 590 minutes (23 apparitions) avec 2 buts et 4 passes décisives, dont 1 but et 1 assist en Liga, reflétant un potentiel sous-exploité."}},{"@type":"Question","name":"Quelle est la valeur marchande actuelle de Roony Bardghji ?","acceptedAnswer":{"@type":"Answer","text":"Sa valeur marchande est estimée à environ 15,7 millions d'euros, malgré son contrat avec le Barça jusqu'en 2026."}}]}<\/script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Pourquoi Roony Bardghji pourrait-il quitter le FC Barcelone en 2026 ?","acceptedAnswer":{"@type":"Answer","text":"Roony Bardghji cherche une porte de sortie en raison d'un manque de temps de jeu, barré par l'émergence de Lamine Yamal, ce qui limite son développement."}},{"@type":"Question","name":"Quelles sont les statistiques de Bardghji au Barça avant le mercato 2026 ?","acceptedAnswer":{"@type":"Answer","text":"Il a cumulé 590 minutes (23 apparitions) avec 2 buts et 4 passes décisives, dont 1 but et 1 assist en Liga, reflétant un potentiel sous-exploité."}},{"@type":"Question","name":"Quelle est la valeur marchande actuelle de Roony Bardghji ?","acceptedAnswer":{"@type":"Answer","text":"Sa valeur marchande est estimée à environ 15,7 millions d'euros, malgré son contrat avec le Barça jusqu'en 2026."}}]}</script>
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -202,7 +202,7 @@
     </div>
     <!-- Articles similaires -->
     <section class="related-section">
-      <p class="related-label">— À lire aussi</p>
+      <p class="related-label">— Articles similaires</p>
       <div id="related-articles" class="related-grid"></div>
     </section>
     <footer>
@@ -251,7 +251,7 @@
       var sidebar=articles.filter(function(a){return a.file!==currentFile;}).slice(0,4);
       var el=document.getElementById('sidebar-articles');
       if(el&&sidebar.length){
-        el.innerHTML=sidebar.map(function(a){return'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">":'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';}).join('');
+        el.innerHTML=sidebar.map(function(a){return'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">:'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';}).join('');
         el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
       }
 
