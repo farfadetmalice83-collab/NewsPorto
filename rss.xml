@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Fri, 17 Apr 2026 19:12:33 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Apr 2026 16:17:19 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[Mercato Porto : Batrakov, le joker russe pour remplacer Mora]]></title>
+      <link>https://newsporto.fr/articles/mercato-porto-batrakov-le-joker-russe-pour-remplacer-mora.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/mercato-porto-batrakov-le-joker-russe-pour-remplacer-mora.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[[H2]FC Porto mise sur Aleksey Batrakov pour remplacer Rodrigo Mora[/H2]]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://www.les-transferts.com/wp-content/uploads/2025/09/Aleksey-Batrakov-avec-la-Russie-@Alamy.webp" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[Droits TV Liga Portugal : le Benfica isolé face au nouveau modèle]]></title>
       <link>https://newsporto.fr/articles/droits-tv-liga-portugal-le-benfica-isole-face-au-nouveau-mod.html</link>
