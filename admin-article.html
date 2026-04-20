@@ -842,6 +842,21 @@
 
       <hr class="divider">
 
+      <!-- 05b ANGLE + ALT IMAGE -->
+      <div class="form-section">
+        <p class="section-label">05b — Paramètres optionnels</p>
+        <div class="field">
+          <label>Angle éditorial <span style="color:rgba(255,255,255,.3);font-size:9px">(point de vue, ton souhaité)</span></label>
+          <input type="text" id="f-angle" placeholder="Ex: Sceptique sur le prix, focalisé sur l'impact tactique…">
+        </div>
+        <div class="field">
+          <label>Description image inline <span style="color:rgba(255,255,255,.3);font-size:9px">(alt SEO)</span></label>
+          <input type="text" id="f-imgalt" placeholder="Ex: Batrakov célébrant un but avec le Lokomotiv Moscou">
+        </div>
+      </div>
+
+      <hr class="divider">
+
       <!-- 06 GITHUB -->
       <div class="form-section">
         <p class="section-label">06 — Publication GitHub</p>
@@ -904,6 +919,7 @@
         <div class="check-item" data-field="f-cat"><span class="ck-ico">○</span><span class="ck-lbl">Catégorie</span></div>
         <div class="check-item" data-field="f-cover"><span class="ck-ico">○</span><span class="ck-lbl">Image couverture</span></div>
         <div class="check-item" data-field="f-body"><span class="ck-ico">○</span><span class="ck-lbl">Corps de l'article</span></div>
+        <div class="check-item" data-field="f-angle"><span class="ck-ico">○</span><span class="ck-lbl">Angle éditorial (optionnel)</span></div>
         <div class="check-item" data-field="f-repo"><span class="ck-ico">○</span><span class="ck-lbl">Repo GitHub</span></div>
         <div class="check-item" data-field="f-gh-token"><span class="ck-ico">○</span><span class="ck-lbl">Token GitHub</span></div>
       </div>
@@ -1056,6 +1072,8 @@ Règles rédactionnelles :
 - OBLIGATOIREMENT 800 mots minimum — compte tes mots, ne termine pas avant d'avoir atteint 800 mots
 - FORMAT TEXTE BRUT UNIQUEMENT : pas de Markdown, pas de **, pas de *, pas de #, pas de tirets de liste, pas de tirets longs (—) entre deux phrases ou en début de phrase. Texte brut uniquement, paragraphes séparés par une ligne vide.
 - STRUCTURE SEO OBLIGATOIRE : organise l'article en blocs thématiques clairs. Avant chaque nouveau bloc thématique (tous les 2-3 paragraphes environ), insère une ligne contenant UNIQUEMENT un titre de section entre balises [H2]Titre du bloc[/H2] ou [H3]Sous-titre[/H3]. Ces balises seront converties en vrais titres HTML.
+- ENCADRÉ EN BREF : OBLIGATOIREMENT au tout début du texte (avant le premier paragraphe), insère une ligne [BREF]point 1|point 2|point 3[/BREF] avec 3 points clés résumant l'article en moins de 10 mots chacun.
+- CITATION FORTE : si l'article contient une citation, un chiffre marquant ou une phrase d'accroche puissante, mets-la en valeur avec [QUOTE]texte[/QUOTE] (1 seule fois par article).
 
 Règles SEO :
 - Intègre naturellement "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
@@ -1085,18 +1103,27 @@ FORMAT DE RÉPONSE — JSON STRICT, rien d'autre :
 
   try {
     // Appels parallèles : texte + titre
-    const [rText, rTitle] = await Promise.all([
+    const sysFaq=`Tu es expert SEO. Génère une FAQ de 3 questions/réponses sur le sujet de l'article.
+FORMAT JSON STRICT : {"faq":[{"q":"Question ?","a":"Réponse courte en 1-2 phrases."},...]}`; 
+
+    const [rText, rTitle, rFaq] = await Promise.all([
       fetch('https://api.mistral.ai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
         body:JSON.stringify({model:'mistral-large-latest',max_tokens:2048,temperature:0.72,
-          messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
+          messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto.${$('f-angle')&&$('f-angle').value.trim()?'\nAngle éditorial imposé : '+$('f-angle').value.trim():''}\n\n${source}`}]})
       }),
       fetch('https://api.mistral.ai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
         body:JSON.stringify({model:'mistral-large-latest',max_tokens:256,temperature:0.6,
           messages:[{role:'system',content:sysTitre},{role:'user',content:`Sujet de l'article :\nCatégorie : ${catLabels[cat]||cat}\n${title?`Titre actuel : "${title}"\n`:''}Résumé source :\n${source.slice(0,600)}`}]})
+      }),
+      fetch('https://api.mistral.ai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({model:'mistral-large-latest',max_tokens:300,temperature:0.5,
+          messages:[{role:'system',content:sysFaq},{role:'user',content:`Article (résumé) : ${source.slice(0,800)}`}]})
       })
     ]);
 
@@ -1108,6 +1135,26 @@ FORMAT DE RÉPONSE — JSON STRICT, rien d'autre :
     $('groq-output').textContent=text;
     $('groq-output').className='result-text on';
     $('groq-actions').style.display='flex';
+
+    // Traitement FAQ
+    let faqHTML = '';
+    let faqSchema = null;
+    if(rFaq && rFaq.ok) {
+      try {
+        const dFaq = await rFaq.json();
+        const rawFaq = (dFaq.choices?.[0]?.message?.content||'').trim();
+        const cleanFaq = rawFaq.replace(/```json|```/g,'').trim();
+        const parsedFaq = JSON.parse(cleanFaq);
+        const items = parsedFaq.faq || [];
+        if(items.length) {
+          faqHTML = `<div class="a-faq"><p class="a-faq-title">Questions fréquentes</p>${items.map(f=>`<div class="a-faq-item"><p class="a-faq-q">${f.q}</p><p class="a-faq-a">${f.a}</p></div>`).join('')}</div>`;
+          faqSchema = JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":items.map(f=>({'@type':'Question','name':f.q,'acceptedAnswer':{'@type':'Answer','text':f.a}}))});
+        }
+      } catch(e) {}
+    }
+    // Stocker pour buildHTML
+    window._lastFaqHTML = faqHTML;
+    window._lastFaqSchema = faqSchema;
 
     // Traitement titre SEO
     if(rTitle.ok) {
@@ -1173,16 +1220,18 @@ function useRewritten() {
 }
 
 // ── BUILD HTML ARTICLE ────────────────────────────────────────────
-function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime) {
+function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime,imgAlt,faqHTML,faqSchema) {
   const catLabel=catLabels[cat]||cat;
   const year=new Date().getFullYear();
   const isoDate=new Date().toISOString();
+  const isoModified=isoDate; // distinct pour futures mises à jour
 
   // ── SEO : title tag enrichi (50-65 car.) ──
   const titleTag=`${title} — FC Porto · NewsPorto`;
 
-  // ── SEO : meta description enrichie ──
-  const metaDesc=excerpt.length>155?excerpt.slice(0,152)+'…':excerpt;
+  // ── SEO : meta description enrichie — nettoyée de toutes balises ──
+  const excerptClean=excerpt.replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const metaDesc=excerptClean.length>155?excerptClean.slice(0,152)+'…':excerptClean;
 
   // ── SEO : mots-clés keywords ──
   const keywords=`FC Porto, Porto, ${catLabel}, newsporto.fr, Liga Portugal, football portugais, Dragons`;
@@ -1193,7 +1242,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     "headline":title,
     "description":metaDesc,
     "image":[coverUrl],
-    "datePublished":isoDate,"dateModified":isoDate,
+    "datePublished":isoDate,"dateModified":isoModified,
     "author":[{"@type":"Person","name":"Luis","url":"https://newsporto.fr/contact.html"},{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
     "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png","width":200,"height":60}},
     "mainEntityOfPage":{"@type":"WebPage","@id":"https://newsporto.fr/articles/"+slug+".html"},
@@ -1226,6 +1275,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   let parasArr = [];
   let imgInserted = false;
 
+  let brefInserted=false;
   blocksRaw.forEach((block, i) => {
     const trimmed = block.trim();
     if (trimmed.startsWith('__H2__') && trimmed.endsWith('__/H2__')) {
@@ -1234,13 +1284,26 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     } else if (trimmed.startsWith('__H3__') && trimmed.endsWith('__/H3__')) {
       const headText = trimmed.replace('__H3__','').replace('__/H3__','').trim();
       parasArr.push(`      <h3 class="a-h3">${headText}</h3>`);
+    } else if (/^\[BREF\]/.test(trimmed) && !brefInserted) {
+      // Encadré "En bref"
+      const brefContent = trimmed.replace(/^\[BREF\]/,'').replace(/\[\/BREF\]$/,'').trim();
+      const points = brefContent.split('|').map(p=>p.trim()).filter(Boolean);
+      parasArr.push(`      <div class="a-bref"><p class="a-bref-label">En bref</p><ul>${points.map(p=>`<li>${p}</li>`).join('')}</ul></div>`);
+      brefInserted=true;
+    } else if (/^\[QUOTE\]/.test(trimmed)) {
+      const qt = trimmed.replace(/^\[QUOTE\]/,'').replace(/\[\/QUOTE\]$/,'').trim();
+      parasArr.push(`      <blockquote class="a-quote">${qt}</blockquote>`);
     } else {
-      parasArr.push(`      <p${i===0?' class="dc"':''}>${trimmed.replace(/\n/g,'<br>')}</p>`);
-      // Insérer l'image inline après le 3e paragraphe de texte (pas header)
+      // Retirer d'éventuels [BREF] ou [QUOTE] résiduels inline
+      const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
+      if (!clean) return;
+      parasArr.push(`      <p${i===0?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
+      // Insérer l'image inline après le 3e paragraphe de texte
       if (!imgInserted && inlineUrl) {
         const textParas = parasArr.filter(p => p.trim().startsWith('<p')).length;
         if (textParas === 3) {
-          parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${title} — FC Porto" loading="lazy">\n      </figure>`);
+          const altTxt = (typeof imgAlt!=='undefined'&&imgAlt) ? imgAlt : title+' — FC Porto';
+          parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${altTxt}" loading="lazy" width="800" height="533">\n      </figure>`);
           imgInserted = true;
         }
       }
@@ -1268,6 +1331,10 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <meta property="og:url" content="https://newsporto.fr/articles/${slug}.html">
   <meta property="article:published_time" content="${isoDate}">
   <meta property="article:section" content="${catLabel}">
+  <meta property="article:tag" content="${catLabel}">
+  <meta property="article:tag" content="FC Porto">
+  <meta property="article:tag" content="Dragons">
+  <link rel="alternate" type="application/rss+xml" title="NewsPorto RSS" href="../rss.xml">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@NewsPortoFR">
   <meta name="twitter:title" content="${title} — NewsPorto">
@@ -1285,6 +1352,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   ${schemaTag}
   ${breadcrumbTag}
+  ${faqSchema ? '<script type="application/ld+json">'+faqSchema+'<\\/script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -1337,10 +1405,46 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}}
+    /* ── En bref ── */
+    .a-bref{background:rgba(0,61,165,.08);border:1px solid rgba(0,61,165,.25);border-left:3px solid #003DA5;padding:18px 22px;margin:28px 0 32px}
+    .a-bref-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(0,100,255,.7);margin-bottom:10px}
+    .a-bref ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+    .a-bref li{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.3px;color:rgba(255,255,255,.85);padding-left:14px;position:relative}
+    .a-bref li::before{content:'—';position:absolute;left:0;color:rgba(0,100,255,.6)}
+    /* ── Citation ── */
+    .a-quote{border-left:3px solid rgba(255,255,255,.2);padding:16px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.7);line-height:1.3;font-style:normal}
+    /* ── Barre de progression ── */
+    #read-progress{position:fixed;top:0;left:0;height:2px;background:#003DA5;z-index:9999;width:0%;transition:width .1s linear;pointer-events:none}
+    /* ── Liens internes ── */
+    .abdy a.internal-link{color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(0,61,165,.6);padding-bottom:1px;transition:color .2s,border-color .2s}
+    .abdy a.internal-link:hover{color:#fff;border-bottom-color:#4d82d4}
+    /* ── Articles similaires ── */
+    .related-section{border-top:1px solid var(--border);padding:48px 48px 56px}
+    .related-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:10px;margin-bottom:28px}
+    .related-label::before{content:'';display:block;width:22px;height:1px;background:#003DA5}
+    .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)}
+    .rel-card{background:#0d0d0d;text-decoration:none;color:#fff;display:flex;flex-direction:column;transition:background .2s}
+    .rel-card:hover{background:rgba(0,61,165,.1)}
+    .rel-img{aspect-ratio:16/9;overflow:hidden}
+    .rel-img img{width:100%;height:100%;object-fit:cover;opacity:.75;display:block;transition:transform .4s}
+    .rel-card:hover .rel-img img{transform:scale(1.04)}
+    .rel-img-ph{background:rgba(255,255,255,.04)}
+    .rel-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+    .rel-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#4d82d4}
+    .rel-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.4px;line-height:1.05;color:#fff}
+    .rel-meta{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-top:auto}
+    /* ── FAQ ── */
+    .a-faq{margin:40px 0}
+    .a-faq-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .a-faq-title::before{content:'';display:block;width:18px;height:1px;background:#003DA5}
+    .a-faq-item{border-top:1px solid rgba(255,255,255,.07);padding:16px 0}
+    .a-faq-q{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:rgba(255,255,255,.85);margin-bottom:8px}
+    .a-faq-a{font-size:14px;line-height:1.7;color:rgba(255,255,255,.55)}
+    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}.related-section{padding:32px 16px 40px}.related-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
+  <div id="read-progress"></div>
   <div class="gbg"></div>
   <div class="pg">
     <nav>
@@ -1365,8 +1469,9 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
         <meta itemprop="datePublished" content="${isoDate}">
         <meta itemprop="author" content="NewsPorto">
         <meta itemprop="publisher" content="NewsPorto">
-        <div class="apull">${excerpt}</div>
+        <div class="apull">${excerptClean}</div>
 ${paras}
+        ${faqHTML||''}
         <div class="afig-clear"></div>
       </article>
       <aside class="asb" aria-label="Articles recommandés">
@@ -1387,22 +1492,76 @@ ${paras}
         <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
       </div>
     </div>
+    <!-- Articles similaires -->
+    <section class="related-section">
+      <p class="related-label">— À lire aussi</p>
+      <div id="related-articles" class="related-grid"></div>
+    </section>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© ${year} NewsPorto · Fan Media Indépendant FC Porto</span>
     </footer>
   </div>
   <script>
-  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
-    const articles=(data.articles||[]).slice(0,5);
-    const currentFile=window.location.pathname.split('/').pop();
-    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
-    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
-    const el=document.getElementById('sidebar-articles');
-    if(!el||!filtered.length)return;
-    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
-    el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
-  }).catch(()=>{});
+  // Barre de progression lecture
+  (function(){var bar=document.getElementById('read-progress');if(!bar)return;function upd(){var s=document.documentElement,p=(s.scrollTop||document.body.scrollTop)/(s.scrollHeight-s.clientHeight)*100;bar.style.width=Math.min(100,p)+'%';}window.addEventListener('scroll',upd,{passive:true});})();
+
+  // Sidebar + Similaires + Liens internes
+  (function(){
+    fetch('../articles/articlestotal.json').then(r=>r.json()).then(function(data){
+      var articles=data.articles||[];
+      var currentFile=location.pathname.split('/').pop();
+      var catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+      var currentCat=document.querySelector('.acat')?document.querySelector('.acat').textContent.trim():'';
+
+      // Liens internes
+      var linkables=articles.filter(function(a){return a.file!==currentFile;}).slice(0,12);
+      var body=document.querySelector('.abdy');
+      if(body&&linkables.length){
+        var paras=Array.from(body.querySelectorAll('p'));
+        var added=0;
+        paras.forEach(function(p){
+          if(added>=4)return;
+          for(var i=0;i<linkables.length;i++){
+            var a=linkables[i];
+            var words=a.title.split(' ').filter(function(w){return w.replace(/[^a-zA-Z\u00C0-\u017E]/g,'').length>5;});
+            for(var wi=0;wi<words.length;wi++){
+              var word=words[wi].replace(/[^a-zA-Z\u00C0-\u017E]/g,'');
+              if(!word)continue;
+              try{var rx=new RegExp('(?<!["\'>])\\b('+word+')\\b(?!["\'])','i');
+              if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
+                p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
+                added++;linkables.splice(i,1);break;
+              }}catch(e){}
+            }
+            if(added>paras.indexOf(p)+1)break;
+          }
+        });
+      }
+
+      // Sidebar
+      var sidebar=articles.filter(function(a){return a.file!==currentFile;}).slice(0,4);
+      var el=document.getElementById('sidebar-articles');
+      if(el&&sidebar.length){
+        el.innerHTML=sidebar.map(function(a){return'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">":'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';}).join('');
+        el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
+      }
+
+      // Articles similaires
+      var relEl=document.getElementById('related-articles');
+      if(relEl){
+        var same=articles.filter(function(a){return a.file!==currentFile&&catLabels[a.category]===currentCat;});
+        var other=articles.filter(function(a){return a.file!==currentFile&&catLabels[a.category]!==currentCat;});
+        var related=same.concat(other).slice(0,3);
+        if(related.length){
+          relEl.innerHTML=related.map(function(a){
+            var cat=catLabels[a.category]||a.category||'';
+            return'<a href="'+a.file+'" class="rel-card">'+(a.image?'<div class="rel-img"><img src="'+a.image+'" alt="'+a.title+'" loading="lazy"></div>':'<div class="rel-img rel-img-ph"></div>')+'<div class="rel-body"><div class="rel-cat">'+cat+'</div><div class="rel-title">'+a.title+'</div><div class="rel-meta">'+a.date+'</div></div></a>';
+          }).join('');
+        }
+      }
+    }).catch(function(){});
+  })();
   const likeKey='np_like_'+window.location.pathname;
   function toggleLike(){const liked=localStorage.getItem(likeKey)==='1';const btn=document.getElementById('btn-like');const ico=btn.querySelector('.like-ico');const lbl=document.getElementById('like-label');if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}}
   if(localStorage.getItem(likeKey)==='1'){const btn=document.getElementById('btn-like');if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}}
@@ -1499,7 +1658,8 @@ async function publish() {
   try {
     // ÉTAPE 1 — Génération HTML
     setStep('step-1','active');
-    const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime);
+    const imgAlt = $('f-imgalt') ? $('f-imgalt').value.trim() : '';
+    const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime,imgAlt,window._lastFaqHTML||'',window._lastFaqSchema||null);
     await delay(200);
     setStep('step-1','done');
 
