@@ -1216,9 +1216,10 @@
       flex-direction: column;
       justify-content: center;
       gap: 5px;
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       background: none; border: none;
-      cursor: pointer; padding: 4px; z-index: 200;
+      cursor: pointer; padding: 6px; z-index: 200;
+      -webkit-tap-highlight-color: transparent;
     }
     .hamburger span {
       display: block; width: 100%; height: 1.5px;
@@ -1283,6 +1284,7 @@
 
       /* Image hero — grande et bien visible */
       .hero-visual {
+        position: relative !important;
         order: 0;
         width: 100% !important;
         min-height: 320px !important;
@@ -1375,6 +1377,20 @@
       }
     }
 
+
+    /* ── TOUCH / MOBILE PERFORMANCE ── */
+    @media (hover: none) and (pointer: coarse) {
+      .article-card:hover { transform: none !important; box-shadow: none !important; }
+      .video-card:hover { transform: none !important; }
+      .stat-cell:hover::before { transform: scaleX(0) !important; }
+      #cursor-glow { display: none !important; }
+      .grid-bg { animation: none; }
+    }
+    /* Prevent text-size adjust on iOS */
+    input, button, select, textarea { font-size: 16px; } /* évite le zoom auto iOS */
+    @media (max-width: 480px) {
+      .mobile-nav-item { font-size: clamp(36px, 10vw, 52px) !important; }
+    }
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -1468,7 +1484,7 @@
       <div class="hero-ring hero-ring-1"></div>
       <div class="hero-ring hero-ring-2"></div>
       <div class="hero-ring hero-ring-3"></div>
-      <img src="team_nobg.png" alt="FC Porto" class="hero-team-img">
+      <img loading="lazy" src="team_nobg.png" alt="FC Porto" class="hero-team-img">
     </div>
 
 
@@ -1525,7 +1541,7 @@
       <div class="match-competition" id="match-competition">Chargement...</div>
       <div class="match-teams">
         <div class="match-team">
-          <img id="logo-home" src="" class="match-logo" alt="" style="display:none">
+          <img loading="lazy" id="logo-home" src="" class="match-logo" alt="" style="display:none">
           <span class="match-team-name" id="team-home">—</span>
         </div>
         <div class="match-score-wrap">
@@ -1542,7 +1558,7 @@
           </div>
         </div>
         <div class="match-team">
-          <img id="logo-away" src="" class="match-logo" alt="" style="display:none">
+          <img loading="lazy" id="logo-away" src="" class="match-logo" alt="" style="display:none">
           <span class="match-team-name" id="team-away">—</span>
         </div>
       </div>
@@ -2246,7 +2262,7 @@
         <!-- Score header -->
         <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div style="display:flex;align-items:center;gap:12px;flex:1;">
-            <img id="ml-logo-home" src="" style="width:40px;height:40px;object-fit:contain;display:none">
+            <img loading="lazy" id="ml-logo-home" src="" style="width:40px;height:40px;object-fit:contain;display:none">
             <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;" id="ml-home">—</span>
           </div>
           <div style="text-align:center;min-width:100px;">
@@ -2255,7 +2271,7 @@
           </div>
           <div style="display:flex;align-items:center;gap:12px;flex:1;justify-content:flex-end;">
             <span style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;" id="ml-away">—</span>
-            <img id="ml-logo-away" src="" style="width:40px;height:40px;object-fit:contain;display:none">
+            <img loading="lazy" id="ml-logo-away" src="" style="width:40px;height:40px;object-fit:contain;display:none">
           </div>
         </div>
       </div>
@@ -2611,7 +2627,7 @@
   .popup-input {
     flex: 1; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15);
     border-right: none; color: #fff; padding: 13px 16px;
-    font-family: 'Barlow', sans-serif; font-size: 14px; outline: none;
+    font-family: 'Barlow', sans-serif; font-size: 16px; outline: none;
     transition: border-color .2s;
   }
   .popup-input::placeholder { color: rgba(255,255,255,0.3); }
