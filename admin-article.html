@@ -1352,7 +1352,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   ${schemaTag}
   ${breadcrumbTag}
-  ${faqSchema ? '<script type="application/ld+json">'+faqSchema+'<\\/script>' : ''}
+  ${faqSchema ? '<script type="application/ld+json">'+faqSchema+'<'+'/script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -1528,7 +1528,7 @@ ${paras}
             for(var wi=0;wi<words.length;wi++){
               var word=words[wi].replace(/[^a-zA-Z\u00C0-\u017E]/g,'');
               if(!word)continue;
-              try{var rx=new RegExp('(?<!["\'>])\\b('+word+')\\b(?!["\'])','i');
+              try{vatry{var rx=new RegExp('\\b('+word+')\\b','i');
               if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
                 p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
                 added++;linkables.splice(i,1);break;
@@ -1543,7 +1543,7 @@ ${paras}
       var sidebar=articles.filter(function(a){return a.file!==currentFile;}).slice(0,4);
       var el=document.getElementById('sidebar-articles');
       if(el&&sidebar.length){
-        el.innerHTML=sidebar.map(function(a){return'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">":'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';}).join('');
+        el.innerHTML=sidebar.map(function(a){return'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';}).join('');
         el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
       }
 
