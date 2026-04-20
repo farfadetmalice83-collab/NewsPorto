@@ -1676,19 +1676,27 @@
 
     if (live) {
       scoreEl.textContent = `${m.homeGoals ?? 0} – ${m.awayGoals ?? 0}`;
-      if (m.status !== 'FINISHED') {
-        liveBadge.style.display = 'block';
-        liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
-      } else {
+      if (m.status === 'FINISHED') {
         liveBadge.style.display = 'none';
         document.getElementById('match-status').textContent = 'Terminé';
+      } else if (m.status === 'HALF_TIME' || m.status === 'PAUSED') {
+        liveBadge.style.display = 'block';
+        liveMin.textContent = 'MI-TEMPS';
+        liveMin.style.background = '#f0a500';
+        document.getElementById('match-status').textContent = 'Mi-temps';
+      } else {
+        liveBadge.style.display = 'block';
+        liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
+        liveMin.style.background = '#ff4444';
+        document.getElementById('match-status').textContent = m.minute ? `${m.minute}'` : 'En cours';
+        document.getElementById('match-status').classList.add('live');
       }
     } else {
       scoreEl.textContent = 'VS';
       liveBadge.style.display = 'none';
       const date = new Date(m.date);
-      document.getElementById('match-date').textContent  = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Lisbon' });
-      document.getElementById('match-heure').textContent = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' });
+      document.getElementById('match-date').textContent  = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
+      document.getElementById('match-heure').textContent = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
     }
 
     if (data.lineup) { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
@@ -2376,15 +2384,20 @@
         const icons = {GOAL:'⚽',YELLOW_CARD:'🟨',RED_CARD:'🟥',SUBSTITUTION:'🔄',OWN_GOAL:'⚽',PENALTY:'⚽'};
         eventsEl.innerHTML = events.slice().reverse().map(e => {
           const isPorto = e.teamId===503;
-          return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
-            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;color:rgba(255,255,255,0.4);min-width:30px;">'+(e.minute||'—')+"'</span>"
-            +'<span style="font-size:16px;">'+(icons[e.type]||'•')+'</span>'
+          const isGoal = e.type==='GOAL'||e.type==='OWN_GOAL'||e.type==='PENALTY';
+          const minColor = isGoal ? (isPorto?'#4d82d4':'rgba(255,255,255,0.5)') : 'rgba(255,255,255,0.4)';
+          let detail = '';
+          if (e.type==='OWN_GOAL') detail = '<span style="font-size:9px;letter-spacing:1px;color:#e74c3c;text-transform:uppercase;">CSC</span>';
+          else if (e.assistName) detail = '<span style="font-size:10px;color:rgba(255,255,255,0.35);">⚡ ' + e.assistName + '</span>';
+          else if (e.playerOutName) detail = '<span style="font-size:10px;color:rgba(255,255,255,0.3);">↓ ' + e.playerOutName + '</span>';
+          return '<div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(255,255,255,0.05);' + (isGoal&&isPorto?'background:rgba(0,61,165,0.06);margin:0 -8px;padding:11px 8px;':'') + '">'
+            +'<span style="font-family:Bebas Neue,sans-serif;font-size:16px;color:'+minColor+';min-width:32px;text-align:right;">'+(e.minute||'—')+"'</span>"
+            +'<span style="font-size:18px;">'+(icons[e.type]||'•')+'</span>'
             +'<div style="flex:1;">'
-            +'<div style="font-family:Barlow Condensed,sans-serif;font-size:13px;font-weight:700;text-transform:uppercase;color:'+(isPorto?'#fff':'rgba(255,255,255,0.5)')+';">'+(e.playerName||'—')+'</div>'
-            +(e.assistName?'<div style="font-size:10px;color:rgba(255,255,255,0.3);">Passe : '+e.assistName+'</div>':'')
-            +(e.playerOutName?'<div style="font-size:10px;color:rgba(255,255,255,0.3);">↓ '+e.playerOutName+'</div>':'')
+            +'<div style="font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:'+(isPorto?'#fff':'rgba(255,255,255,0.5)')+';">'+(e.playerName||'—')+'</div>'
+            +(detail?'<div style="margin-top:2px;">'+detail+'</div>':'')
             +'</div>'
-            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);">'+(isPorto?'Porto':e.teamName||'')+'</span>'
+            +'<span style="font-family:Barlow Condensed,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);white-space:nowrap;">'+(isPorto?'Porto':e.teamName||'')+'</span>'
             +'</div>';
         }).join('');
       }
@@ -2431,7 +2444,7 @@
       if (m?.awayCrest) { document.getElementById('ml-logo-away').src=m.awayCrest; document.getElementById('ml-logo-away').style.display='block'; }
       if (m?.date) {
         const d=new Date(m.date);
-        document.getElementById('ml-status-badge').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+        document.getElementById('ml-status-badge').textContent=d.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'})+' · '+d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
       }
 
       const upcoming = data.upcomingMatches || [];
@@ -2443,8 +2456,8 @@
         html += '<p style="font-family:Barlow Condensed,sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,0.06);">PROCHAINS MATCHS</p>';
         upcoming.forEach(u => {
           const d=new Date(u.date);
-          const dateStr=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
-          const timeStr=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Lisbon'});
+          const dateStr=d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',timeZone:'Europe/Paris'});
+          const timeStr=d.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
           html += '<div style="display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);">'
             +'<div style="min-width:90px;"><div style="font-family:Barlow Condensed,sans-serif;font-size:12px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.5);">'+dateStr+'</div><div style="font-family:Barlow Condensed,sans-serif;font-size:11px;color:rgba(255,255,255,0.25);">'+timeStr+'</div></div>'
             +'<div style="flex:1;"><div style="font-family:Barlow Condensed,sans-serif;font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">'+u.homeTeam+' — '+u.awayTeam+'</div>'
