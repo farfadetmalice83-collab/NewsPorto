@@ -181,7 +181,7 @@
       </div>
     </div>
     <section class="related-section">
-      <div class="related-header"><span class="related-label">— À lire aussi</span></div>
+      <div class="related-header"><span class="related-label">— Articles similaires</span></div>
       <div id="related-articles" class="related-grid"></div>
     </section>
     <footer>
@@ -189,64 +189,71 @@
       <span class="fc">© 2026 NewsPorto · Fan Media Indépendant FC Porto</span>
     </footer>
   </div>
-  <script>
+    <script>
   (function() {
-    fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
-      const articles = data.articles || [];
-      const currentFile = window.location.pathname.split('/').pop();
-      const catLabels = {europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
-      const currentCat = 'Mercato';
+    fetch('../articles/articlestotal.json').then(function(r){return r.json();}).then(function(data){
+      var articles = data.articles || [];
+      var currentFile = location.pathname.split('/').pop();
+      var catLabels = {europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
+      var currentCat = 'Mercato';
 
-      // Liens hypertexte dans les paragraphes
-      const linkables = articles.filter(a=>a.file!==currentFile).slice(0,12);
-      const body = document.querySelector('.abdy');
-      if (body && linkables.length) {
-        const paras = Array.from(body.querySelectorAll('p'));
-        let linksAdded = 0;
+      // Liens hypertexte — regex robuste sans lookbehind ni guillemets spéciaux
+      var linkables = articles.filter(function(a){return a.file!==currentFile;}).slice(0,12);
+      var bodyEl = document.querySelector('.abdy');
+      if (bodyEl && linkables.length) {
+        var paras = Array.from(bodyEl.querySelectorAll('p'));
+        var linksAdded = 0;
         paras.forEach(function(p) {
           if (linksAdded >= 4) return;
-          for (let i = 0; i < linkables.length; i++) {
-            const a = linkables[i];
-            const words = a.title.split(' ').filter(w=>w.replace(/[^a-zA-ZÀ-ž]/g,'').length>5);
-            for (let wi=0;wi<words.length;wi++) {
-              const word = words[wi].replace(/[^a-zA-ZÀ-ž]/g,'');
-              if (!word) continue;
-              const regex = new RegExp('(?<!["'>])\b('+word+')\b(?!["'])','i');
-              if (regex.test(p.textContent) && !p.innerHTML.includes('internal-link')) {
-                p.innerHTML = p.innerHTML.replace(regex,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
-                linksAdded++; linkables.splice(i,1); break;
-              }
+          for (var i=0; i<linkables.length; i++) {
+            var a = linkables[i];
+            var words = a.title.split(' ').filter(function(w){return w.replace(/[^a-zA-ZÀ-ž]/g,'').length>5;});
+            for (var wi=0; wi<words.length; wi++) {
+              var word = words[wi].replace(/[^a-zA-ZÀ-ž]/g,'');
+              if (!word || p.innerHTML.includes('internal-link')) continue;
+              try {
+                var rx = new RegExp('\\b(' + word + ')\\b','i');
+                if (rx.test(p.textContent)) {
+                  p.innerHTML = p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title.replace(/"/g,'&quot;')+'">$1</a>');
+                  linksAdded++; linkables.splice(i,1); break;
+                }
+              } catch(e){}
             }
             if (linksAdded > paras.indexOf(p)+1) break;
           }
         });
       }
 
-      // Sidebar
-      const sidebarItems = articles.filter(a=>a.file!==currentFile).slice(0,4);
-      const el = document.getElementById('sidebar-articles');
+      // Sidebar — 4 articles récents
+      var sidebarItems = articles.filter(function(a){return a.file!==currentFile;}).slice(0,4);
+      var el = document.getElementById('sidebar-articles');
       if (el && sidebarItems.length) {
-        el.innerHTML = sidebarItems.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
+        el.innerHTML = sidebarItems.map(function(a){
+          var cat = catLabels[a.category]||a.category||'';
+          return '<a href="'+a.file+'" class="asb-card">'
+            +(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title.replace(/"/g,'&quot;')+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')
+            +'<div><div class="asb-card-cat">'+cat+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';
+        }).join('');
         el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
       }
 
       // Articles similaires bas de page
-      const relatedEl = document.getElementById('related-articles');
+      var relatedEl = document.getElementById('related-articles');
       if (relatedEl) {
-        const sameCat = articles.filter(a=>a.file!==currentFile && catLabels[a.category]===currentCat);
-        const otherCat = articles.filter(a=>a.file!==currentFile && catLabels[a.category]!==currentCat);
-        const related = [...sameCat,...otherCat].slice(0,3);
+        var sameCat = articles.filter(function(a){return a.file!==currentFile && catLabels[a.category]===currentCat;});
+        var otherCat = articles.filter(function(a){return a.file!==currentFile && catLabels[a.category]!==currentCat;});
+        var related = sameCat.concat(otherCat).slice(0,3);
         if (related.length) {
-          relatedEl.innerHTML = related.map(a=>{
-            const cat = catLabels[a.category]||a.category||'';
+          relatedEl.innerHTML = related.map(function(a){
+            var cat = catLabels[a.category]||a.category||'';
             return '<a href="'+a.file+'" class="rel-card">'
-              +(a.image?'<div class="rel-img"><img src="'+a.image+'" alt="'+a.title+'" loading="lazy"></div>':'<div class="rel-img rel-img-ph"></div>')
+              +(a.image?'<div class="rel-img"><img src="'+a.image+'" alt="'+a.title.replace(/"/g,'&quot;')+'" loading="lazy"></div>':'<div class="rel-img rel-img-ph"></div>')
               +'<div class="rel-body"><div class="rel-cat">'+cat+'</div><div class="rel-title">'+a.title+'</div><div class="rel-meta">'+a.date+'</div></div>'
               +'</a>';
           }).join('');
         }
       }
-    }).catch(()=>{});
+    }).catch(function(){});
   })();
   const likeKey='np_like_'+window.location.pathname;
   function toggleLike(){const liked=localStorage.getItem(likeKey)==='1';const btn=document.getElementById('btn-like');const ico=btn.querySelector('.like-ico');const lbl=document.getElementById('like-label');if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}}
