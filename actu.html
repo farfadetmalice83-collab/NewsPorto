@@ -374,10 +374,11 @@
       flex-direction: column;
       justify-content: center;
       gap: 5px;
-      width: 40px; height: 40px;
+      width: 44px; height: 44px;
       background: none; border: none;
-      cursor: pointer; padding: 4px;
+      cursor: pointer; padding: 6px;
       z-index: 200; position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
     .hamburger span {
       display: block; width: 100%; height: 1.5px;
@@ -478,7 +479,7 @@
       .page-title { font-size: clamp(52px, 14vw, 80px) !important; }
       .hero-right { text-align: left !important; }
 
-      section { padding: 32px 20px !important; }
+      section { padding: 28px 16px !important; }
       .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
       .match-row { grid-template-columns: 70px 1fr auto 1fr 28px !important; gap: 4px !important; padding: 10px 12px !important; }
@@ -542,6 +543,20 @@
       }
     }
 
+
+    /* ── TOUCH / MOBILE PERFORMANCE ── */
+    @media (hover: none) and (pointer: coarse) {
+      .article-card:hover { transform: none !important; box-shadow: none !important; }
+      .video-card:hover { transform: none !important; }
+      .stat-cell:hover::before { transform: scaleX(0) !important; }
+      #cursor-glow { display: none !important; }
+      .grid-bg { animation: none; }
+    }
+    /* Prevent text-size adjust on iOS */
+    input, button, select, textarea { font-size: 16px; } /* évite le zoom auto iOS */
+    @media (max-width: 480px) {
+      .mobile-nav-item { font-size: clamp(36px, 10vw, 52px) !important; }
+    }
     </style>
   <script defer src="/_vercel/insights/script.js"></script>
   <script defer src="/_vercel/speed-insights/script.js"></script>
@@ -673,7 +688,7 @@
     let html = `
     <a href="articles/${a0.file}" class="article-featured article-item" data-cat="${a0.category}">
       <div class="article-featured-img">
-        ${a0.image ? `<img src="${a0.image}" alt="${a0.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.75;">` : '<div class="img-placeholder">FC Porto</div>'}
+        ${a0.image ? `<img loading="lazy" src="${a0.image}" alt="${a0.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.75;">` : '<div class="img-placeholder">FC Porto</div>'}
         <span class="img-cat-badge">${cat0}</span>
       </div>
       <div class="article-featured-body">
@@ -698,7 +713,7 @@
         html += `
         <a href="articles/${a.file}" class="article-card article-item" data-cat="${a.category}" style="padding:0;display:flex;flex-direction:column;">
           <div style="width:100%;aspect-ratio:16/9;overflow:hidden;flex-shrink:0;">
-            ${a.image ? `<img src="${a.image}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.8;display:block;">` : ''}
+            ${a.image ? `<img loading="lazy" src="${a.image}" alt="${a.title}" style="width:100%;height:100%;object-fit:cover;opacity:0.8;display:block;">` : ''}
           </div>
           <div style="padding:20px 20px 24px;display:flex;flex-direction:column;flex:1;">
             <p class="article-cat">${cat}</p>
@@ -720,7 +735,7 @@
       html += `
       <a href="articles/${a.file}" class="article-wide article-item" data-cat="${a.category}">
         <div class="article-wide-num" style="position:relative;overflow:hidden;padding:0;min-width:200px;">
-          ${a.image ? `<img src="${a.image}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.5;position:absolute;inset:0;">` : ''}
+          ${a.image ? `<img loading="lazy" src="${a.image}" alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.5;position:absolute;inset:0;">` : ''}
         </div>
         <div class="article-wide-body">
           <p class="article-cat">${cat}</p>
