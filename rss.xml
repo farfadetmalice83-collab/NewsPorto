@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Mon, 20 Apr 2026 16:17:19 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 20 Apr 2026 16:20:23 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[FC Porto forme les jeunes Français à Blain son savoir-faire d'élite]]></title>
+      <link>https://newsporto.fr/articles/fc-porto-forme-les-jeunes-francais-a-blain-son-savoir-faire-.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/fc-porto-forme-les-jeunes-francais-a-blain-son-savoir-faire-.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[[H2]Le FC Porto exporte son ADN en Loire-Atlantique : immersion au cœur de la formation des Dragons[/H2]]]></description>
+      <category><![CDATA[Analyse]]></category>
+      <enclosure url="https://media.ouest-france.fr/v1/pictures/MjAyNjA0ODgxZGQ2OTcwNzYwOTNmMDNjMDZkYjA4YWM3YjYxZDE?width=1260&height=708&focuspoint=50%2C25&cropresize=1&client_id=bpeditorial&sign=b76d20daa5893ba6cbafa68ab36881975c9627b1683e693a561e914be8681983" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[Mercato Porto : Batrakov, le joker russe pour remplacer Mora]]></title>
       <link>https://newsporto.fr/articles/mercato-porto-batrakov-le-joker-russe-pour-remplacer-mora.html</link>
