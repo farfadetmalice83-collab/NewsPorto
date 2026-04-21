@@ -743,15 +743,17 @@ img[loading="lazy"].loaded { opacity: 1; }
   function setCrest(imgId, phId, src) {
     const img = document.getElementById(imgId);
     const ph  = document.getElementById(phId);
+    if (!img) return;
     if (src) {
       img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
       img.onload  = () => { if(ph) ph.style.display='none'; };
+      img.crossOrigin = 'anonymous';
       img.src = src;
       img.style.display = 'block';
       if(ph) ph.style.display = 'none';
     } else {
-      if(img) img.style.display = 'none';
-      if(ph)  ph.style.display  = 'block';
+      img.style.display = 'none';
+      if(ph) ph.style.display = 'block';
     }
   }
   function crestHTML(src, name) {
@@ -819,7 +821,7 @@ img[loading="lazy"].loaded { opacity: 1; }
     localStorage.setItem('chat_pseudo', pseudo);
     document.getElementById('chat-auth-form').style.display = 'none';
     document.getElementById('chat-input-wrap').style.display = 'flex';
-    document.getElementById('chat-user-badge').textContent = pseudo;
+    document.getElementById('chat-user-badge').textContent = '👤 ' + pseudo;
     document.getElementById('chat-input').focus();
     initFirebase();
     if (!chatDB) { showChatFallback(); return; }
@@ -834,8 +836,12 @@ img[loading="lazy"].loaded { opacity: 1; }
     if (saved && saved.length >= 2) {
       const input = document.getElementById('chat-pseudo');
       if (input) input.value = saved;
-      // Petit délai pour que le DOM soit prêt
-      setTimeout(() => chatJoin(saved), 500);
+      // Attendre que le DOM et Firebase soient prêts
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => setTimeout(() => chatJoin(saved), 300));
+      } else {
+        setTimeout(() => chatJoin(saved), 300);
+      }
     }
   })();
 
@@ -1007,8 +1013,9 @@ img[loading="lazy"].loaded { opacity: 1; }
     document.getElementById('live-sec-label').textContent =
       m.status === 'FINISHED' ? 'Match terminé' : 'Match en direct';
     document.getElementById('live-comp-txt').textContent = m.competition || '';
-    setCrest('lv-crest-home', 'lv-ph-home', m.homeCrest);
-    setCrest('lv-crest-away', 'lv-ph-away', m.awayCrest);
+    const _lvIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
+    setCrest('lv-crest-home', 'lv-ph-home', m.homeCrest || (_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
+    setCrest('lv-crest-away', 'lv-ph-away', m.awayCrest || (!_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
     document.getElementById('lv-home').textContent = m.homeTeam;
     document.getElementById('lv-away').textContent = m.awayTeam;
     const awayLabel = document.getElementById('lv-away-stats-label');
@@ -1099,8 +1106,9 @@ img[loading="lazy"].loaded { opacity: 1; }
     document.getElementById('nx-date').textContent = fmtFull(m.date);
     document.getElementById('nx-venue').textContent = m.venue || '';
     document.getElementById('nx-comp').textContent = m.competition || '';
-    setCrest('nx-crest-home', 'nx-ph-home', m.homeCrest);
-    setCrest('nx-crest-away', 'nx-ph-away', m.awayCrest);
+    const _nxIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
+    setCrest('nx-crest-home', 'nx-ph-home', m.homeCrest || (_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
+    setCrest('nx-crest-away', 'nx-ph-away', m.awayCrest || (!_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
     document.getElementById('nx-home').textContent = m.homeTeam;
     document.getElementById('nx-away').textContent = m.awayTeam;
     startCountdown(m.date);
