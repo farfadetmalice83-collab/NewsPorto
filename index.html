@@ -32,6 +32,16 @@
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── FOCUS KEYBOARD ── */
+    :focus-visible {
+      outline: 2px solid #003DA5;
+      outline-offset: 3px;
+    }
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid #4d82d4;
+      outline-offset: 3px;
+    }
+
     html { scroll-behavior: smooth; }
 
     body {
@@ -422,7 +432,7 @@
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 9px;
       letter-spacing: 2px;
-      color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.5);
       text-transform: uppercase;
     }
 
@@ -829,14 +839,14 @@
       font-family: 'Bebas Neue', sans-serif;
       font-size: 16px;
       letter-spacing: 3px;
-      color: rgba(255,255,255,0.4);
+      color: rgba(255,255,255,0.5);
     }
     .footer-copy {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.45);
     }
     .footer-links {
       display: flex;
@@ -848,7 +858,7 @@
       font-size: 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.45);
       text-decoration: none;
       transition: color .2s;
     }
@@ -881,11 +891,9 @@
     #page-loader {
       position: fixed; inset: 0; z-index: 9999; background: #000;
       display: flex; align-items: center; justify-content: center;
-      transition: opacity 0.5s ease, visibility 0.5s ease;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
     }
     #page-loader.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    #page-loader { animation: autoHide 1s ease 0.8s forwards; }
-    @keyframes autoHide { to { opacity: 0; visibility: hidden; pointer-events: none; } }
     .loader-inner { display: flex; flex-direction: column; align-items: center; gap: 14px; }
     .loader-bar { width: 100px; height: 1px; background: rgba(255,255,255,0.1); overflow: hidden; }
     .loader-bar-fill { height: 100%; background: #fff; animation: loaderFill 0.45s cubic-bezier(.22,1,.36,1) forwards; }
@@ -940,7 +948,7 @@
     .section-label::before, .page-eyebrow::before, .hero-eyebrow::before { background: #003DA5 !important; }
 
     /* 6. Stat-cell — top border scan + glow bleu */
-    .stat-cell::before { content: ; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
+    .stat-cell::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: #003DA5; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,1,.36,1); }
     .stat-cell:hover::before { transform: scaleX(1); }
     .stat-cell:hover { background: rgba(0,20,80,0.22) !important; }
     .stat-cell::after { background: radial-gradient(ellipse at 50% 120%, rgba(0,61,165,0.28) 0%, transparent 68%) !important; }
@@ -1391,6 +1399,24 @@
       .stat-cell:hover::before { transform: scaleX(0) !important; }
       #cursor-glow { display: none !important; }
       .grid-bg { animation: none; }
+    }
+
+    /* ── PREFERS-REDUCED-MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+      .grid-bg { animation: none !important; }
+      .hero-team-img { animation: none !important; }
+      .hero-ring-1, .hero-ring-2, .hero-ring-3 { animation: none !important; opacity: 1; }
+      .hero-eyebrow, .hero-meta, .hero-lead, .hero-btn { animation: none !important; opacity: 1; transform: none; }
+      .hero-title-line span { animation: none !important; transform: none; opacity: 1; }
+      .reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-fade { opacity: 1 !important; transform: none !important; transition: none !important; }
+      .match-section, .match-card, .shop-card { opacity: 1 !important; transform: none !important; }
+      .ticker-inner.ready { animation: none !important; }
+      #particles-canvas { display: none !important; }
     }
     /* Prevent text-size adjust on iOS */
     input, button, select, textarea { font-size: 16px; } /* évite le zoom auto iOS */
@@ -2451,6 +2477,7 @@ img[loading="lazy"].loaded { opacity: 1; }
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
       <li><a href="/cdn-cgi/l/email-protection#412d342832252032282d3720797272707101262c20282d6f222e2c">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
+      <li><a href="confidentialite.html">Confidentialité</a></li>
     </ul>
   </footer>
   <button id="push-fab" onclick="reopenPopup()">
@@ -2460,8 +2487,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 </div>
 
   <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-  // Page loader
-  // Hide loader immediately
+  // Page loader — masqué dès que possible
   (function() {
     var l = document.getElementById('page-loader');
     if (l) l.classList.add('hidden');
@@ -2470,10 +2496,6 @@ img[loading="lazy"].loaded { opacity: 1; }
     var l = document.getElementById('page-loader');
     if (l) l.classList.add('hidden');
   });
-  setTimeout(() => {
-    var l = document.getElementById('page-loader');
-    if (l) l.classList.add('hidden');
-  }, 500);
 
 
   // ── SCROLL ANIMATIONS ────────────────────────────────────────────
@@ -3375,12 +3397,38 @@ img[loading="lazy"].loaded { opacity: 1; }
   // ── Afficher le popup après délai ──────────────────────────────────────
   function maybeShowPopup() {
     if (localStorage.getItem(EMAIL_KEY)) return;
-    setTimeout(() => {
+    let shown = false;
+
+    function showPopup() {
+      if (shown) return;
+      shown = true;
       const popup = document.getElementById('notif-popup');
       if (!popup) return;
       popup.classList.add('show');
       initPushBtn();
-    }, POPUP_DELAY_MS);
+    }
+
+    // Déclencheur 1 : exit-intent (souris vers le haut de la fenêtre)
+    function onMouseOut(e) {
+      if (e.clientY < 10) {
+        showPopup();
+        document.removeEventListener('mouseout', onMouseOut);
+      }
+    }
+    document.addEventListener('mouseout', onMouseOut);
+
+    // Déclencheur 2 : 70% de scroll de la page
+    function onScroll() {
+      const scrolled = (window.scrollY + window.innerHeight) / document.body.scrollHeight;
+      if (scrolled >= 0.7) {
+        showPopup();
+        window.removeEventListener('scroll', onScroll, { passive: true });
+      }
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    // Déclencheur 3 : fallback après 30s si rien ne s'est passé
+    setTimeout(showPopup, 30000);
   }
 
   // ── Init état du bouton push ────────────────────────────────────────────
