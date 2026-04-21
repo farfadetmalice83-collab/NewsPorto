@@ -505,6 +505,9 @@ img[loading="lazy"].loaded { opacity: 1; }
     .chat-input-wrap button { background:rgba(0,61,165,.3);border:1px solid rgba(0,61,165,.5);color:#fff;width:40px;height:40px;font-size:16px;cursor:pointer;transition:.2s;flex-shrink:0; }
     .chat-input-wrap button:hover { background:var(--blue); }
     @media(max-width:768px) {
+      #sec-next > div[style*="grid"] { grid-template-columns:1fr !important; }
+    }
+    @media(max-width:768px) {
       .lineup-grid { grid-template-columns:1fr;gap:16px; }
       .player-dot-circle { width:24px;height:24px;font-size:9px; }
       .player-dot-name { font-size:7px;max-width:36px; }
@@ -624,34 +627,58 @@ img[loading="lazy"].loaded { opacity: 1; }
         </div>
       </div>
 
-      <!-- ══ PROCHAIN MATCH ══ -->
+      <!-- ══ PROCHAIN MATCH + CHAT ══ -->
       <div id="sec-next" style="display:none">
         <p class="sec-label">Prochain match</p>
-        <div class="next-card">
-          <div class="next-date-line">
-            <div class="next-date-txt" id="nx-date">—</div>
-            <div class="next-venue-txt" id="nx-venue"></div>
-          </div>
-          <div class="countdown" id="nx-countdown">
-            <div class="cd-block"><div class="cd-num" id="cd-j">—</div><div class="cd-lbl">Jours</div></div>
-            <div class="cd-block"><div class="cd-num" id="cd-h">—</div><div class="cd-lbl">Heures</div></div>
-            <div class="cd-block"><div class="cd-num" id="cd-m">—</div><div class="cd-lbl">Min</div></div>
-            <div class="cd-block"><div class="cd-num" id="cd-s">—</div><div class="cd-lbl">Sec</div></div>
-          </div>
-          <div class="match-row">
-            <div class="team-block">
-              <img loading="lazy" id="nx-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-home').style.display='block'">
-              <div id="nx-ph-home" class="team-crest-ph" style="display:none"></div>
-              <div class="team-nm" id="nx-home">—</div>
+        <div style="display:grid;grid-template-columns:1fr 340px;gap:24px;align-items:start;">
+          <div class="next-card" style="margin-bottom:0;">
+            <div class="next-date-line">
+              <div class="next-date-txt" id="nx-date">—</div>
+              <div class="next-venue-txt" id="nx-venue"></div>
             </div>
-            <div class="score-col">
-              <div class="vs-txt">VS</div>
-              <div class="vs-comp" id="nx-comp">—</div>
+            <div class="countdown" id="nx-countdown">
+              <div class="cd-block"><div class="cd-num" id="cd-j">—</div><div class="cd-lbl">Jours</div></div>
+              <div class="cd-block"><div class="cd-num" id="cd-h">—</div><div class="cd-lbl">Heures</div></div>
+              <div class="cd-block"><div class="cd-num" id="cd-m">—</div><div class="cd-lbl">Min</div></div>
+              <div class="cd-block"><div class="cd-num" id="cd-s">—</div><div class="cd-lbl">Sec</div></div>
             </div>
-            <div class="team-block">
-              <img loading="lazy" id="nx-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-away').style.display='block'">
-              <div id="nx-ph-away" class="team-crest-ph" style="display:none"></div>
-              <div class="team-nm" id="nx-away">—</div>
+            <div class="match-row">
+              <div class="team-block">
+                <img loading="lazy" id="nx-crest-home" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-home').style.display='block'">
+                <div id="nx-ph-home" class="team-crest-ph" style="display:none"></div>
+                <div class="team-nm" id="nx-home">—</div>
+              </div>
+              <div class="score-col">
+                <div class="vs-txt">VS</div>
+                <div class="vs-comp" id="nx-comp">—</div>
+              </div>
+              <div class="team-block">
+                <img loading="lazy" id="nx-crest-away" class="team-crest" src="" alt="" style="display:none" onerror="this.style.display='none';document.getElementById('nx-ph-away').style.display='block'">
+                <div id="nx-ph-away" class="team-crest-ph" style="display:none"></div>
+                <div class="team-nm" id="nx-away">—</div>
+              </div>
+            </div>
+          </div>
+          <!-- CHAT INLINE -->
+          <div style="border:1px solid var(--border);padding:20px;background:rgba(255,255,255,.02);">
+            <div class="live-chat-header">
+              <span class="live-chat-title-wrap">
+                <span class="live-dot" style="margin-right:6px;"></span>
+                <span class="live-chat-title" id="chat-title-txt">Discussion</span>
+              </span>
+              <span class="live-chat-count"><span id="chat-online-count">0</span> en ligne</span>
+            </div>
+            <div class="live-chat-box" id="chat-messages" style="height:260px;">
+              <div class="chat-placeholder">Connecte-toi pour rejoindre le chat ⚽</div>
+            </div>
+            <div id="chat-auth-form" class="chat-auth-form">
+              <input id="chat-pseudo" maxlength="20" placeholder="Ton pseudo…" autocomplete="off">
+              <button onclick="chatJoin()">Rejoindre</button>
+            </div>
+            <div id="chat-input-wrap" class="chat-input-wrap" style="display:none">
+              <span id="chat-user-badge" class="chat-user-badge"></span>
+              <input id="chat-input" maxlength="200" placeholder="Ton message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
+              <button onclick="sendMsg()">→</button>
             </div>
           </div>
         </div>
@@ -670,31 +697,6 @@ img[loading="lazy"].loaded { opacity: 1; }
       </div>
 
 
-      <!-- ══ CHAT COMMUNAUTÉ ══ -->
-      <div id="sec-chat">
-        <p class="sec-label" id="chat-sec-label">Chat communauté</p>
-        <div class="live-chat-section" style="margin-top:0;padding-top:0;border-top:none;">
-          <div class="live-chat-header">
-            <span class="live-chat-title-wrap">
-              <span class="live-dot" style="margin-right:6px;"></span>
-              <span class="live-chat-title" id="chat-title-txt">Discussion</span>
-            </span>
-            <span class="live-chat-count"><span id="chat-online-count">0</span> connecté(s)</span>
-          </div>
-          <div class="live-chat-box" id="chat-messages">
-            <div class="chat-placeholder">Connecte-toi pour rejoindre le chat ⚽</div>
-          </div>
-          <div id="chat-auth-form" class="chat-auth-form">
-            <input id="chat-pseudo" maxlength="20" placeholder="Ton pseudo…" autocomplete="off">
-            <button onclick="chatJoin()">Rejoindre</button>
-          </div>
-          <div id="chat-input-wrap" class="chat-input-wrap" style="display:none">
-            <span id="chat-user-badge" class="chat-user-badge"></span>
-            <input id="chat-input" maxlength="200" placeholder="Ton message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
-            <button onclick="sendMsg()">→</button>
-          </div>
-        </div>
-      </div>
 
       <!-- Footer -->
       <div class="page-footer">
