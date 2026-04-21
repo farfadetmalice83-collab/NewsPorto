@@ -121,111 +121,6 @@
   }
   #pw-overlay.unlocking { pointer-events: none; }
   #pw-overlay.hidden { display: none; }
-  #pw-overlay.alert-flash {
-    animation: alertFlash 0.5s ease;
-  }
-  @keyframes alertFlash {
-    0%   { filter: none; }
-    15%  { filter: brightness(2.5) saturate(3) hue-rotate(-10deg); }
-    30%  { filter: none; }
-    50%  { filter: brightness(1.8) saturate(2.5) hue-rotate(-15deg); }
-    70%  { filter: none; }
-    85%  { filter: brightness(1.4) saturate(2); }
-    100% { filter: none; }
-  }
-  /* Crack CSS */
-  #pw-crack.crack-appear {
-    animation: crackAppear 0.12s ease forwards;
-  }
-  @keyframes crackAppear {
-    0%  { opacity: 0; transform: scale(0.3); filter: brightness(3); }
-    40% { opacity: 1; transform: scale(1.06); filter: brightness(2); }
-    100%{ opacity: 1; transform: scale(1);    filter: brightness(1); }
-  }
-  #pw-crack.crack-visible { opacity: 1; }
-
-  /* ── CASSURE ── */
-  #pw-top-half.break-top {
-    animation: breakTop 1.4s cubic-bezier(.4,0,.6,1) forwards;
-  }
-  @keyframes breakTop {
-    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
-    8%   { transform: translateY(-12px) rotate(-1.5deg); }
-    15%  { transform: translateY(0) rotate(0deg);   } /* recul avant élan */
-    25%  { transform: translateY(8px) rotate(1deg); } /* impact */
-    35%  { transform: translateY(-4px) rotate(-0.5deg); }
-    50%  { transform: translateY(0) rotate(0deg);   }
-    60%  { transform: translateY(-6px) rotate(-2deg) skewX(-1deg); opacity:1; }
-    100% { transform: translateY(-130vh) rotate(-8deg) skewX(-2deg); opacity:0; }
-  }
-  #pw-bot-half.break-bot {
-    animation: breakBot 1.4s cubic-bezier(.4,0,.6,1) forwards;
-  }
-  @keyframes breakBot {
-    0%   { transform: translateY(0) rotate(0deg);   opacity: 1; }
-    8%   { transform: translateY(8px) rotate(1deg); }
-    15%  { transform: translateY(0) rotate(0deg);   }
-    25%  { transform: translateY(-6px) rotate(-0.8deg); }
-    35%  { transform: translateY(3px) rotate(0.3deg); }
-    50%  { transform: translateY(0) rotate(0deg);   }
-    60%  { transform: translateY(5px) rotate(2deg) skewX(1deg); opacity:1; }
-    100% { transform: translateY(130vh) rotate(10deg) skewX(3deg); opacity:0; }
-  }
-  #pw-overlay.final-flash {
-    animation: finalFlash 0.35s ease forwards;
-  }
-  @keyframes finalFlash {
-    0%  { filter: brightness(1); }
-    20% { filter: brightness(4) saturate(0); }
-    50% { filter: brightness(2) saturate(0.5); }
-    100%{ filter: brightness(1) saturate(1); }
-  }
-  #pw-overlay.big-shake {
-    animation: bigShake 0.6s cubic-bezier(.36,.07,.19,.97);
-  }
-  @keyframes bigShake {
-    0%,100%{ transform:translate(0,0) rotate(0); }
-    10%    { transform:translate(-20px,-8px) rotate(-1.5deg); }
-    20%    { transform:translate(22px,10px) rotate(1.2deg); }
-    30%    { transform:translate(-18px,6px) rotate(-1deg); }
-    40%    { transform:translate(20px,-10px) rotate(1.5deg); }
-    55%    { transform:translate(-14px,7px) rotate(-0.8deg); }
-    68%    { transform:translate(15px,-6px) rotate(0.9deg); }
-    80%    { transform:translate(-10px,5px) rotate(-0.5deg); }
-    90%    { transform:translate(8px,-4px) rotate(0.3deg); }
-  }
-
-  #pw-overlay.punch-shake {
-    animation: punchShake 0.55s cubic-bezier(.36,.07,.19,.97);
-  }
-  @keyframes punchShake {
-    0%,100% { transform: translate(0,0) rotate(0deg); }
-    8%  { transform: translate(-14px,-6px) rotate(-1deg); }
-    16% { transform: translate(16px, 7px) rotate(0.8deg); }
-    24% { transform: translate(-13px, 4px) rotate(-0.7deg); }
-    32% { transform: translate(14px,-7px) rotate(1deg); }
-    44% { transform: translate(-10px, 5px) rotate(-0.5deg); }
-    56% { transform: translate(11px,-4px) rotate(0.6deg); }
-    68% { transform: translate(-8px, 3px) rotate(-0.4deg); }
-    80% { transform: translate(7px,-3px) rotate(0.3deg); }
-    90% { transform: translate(-5px, 2px) rotate(-0.2deg); }
-  }
-
-  #pw-overlay.screen-shake {
-    animation: screenShake 0.45s cubic-bezier(.36,.07,.19,.97);
-  }
-  @keyframes screenShake {
-    0%,100% { transform: translate(0,0) rotate(0deg); }
-    10%     { transform: translate(-8px, -3px) rotate(-0.5deg); }
-    20%     { transform: translate(10px, 4px) rotate(0.4deg); }
-    30%     { transform: translate(-9px, 2px) rotate(-0.3deg); }
-    40%     { transform: translate(8px, -4px) rotate(0.5deg); }
-    50%     { transform: translate(-6px, 3px) rotate(-0.2deg); }
-    60%     { transform: translate(7px, -2px) rotate(0.3deg); }
-    70%     { transform: translate(-5px, 4px) rotate(-0.4deg); }
-    80%     { transform: translate(6px, -3px) rotate(0.2deg); }
-    90%     { transform: translate(-4px, 2px) rotate(-0.1deg); }
-  }
 
   /* Grille animée derrière */
   #pw-grid {
@@ -415,74 +310,27 @@
   <div id="pw-grid"></div>
   <div id="pw-glow"></div>
   <div id="pw-scan"></div>
-  <div id="pw-flash" style="position:absolute;inset:0;z-index:1;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%);transition:opacity 0.15s ease;"></div>
-
-  <!-- Crack d'écran -->
-  <svg id="pw-crack" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"
-    style="position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none;opacity:0;transition:opacity 0.05s ease;">
-    <!-- Impact central -->
-    <circle cx="200" cy="200" r="18" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="1.5"/>
-    <circle cx="200" cy="200" r="8"  fill="rgba(255,255,255,0.6)"/>
-    <!-- Fissures principales rayonnantes -->
-    <path d="M200 200 L148 88"  fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.8" stroke-linecap="round"/>
-    <path d="M200 200 L82  155" fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M200 200 L70  268" fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="1.7" stroke-linecap="round"/>
-    <path d="M200 200 L155 345" fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M200 200 L255 358" fill="none" stroke="rgba(255,255,255,0.83)" stroke-width="1.6" stroke-linecap="round"/>
-    <path d="M200 200 L335 290" fill="none" stroke="rgba(255,255,255,0.80)" stroke-width="1.7" stroke-linecap="round"/>
-    <path d="M200 200 L345 175" fill="none" stroke="rgba(255,255,255,0.78)" stroke-width="1.5" stroke-linecap="round"/>
-    <path d="M200 200 L268 82"  fill="none" stroke="rgba(255,255,255,0.82)" stroke-width="1.6" stroke-linecap="round"/>
-    <!-- Fissures secondaires avec branches -->
-    <path d="M200 200 L148 88 L120 55 M148 88 L105 95" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.0" stroke-linecap="round"/>
-    <path d="M200 200 L82 155 L40 130 M82 155 L65 195" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="0.9" stroke-linecap="round"/>
-    <path d="M200 200 L70 268 L35 295 M70 268 L55 245" fill="none" stroke="rgba(255,255,255,0.50)" stroke-width="1.0" stroke-linecap="round"/>
-    <path d="M200 200 L155 345 L130 395 M155 345 L185 390" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="0.9" stroke-linecap="round"/>
-    <path d="M200 200 L255 358 L245 400 M255 358 L310 380" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="1.0" stroke-linecap="round"/>
-    <path d="M200 200 L335 290 L385 300 M335 290 L360 255" fill="none" stroke="rgba(255,255,255,0.50)" stroke-width="0.9" stroke-linecap="round"/>
-    <path d="M200 200 L345 175 L395 160 M345 175 L365 210" fill="none" stroke="rgba(255,255,255,0.55)" stroke-width="1.0" stroke-linecap="round"/>
-    <path d="M200 200 L268 82 L295 45 M268 82 L310 100" fill="none" stroke="rgba(255,255,255,0.52)" stroke-width="0.9" stroke-linecap="round"/>
-    <!-- Micro fissures tertiaires -->
-    <path d="M148 88 L135 72 M120 55 L108 42" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.7"/>
-    <path d="M82 155 L62 148 M40 130 L22 120" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.6"/>
-    <path d="M335 290 L355 310 M385 300 L400 308" fill="none" stroke="rgba(255,255,255,0.30)" stroke-width="0.6"/>
-    <path d="M268 82 L280 65 M310 100 L325 88" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.7"/>
-    <!-- Zones d'éclats (polygones flous) -->
-    <path d="M200 200 L148 88 L82 155 Z"  fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
-    <path d="M200 200 L268 82 L345 175 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.18)" stroke-width="0.5"/>
-    <path d="M200 200 L335 290 L255 358 Z" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.16)" stroke-width="0.5"/>
-    <path d="M200 200 L70 268 L155 345 Z"  fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.16)" stroke-width="0.5"/>
-  </svg>
 
   <!-- Oeil géant en fond -->
   <canvas id="eye-canvas" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
 
-  <!-- Moitié HAUTE (logo + titre) -->
-  <div id="pw-top-half" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:0;">
+  <div id="pw-content">
     <img id="pw-logo-img" src="Logo.png" alt="NewsPorto">
     <p id="pw-title">NewsPorto</p>
     <p id="pw-subtitle">Administration</p>
     <div id="pw-line"></div>
-  </div>
-
-  <!-- Moitié BASSE (formulaire) -->
-  <div id="pw-bot-half" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:0;">
     <div class="pw-box">
       <input id="pw-input" type="password" placeholder="••••" maxlength="10" autofocus>
       <p id="pw-error"></p>
       <button id="pw-btn" onclick="checkPw()">Accéder →</button>
     </div>
   </div>
-
-  <!-- Ligne de fracture horizontale (cachée au départ) -->
-  <div id="pw-fracture-line" style="position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.9) 20%,white 50%,rgba(255,255,255,0.9) 80%,transparent 100%);opacity:0;z-index:10;box-shadow:0 0 18px 4px rgba(255,255,255,0.6),0 0 40px 8px rgba(200,220,255,0.3);pointer-events:none;"></div>
 </div>
 
 <script>
   if (sessionStorage.getItem('np_admin') === '1') {
     document.getElementById('pw-overlay').classList.add('hidden');
   }
-
-  let wrongAttempts = 0;
 
   function checkPw() {
     const val = document.getElementById('pw-input').value;
@@ -492,124 +340,15 @@
       setTimeout(() => overlay.classList.add('hidden'), 1000);
       sessionStorage.setItem('np_admin', '1');
     } else {
-      wrongAttempts++;
-      const input   = document.getElementById('pw-input');
-      const err     = document.getElementById('pw-error');
-      const overlay = document.getElementById('pw-overlay');
-      const flash   = document.getElementById('pw-flash');
-      const crack   = document.getElementById('pw-crack');
-
-      // Shake input
-      input.classList.remove('shake'); void input.offsetWidth; input.classList.add('shake');
-      err.textContent = wrongAttempts >= 2 ? '💥 ACCÈS REFUSÉ' : 'Code incorrect';
+      const input = document.getElementById('pw-input');
+      const err   = document.getElementById('pw-error');
+      input.classList.remove('shake');
+      void input.offsetWidth;
+      input.classList.add('shake');
+      err.textContent = 'Code incorrect';
       input.value = '';
-
-      if (wrongAttempts >= 3) {
-        // ── CASSURE FINALE : la page se brise en deux ──
-        err.textContent = '💀 SYSTÈME DÉTRUIT';
-
-        const topHalf = document.getElementById('pw-top-half');
-        const botHalf = document.getElementById('pw-bot-half');
-        const fracture = document.getElementById('pw-fracture-line');
-
-        // Désactiver input
-        input.disabled = true;
-        document.getElementById('pw-btn').disabled = true;
-
-        // Shake violent + flash aveuglant
-        overlay.classList.remove('big-shake'); void overlay.offsetWidth;
-        overlay.classList.add('big-shake');
-        overlay.classList.remove('final-flash'); void overlay.offsetWidth;
-        overlay.classList.add('final-flash');
-
-        // Flash rouge total
-        if (flash) {
-          flash.style.background = 'rgba(255,30,0,0.6)';
-          flash.style.opacity = '1';
-          setTimeout(() => { flash.style.opacity = '0'; flash.style.background = 'radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%)'; }, 300);
-        }
-
-        // Oeil FURIEUX max
-        if (window.triggerAngryEye) window.triggerAngryEye();
-
-        // Ligne de fracture au milieu
-        setTimeout(() => {
-          if (fracture) {
-            const rect = botHalf ? botHalf.getBoundingClientRect() : null;
-            fracture.style.top = (rect ? rect.top - 8 : window.innerHeight/2) + 'px';
-            fracture.style.opacity = '1';
-            fracture.style.animation = 'none';
-          }
-        }, 180);
-
-        // Les deux moitiés s'écartent et tombent
-        setTimeout(() => {
-          if (topHalf) { topHalf.classList.add('break-top'); }
-          if (botHalf) { botHalf.classList.add('break-bot'); }
-          if (fracture) { fracture.style.opacity = '0'; }
-        }, 350);
-
-        // Fond noir total après la chute
-        setTimeout(() => {
-          overlay.style.background = '#000';
-          overlay.style.transition = 'background 0.5s ease';
-        }, 1200);
-
-      } else if (wrongAttempts >= 2) {
-        // ── COUP DE POING : effets max ──
-        // 1. Vibration violente
-        overlay.classList.remove('punch-shake'); void overlay.offsetWidth;
-        overlay.classList.add('punch-shake');
-
-        // 2. Flash blanc aveuglant puis rouge
-        overlay.classList.remove('alert-flash'); void overlay.offsetWidth;
-        overlay.classList.add('alert-flash');
-        if (flash) {
-          flash.style.background = 'radial-gradient(ellipse at center, rgba(255,255,255,0.7) 0%, rgba(255,50,0,0.35) 40%, rgba(180,0,0,0.12) 70%, transparent 100%)';
-          flash.style.opacity = '1';
-          setTimeout(() => {
-            flash.style.background = 'radial-gradient(ellipse at center, rgba(255,0,0,0.22) 0%, rgba(180,0,0,0.08) 60%, transparent 100%)';
-            flash.style.opacity = '0';
-          }, 250);
-        }
-
-        // 3. Crack qui apparaît avec impact
-        if (crack) {
-          crack.style.opacity = '0';
-          crack.classList.remove('crack-appear');
-          void crack.offsetWidth;
-          setTimeout(() => {
-            crack.classList.add('crack-appear', 'crack-visible');
-          }, 80); // léger délai après le punch
-        }
-
-        // 4. Oeil furieux
-        if (window.triggerAngryEye) window.triggerAngryEye();
-
-        // Nettoyage partiel (crack reste visible)
-        setTimeout(() => {
-          input.classList.remove('shake');
-          overlay.classList.remove('punch-shake', 'alert-flash');
-          // err reste rouge
-        }, 2500);
-
-      } else {
-        // ── PREMIÈRE ERREUR : effets normaux ──
-        overlay.classList.remove('screen-shake'); void overlay.offsetWidth;
-        overlay.classList.add('screen-shake');
-        overlay.classList.remove('alert-flash'); void overlay.offsetWidth;
-        overlay.classList.add('alert-flash');
-        if (flash) {
-          flash.style.opacity = '1';
-          setTimeout(() => { flash.style.opacity = '0'; }, 600);
-        }
-        if (window.triggerAngryEye) window.triggerAngryEye();
-        setTimeout(() => {
-          input.classList.remove('shake');
-          err.textContent = '';
-          overlay.classList.remove('screen-shake', 'alert-flash');
-        }, 2200);
-      }
+      if (window.triggerAngryEye) window.triggerAngryEye();
+      setTimeout(() => { input.classList.remove('shake'); err.textContent = ''; }, 2200);
     }
   }
   document.getElementById('pw-input').addEventListener('keydown', e => {
@@ -793,28 +532,27 @@
       ctx.fillStyle = 'rgba(255,255,255,0.26)'; ctx.fill();
       ctx.restore();
 
-      // ── Paupières : fines bandes colorées sur le bord ──
-      const lidThick = eh * 0.045;
-
-      // Paupière supérieure — gradient chair/rose foncé
-      const topLidY = cy - eh*(1.0-topClose-squint)*1.08;
-      const lidTopGrad = ctx.createLinearGradient(0, topLidY, 0, topLidY + lidThick*2);
-      lidTopGrad.addColorStop(0, 'rgba(28,16,12,0.92)');
-      lidTopGrad.addColorStop(1, 'rgba(20,12,8,0)');
+      // ── Paupières dessinées PAR-DESSUS (masquent l'iris si nécessaire) ──
+      // Paupière supérieure : remplissage noir depuis le haut
       ctx.save();
+      // Zone au-dessus de la paupière sup
       ctx.beginPath();
-      // Bande juste sous la paupière sup (intérieur de l'oeil)
+      ctx.rect(0, 0, W, cy); // demi-écran haut
       ctx.moveTo(cx - ew/2, cy);
       ctx.bezierCurveTo(cx-ew*0.22, cy-eh*(1.0-topClose-squint)*1.08, cx+ew*0.22, cy-eh*(1.0-topClose-squint)*1.08, cx+ew/2, cy);
-      ctx.strokeStyle = 'rgba(255,255,255,0.22)';
-      ctx.lineWidth = 2.5; ctx.stroke();
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.97)'; ctx.fill();
       ctx.restore();
 
-      // Paupière inférieure — ligne fine
+      // Paupière inférieure : remplissage noir depuis le bas
+      ctx.save();
       ctx.beginPath();
-      ctx.moveTo(cx-ew/2, cy);
+      ctx.rect(0, cy, W, H);
+      ctx.moveTo(cx - ew/2, cy);
       ctx.bezierCurveTo(cx-ew*0.22, cy+eh*(0.65-botClose*0.65), cx+ew*0.22, cy+eh*(0.65-botClose*0.65), cx+ew/2, cy);
-      ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(0,0,0,0.97)'; ctx.fill();
+      ctx.restore();
 
       // Bords de l'oeil (contour fin)
       ctx.beginPath();
@@ -1104,6 +842,21 @@
 
       <hr class="divider">
 
+      <!-- 05b ANGLE + ALT IMAGE -->
+      <div class="form-section">
+        <p class="section-label">05b — Paramètres optionnels</p>
+        <div class="field">
+          <label>Angle éditorial <span style="color:rgba(255,255,255,.3);font-size:9px">(point de vue, ton souhaité)</span></label>
+          <input type="text" id="f-angle" placeholder="Ex: Sceptique sur le prix, focalisé sur l'impact tactique…">
+        </div>
+        <div class="field">
+          <label>Description image inline <span style="color:rgba(255,255,255,.3);font-size:9px">(alt SEO)</span></label>
+          <input type="text" id="f-imgalt" placeholder="Ex: Batrakov célébrant un but avec le Lokomotiv Moscou">
+        </div>
+      </div>
+
+      <hr class="divider">
+
       <!-- 06 GITHUB -->
       <div class="form-section">
         <p class="section-label">06 — Publication GitHub</p>
@@ -1166,6 +919,7 @@
         <div class="check-item" data-field="f-cat"><span class="ck-ico">○</span><span class="ck-lbl">Catégorie</span></div>
         <div class="check-item" data-field="f-cover"><span class="ck-ico">○</span><span class="ck-lbl">Image couverture</span></div>
         <div class="check-item" data-field="f-body"><span class="ck-ico">○</span><span class="ck-lbl">Corps de l'article</span></div>
+        <div class="check-item" data-field="f-angle"><span class="ck-ico">○</span><span class="ck-lbl">Angle éditorial (optionnel)</span></div>
         <div class="check-item" data-field="f-repo"><span class="ck-ico">○</span><span class="ck-lbl">Repo GitHub</span></div>
         <div class="check-item" data-field="f-gh-token"><span class="ck-ico">○</span><span class="ck-lbl">Token GitHub</span></div>
       </div>
@@ -1318,6 +1072,8 @@ Règles rédactionnelles :
 - OBLIGATOIREMENT 800 mots minimum — compte tes mots, ne termine pas avant d'avoir atteint 800 mots
 - FORMAT TEXTE BRUT UNIQUEMENT : pas de Markdown, pas de **, pas de *, pas de #, pas de tirets de liste, pas de tirets longs (—) entre deux phrases ou en début de phrase. Texte brut uniquement, paragraphes séparés par une ligne vide.
 - STRUCTURE SEO OBLIGATOIRE : organise l'article en blocs thématiques clairs. Avant chaque nouveau bloc thématique (tous les 2-3 paragraphes environ), insère une ligne contenant UNIQUEMENT un titre de section entre balises [H2]Titre du bloc[/H2] ou [H3]Sous-titre[/H3]. Ces balises seront converties en vrais titres HTML.
+- ENCADRÉ EN BREF : OBLIGATOIREMENT au tout début du texte (avant le premier paragraphe), insère une ligne [BREF]point 1|point 2|point 3[/BREF] avec 3 points clés résumant l'article en moins de 10 mots chacun.
+- CITATION FORTE : si l'article contient une citation, un chiffre marquant ou une phrase d'accroche puissante, mets-la en valeur avec [QUOTE]texte[/QUOTE] (1 seule fois par article).
 
 Règles SEO :
 - Intègre naturellement "FC Porto", "les Dragons", "newsporto.fr" et le sujet principal au moins 3 fois chacun
@@ -1347,18 +1103,27 @@ FORMAT DE RÉPONSE — JSON STRICT, rien d'autre :
 
   try {
     // Appels parallèles : texte + titre
-    const [rText, rTitle] = await Promise.all([
+    const sysFaq=`Tu es expert SEO. Génère une FAQ de 3 questions/réponses sur le sujet de l'article.
+FORMAT JSON STRICT : {"faq":[{"q":"Question ?","a":"Réponse courte en 1-2 phrases."},...]}`; 
+
+    const [rText, rTitle, rFaq] = await Promise.all([
       fetch('https://api.mistral.ai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
         body:JSON.stringify({model:'mistral-large-latest',max_tokens:2048,temperature:0.72,
-          messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto :\n\n${source}`}]})
+          messages:[{role:'system',content:sys},{role:'user',content:`Reformule pour NewsPorto.${$('f-angle')&&$('f-angle').value.trim()?'\nAngle éditorial imposé : '+$('f-angle').value.trim():''}\n\n${source}`}]})
       }),
       fetch('https://api.mistral.ai/v1/chat/completions',{
         method:'POST',
         headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
         body:JSON.stringify({model:'mistral-large-latest',max_tokens:256,temperature:0.6,
           messages:[{role:'system',content:sysTitre},{role:'user',content:`Sujet de l'article :\nCatégorie : ${catLabels[cat]||cat}\n${title?`Titre actuel : "${title}"\n`:''}Résumé source :\n${source.slice(0,600)}`}]})
+      }),
+      fetch('https://api.mistral.ai/v1/chat/completions',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+        body:JSON.stringify({model:'mistral-large-latest',max_tokens:300,temperature:0.5,
+          messages:[{role:'system',content:sysFaq},{role:'user',content:`Article (résumé) : ${source.slice(0,800)}`}]})
       })
     ]);
 
@@ -1370,6 +1135,26 @@ FORMAT DE RÉPONSE — JSON STRICT, rien d'autre :
     $('groq-output').textContent=text;
     $('groq-output').className='result-text on';
     $('groq-actions').style.display='flex';
+
+    // Traitement FAQ
+    let faqHTML = '';
+    let faqSchema = null;
+    if(rFaq && rFaq.ok) {
+      try {
+        const dFaq = await rFaq.json();
+        const rawFaq = (dFaq.choices?.[0]?.message?.content||'').trim();
+        const cleanFaq = rawFaq.replace(/```json|```/g,'').trim();
+        const parsedFaq = JSON.parse(cleanFaq);
+        const items = parsedFaq.faq || [];
+        if(items.length) {
+          faqHTML = `<div class="a-faq" role="region" aria-label="Questions fréquentes"><p class="a-faq-title">Questions fréquentes</p>${items.map(f=>`<div class="a-faq-item"><button class="a-faq-btn" aria-expanded="false" onclick="toggleFaq(this)"><span class="a-faq-q">${f.q}</span><span class="a-faq-ico" aria-hidden="true">+</span></button><div class="a-faq-body" role="region"><p class="a-faq-a">${f.a}</p></div></div>`).join('')}</div>`;
+          faqSchema = JSON.stringify({"@context":"https://schema.org","@type":"FAQPage","mainEntity":items.map(f=>({'@type':'Question','name':f.q,'acceptedAnswer':{'@type':'Answer','text':f.a}}))});
+        }
+      } catch(e) {}
+    }
+    // Stocker pour buildHTML
+    window._lastFaqHTML = faqHTML;
+    window._lastFaqSchema = faqSchema;
 
     // Traitement titre SEO
     if(rTitle.ok) {
@@ -1435,16 +1220,18 @@ function useRewritten() {
 }
 
 // ── BUILD HTML ARTICLE ────────────────────────────────────────────
-function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime) {
+function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime,imgAlt,faqHTML,faqSchema) {
   const catLabel=catLabels[cat]||cat;
   const year=new Date().getFullYear();
   const isoDate=new Date().toISOString();
+  const isoModified=isoDate; // distinct pour futures mises à jour
 
   // ── SEO : title tag enrichi (50-65 car.) ──
   const titleTag=`${title} — FC Porto · NewsPorto`;
 
-  // ── SEO : meta description enrichie ──
-  const metaDesc=excerpt.length>155?excerpt.slice(0,152)+'…':excerpt;
+  // ── SEO : meta description enrichie — nettoyée de toutes balises ──
+  const excerptClean=excerpt.replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const metaDesc=excerptClean.length>155?excerptClean.slice(0,152)+'…':excerptClean;
 
   // ── SEO : mots-clés keywords ──
   const keywords=`FC Porto, Porto, ${catLabel}, newsporto.fr, Liga Portugal, football portugais, Dragons`;
@@ -1455,7 +1242,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     "headline":title,
     "description":metaDesc,
     "image":[coverUrl],
-    "datePublished":isoDate,"dateModified":isoDate,
+    "datePublished":isoDate,"dateModified":isoModified,
     "author":[{"@type":"Person","name":"Luis","url":"https://newsporto.fr/contact.html"},{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
     "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png","width":200,"height":60}},
     "mainEntityOfPage":{"@type":"WebPage","@id":"https://newsporto.fr/articles/"+slug+".html"},
@@ -1488,6 +1275,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   let parasArr = [];
   let imgInserted = false;
 
+  let brefInserted=false;
   blocksRaw.forEach((block, i) => {
     const trimmed = block.trim();
     if (trimmed.startsWith('__H2__') && trimmed.endsWith('__/H2__')) {
@@ -1496,13 +1284,26 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     } else if (trimmed.startsWith('__H3__') && trimmed.endsWith('__/H3__')) {
       const headText = trimmed.replace('__H3__','').replace('__/H3__','').trim();
       parasArr.push(`      <h3 class="a-h3">${headText}</h3>`);
+    } else if (/^\[BREF\]/.test(trimmed) && !brefInserted) {
+      // Encadré "En bref"
+      const brefContent = trimmed.replace(/^\[BREF\]/,'').replace(/\[\/BREF\]$/,'').trim();
+      const points = brefContent.split('|').map(p=>p.trim()).filter(Boolean);
+      parasArr.push(`      <div class="a-bref"><p class="a-bref-label">En bref</p><ul>${points.map(p=>`<li>${p}</li>`).join('')}</ul></div>`);
+      brefInserted=true;
+    } else if (/^\[QUOTE\]/.test(trimmed)) {
+      const qt = trimmed.replace(/^\[QUOTE\]/,'').replace(/\[\/QUOTE\]$/,'').trim();
+      parasArr.push(`      <blockquote class="a-quote">${qt}</blockquote>`);
     } else {
-      parasArr.push(`      <p${i===0?' class="dc"':''}>${trimmed.replace(/\n/g,'<br>')}</p>`);
-      // Insérer l'image inline après le 3e paragraphe de texte (pas header)
+      // Retirer d'éventuels [BREF] ou [QUOTE] résiduels inline
+      const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
+      if (!clean) return;
+      parasArr.push(`      <p${i===0?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
+      // Insérer l'image inline après le 3e paragraphe de texte
       if (!imgInserted && inlineUrl) {
         const textParas = parasArr.filter(p => p.trim().startsWith('<p')).length;
         if (textParas === 3) {
-          parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${title} — FC Porto" loading="lazy">\n      </figure>`);
+          const altTxt = (typeof imgAlt!=='undefined'&&imgAlt) ? imgAlt : title+' — FC Porto';
+          parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${altTxt}" loading="lazy">\n      </figure>`);
           imgInserted = true;
         }
       }
@@ -1530,6 +1331,10 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <meta property="og:url" content="https://newsporto.fr/articles/${slug}.html">
   <meta property="article:published_time" content="${isoDate}">
   <meta property="article:section" content="${catLabel}">
+  <meta property="article:tag" content="${catLabel}">
+  <meta property="article:tag" content="FC Porto">
+  <meta property="article:tag" content="Dragons">
+  <link rel="alternate" type="application/rss+xml" title="NewsPorto RSS" href="../rss.xml">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@NewsPortoFR">
   <meta name="twitter:title" content="${title} — NewsPorto">
@@ -1540,13 +1345,14 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
   <script defer src="/_vercel/insights/script.js"><\/script>
-  <script defer src="\/_vercel\/speed-insights\/script.js"><\/script>
+  <script defer src="/_vercel/speed-insights/script.js"><\/script>
   <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
   <link rel="manifest" href="../site.webmanifest">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   ${schemaTag}
   ${breadcrumbTag}
+  ${faqSchema ? '<script type="application/ld+json">'+faqSchema+'<\/script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -1560,49 +1366,121 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     .nlogt{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px}
     .bk{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.2);padding-bottom:2px;transition:color .2s}
     .bk:hover{color:var(--white)}
-    .hero{position:relative;height:60vh;min-height:400px;overflow:hidden;border-bottom:1px solid var(--border)}
-    .hero img{width:100%;height:100%;object-fit:cover;opacity:.55}
-    .hov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.9) 30%,rgba(0,0,0,.2))}
-    .hbd{position:absolute;bottom:0;left:0;right:0;padding:40px 48px}
+    .hero{position:relative;height:60vh;min-height:420px;overflow:hidden;border-bottom:1px solid var(--border)}
+    .hero-img-wrap{position:absolute;inset:0}
+    .hero-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:center top;opacity:.6;display:block}
+    .hov{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.92) 25%,rgba(0,0,0,.35) 60%,rgba(0,0,0,.1))}
+    .hbd{position:absolute;bottom:0;left:0;right:0;padding:44px 48px 40px}
     .acat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;display:flex;align-items:center;gap:8px}
     .acat::before{content:'';display:block;width:18px;height:1px;background:var(--gray)}
     .atit{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,72px);line-height:.95;letter-spacing:.5px;margin-bottom:16px}
     .amet{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);display:flex;gap:16px}
-    .aly{display:grid;grid-template-columns:1fr 320px}
-    .abdy{padding:48px 48px;border-right:1px solid var(--border)}
-    .abdy p{font-size:16px;line-height:1.8;color:rgba(255,255,255,.8);margin-bottom:24px}
-    .abdy p.dc::first-letter{font-family:'Bebas Neue',sans-serif;font-size:64px;line-height:.85;float:left;margin-right:10px;color:var(--white)}
-    .a-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(24px,3vw,36px);letter-spacing:.5px;line-height:1;color:var(--white);margin:40px 0 20px;padding-top:8px;border-top:1px solid rgba(255,255,255,.08)}
+    .aly{display:grid;grid-template-columns:1fr 340px;min-height:60vh}
+    .abdy{padding:52px 52px 52px 48px;border-right:1px solid var(--border)}
+    .abdy p{font-size:17px;line-height:1.9;color:rgba(255,255,255,.82);margin-bottom:28px}
+    .abdy p.dc::first-letter{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:.82;float:left;margin-right:12px;margin-top:4px;color:var(--white)}
+    .a-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3vw,38px);letter-spacing:.5px;line-height:1;color:var(--white);margin:52px 0 20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
     .a-h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.75);margin:28px 0 14px}
     .apull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
-    .afig{float:left;margin:8px 28px 16px 0;border:1px solid var(--border);max-width:420px;width:45%}
-    .afig img{width:100%;display:block;opacity:.85}
+    .afig{float:left;margin:4px 32px 20px 0;border:1px solid var(--border);max-width:360px;width:38%;overflow:hidden}
+    .afig img{width:100%;height:auto;display:block;opacity:.88;aspect-ratio:16/9;object-fit:cover}
     .afig-clear{clear:both}
-    .asb{padding:40px 32px}
-    .sbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:8px}
-    .sbl::before{content:'';display:block;width:12px;height:1px;background:var(--gray)}
-    .asb-card{border:1px solid var(--border);margin-bottom:12px;text-decoration:none;color:inherit;display:flex;gap:12px;padding:12px;transition:background .2s}
-    .asb-card:hover{background:rgba(255,255,255,.04)}
-    .asb-card-img{width:72px;height:56px;object-fit:cover;flex-shrink:0;opacity:.8}
-    .asb-card-img-ph{width:72px;height:56px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
-    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:4px}
-    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.25;color:var(--white)}
+    .asb{padding:36px 28px;position:sticky;top:56px;align-self:start;max-height:calc(100vh - 56px);overflow-y:auto}
+    .sbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:20px;display:flex;align-items:center;gap:10px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+    .sbl::before{content:'';display:block;width:18px;height:1px;background:#003DA5}
+    .asb-card{border:1px solid rgba(255,255,255,.07);margin-bottom:10px;text-decoration:none;color:inherit;display:flex;gap:0;overflow:hidden;transition:background .2s,border-color .2s;background:rgba(255,255,255,.02)}
+    .asb-card:hover{background:rgba(0,61,165,.1);border-color:rgba(0,61,165,.3)}
+    .asb-card-img{width:96px;height:72px;object-fit:cover;flex-shrink:0;opacity:.85;display:block}
+    .asb-card-img-ph{width:96px;height:72px;background:rgba(255,255,255,.05);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,.15)}
+    .asb-card-body{padding:10px 12px;display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0}
+    .asb-card-cat{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4d82d4;margin-bottom:5px}
+    .asb-card-title{font-family:'Barlow Condensed',sans-serif;font-size:12.5px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;line-height:1.3;color:var(--white);overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
     .art-actions{display:flex;align-items:center;gap:12px;padding:20px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:32px 0}
-    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 16px;cursor:pointer;transition:all .2s}
+    .btn-like{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);color:rgba(255,255,255,.4);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:10px 16px;cursor:pointer;transition:all .2s;min-height:44px;-webkit-tap-highlight-color:transparent}
     .btn-like:hover,.btn-like.liked{border-color:rgba(231,76,60,.5);color:#e74c3c}
     .like-ico{font-size:14px;transition:transform .2s}
     .btn-like.liked .like-ico{transform:scale(1.3)}
     .share-btns{display:flex;gap:8px;margin-left:auto}
-    .btn-share{display:flex;align-items:center;justify-content:center;width:34px;height:34px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:14px}
+    .btn-share{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:1px solid var(--border);color:rgba(255,255,255,.4);background:none;cursor:pointer;transition:all .2s;text-decoration:none;font-size:15px;-webkit-tap-highlight-color:transparent}
     .btn-share:hover{border-color:rgba(255,255,255,.4);color:var(--white)}
     .btn-share.copied{border-color:rgba(0,168,107,.5);color:#00a86b}
     footer{padding:28px 48px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border)}
     .fn{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.2)}
     .fc{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.15)}
-    @media(max-width:768px){nav,footer{padding:0 20px}.hbd{padding:24px 20px}.aly{grid-template-columns:1fr}.abdy{padding:32px 20px;border-right:none}.asb{padding:24px 20px}.afig{float:none;width:100%;max-width:100%;margin:0 0 20px}}
+    /* ── En bref ── */
+    .a-bref{background:rgba(0,61,165,.08);border:1px solid rgba(0,61,165,.25);border-left:3px solid #003DA5;padding:18px 22px;margin:28px 0 32px}
+    .a-bref-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(0,100,255,.7);margin-bottom:10px}
+    .a-bref ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+    .a-bref li{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:.3px;color:rgba(255,255,255,.85);padding-left:14px;position:relative}
+    .a-bref li::before{content:'—';position:absolute;left:0;color:rgba(0,100,255,.6)}
+    /* ── Citation ── */
+    .a-quote{border-left:3px solid rgba(255,255,255,.2);padding:16px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.7);line-height:1.3;font-style:normal}
+    /* ── Barre de progression ── */
+    #read-progress{position:fixed;top:0;left:0;height:2px;background:#003DA5;z-index:9999;width:0%;transition:width .1s linear;pointer-events:none}
+    /* ── Liens internes ── */
+    .abdy a.internal-link{color:rgba(255,255,255,.85);text-decoration:none;border-bottom:1px solid rgba(0,61,165,.6);padding-bottom:1px;transition:color .2s,border-color .2s}
+    .abdy a.internal-link:hover{color:#fff;border-bottom-color:#4d82d4}
+    /* ── Articles similaires ── */
+    .related-section{border-top:1px solid var(--border);padding:48px 48px 56px}
+    .related-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:10px;margin-bottom:28px}
+    .related-label::before{content:'';display:block;width:22px;height:1px;background:#003DA5}
+    .related-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08)}
+    .rel-card{background:#0d0d0d;text-decoration:none;color:#fff;display:flex;flex-direction:column;transition:background .2s}
+    .rel-card:hover{background:rgba(0,61,165,.1)}
+    .rel-img{aspect-ratio:16/9;overflow:hidden}
+    .rel-img img{width:100%;height:100%;object-fit:cover;opacity:.75;display:block;transition:transform .4s}
+    .rel-card:hover .rel-img img{transform:scale(1.04)}
+    .rel-img-ph{background:rgba(255,255,255,.04)}
+    .rel-body{padding:16px 18px 20px;display:flex;flex-direction:column;gap:6px;flex:1}
+    .rel-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#4d82d4}
+    .rel-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:.4px;line-height:1.05;color:#fff}
+    .rel-meta{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-top:auto}
+    /* ── FAQ ACCORDION ── */
+    .a-faq{margin:44px 0}
+    .a-faq-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+    .a-faq-title::before{content:'';display:block;width:18px;height:1px;background:#003DA5}
+    .a-faq-item{border-top:1px solid rgba(255,255,255,.08)}
+    .a-faq-item:last-child{border-bottom:1px solid rgba(255,255,255,.08)}
+    .a-faq-btn{width:100%;background:none;border:none;color:inherit;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 4px;text-align:left;transition:background .15s;-webkit-tap-highlight-color:transparent}
+    .a-faq-btn:hover{background:rgba(255,255,255,.02)}
+    .a-faq-q{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;color:rgba(255,255,255,.85);line-height:1.3}
+    .a-faq-ico{flex-shrink:0;width:22px;height:22px;border:1px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;color:rgba(255,255,255,.4);transition:transform .3s,border-color .2s,color .2s;line-height:1}
+    .a-faq-item.open .a-faq-ico{transform:rotate(45deg);border-color:#003DA5;color:#4d82d4}
+    .a-faq-body{overflow:hidden;max-height:0;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+    .a-faq-item.open .a-faq-body{max-height:300px}
+    .a-faq-a{font-size:14px;line-height:1.8;color:rgba(255,255,255,.58);padding:0 4px 18px}
+    @media(max-width:1024px){.aly{grid-template-columns:1fr 300px}.abdy{padding:40px 32px 48px}.asb{padding:28px 20px}}
+    @media(max-width:768px){nav,footer{padding:0 16px}.nlogt{font-size:17px}.hero{height:52vh;min-height:300px}.hbd{padding:20px 16px 24px}.aly{grid-template-columns:1fr;display:block}.abdy{padding:24px 16px 36px;border-right:none}.abdy p{font-size:16px;line-height:1.8}.afig{float:none;width:100%;max-width:100%;margin:0 0 24px}.asb{position:static;max-height:none;padding:24px 16px;border-top:1px solid var(--border);overflow-y:visible}.art-actions{padding:16px}.related-section{padding:32px 16px 44px}.related-grid{grid-template-columns:1fr}.footer{padding:20px 16px;flex-direction:column;align-items:flex-start}.apull{font-size:16px;padding:16px 18px}.a-quote{font-size:18px;padding:16px 20px}.a-faq-q{font-size:14px}#notif-popup{align-items:flex-end}.popup-box{width:100%;max-width:100%;padding:28px 16px 36px;border-left:none;border-right:none;border-bottom:none;border-radius:16px 16px 0 0}.popup-title{font-size:28px}.popup-form{flex-direction:column}.popup-input{border-right:1px solid rgba(255,255,255,.15);border-bottom:none}.btn-share{width:44px;height:44px}}
+    @media(max-width:480px){.atit{font-size:28px}.a-h2{font-size:24px}.share-btns{gap:6px}}
+    @media(hover:none){.a-faq-btn{padding:20px 4px}}
+    /* ── Newsletter popup ── */
+    #notif-popup{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.78);backdrop-filter:blur(6px);align-items:center;justify-content:center;animation:fadeInOverlay .3s ease}
+    #notif-popup.show{display:flex}
+    @keyframes fadeInOverlay{from{opacity:0}to{opacity:1}}
+    .popup-box{background:#0a0a0a;border:1px solid rgba(255,255,255,.12);max-width:480px;width:calc(100% - 40px);padding:48px 40px;position:relative;animation:slideUpPopup .35s cubic-bezier(.22,1,.36,1)}
+    @keyframes slideUpPopup{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}
+    .popup-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,.3);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;transition:color .2s;line-height:1}
+    .popup-close:hover{color:#fff}
+    .popup-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:8px;margin-bottom:16px}
+    .popup-eyebrow::before{content:'';width:16px;height:1px;background:rgba(255,255,255,.35)}
+    .popup-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:.95;margin-bottom:14px}
+    .popup-title span{-webkit-text-stroke:1.5px rgba(255,255,255,.4);color:transparent}
+    .popup-desc{font-family:'Barlow',sans-serif;font-size:14px;line-height:1.65;color:rgba(255,255,255,.55);margin-bottom:24px}
+    .popup-form{display:flex;gap:0;margin-bottom:12px}
+    .popup-input{flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-right:none;color:#fff;padding:13px 16px;font-family:'Barlow',sans-serif;font-size:16px;outline:none;transition:border-color .2s}
+    .popup-input::placeholder{color:rgba(255,255,255,.3)}
+    .popup-input:focus{border-color:rgba(255,255,255,.4)}
+    .popup-submit{background:#fff;color:#000;border:none;padding:13px 24px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:.2s;white-space:nowrap}
+    .popup-submit:hover{background:#e8e8e8}
+    .popup-msg{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;text-align:center;margin-top:10px;min-height:18px}
+    .popup-msg.ok{color:#00a86b}.popup-msg.err{color:#e74c3c}
+    .popup-skip{display:block;text-align:center;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);cursor:pointer;background:none;border:none}
+    .popup-skip:hover{color:rgba(255,255,255,.4)}
+    @media(max-width:600px){#notif-popup{align-items:flex-end}.popup-box{width:100%;max-width:100%;padding:32px 20px 40px;border-left:none;border-right:none;border-bottom:none;border-radius:16px 16px 0 0}.popup-title{font-size:28px}.popup-form{flex-direction:column}.popup-input{border-right:1px solid rgba(255,255,255,.15);border-bottom:none}}
   </style>
 </head>
 <body>
+  <div id="read-progress"></div>
   <div class="gbg"></div>
   <div class="pg">
     <nav>
@@ -1613,7 +1491,9 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       <a href="../actu.html" class="bk">← Actualités</a>
     </nav>
     <section class="hero">
-      <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager" width="1200" height="630">
+      <div class="hero-img-wrap">
+        <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager">
+      </div>
       <div class="hov"></div>
       <div class="hbd">
         <p class="acat">${catLabel}</p>
@@ -1627,14 +1507,15 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
         <meta itemprop="datePublished" content="${isoDate}">
         <meta itemprop="author" content="NewsPorto">
         <meta itemprop="publisher" content="NewsPorto">
-        <div class="apull">${excerpt}</div>
+        <div class="apull">${excerptClean}</div>
 ${paras}
+        ${faqHTML||''}
         <div class="afig-clear"></div>
       </article>
       <aside class="asb" aria-label="Articles recommandés">
-        <p class="sbl">À la une</p>
+        <p class="sbl">— Derniers articles</p>
         <div id="sidebar-articles"></div>
-        <a href="../actu.html" style="display:block;margin-top:16px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
+        <a href="../actu.html" style="display:block;margin-top:20px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:4px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,.3)'">Toutes les actus →</a>
       </aside>
     </div>
     <div class="art-actions" style="padding:20px 48px;display:flex;align-items:center;gap:12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
@@ -1643,28 +1524,145 @@ ${paras}
         <span id="like-label">J'aime</span>
       </button>
       <div class="share-btns" style="margin-left:auto;display:flex;gap:8px;">
-        <a class="btn-share" href="#" onclick="shareTwitter();return false;" title="Partager sur X">𝕏</a>
-        <a class="btn-share" href="#" onclick="shareWhatsApp();return false;" title="Partager sur WhatsApp">💬</a>
-        <a class="btn-share" href="#" onclick="shareFacebook();return false;" title="Partager sur Facebook">f</a>
-        <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien">🔗</button>
+        <a class="btn-share" href="javascript:void(0)" onclick="shareTwitter()" title="Partager sur X" aria-label="Partager sur X">𝕏</a>
+        <a class="btn-share" href="javascript:void(0)" onclick="shareWhatsApp()" title="WhatsApp" aria-label="Partager sur WhatsApp">💬</a>
+        <a class="btn-share" href="javascript:void(0)" onclick="shareFacebook()" title="Facebook" aria-label="Partager sur Facebook">f</a>
+        <button class="btn-share" id="btn-copy" onclick="copyLink()" title="Copier le lien" aria-label="Copier le lien">🔗</button>
       </div>
     </div>
+    <!-- Articles similaires -->
+    <section class="related-section">
+      <p class="related-label">— Articles similaires</p>
+      <div id="related-articles" class="related-grid"></div>
+    </section>
     <footer>
       <span class="fn">NewsPorto</span>
       <span class="fc">© ${year} NewsPorto · Fan Media Indépendant FC Porto</span>
     </footer>
   </div>
+  <!-- Newsletter popup déclenché à 75% de lecture -->
+  <div id="notif-popup">
+    <div class="popup-box">
+      <button class="popup-close" onclick="closePopup()">✕</button>
+      <p class="popup-eyebrow">NewsPorto · Rester informé</p>
+      <p class="popup-title">Rejoins la <span>communauté</span></p>
+      <p class="popup-desc">Plus de 500 Portistas déjà présents. Reçois toute l'actu du FC Porto directement dans ta boîte mail.</p>
+      <div class="popup-form">
+        <input class="popup-input" type="email" id="popup-email" placeholder="ton@email.com" autocomplete="email">
+        <button class="popup-submit" id="popup-submit-btn" onclick="subscribeEmail()">S'abonner</button>
+      </div>
+      <p class="popup-msg" id="popup-msg"></p>
+      <button class="popup-skip" onclick="closePopup()">Non merci</button>
+    </div>
+  </div>
   <script>
-  fetch('../articles/articlestotal.json').then(r=>r.json()).then(data=>{
-    const articles=(data.articles||[]).slice(0,5);
-    const currentFile=window.location.pathname.split('/').pop();
-    const filtered=articles.filter(a=>a.file!==currentFile).slice(0,3);
-    const catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',liga:'Championnat',interview:'Interview'};
-    const el=document.getElementById('sidebar-articles');
-    if(!el||!filtered.length)return;
-    el.innerHTML=filtered.map(a=>'<a href="'+a.file+'" class="asb-card">'+(a.image?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">':'<div class="asb-card-img-ph">NP</div>')+'<div><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>').join('');
-    el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
-  }).catch(()=>{});
+  // Barre de progression + popup newsletter à 75%
+  (function(){
+    var bar=document.getElementById('read-progress');
+    if(!bar)return;
+    var popupShown=false;
+    var EMAIL_KEY='np_email_subscribed';
+    function upd(){
+      var s=document.documentElement;
+      var scrolled=s.scrollTop||document.body.scrollTop;
+      var total=s.scrollHeight-s.clientHeight;
+      if(!total)return;
+      var pct=(scrolled/total)*100;
+      bar.style.width=Math.min(100,pct)+'%';
+      if(!popupShown&&pct>=75&&!localStorage.getItem(EMAIL_KEY)){
+        popupShown=true;
+        var pop=document.getElementById('notif-popup');
+        if(pop)pop.classList.add('show');
+      }
+    }
+    window.addEventListener('scroll',upd,{passive:true});
+  })();
+
+  // FAQ accordion
+  function toggleFaq(btn){
+    var item=btn.closest('.a-faq-item');
+    var isOpen=item.classList.contains('open');
+    document.querySelectorAll('.a-faq-item.open').forEach(function(el){
+      el.classList.remove('open');
+      el.querySelector('.a-faq-btn').setAttribute('aria-expanded','false');
+    });
+    if(!isOpen){item.classList.add('open');btn.setAttribute('aria-expanded','true');}
+  }
+
+  // Sidebar + Similaires + Liens internes
+  (function(){
+    fetch('../articles/articlestotal.json').then(r=>r.json()).then(function(data){
+      var articles=data.articles||[];
+      var currentFile=location.pathname.split('/').pop();
+      var catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',mercato:'Mercato',liga:'Championnat',interview:'Interview'};
+      var currentCat=document.querySelector('.acat')?document.querySelector('.acat').textContent.trim():'';
+
+      // Liens internes automatiques
+      var linkables=articles.filter(function(a){return a.file!==currentFile;}).slice(0,12);
+      var body=document.querySelector('.abdy');
+      if(body&&linkables.length){
+        var paras=Array.from(body.querySelectorAll('p'));
+        var added=0;
+        paras.forEach(function(p){
+          if(added>=4)return;
+          for(var i=0;i<linkables.length;i++){
+            var a=linkables[i];
+            var words=a.title.split(' ').filter(function(w){return w.replace(/[^a-zA-Z\u00C0-\u017E]/g,'').length>5;});
+            for(var wi=0;wi<words.length;wi++){
+              var word=words[wi].replace(/[^a-zA-Z\u00C0-\u017E]/g,'');
+              if(!word)continue;
+              try{
+                var rx=new RegExp('(?<!["\'>])\\b('+word+')\\b(?!["\'])','i');
+                if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
+                  p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
+                  added++;linkables.splice(i,1);break;
+                }
+              }catch(e){}
+            }
+          }
+        });
+      }
+
+      // Sidebar — 5 articles récents
+      var sidebar=articles.filter(function(a){return a.file!==currentFile;}).slice(0,5);
+      var el=document.getElementById('sidebar-articles');
+      if(el&&sidebar.length){
+        el.innerHTML=sidebar.map(function(a){
+          var imgHtml=a.image
+            ?'<img src="'+a.image+'" class="asb-card-img" alt="'+a.title+' — FC Porto" loading="lazy">'
+            :'<div class="asb-card-img-ph">NP</div>';
+          return'<a href="'+a.file+'" class="asb-card">'+imgHtml+'<div class="asb-card-body"><div class="asb-card-cat">'+(catLabels[a.category]||a.category||'')+'</div><div class="asb-card-title">'+a.title+'</div></div></a>';
+        }).join('');
+        el.querySelectorAll('.asb-card-img').forEach(function(img){img.onerror=function(){this.style.display='none';};});
+      }
+
+      // Articles similaires
+      var relEl=document.getElementById('related-articles');
+      if(relEl){
+        var same=articles.filter(function(a){
+          var cat=catLabels[a.category]||a.category||'';
+          return a.file!==currentFile&&cat===currentCat;
+        });
+        var other=articles.filter(function(a){
+          var cat=catLabels[a.category]||a.category||'';
+          return a.file!==currentFile&&cat!==currentCat;
+        });
+        var related=same.concat(other).slice(0,3);
+        if(related.length){
+          relEl.innerHTML=related.map(function(a){
+            var cat=catLabels[a.category]||a.category||'';
+            var imgHtml=a.image
+              ?'<div class="rel-img"><img src="'+a.image+'" alt="'+a.title+'" loading="lazy"></div>'
+              :'<div class="rel-img rel-img-ph"></div>';
+            return'<a href="'+a.file+'" class="rel-card">'+imgHtml+'<div class="rel-body"><div class="rel-cat">'+cat+'</div><div class="rel-title">'+a.title+'</div><div class="rel-meta">'+(a.date||'')+'</div></div></a>';
+          }).join('');
+        } else {
+          relEl.closest('.related-section').style.display='none';
+        }
+      }
+    }).catch(function(){});
+  })();
+  })();
   const likeKey='np_like_'+window.location.pathname;
   function toggleLike(){const liked=localStorage.getItem(likeKey)==='1';const btn=document.getElementById('btn-like');const ico=btn.querySelector('.like-ico');const lbl=document.getElementById('like-label');if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}}
   if(localStorage.getItem(likeKey)==='1'){const btn=document.getElementById('btn-like');if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}}
@@ -1672,6 +1670,26 @@ ${paras}
   function shareWhatsApp(){window.open('https://api.whatsapp.com/send?text='+encodeURIComponent(document.title+' '+location.href),'_blank');}
   function shareFacebook(){window.open('https://www.facebook.com/sharer/sharer.php?u='+encodeURIComponent(location.href),'_blank');}
   function copyLink(){navigator.clipboard.writeText(location.href).then(()=>{const b=document.getElementById('btn-copy');b.classList.add('copied');b.textContent='✓';setTimeout(()=>{b.classList.remove('copied');b.textContent='🔗';},2000);});}
+  // Newsletter popup
+  const EMAIL_KEY_NL='np_email_subscribed';
+  function closePopup(){document.getElementById('notif-popup').classList.remove('show');}
+  document.getElementById('notif-popup').addEventListener('click',function(e){if(e.target===this)closePopup();});
+  async function subscribeEmail(){
+    const input=document.getElementById('popup-email');
+    const btn=document.getElementById('popup-submit-btn');
+    const msg=document.getElementById('popup-msg');
+    const email=input?.value?.trim();
+    if(!email||!/^[^@]+@[^@]+\.[^@]+$/.test(email)){msg.textContent='Adresse email invalide';msg.className='popup-msg err';return;}
+    btn.disabled=true;btn.textContent='…';
+    try{
+      const r=await fetch('/api/subscribe',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});
+      if(!r.ok)throw new Error();
+      msg.innerHTML='✓ Abonnement confirmé !';msg.className='popup-msg ok';
+      localStorage.setItem(EMAIL_KEY_NL,'1');
+      setTimeout(()=>closePopup(),3000);
+    }catch{msg.textContent='Erreur, réessaie dans un instant.';msg.className='popup-msg err';btn.disabled=false;btn.textContent="S'abonner";}
+  }
+  document.getElementById('popup-email')?.addEventListener('keydown',e=>{if(e.key==='Enter')subscribeEmail();});
   <\/script>
 </body>
 </html>`;
@@ -1742,7 +1760,8 @@ async function publish() {
     .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   const readTime = Math.max(2,Math.ceil(body.split(/\s+/).length/200));
   const firstPara= body.split(/\n\n/)[0].trim();
-  const excerpt  = firstPara.length>180 ? firstPara.slice(0,177)+'…' : firstPara;
+  const firstParaClean = firstPara.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const excerpt  = firstParaClean.length>180 ? firstParaClean.slice(0,177)+'…' : firstParaClean;
   const fileName = `${slug}.html`;
   const filePath = `articles/${fileName}`;
 
@@ -1761,7 +1780,8 @@ async function publish() {
   try {
     // ÉTAPE 1 — Génération HTML
     setStep('step-1','active');
-    const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime);
+    const imgAlt = $('f-imgalt') ? $('f-imgalt').value.trim() : '';
+    const html = buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTime,imgAlt,window._lastFaqHTML||'',window._lastFaqSchema||null);
     await delay(200);
     setStep('step-1','done');
 
