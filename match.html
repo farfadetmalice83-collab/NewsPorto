@@ -812,10 +812,11 @@ img[loading="lazy"].loaded { opacity: 1; }
     }
   }
 
-  function chatJoin() {
-    const pseudo = document.getElementById('chat-pseudo').value.trim().replace(/[<>]/g,'');
+  function chatJoin(forcedPseudo) {
+    const pseudo = forcedPseudo || document.getElementById('chat-pseudo').value.trim().replace(/[<>]/g,'');
     if (!pseudo || pseudo.length < 2) return;
     chatUser = pseudo;
+    localStorage.setItem('chat_pseudo', pseudo);
     document.getElementById('chat-auth-form').style.display = 'none';
     document.getElementById('chat-input-wrap').style.display = 'flex';
     document.getElementById('chat-user-badge').textContent = pseudo;
@@ -826,6 +827,17 @@ img[loading="lazy"].loaded { opacity: 1; }
     trackOnline(pseudo);
     postSystem(`${pseudo} a rejoint le chat ⚽`);
   }
+
+  // Auto-login si pseudo déjà enregistré
+  (function autoLogin() {
+    const saved = localStorage.getItem('chat_pseudo');
+    if (saved && saved.length >= 2) {
+      const input = document.getElementById('chat-pseudo');
+      if (input) input.value = saved;
+      // Petit délai pour que le DOM soit prêt
+      setTimeout(() => chatJoin(saved), 500);
+    }
+  })();
 
   function startChatListener() {
     if (chatListenerOff) chatListenerOff();
