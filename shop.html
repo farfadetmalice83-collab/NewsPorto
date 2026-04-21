@@ -683,6 +683,7 @@ img[loading="lazy"].loaded { opacity: 1; }
   #back-to-top { bottom: 20px; right: 20px; width: 40px; height: 40px; font-size: 16px; }
   #toast-container { bottom: 20px; left: 20px; right: 20px; }
   .toast { font-size: 11px; }
+  .fourthwall-disclaimer { padding: 16px 20px !important; flex-direction: column !important; align-items: flex-start !important; gap: 12px !important; }
 }
 
 /* ─── PRINT STYLES (SEO bonus) ─── */
@@ -993,6 +994,46 @@ img[loading="lazy"].loaded { opacity: 1; }
     </div>
   </section>
 
+  <!-- DISCLAIMER FOURTHWALL -->
+  <div style="
+    padding: 20px 48px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    background: rgba(0,20,80,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  ">
+    <p style="
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.7;
+      max-width: 680px;
+    ">
+      ⓘ Les achats sont traités par <strong style="color:rgba(255,255,255,0.55)">Fourthwall, Inc.</strong> (États-Unis). Les CGV, politiques de retour et données de paiement relèvent exclusivement de leur responsabilité.
+      En cliquant sur un produit, vous serez redirigé vers la boutique Fourthwall.
+    </p>
+    <a href="https://help.fourthwall.com/hc/en-us" target="_blank" rel="noopener" style="
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+      padding-bottom: 2px;
+      white-space: nowrap;
+      transition: color .2s;
+    " onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">
+      CGV Fourthwall →
+    </a>
+  </div>
+
   <!-- TRUST STRIP -->
   <div class="trust-strip reveal">
     <div class="strip-item">
@@ -1029,6 +1070,7 @@ img[loading="lazy"].loaded { opacity: 1; }
       <li><a href="https://discord.gg/YCcuMHmGcH" target="_blank">Discord</a></li>
       <li><a href="/cdn-cgi/l/email-protection#dcb0a9b5afb8bdafb5b0aabde4efefedec9cbbb1bdb5b0f2bfb3b1">Contact</a></li>
       <li><a href="mentions-legales.html">Mentions légales</a></li>
+      <li><a href="confidentialite.html">Confidentialité</a></li>
     </ul>
   </footer>
 
