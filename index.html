@@ -1959,6 +1959,26 @@ img[loading="lazy"].loaded { opacity: 1; }
     #back-to-top { bottom: 66px !important; right: 16px !important; }
   }
   </style>
+  <style>
+  /* Newsletter : statique en bas de page, plus fixe */
+  #push-fab {
+    position: static !important;
+    display: flex !important;
+    width: 100% !important;
+    border-radius: 0 !important;
+    justify-content: center !important;
+    padding: 18px 24px !important;
+    font-size: 12px !important;
+    letter-spacing: 3px !important;
+    box-shadow: none !important;
+    bottom: auto !important; right: auto !important; left: auto !important;
+    border-top: 1px solid rgba(0,61,165,0.3) !important;
+  }
+  #push-fab:hover { transform: none !important; box-shadow: none !important; background: #0050CC !important; }
+  /* back-to-top : bas droite normal */
+  #back-to-top { position: fixed !important; right: 28px !important; left: auto !important; bottom: 28px !important; }
+  @media (max-width:600px) { #back-to-top { right:16px !important; bottom:16px !important; } }
+  </style>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
@@ -2433,6 +2453,9 @@ img[loading="lazy"].loaded { opacity: 1; }
       <li><a href="mentions-legales.html">Mentions légales</a></li>
     </ul>
   </footer>
+  <button id="push-fab" onclick="reopenPopup()">
+  📬 Newsletter
+</button>
 
 </div>
 
@@ -3338,9 +3361,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 </div>
 
 <!-- Bouton flottant push -->
-<button id="push-fab" onclick="reopenPopup()">
-  📬 Newsletter
-</button>
+
 
 <!-- JS popup + push -->
 <script>
