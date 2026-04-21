@@ -253,16 +253,20 @@ export default async function handler(req, res) {
       .filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
       .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
 
-    const mapMatch = m => ({
-      id: m.id, date: m.utcDate,
-      competition: m.competition?.name ?? '—',
-      competitionCode: m.competition?.code ?? '',
-      homeTeam:  m.homeTeam?.shortName ?? m.homeTeam?.name ?? '—',
-      awayTeam:  m.awayTeam?.shortName ?? m.awayTeam?.name ?? '—',
-      homeCrest: m.homeTeam?.crest ?? null,
-      awayCrest: m.awayTeam?.crest ?? null,
-      venue:     m.venue ?? null,
-    });
+    const PORTO_CREST_URL = 'https://crests.football-data.org/503.png';
+    const mapMatch = m => {
+      const isHomePorto = m.homeTeam?.id === PORTO_FD;
+      return {
+        id: m.id, date: m.utcDate,
+        competition: m.competition?.name ?? '—',
+        competitionCode: m.competition?.code ?? '',
+        homeTeam:  m.homeTeam?.shortName ?? m.homeTeam?.name ?? '—',
+        awayTeam:  m.awayTeam?.shortName ?? m.awayTeam?.name ?? '—',
+        homeCrest: m.homeTeam?.crest ?? (isHomePorto ? PORTO_CREST_URL : null),
+        awayCrest: m.awayTeam?.crest ?? (!isHomePorto ? PORTO_CREST_URL : null),
+        venue:     m.venue ?? null,
+      };
+    };
 
     const upcomingMatches = scheduled.slice(0, 5).map(mapMatch);
     const nextMatch       = upcomingMatches[0] ?? null;
