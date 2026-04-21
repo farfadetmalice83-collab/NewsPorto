@@ -620,28 +620,7 @@ img[loading="lazy"].loaded { opacity: 1; }
             <div id="lv-lineup"><p class="no-lineup">Compositions en attente…</p></div>
           </div>
 
-          <!-- Discord Live Chat -->
-          <div class="live-chat-section">
-            <div class="live-chat-header">
-              <span class="live-chat-title-wrap">
-                <span class="live-dot" style="margin-right:6px;"></span>
-                <span class="live-chat-title">Chat Live</span>
-              </span>
-              <span class="live-chat-count"><span id="chat-online-count">0</span> connecté(s)</span>
-            </div>
-            <div class="live-chat-box" id="chat-messages">
-              <div class="chat-placeholder">Connecte-toi pour rejoindre le chat live ⚽</div>
-            </div>
-            <div id="chat-auth-form" class="chat-auth-form">
-              <input id="chat-pseudo" maxlength="20" placeholder="Ton pseudo…" autocomplete="off">
-              <button onclick="chatJoin()">Rejoindre</button>
-            </div>
-            <div id="chat-input-wrap" class="chat-input-wrap" style="display:none">
-              <span id="chat-user-badge" class="chat-user-badge"></span>
-              <input id="chat-input" maxlength="200" placeholder="Ton message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
-              <button onclick="sendMsg()">→</button>
-            </div>
-          </div>
+
         </div>
       </div>
 
@@ -688,6 +667,33 @@ img[loading="lazy"].loaded { opacity: 1; }
       <div id="sec-recent" style="display:none">
         <p class="sec-label">Derniers résultats</p>
         <div class="recent-wrap" id="recent-list"></div>
+      </div>
+
+
+      <!-- ══ CHAT COMMUNAUTÉ ══ -->
+      <div id="sec-chat">
+        <p class="sec-label" id="chat-sec-label">Chat communauté</p>
+        <div class="live-chat-section" style="margin-top:0;padding-top:0;border-top:none;">
+          <div class="live-chat-header">
+            <span class="live-chat-title-wrap">
+              <span class="live-dot" style="margin-right:6px;"></span>
+              <span class="live-chat-title" id="chat-title-txt">Discussion</span>
+            </span>
+            <span class="live-chat-count"><span id="chat-online-count">0</span> connecté(s)</span>
+          </div>
+          <div class="live-chat-box" id="chat-messages">
+            <div class="chat-placeholder">Connecte-toi pour rejoindre le chat ⚽</div>
+          </div>
+          <div id="chat-auth-form" class="chat-auth-form">
+            <input id="chat-pseudo" maxlength="20" placeholder="Ton pseudo…" autocomplete="off">
+            <button onclick="chatJoin()">Rejoindre</button>
+          </div>
+          <div id="chat-input-wrap" class="chat-input-wrap" style="display:none">
+            <span id="chat-user-badge" class="chat-user-badge"></span>
+            <input id="chat-input" maxlength="200" placeholder="Ton message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
+            <button onclick="sendMsg()">→</button>
+          </div>
+        </div>
       </div>
 
       <!-- Footer -->
@@ -1083,15 +1089,16 @@ img[loading="lazy"].loaded { opacity: 1; }
   }
 
   // ── Render recent ──
+  const PORTO_CREST = 'https://crests.football-data.org/503.png';
   function renderRecent(matches) {
     if (!matches || !matches.length) return;
     document.getElementById('sec-recent').style.display = 'block';
     document.getElementById('recent-list').innerHTML = matches.map(m => {
-      const score   = m.isHome ? `${m.portoGoals} – ${m.oppGoals}` : `${m.oppGoals} – ${m.portoGoals}`;
+      const score    = m.isHome ? `${m.portoGoals} – ${m.oppGoals}` : `${m.oppGoals} – ${m.portoGoals}`;
       const homeName = m.isHome ? 'FC Porto' : m.opponentName;
       const awayName = m.isHome ? m.opponentName : 'FC Porto';
-      const homeCr  = m.isHome ? '' : crestHTML(m.opponentCrest, m.opponentName);
-      const awayCr  = m.isHome ? crestHTML(m.opponentCrest, m.opponentName) : '';
+      const homeCr   = m.isHome ? crestHTML(PORTO_CREST, 'FC Porto') : crestHTML(m.opponentCrest, m.opponentName);
+      const awayCr   = m.isHome ? crestHTML(m.opponentCrest, m.opponentName) : crestHTML(PORTO_CREST, 'FC Porto');
       return `<div class="result-row">
         <div class="res-badge ${m.result}">${m.result === 'W' ? 'V' : m.result === 'D' ? 'N' : 'D'}</div>
         <div class="ml-team">${homeCr}<span class="ml-name">${homeName}</span></div>
@@ -1154,6 +1161,17 @@ img[loading="lazy"].loaded { opacity: 1; }
 
         // Résultats récents toujours affichés
         renderRecent(data.recentMatches);
+
+        // Chat — titre dynamique selon statut match
+        const chatLabel = document.getElementById('chat-sec-label');
+        const chatTitle = document.getElementById('chat-title-txt');
+        if (isLiveOngoing) {
+          if (chatLabel) chatLabel.textContent = 'Chat Live';
+          if (chatTitle) chatTitle.textContent = 'Chat Live ⚽';
+        } else {
+          if (chatLabel) chatLabel.textContent = 'Chat communauté';
+          if (chatTitle) chatTitle.textContent = 'Discussion';
+        }
 
         // Heure de mise à jour
         if (data.updatedAt) {
