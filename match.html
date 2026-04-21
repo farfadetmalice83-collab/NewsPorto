@@ -829,22 +829,42 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   function startChatListener() {
     if (chatListenerOff) chatListenerOff();
-    chatRef = chatDB.ref('livechat/messages');
-    // Load last 80 msgs
-    const query = chatRef.orderByChild('ts').limitToLast(80);
-    query.on('value', snap => {
-      const msgs = [];
-      snap.forEach(c => msgs.push(c.val()));
-      renderMessages(msgs);
+    const msgRef = chatDB.ref('livechat/messages');
+    const box = document.getElementById('chat-messages');
+    if (box) box.innerHTML = '';
+    // child_added se déclenche pour chaque message existant puis chaque nouveau
+    msgRef.limitToLast(80).on('child_added', snap => {
+      const m = snap.val();
+      if (!m) return;
+      const box = document.getElementById('chat-messages');
+      if (!box) return;
+      // Retirer placeholder si présent
+      const ph = box.querySelector('.chat-placeholder');
+      if (ph) ph.remove();
+      const div = document.createElement('div');
+      if (m.system) {
+        div.className = 'chat-system-msg';
+        div.textContent = m.text || '';
+      } else {
+        div.className = 'chat-msg';
+        const isMe = m.pseudo === chatUser;
+        const time = m.ts ? new Date(m.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
+        div.innerHTML = `<div class="chat-msg-header">
+          <span class="chat-msg-pseudo${isMe?' me':''}">${escHtml(m.pseudo||'?')}</span>
+          <span class="chat-msg-time">${time}</span>
+        </div>
+        <div class="chat-msg-text">${escHtml(m.text||'')}</div>`;
+      }
+      box.appendChild(div);
+      box.scrollTop = box.scrollHeight;
     });
-    chatListenerOff = () => query.off();
+    chatListenerOff = () => msgRef.off();
 
     // Online count
     onlineRef = chatDB.ref('livechat/online');
     onlineRef.on('value', snap => {
-      const count = snap.numChildren();
       const el = document.getElementById('chat-online-count');
-      if (el) el.textContent = count;
+      if (el) el.textContent = snap.numChildren();
     });
   }
 
