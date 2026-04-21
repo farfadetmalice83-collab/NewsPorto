@@ -449,6 +449,51 @@ img[loading="lazy"].loaded { opacity: 1; }
   body { background: #fff !important; color: #000 !important; }
 }
 </style>
+
+  <style>
+    /* ══ LINEUP (COMPOS) ══ */
+    .lineup-section { margin-top:32px; padding-top:24px; border-top:1px solid var(--border); }
+    .lineup-section-title { font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:20px; }
+    .lineup-grid { display:grid;grid-template-columns:1fr 1fr;gap:24px; }
+    .lineup-team-col { }
+    .lineup-team-name { font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#fff;margin-bottom:12px;text-align:center; }
+    .pitch { background:rgba(0,61,165,0.05);border:1px solid rgba(0,61,165,0.15);padding:16px 8px;position:relative; }
+    .lineup-row { display:flex;justify-content:center;gap:6px;margin-bottom:12px; }
+    .lineup-row:last-child { margin-bottom:0; }
+    .player-dot { display:flex;flex-direction:column;align-items:center;gap:3px;cursor:default; }
+    .player-dot-circle { width:28px;height:28px;border-radius:50%;background:rgba(0,61,165,0.4);border:1.5px solid rgba(0,61,165,0.7);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:#fff;transition:background .2s; }
+    .player-dot-circle.opp { background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.25); }
+    .player-dot-circle:hover { background:rgba(0,61,165,0.8); }
+    .player-dot-name { font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.55);text-align:center;max-width:44px;line-height:1.1; }
+    .bench-list { margin-top:12px; }
+    .bench-title { font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:8px; }
+    .bench-player { display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.04); }
+    .bench-player:last-child { border-bottom:none; }
+    .bench-num { font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,.3);min-width:20px; }
+    .bench-name { font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6); }
+    .bench-pos { font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-left:auto; }
+    .no-lineup { font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);text-align:center;padding:20px 0; }
+
+    /* ══ DISCORD CHAT ══ */
+    .discord-section { margin-top:40px;padding-top:28px;border-top:1px solid var(--border); }
+    .discord-header { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
+    .discord-logo { font-size:18px; }
+    .discord-title { font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray); }
+    .discord-count { font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(0,200,100,.6);margin-left:auto;display:flex;align-items:center;gap:5px; }
+    .online-dot { width:6px;height:6px;border-radius:50%;background:#00c864;animation:blink 2s ease-in-out infinite; }
+    .discord-frame-wrap { border:1px solid rgba(88,101,242,.3);overflow:hidden;background:rgba(88,101,242,.04); }
+    .discord-frame-wrap iframe { display:block;width:100%;border:none; }
+    .discord-no-channel { padding:32px;text-align:center;border:1px solid rgba(88,101,242,.2);background:rgba(88,101,242,.03); }
+    .discord-no-channel p { font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3); }
+    .discord-no-channel a { color:rgba(88,101,242,.8);text-decoration:none;border-bottom:1px solid rgba(88,101,242,.3); }
+
+    @media(max-width:768px) {
+      .lineup-grid { grid-template-columns:1fr;gap:16px; }
+      .player-dot-circle { width:24px;height:24px;font-size:9px; }
+      .player-dot-name { font-size:7px;max-width:36px; }
+    }
+
+  </style>
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@NewsPortoFR">
   <meta name="twitter:title" content="NewsPorto">
@@ -530,6 +575,7 @@ img[loading="lazy"].loaded { opacity: 1; }
           <div style="display:flex;border-top:1px solid var(--border);margin-top:28px;">
             <button id="tab-btn-events" onclick="switchLiveTab('events')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;border-bottom:2px solid #fff;color:#fff;cursor:pointer;">Événements</button>
             <button id="tab-btn-stats" onclick="switchLiveTab('stats')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.35);cursor:pointer;">Stats</button>
+            <button id="tab-btn-lineup" onclick="switchLiveTab('lineup')" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:14px;background:transparent;border:none;border-bottom:2px solid transparent;color:rgba(255,255,255,0.35);cursor:pointer;">Compos</button>
           </div>
 
           <div id="tab-events" style="padding-top:20px;">
@@ -538,6 +584,7 @@ img[loading="lazy"].loaded { opacity: 1; }
             </div>
           </div>
 
+          <!-- Tab buttons: add Compos -->
           <div id="tab-stats" style="display:none;padding-top:20px;">
             <div style="display:flex;justify-content:space-between;margin-bottom:16px;">
               <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fff;">Porto</span>
@@ -545,6 +592,31 @@ img[loading="lazy"].loaded { opacity: 1; }
             </div>
             <div id="lv-stats">
               <p class="no-events">Stats disponibles dès le coup d'envoi</p>
+            </div>
+          </div>
+
+          <!-- Tab Compos -->
+          <div id="tab-lineup" style="display:none;padding-top:20px;">
+            <div id="lv-lineup"><p class="no-lineup">Compositions en attente…</p></div>
+          </div>
+
+          <!-- Discord Live Chat -->
+          <div class="discord-section">
+            <div class="discord-header">
+              <span class="discord-logo">💬</span>
+              <span class="discord-title">Chat Live — Discord</span>
+              <div class="discord-count"><span class="online-dot"></span><span id="discord-online">—</span> en ligne</div>
+            </div>
+            <div id="discord-embed-wrap">
+              <div class="discord-no-channel">
+                <p>Configure ton serveur Discord ci-dessous</p>
+                <p style="margin-top:8px;font-size:10px;">Widget ID : <a href="https://discord.com/developers/applications" target="_blank">discord.com/developers</a></p>
+                <div style="display:flex;gap:8px;margin-top:16px;align-items:center;justify-content:center;">
+                  <input id="discord-server-id" placeholder="ID serveur Discord" style="background:rgba(255,255,255,.06);border:1px solid rgba(88,101,242,.3);color:#fff;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;outline:none;width:200px;">
+                  <input id="discord-channel-id" placeholder="ID channel (optionnel)" style="background:rgba(255,255,255,.06);border:1px solid rgba(88,101,242,.3);color:#fff;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;outline:none;width:200px;">
+                  <button onclick="setDiscord()" style="background:rgba(88,101,242,.2);border:1px solid rgba(88,101,242,.5);color:#fff;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Connecter</button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -638,11 +710,17 @@ img[loading="lazy"].loaded { opacity: 1; }
     return new Date(iso).toLocaleDateString('fr-FR', { day:'numeric', month:'short', timeZone:TZ });
   }
   function setCrest(imgId, phId, src) {
-    const ph = document.getElementById(phId);
-    if (ph) ph.style.display = 'none'; // toujours cacher le placeholder
+    const img = document.getElementById(imgId);
+    const ph  = document.getElementById(phId);
     if (src) {
-      const img = document.getElementById(imgId);
-      img.src = src; img.style.display = 'block';
+      img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
+      img.onload  = () => { if(ph) ph.style.display='none'; };
+      img.src = src;
+      img.style.display = 'block';
+      if(ph) ph.style.display = 'none';
+    } else {
+      if(img) img.style.display = 'none';
+      if(ph)  ph.style.display  = 'block';
     }
   }
   function crestHTML(src, name) {
@@ -671,15 +749,113 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   // ── Switch tab live ──
   function switchLiveTab(tab) {
-    const isEvents = tab === 'events';
-    document.getElementById('tab-events').style.display = isEvents ? 'block' : 'none';
-    document.getElementById('tab-stats').style.display  = isEvents ? 'none'  : 'block';
-    const btnE = document.getElementById('tab-btn-events');
-    const btnS = document.getElementById('tab-btn-stats');
-    btnE.style.borderBottomColor = isEvents ? '#fff' : 'transparent';
-    btnE.style.color = isEvents ? '#fff' : 'rgba(255,255,255,0.35)';
-    btnS.style.borderBottomColor = isEvents ? 'transparent' : '#fff';
-    btnS.style.color = isEvents ? 'rgba(255,255,255,0.35)' : '#fff';
+    ['events','stats','lineup'].forEach(t => {
+      const el = document.getElementById('tab-'+t);
+      const btn = document.getElementById('tab-btn-'+t);
+      if (!el || !btn) return;
+      const active = t === tab;
+      el.style.display = active ? 'block' : 'none';
+      btn.style.borderBottomColor = active ? '#fff' : 'transparent';
+      btn.style.color = active ? '#fff' : 'rgba(255,255,255,0.35)';
+    });
+  }
+
+  // ── Discord setup ──
+  function setDiscord() {
+    const sid = document.getElementById('discord-server-id').value.trim();
+    if (!sid) return;
+    const cid = document.getElementById('discord-channel-id').value.trim();
+    const url = cid
+      ? `https://discord.com/widget?id=${sid}&theme=dark&username=&channel=${cid}`
+      : `https://discord.com/widget?id=${sid}&theme=dark`;
+    localStorage.setItem('np_discord_sid', sid);
+    if (cid) localStorage.setItem('np_discord_cid', cid);
+    renderDiscord(sid, cid);
+    // Fetch online count
+    fetchDiscordOnline(sid);
+  }
+
+  function renderDiscord(sid, cid) {
+    const url = cid
+      ? `https://discord.com/widget?id=${sid}&theme=dark&channel=${cid}`
+      : `https://discord.com/widget?id=${sid}&theme=dark`;
+    document.getElementById('discord-embed-wrap').innerHTML =
+      `<div class="discord-frame-wrap"><iframe src="${url}" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals"></iframe></div>`;
+  }
+
+  function fetchDiscordOnline(sid) {
+    fetch(`https://discord.com/api/guilds/${sid}/widget.json`)
+      .then(r => r.json())
+      .then(d => {
+        const el = document.getElementById('discord-online');
+        if (el && d.presence_count != null) el.textContent = d.presence_count;
+      }).catch(() => {});
+  }
+
+  // Auto-load saved Discord config
+  (function() {
+    const sid = localStorage.getItem('np_discord_sid');
+    const cid = localStorage.getItem('np_discord_cid') || '';
+    if (sid) { renderDiscord(sid, cid); fetchDiscordOnline(sid); }
+  })();
+
+  // ── Render lineup ──
+  function renderLineup(m) {
+    const el = document.getElementById('lv-lineup');
+    if (!el) return;
+    const home = m.lineupHome || null;
+    const away = m.lineupAway || null;
+    if (!home && !away) {
+      el.innerHTML = '<p class="no-lineup">Compositions non encore disponibles</p>';
+      return;
+    }
+
+    function buildFormation(lineup, isHome) {
+      if (!lineup) return '<p class="no-lineup">—</p>';
+      const cls = isHome ? '' : ' opp';
+      // Group players by formation lines
+      const starters = (lineup.startXI || []);
+      const formation = lineup.formation || '4-3-3';
+      const lines = formation.split('-').map(Number);
+      // Split starters into GK + lines
+      let idx = 0;
+      const gk = starters[idx++];
+      const lineGroups = [[gk]];
+      for (const count of lines) {
+        lineGroups.push(starters.slice(idx, idx+count));
+        idx += count;
+      }
+      // Render in reverse (attack at top)
+      const rows = [...lineGroups].reverse().map(group =>
+        `<div class="lineup-row">${group.map(p =>
+          `<div class="player-dot">
+            <div class="player-dot-circle${cls}">${p?.number ?? '?'}</div>
+            <div class="player-dot-name">${(p?.player?.name || '').split(' ').pop()}</div>
+          </div>`
+        ).join('')}</div>`
+      ).join('');
+      const bench = (lineup.substitutes || []).slice(0,7);
+      const benchHTML = bench.length ? `<div class="bench-list">
+        <div class="bench-title">Remplaçants</div>
+        ${bench.map(p=>`<div class="bench-player"><span class="bench-num">${p?.number??''}</span><span class="bench-name">${p?.player?.name||'—'}</span><span class="bench-pos">${p?.player?.pos||''}</span></div>`).join('')}
+      </div>` : '';
+      return `<div class="pitch">${rows}</div>${benchHTML}`;
+    }
+
+    el.innerHTML = `<div class="lineup-grid">
+      <div class="lineup-team-col">
+        <div class="lineup-team-name">${m.homeTeam}</div>
+        ${buildFormation(home, true)}
+      </div>
+      <div class="lineup-team-col">
+        <div class="lineup-team-name">${m.awayTeam}</div>
+        ${buildFormation(away, false)}
+      </div>
+    </div>`;
+
+    // Show tab if lineups available
+    const tabBtn = document.getElementById('tab-btn-lineup');
+    if (tabBtn) { tabBtn.style.opacity = '1'; tabBtn.style.color = '#fff'; }
   }
 
   // ── Render live ──
@@ -769,6 +945,9 @@ img[loading="lazy"].loaded { opacity: 1; }
         }).join('');
       }
     }
+
+    // ── Compositions ──
+    renderLineup(m);
   }
 
   // ── Render next ──
