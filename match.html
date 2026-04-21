@@ -474,19 +474,36 @@ img[loading="lazy"].loaded { opacity: 1; }
     .bench-pos { font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-left:auto; }
     .no-lineup { font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);text-align:center;padding:20px 0; }
 
-    /* ══ DISCORD CHAT ══ */
-    .discord-section { margin-top:40px;padding-top:28px;border-top:1px solid var(--border); }
-    .discord-header { display:flex;align-items:center;gap:10px;margin-bottom:16px; }
-    .discord-logo { font-size:18px; }
-    .discord-title { font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray); }
-    .discord-count { font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(0,200,100,.6);margin-left:auto;display:flex;align-items:center;gap:5px; }
-    .online-dot { width:6px;height:6px;border-radius:50%;background:#00c864;animation:blink 2s ease-in-out infinite; }
-    .discord-frame-wrap { border:1px solid rgba(88,101,242,.3);overflow:hidden;background:rgba(88,101,242,.04); }
-    .discord-frame-wrap iframe { display:block;width:100%;border:none; }
-    .discord-no-channel { padding:32px;text-align:center;border:1px solid rgba(88,101,242,.2);background:rgba(88,101,242,.03); }
-    .discord-no-channel p { font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3); }
-    .discord-no-channel a { color:rgba(88,101,242,.8);text-decoration:none;border-bottom:1px solid rgba(88,101,242,.3); }
-
+    /* ══ LIVE CHAT ══ */
+    .live-chat-section { margin-top:40px;padding-top:28px;border-top:1px solid var(--border); }
+    .live-chat-header { display:flex;align-items:center;justify-content:space-between;margin-bottom:14px; }
+    .live-chat-title-wrap { display:flex;align-items:center; }
+    .live-chat-title { font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray); }
+    .live-chat-count { font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(0,200,100,.6); }
+    .live-chat-box { height:320px;overflow-y:auto;border:1px solid var(--border);background:rgba(255,255,255,.02);padding:12px;display:flex;flex-direction:column;gap:6px;scroll-behavior:smooth; }
+    .live-chat-box::-webkit-scrollbar { width:3px; }
+    .live-chat-box::-webkit-scrollbar-track { background:transparent; }
+    .live-chat-box::-webkit-scrollbar-thumb { background:rgba(0,61,165,.4); }
+    .chat-placeholder { font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.2);text-align:center;margin:auto; }
+    .chat-msg { display:flex;flex-direction:column;gap:2px;animation:msgIn .2s ease; }
+    @keyframes msgIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+    .chat-msg-header { display:flex;align-items:baseline;gap:8px; }
+    .chat-msg-pseudo { font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#4d82d4; }
+    .chat-msg-pseudo.me { color:#fff; }
+    .chat-msg-time { font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(255,255,255,.2); }
+    .chat-msg-text { font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,.8);word-break:break-word;line-height:1.4; }
+    .chat-system-msg { font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.25);text-align:center;padding:4px 0; }
+    .chat-auth-form { display:flex;gap:8px;margin-top:10px; }
+    .chat-auth-form input { flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:.5px;outline:none;transition:border-color .2s; }
+    .chat-auth-form input:focus { border-color:rgba(0,61,165,.6); }
+    .chat-auth-form button { background:var(--blue);border:none;color:#fff;padding:10px 20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;white-space:nowrap; }
+    .chat-auth-form button:hover { background:#0050d0; }
+    .chat-input-wrap { display:flex;gap:8px;margin-top:10px;align-items:center; }
+    .chat-user-badge { font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.4);white-space:nowrap;flex-shrink:0; }
+    .chat-input-wrap input { flex:1;background:rgba(255,255,255,.05);border:1px solid var(--border);color:#fff;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s; }
+    .chat-input-wrap input:focus { border-color:rgba(0,61,165,.6); }
+    .chat-input-wrap button { background:rgba(0,61,165,.3);border:1px solid rgba(0,61,165,.5);color:#fff;width:40px;height:40px;font-size:16px;cursor:pointer;transition:.2s;flex-shrink:0; }
+    .chat-input-wrap button:hover { background:var(--blue); }
     @media(max-width:768px) {
       .lineup-grid { grid-template-columns:1fr;gap:16px; }
       .player-dot-circle { width:24px;height:24px;font-size:9px; }
@@ -494,7 +511,10 @@ img[loading="lazy"].loaded { opacity: 1; }
     }
 
   </style>
-  <meta name="twitter:card" content="summary_large_image">
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <meta name="twitter:card"  content="summary_large_image">
   <meta name="twitter:site" content="@NewsPortoFR">
   <meta name="twitter:title" content="NewsPorto">
   <meta name="twitter:description" content="Le média de référence des fans du FC Porto">
@@ -601,22 +621,25 @@ img[loading="lazy"].loaded { opacity: 1; }
           </div>
 
           <!-- Discord Live Chat -->
-          <div class="discord-section">
-            <div class="discord-header">
-              <span class="discord-logo">💬</span>
-              <span class="discord-title">Chat Live — Discord</span>
-              <div class="discord-count"><span class="online-dot"></span><span id="discord-online">—</span> en ligne</div>
+          <div class="live-chat-section">
+            <div class="live-chat-header">
+              <span class="live-chat-title-wrap">
+                <span class="live-dot" style="margin-right:6px;"></span>
+                <span class="live-chat-title">Chat Live</span>
+              </span>
+              <span class="live-chat-count"><span id="chat-online-count">0</span> connecté(s)</span>
             </div>
-            <div id="discord-embed-wrap">
-              <div class="discord-no-channel">
-                <p>Configure ton serveur Discord ci-dessous</p>
-                <p style="margin-top:8px;font-size:10px;">Widget ID : <a href="https://discord.com/developers/applications" target="_blank">discord.com/developers</a></p>
-                <div style="display:flex;gap:8px;margin-top:16px;align-items:center;justify-content:center;">
-                  <input id="discord-server-id" placeholder="ID serveur Discord" style="background:rgba(255,255,255,.06);border:1px solid rgba(88,101,242,.3);color:#fff;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;outline:none;width:200px;">
-                  <input id="discord-channel-id" placeholder="ID channel (optionnel)" style="background:rgba(255,255,255,.06);border:1px solid rgba(88,101,242,.3);color:#fff;padding:8px 12px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;outline:none;width:200px;">
-                  <button onclick="setDiscord()" style="background:rgba(88,101,242,.2);border:1px solid rgba(88,101,242,.5);color:#fff;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;">Connecter</button>
-                </div>
-              </div>
+            <div class="live-chat-box" id="chat-messages">
+              <div class="chat-placeholder">Connecte-toi pour rejoindre le chat live ⚽</div>
+            </div>
+            <div id="chat-auth-form" class="chat-auth-form">
+              <input id="chat-pseudo" maxlength="20" placeholder="Ton pseudo…" autocomplete="off">
+              <button onclick="chatJoin()">Rejoindre</button>
+            </div>
+            <div id="chat-input-wrap" class="chat-input-wrap" style="display:none">
+              <span id="chat-user-badge" class="chat-user-badge"></span>
+              <input id="chat-input" maxlength="200" placeholder="Ton message…" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
+              <button onclick="sendMsg()">→</button>
             </div>
           </div>
         </div>
@@ -760,44 +783,121 @@ img[loading="lazy"].loaded { opacity: 1; }
     });
   }
 
-  // ── Discord setup ──
-  function setDiscord() {
-    const sid = document.getElementById('discord-server-id').value.trim();
-    if (!sid) return;
-    const cid = document.getElementById('discord-channel-id').value.trim();
-    const url = cid
-      ? `https://discord.com/widget?id=${sid}&theme=dark&username=&channel=${cid}`
-      : `https://discord.com/widget?id=${sid}&theme=dark`;
-    localStorage.setItem('np_discord_sid', sid);
-    if (cid) localStorage.setItem('np_discord_cid', cid);
-    renderDiscord(sid, cid);
-    // Fetch online count
-    fetchDiscordOnline(sid);
+  // ══ FIREBASE LIVE CHAT ══
+  // Config Firebase — remplace par tes propres valeurs depuis console.firebase.google.com
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyBK5fwbwpUpACxZUB-o3pskOefkOf4KAIQ",
+    authDomain: "newsporto-cc80b.firebaseapp.com",
+    databaseURL: "https://newsporto-cc80b-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "newsporto-cc80b",
+  };
+
+  let chatDB = null, chatUser = null, chatRef = null, onlineRef = null, chatListenerOff = null;
+
+  function initFirebase() {
+    if (chatDB) return;
+    try {
+      if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+      chatDB = firebase.database();
+    } catch(e) {
+      console.warn('Firebase non configuré:', e.message);
+    }
   }
 
-  function renderDiscord(sid, cid) {
-    const url = cid
-      ? `https://discord.com/widget?id=${sid}&theme=dark&channel=${cid}`
-      : `https://discord.com/widget?id=${sid}&theme=dark`;
-    document.getElementById('discord-embed-wrap').innerHTML =
-      `<div class="discord-frame-wrap"><iframe src="${url}" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts allow-modals"></iframe></div>`;
+  function chatJoin() {
+    const pseudo = document.getElementById('chat-pseudo').value.trim().replace(/[<>]/g,'');
+    if (!pseudo || pseudo.length < 2) return;
+    chatUser = pseudo;
+    document.getElementById('chat-auth-form').style.display = 'none';
+    document.getElementById('chat-input-wrap').style.display = 'flex';
+    document.getElementById('chat-user-badge').textContent = pseudo;
+    document.getElementById('chat-input').focus();
+    initFirebase();
+    if (!chatDB) { showChatFallback(); return; }
+    startChatListener();
+    trackOnline(pseudo);
+    postSystem(`${pseudo} a rejoint le chat ⚽`);
   }
 
-  function fetchDiscordOnline(sid) {
-    fetch(`https://discord.com/api/guilds/${sid}/widget.json`)
-      .then(r => r.json())
-      .then(d => {
-        const el = document.getElementById('discord-online');
-        if (el && d.presence_count != null) el.textContent = d.presence_count;
-      }).catch(() => {});
+  function startChatListener() {
+    if (chatListenerOff) chatListenerOff();
+    chatRef = chatDB.ref('livechat/messages');
+    // Load last 80 msgs
+    const query = chatRef.orderByChild('ts').limitToLast(80);
+    query.on('value', snap => {
+      const msgs = [];
+      snap.forEach(c => msgs.push(c.val()));
+      renderMessages(msgs);
+    });
+    chatListenerOff = () => query.off();
+
+    // Online count
+    onlineRef = chatDB.ref('livechat/online');
+    onlineRef.on('value', snap => {
+      const count = snap.numChildren();
+      const el = document.getElementById('chat-online-count');
+      if (el) el.textContent = count;
+    });
   }
 
-  // Auto-load saved Discord config
-  (function() {
-    const sid = localStorage.getItem('np_discord_sid');
-    const cid = localStorage.getItem('np_discord_cid') || '';
-    if (sid) { renderDiscord(sid, cid); fetchDiscordOnline(sid); }
-  })();
+  function trackOnline(pseudo) {
+    if (!chatDB) return;
+    const myRef = chatDB.ref('livechat/online/' + pseudo.replace(/[.#$/\[\]]/g,'_'));
+    myRef.set(true);
+    myRef.onDisconnect().remove();
+  }
+
+  function renderMessages(msgs) {
+    const box = document.getElementById('chat-messages');
+    if (!box) return;
+    const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
+    box.innerHTML = msgs.map(m => {
+      if (m.system) return `<div class="chat-system-msg">${escHtml(m.text)}</div>`;
+      const isMe = m.pseudo === chatUser;
+      const time = new Date(m.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      return `<div class="chat-msg">
+        <div class="chat-msg-header">
+          <span class="chat-msg-pseudo${isMe?' me':''}">${escHtml(m.pseudo)}</span>
+          <span class="chat-msg-time">${time}</span>
+        </div>
+        <div class="chat-msg-text">${escHtml(m.text)}</div>
+      </div>`;
+    }).join('') || '<div class="chat-placeholder">Sois le premier à écrire ⚽</div>';
+    if (wasAtBottom) box.scrollTop = box.scrollHeight;
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text || !chatUser || !chatDB) return;
+    input.value = '';
+    chatDB.ref('livechat/messages').push({ pseudo: chatUser, text, ts: Date.now() });
+    // Auto-clean old msgs (keep last 200)
+    chatDB.ref('livechat/messages').orderByChild('ts').limitToFirst(1).once('value', snap => {
+      const count = snap.ref.parent;
+      // light cleanup only if needed
+    });
+  }
+
+  function postSystem(text) {
+    if (!chatDB) return;
+    chatDB.ref('livechat/messages').push({ system: true, text, ts: Date.now() });
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function showChatFallback() {
+    // Firebase not configured - show setup instructions
+    const box = document.getElementById('chat-messages');
+    if (box) box.innerHTML = `<div class="chat-placeholder" style="font-size:10px;line-height:1.8;text-align:left;color:rgba(255,255,255,.35);">
+      Pour activer le chat :<br>
+      1. Va sur <strong style="color:rgba(255,255,255,.5)">console.firebase.google.com</strong><br>
+      2. Crée un projet → Realtime Database<br>
+      3. Copie ta config dans FIREBASE_CONFIG dans le code
+    </div>`;
+  }
 
   // ── Render lineup ──
   function renderLineup(m) {
