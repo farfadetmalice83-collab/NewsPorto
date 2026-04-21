@@ -1760,7 +1760,8 @@ async function publish() {
     .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   const readTime = Math.max(2,Math.ceil(body.split(/\s+/).length/200));
   const firstPara= body.split(/\n\n/)[0].trim();
-  const excerpt  = firstPara.length>180 ? firstPara.slice(0,177)+'…' : firstPara;
+  const firstParaClean = firstPara.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const excerpt  = firstParaClean.length>180 ? firstParaClean.slice(0,177)+'…' : firstParaClean;
   const fileName = `${slug}.html`;
   const filePath = `articles/${fileName}`;
 
