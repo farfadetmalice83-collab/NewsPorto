@@ -859,18 +859,21 @@ img[loading="lazy"].loaded { opacity: 1; }
     const box = document.getElementById('chat-messages');
     if (!box) return;
     const wasAtBottom = box.scrollHeight - box.scrollTop - box.clientHeight < 60;
-    box.innerHTML = msgs.map(m => {
-      if (m.system) return `<div class="chat-system-msg">${escHtml(m.text)}</div>`;
+    const html = msgs.map(m => {
+      if (!m) return '';
+      if (m.system) return `<div class="chat-system-msg">${escHtml(m.text || '')}</div>`;
+      if (!m.pseudo && !m.text) return '';
       const isMe = m.pseudo === chatUser;
-      const time = new Date(m.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+      const time = m.ts ? new Date(m.ts).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
       return `<div class="chat-msg">
         <div class="chat-msg-header">
-          <span class="chat-msg-pseudo${isMe?' me':''}">${escHtml(m.pseudo)}</span>
+          <span class="chat-msg-pseudo${isMe?' me':''}">${escHtml(m.pseudo || '?')}</span>
           <span class="chat-msg-time">${time}</span>
         </div>
-        <div class="chat-msg-text">${escHtml(m.text)}</div>
+        <div class="chat-msg-text">${escHtml(m.text || '')}</div>
       </div>`;
-    }).join('') || '<div class="chat-placeholder">Sois le premier à écrire ⚽</div>';
+    }).filter(Boolean).join('');
+    box.innerHTML = html || '<div class="chat-placeholder">Sois le premier à écrire ⚽</div>';
     if (wasAtBottom) box.scrollTop = box.scrollHeight;
   }
 
@@ -1072,22 +1075,26 @@ img[loading="lazy"].loaded { opacity: 1; }
   }
 
   // ── Render upcoming (les 5 suivants après le premier) ──
+  const PORTO_CREST_FE = 'https://crests.football-data.org/503.png';
   function renderUpcoming(matches) {
     if (!matches || !matches.length) return;
     document.getElementById('sec-upcoming').style.display = 'block';
-    document.getElementById('upcoming-list').innerHTML = matches.map(m =>
-      `<div class="match-list-row">
+    document.getElementById('upcoming-list').innerHTML = matches.map(m => {
+      const isHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
+      const hCrest = m.homeCrest || (isHomePorto ? PORTO_CREST_FE : null);
+      const aCrest = m.awayCrest || (!isHomePorto ? PORTO_CREST_FE : null);
+      return `<div class="match-list-row">
         <div>
           <div class="ml-date-day">${fmtShort(m.date)}</div>
           <div class="ml-date-time">${fmtTime(m.date)}</div>
           <div class="ml-comp">${m.competition}</div>
         </div>
-        <div class="ml-team">${crestHTML(m.homeCrest, m.homeTeam)}<span class="ml-name">${m.homeTeam}</span></div>
+        <div class="ml-team">${crestHTML(hCrest, m.homeTeam)}<span class="ml-name">${m.homeTeam}</span></div>
         <div class="ml-vs">VS</div>
-        <div class="ml-team right"><span class="ml-name">${m.awayTeam}</span>${crestHTML(m.awayCrest, m.awayTeam)}</div>
+        <div class="ml-team right"><span class="ml-name">${m.awayTeam}</span>${crestHTML(aCrest, m.awayTeam)}</div>
         <div class="ml-venue">${m.venue ? 'DOMICILE' : '—'}</div>
-      </div>`
-    ).join('');
+      </div>`;
+    }).join('');
   }
 
   // ── Render recent ──
