@@ -1235,13 +1235,14 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
 
   // ── SEO : mots-clés keywords ──
   const keywords=`FC Porto, Porto, ${catLabel}, newsporto.fr, Liga Portugal, football portugais, Dragons`;
+  const titleKeywords=title.split(/\s+/).filter(w=>w.replace(/[^a-zA-Z\u00C0-\u017E]/g,'').length>4).slice(0,5);
 
   // ── SEO : Schema.org NewsArticle complet ──
   const schema=JSON.stringify({
     "@context":"https://schema.org","@type":"NewsArticle",
     "headline":title,
     "description":metaDesc,
-    "image":[coverUrl],
+    "image":[{"@type":"ImageObject","url":coverUrl,"width":1200,"height":750}],
     "datePublished":isoDate,"dateModified":isoModified,
     "author":[{"@type":"Person","name":"Luis","url":"https://newsporto.fr/contact.html"},{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"}],
     "publisher":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr","logo":{"@type":"ImageObject","url":"https://newsporto.fr/Logo.png","width":200,"height":60}},
@@ -1265,6 +1266,23 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   });
   const breadcrumbTag='<script type="application/ld+json">'+breadcrumbSchema+'<\/script>';
 
+  // ── SEO : Person schema auteur ──
+  const authorSchema=JSON.stringify({
+    "@context":"https://schema.org","@type":"Person",
+    "name":"Luis","url":"https://newsporto.fr/contact.html",
+    "worksFor":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"},
+    "sameAs":["https://twitter.com/NewsPortoFR","https://newsporto.fr"]
+  });
+  const authorTag='<script type="application/ld+json">'+authorSchema+'<\/script>';
+
+  // ── SEO : WebSite schema ──
+  const webSiteSchema=JSON.stringify({
+    "@context":"https://schema.org","@type":"WebSite",
+    "name":"NewsPorto","url":"https://newsporto.fr",
+    "potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://newsporto.fr/actu.html?q={search_term_string}"},"query-input":"required name=search_term_string"}
+  });
+  const webSiteTag='<script type="application/ld+json">'+webSiteSchema+'<\/script>';
+
   // ── Traitement corps : conversion [H2]…[/H2] et [H3]…[/H3] en vrais titres HTML ──
   // Puis séparation en paragraphes
   const bodyWithHeaders = body
@@ -1276,6 +1294,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   let imgInserted = false;
 
   let brefInserted=false;
+  let firstParaInserted=false;
   blocksRaw.forEach((block, i) => {
     const trimmed = block.trim();
     if (trimmed.startsWith('__H2__') && trimmed.endsWith('__/H2__')) {
@@ -1297,7 +1316,8 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       // Retirer d'éventuels [BREF] ou [QUOTE] résiduels inline
       const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
       if (!clean) return;
-      parasArr.push(`      <p${i===0?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
+      const isDc = !firstParaInserted; firstParaInserted=true;
+      parasArr.push(`      <p${isDc?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
       // Insérer l'image inline après le 3e paragraphe de texte
       if (!imgInserted && inlineUrl) {
         const textParas = parasArr.filter(p => p.trim().startsWith('<p')).length;
@@ -1325,6 +1345,8 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <meta property="og:description" content="${metaDesc}">
   <meta property="og:image" content="${coverUrl}">
   <meta property="og:image:alt" content="${title} — FC Porto">
+  <meta property="og:image:type" content="image/jpeg">
+  <meta property="og:image:secure_url" content="${coverUrl}">
   <meta property="og:type" content="article">
   <meta property="og:locale" content="fr_FR">
   <meta property="og:site_name" content="NewsPorto">
@@ -1334,13 +1356,22 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <meta property="article:tag" content="${catLabel}">
   <meta property="article:tag" content="FC Porto">
   <meta property="article:tag" content="Dragons">
+  ${titleKeywords.map(k=>`<meta property="article:tag" content="${k}">`).join('\n  ')}
   <link rel="alternate" type="application/rss+xml" title="NewsPorto RSS" href="../rss.xml">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:site" content="@NewsPortoFR">
   <meta name="twitter:title" content="${title} — NewsPorto">
   <meta name="twitter:description" content="${metaDesc}">
   <meta name="twitter:image" content="${coverUrl}">
+  <meta name="twitter:creator" content="@NewsPortoFR">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="750">
+  <meta property="article:author" content="https://newsporto.fr/contact.html">
+  <meta property="article:modified_time" content="${isoDate}">
+  <meta property="og:updated_time" content="${isoDate}">
+  <meta name="news_keywords" content="${title}, FC Porto, ${catLabel}, Dragons, Liga Portugal">
   <link rel="canonical" href="https://newsporto.fr/articles/${slug}.html">
+  <link rel="preload" as="image" href="${coverUrl}" fetchpriority="high">
   <link rel="icon" type="image/x-icon" href="../favicon.ico">
   <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
@@ -1352,6 +1383,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   ${schemaTag}
   ${breadcrumbTag}
+  ${webSiteTag}
   ${faqSchema ? '<script type="application/ld+json">'+faqSchema+'<\\/script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
@@ -1492,7 +1524,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     </nav>
     <section class="hero">
       <div class="hero-img-wrap">
-        <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager">
+        <img src="${coverUrl}" alt="${title} — FC Porto" loading="eager" fetchpriority="high" decoding="async">
       </div>
       <div class="hov"></div>
       <div class="hbd">
@@ -1662,7 +1694,6 @@ ${paras}
       }
     }).catch(function(){});
   })();
-  })();
   const likeKey='np_like_'+window.location.pathname;
   function toggleLike(){const liked=localStorage.getItem(likeKey)==='1';const btn=document.getElementById('btn-like');const ico=btn.querySelector('.like-ico');const lbl=document.getElementById('like-label');if(liked){localStorage.removeItem(likeKey);btn.classList.remove('liked');ico.textContent='🤍';lbl.textContent="J'aime";}else{localStorage.setItem(likeKey,'1');btn.classList.add('liked');ico.textContent='❤️';lbl.textContent='Aimé !';}}
   if(localStorage.getItem(likeKey)==='1'){const btn=document.getElementById('btn-like');if(btn){btn.classList.add('liked');btn.querySelector('.like-ico').textContent='❤️';document.getElementById('like-label').textContent='Aimé !';}}
@@ -1759,7 +1790,14 @@ async function publish() {
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   const readTime = Math.max(2,Math.ceil(body.split(/\s+/).length/200));
-  const firstPara= body.split(/\n\n/)[0].trim();
+  const firstPara = (()=>{
+    const paras = body.split(/\n\n/);
+    for(const p of paras){
+      const clean = p.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+      if(clean.length > 30) return clean;
+    }
+    return paras[0]||'';
+  })();
   const firstParaClean = firstPara.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
   const excerpt  = firstParaClean.length>180 ? firstParaClean.slice(0,177)+'…' : firstParaClean;
   const fileName = `${slug}.html`;
