@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Tue, 21 Apr 2026 11:47:04 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 22 Apr 2026 14:01:12 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[FC Porto – Sporting : COMPOS, CHAÎNE ET ANALYSE du choc au Dragão]]></title>
+      <link>https://newsporto.fr/articles/fc-porto-sporting-compos-chaine-et-analyse-du-choc-au-dragao.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/fc-porto-sporting-compos-chaine-et-analyse-du-choc-au-dragao.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[21h45 ce mercredi, l’Estádio do Dragão s’apprête à vivre l’une de ses soirées les plus électriques de la saison. Le FC Porto accueille le Sporting CP pour le match retour de la …]]></description>
+      <category><![CDATA[Analyse]]></category>
+      <enclosure url="https://images.rr.pt/4556815415183f91baf2defaultlarge_1024.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[FC Porto sur les traces de Lewandowski le Polonais en vue d'un coup]]></title>
       <link>https://newsporto.fr/articles/fc-porto-sur-les-traces-de-lewandowski-le-polonais-en-vue-d-.html</link>
