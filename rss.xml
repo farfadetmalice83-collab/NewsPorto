@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Wed, 22 Apr 2026 14:01:12 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 22 Apr 2026 22:03:27 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[FC Porto éliminé par le Sporting ou plutôt par l'arbitrage...]]></title>
+      <link>https://newsporto.fr/articles/fc-porto-elimine-par-le-sporting-ou-plutot-par-l-arbitrage.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/fc-porto-elimine-par-le-sporting-ou-plutot-par-l-arbitrage.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le FC Porto a vécu l’une de ces soirées qui marquent les mémoires, mais pas pour les raisons espérées. Malgré une prestation offensive étouffante et une maîtrise totale du match…]]></description>
+      <category><![CDATA[Analyse]]></category>
+      <enclosure url="https://trivela.fr/wp-content/uploads/2026/03/HCeW-3cWsAEuz4G.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[FC Porto – Sporting : COMPOS, CHAÎNE ET ANALYSE du choc au Dragão]]></title>
       <link>https://newsporto.fr/articles/fc-porto-sporting-compos-chaine-et-analyse-du-choc-au-dragao.html</link>
