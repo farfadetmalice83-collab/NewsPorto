@@ -836,7 +836,6 @@ img[loading="lazy"].loaded { opacity: 1; }
     if (saved && saved.length >= 2) {
       const input = document.getElementById('chat-pseudo');
       if (input) input.value = saved;
-      // Attendre que le DOM et Firebase soient prêts
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => setTimeout(() => chatJoin(saved), 300));
       } else {
