@@ -1387,7 +1387,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   ${schemaTag}
   ${breadcrumbTag}
   ${webSiteTag}
-  ${faqSchema ? '<script type="application/ld+json">'+faqSchema.replace(/<\//g,'\\u003C/')+'<\/script>' : ''}
+  ${faqSchema ? '<script type="application/ld+json">'+faqSchema.replace(/<\//g,'\\u003C/')+'</script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -1646,7 +1646,7 @@ ${paras}
               var word=words[wi].replace(/[^a-zA-Z\u00C0-\u017E]/g,'');
               if(!word)continue;
               try{
-                var rx=new RegExp('(?<!["\'>])\\b('+word+')\\b(?!["\'])','i');
+                var rx=new RegExp('\\\\b('+word+')\\\\b','i');
                 if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
                   p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
                   added++;linkables.splice(i,1);break;
