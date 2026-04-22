@@ -579,7 +579,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 
           <div class="match-row">
             <div class="team-block">
-              <img loading="lazy" id="lv-crest-home" class="team-crest" src="" alt="" style="display:none">
+              <img id="lv-crest-home" class="team-crest" src="" alt="" style="display:none">
               <div id="lv-ph-home" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="lv-home">—</div>
             </div>
@@ -588,7 +588,7 @@ img[loading="lazy"].loaded { opacity: 1; }
               <div class="score-min" id="lv-status">LIVE</div>
             </div>
             <div class="team-block">
-              <img loading="lazy" id="lv-crest-away" class="team-crest" src="" alt="" style="display:none">
+              <img id="lv-crest-away" class="team-crest" src="" alt="" style="display:none">
               <div id="lv-ph-away" class="team-crest-ph" style="display:none"></div>
               <div class="team-nm" id="lv-away">—</div>
             </div>
@@ -644,7 +644,7 @@ img[loading="lazy"].loaded { opacity: 1; }
             </div>
             <div class="match-row">
               <div class="team-block">
-                <img loading="lazy" id="nx-crest-home" class="team-crest" src="" alt="" style="display:none">
+                <img id="nx-crest-home" class="team-crest" src="" alt="" style="display:none">
                 <div id="nx-ph-home" class="team-crest-ph" style="display:none"></div>
                 <div class="team-nm" id="nx-home">—</div>
               </div>
@@ -653,7 +653,7 @@ img[loading="lazy"].loaded { opacity: 1; }
                 <div class="vs-comp" id="nx-comp">—</div>
               </div>
               <div class="team-block">
-                <img loading="lazy" id="nx-crest-away" class="team-crest" src="" alt="" style="display:none">
+                <img id="nx-crest-away" class="team-crest" src="" alt="" style="display:none">
                 <div id="nx-ph-away" class="team-crest-ph" style="display:none"></div>
                 <div class="team-nm" id="nx-away">—</div>
               </div>
@@ -745,15 +745,15 @@ img[loading="lazy"].loaded { opacity: 1; }
     const ph  = document.getElementById(phId);
     if (!img) return;
     if (src) {
-      img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
-      img.onload  = () => { if(ph) ph.style.display='none'; };
-      img.crossOrigin = 'anonymous';
-      img.src = src;
       img.style.display = 'block';
-      if(ph) ph.style.display = 'none';
+      if (ph) ph.style.display = 'none';
+      img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
+      img.onload  = () => { img.style.display='block'; if(ph) ph.style.display='none'; };
+      img.src = ''; // force reset
+      img.src = src;
     } else {
       img.style.display = 'none';
-      if(ph) ph.style.display = 'block';
+      if (ph) ph.style.display = 'block';
     }
   }
   function crestHTML(src, name) {
@@ -1012,10 +1012,15 @@ img[loading="lazy"].loaded { opacity: 1; }
     document.getElementById('live-sec-label').textContent =
       m.status === 'FINISHED' ? 'Match terminé' : 'Match en direct';
     document.getElementById('live-comp-txt').textContent = m.competition || '';
-    const _lvIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
-    setCrest('lv-crest-home', 'lv-ph-home', m.homeCrest || (_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
-    setCrest('lv-crest-away', 'lv-ph-away', m.awayCrest || (!_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
     document.getElementById('lv-home').textContent = m.homeTeam;
+    document.getElementById('lv-away').textContent = m.awayTeam;
+    const _lvIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
+    const _lvHCrest = m.homeCrest || (_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null);
+    const _lvACrest = m.awayCrest || (!_lvIsHomePorto ? 'https://crests.football-data.org/503.png' : null);
+    requestAnimationFrame(() => {
+      setCrest('lv-crest-home', 'lv-ph-home', _lvHCrest);
+      setCrest('lv-crest-away', 'lv-ph-away', _lvACrest);
+    });
     document.getElementById('lv-away').textContent = m.awayTeam;
     const awayLabel = document.getElementById('lv-away-stats-label');
     if (awayLabel) awayLabel.textContent = m.awayTeam;
@@ -1105,11 +1110,17 @@ img[loading="lazy"].loaded { opacity: 1; }
     document.getElementById('nx-date').textContent = fmtFull(m.date);
     document.getElementById('nx-venue').textContent = m.venue || '';
     document.getElementById('nx-comp').textContent = m.competition || '';
-    const _nxIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
-    setCrest('nx-crest-home', 'nx-ph-home', m.homeCrest || (_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
-    setCrest('nx-crest-away', 'nx-ph-away', m.awayCrest || (!_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null));
     document.getElementById('nx-home').textContent = m.homeTeam;
     document.getElementById('nx-away').textContent = m.awayTeam;
+    // section visible AVANT setCrest pour que les images ne soient pas dans un parent display:none
+    const _nxIsHomePorto = m.homeTeam === 'Porto' || m.homeTeam === 'FC Porto';
+    const hCrest = m.homeCrest || (_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null);
+    const aCrest = m.awayCrest || (!_nxIsHomePorto ? 'https://crests.football-data.org/503.png' : null);
+    // Petit délai pour garantir que le DOM est visible avant d'assigner src
+    requestAnimationFrame(() => {
+      setCrest('nx-crest-home', 'nx-ph-home', hCrest);
+      setCrest('nx-crest-away', 'nx-ph-away', aCrest);
+    });
     startCountdown(m.date);
   }
 
