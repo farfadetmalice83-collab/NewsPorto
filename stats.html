@@ -1110,8 +1110,8 @@
 .skip-to-content:focus { top: 8px; }
 
 /* ─── SMOOTH IMAGE REVEAL ─── */
-img[loading="lazy"] { opacity: 0; transition: opacity .5s ease; }
-img[loading="lazy"].loaded { opacity: 1; }
+img[loading="lazy"]:not(.team-crest):not(.match-team-logo):not(.ml-crest) { opacity: 0; transition: opacity .5s ease; }
+img[loading="lazy"]:not(.team-crest):not(.match-team-logo):not(.ml-crest).loaded { opacity: 1; }
 
 /* ─── IMPROVED POPUP OVERLAY ─── */
 #notif-popup {
@@ -1371,11 +1371,11 @@ function fmtTime(iso) {
   });
 }
 function teamLogo(src, name) {
-  if (src) return `<img loading="lazy" class="match-team-logo" src="${src}" alt="${name}" onerror="this.style.display='none'">`;
+  if (src) return `<img class="match-team-logo" src="${src}" alt="${name}" onerror="this.style.display='none'">`;
   return `<div class="match-team-logo placeholder">${name[0]}</div>`;
 }
 function crestImg(src, name) {
-  if (src) return `<img loading="lazy" class="team-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=team-crest-placeholder></div>'">`;
+  if (src) return `<img class="team-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=team-crest-placeholder></div>'">`;
   return `<div class="team-crest-placeholder"></div>`;
 }
 function diffClass(val) {
@@ -1548,6 +1548,7 @@ fetch('/api/porto-stats')
           </div>
         `).join('');
     }
+    if (window._observeLazyImgs) window._observeLazyImgs();
   })
   .catch(err => {
     document.getElementById('loading-state').innerHTML = `
@@ -1782,6 +1783,15 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('img[loading="lazy"]').forEach(img => {
     if (img.complete) img.classList.add('loaded');
   });
+
+  // Re-observe images injected dynamically after API calls
+  window._observeLazyImgs = function() {
+    document.querySelectorAll('img[loading="lazy"]:not([data-observed])').forEach(img => {
+      img.dataset.observed = '1';
+      if (img.complete) { img.classList.add('loaded'); }
+      else { img.addEventListener('load', () => img.classList.add('loaded'), { once: true }); }
+    });
+  };
 
   // ── TOAST UTILITY ─────────────────────
   window.showToast = function(msg, type = '') {
