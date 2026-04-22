@@ -1539,7 +1539,6 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
         <meta itemprop="datePublished" content="${isoDate}">
         <meta itemprop="author" content="NewsPorto">
         <meta itemprop="publisher" content="NewsPorto">
-        <div class="apull">${excerptClean}</div>
 ${paras}
         ${faqHTML||''}
         <div class="afig-clear"></div>
@@ -1623,7 +1622,7 @@ ${paras}
 
   // Sidebar + Similaires + Liens internes
   (function(){
-    fetch('../articles/articlestotal.json').then(r=>r.json()).then(function(data){
+    fetch('articlestotal.json').then(r=>r.json()).then(function(data){
       var articles=data.articles||[];
       var currentFile=location.pathname.split('/').pop();
       var catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',mercato:'Mercato',liga:'Championnat',interview:'Interview'};
