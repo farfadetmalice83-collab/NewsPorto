@@ -209,7 +209,6 @@
         <meta itemprop="datePublished" content="2026-04-22T14:01:11.480Z">
         <meta itemprop="author" content="NewsPorto">
         <meta itemprop="publisher" content="NewsPorto">
-        <div class="apull">21h45 ce mercredi, l’Estádio do Dragão s’apprête à vivre l’une de ses soirées les plus électriques de la saison. Le FC Porto accueille le Sporting CP pour le match retour de la …</div>
       <div class="a-bref"><p class="a-bref-label">En bref</p><ul><li>Demi-finale retour décisive au Dragão</li><li>Porto doit gagner par 2 buts d’écart</li><li>Attaque décimée par les blessures</li></ul></div>
       <p class="dc">21h45 ce mercredi, l’Estádio do Dragão s’apprête à vivre l’une de ses soirées les plus électriques de la saison. Le FC Porto accueille le Sporting CP pour le match retour de la demi-finale de la Taça de Portugal, avec un seul impératif : l’emporter par deux buts d’écart pour effacer le 1-0 encaissé à l’aller. Une mission quasi impossible, surtout avec une attaque amputée de ses deux meilleurs buteurs. Entre pression tactique, enjeux sportifs et absences cruelles, les Dragons jouent leur saison sur 90 minutes. NewsPorto analyse ce choc où chaque détail comptera.</p>
       <blockquote class="a-quote">Ce soir, ce n'est pas seulement un match de foot, c'est une bataille de survie pour notre saison.</blockquote>
@@ -320,7 +319,7 @@
 
   // Sidebar + Similaires + Liens internes
   (function(){
-    fetch('../articles/articlestotal.json').then(r=>r.json()).then(function(data){
+    fetch('articlestotal.json').then(r=>r.json()).then(function(data){
       var articles=data.articles||[];
       var currentFile=location.pathname.split('/').pop();
       var catLabels={europe:'Europa League',analyse:'Analyse',transfert:'Mercato',mercato:'Mercato',liga:'Championnat',interview:'Interview'};
@@ -341,7 +340,7 @@
               var word=words[wi].replace(/[^a-zA-ZÀ-ž]/g,'');
               if(!word)continue;
               try{
-                var rx=new RegExp('(?<!["'>])\b('+word+')\b(?!["'])','i');
+                var rx=new RegExp('\\b('+word+')\\b','i');
                 if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
                   p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
                   added++;linkables.splice(i,1);break;
