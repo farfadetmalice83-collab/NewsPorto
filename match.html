@@ -744,20 +744,29 @@ img[loading="lazy"].loaded { opacity: 1; }
     const img = document.getElementById(imgId);
     const ph  = document.getElementById(phId);
     if (!img) return;
+    // Reset handlers first to avoid stale callbacks
+    img.onload  = null;
+    img.onerror = null;
     if (src) {
-      img.style.display = 'block';
+      // Hide until loaded to avoid flash of broken image
+      img.style.display = 'none';
       if (ph) ph.style.display = 'none';
-      img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
       img.onload  = () => { img.style.display='block'; if(ph) ph.style.display='none'; };
-      img.src = ''; // force reset
-      img.src = src;
+      img.onerror = () => { img.style.display='none'; if(ph) ph.style.display='block'; };
+      // Only assign src once, no empty-src trick which triggers onerror on some browsers
+      if (img.src !== src) img.src = src;
+      else if (img.complete && img.naturalWidth) {
+        // Already cached
+        img.style.display = 'block';
+        if (ph) ph.style.display = 'none';
+      }
     } else {
       img.style.display = 'none';
       if (ph) ph.style.display = 'block';
     }
   }
   function crestHTML(src, name) {
-    if (src) return `<img loading="lazy" class="ml-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=ml-crest-ph></div>'">`;
+    if (src) return `<img class="ml-crest" src="${src}" alt="${name}" onerror="this.outerHTML='<div class=ml-crest-ph></div>'">`;
     return `<div class="ml-crest-ph"></div>`;
   }
 
