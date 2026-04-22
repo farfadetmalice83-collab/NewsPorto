@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NewsPorto — Social Media Hub</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --white: #fff;
+      --gray: rgba(255,255,255,.5);
+      --gray-low: rgba(255,255,255,.2);
+      --border: rgba(255,255,255,.08);
+      --border-blue: rgba(0,61,165,.35);
+      --blue: #003DA5;
+      --blue-mid: #0050CC;
+      --blue-light: #4d82d4;
+      --x-color: #000;
+      --ig-color: #E1306C;
+      --green: #00a86b;
+      --grid: rgba(255,255,255,.04);
+    }
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+    :focus-visible { outline: 2px solid var(--blue-light); outline-offset: 3px; }
+    body { background:#000; color:var(--white); font-family:'Barlow',sans-serif; overflow-x:hidden; min-height:100vh; }
+
+    .grid-bg {
+      position:fixed; inset:0; z-index:0; pointer-events:none;
+      background-image: linear-gradient(var(--grid) 1px,transparent 1px), linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+      background-size: 44px 44px;
+      animation: gridScroll 16s linear infinite;
+    }
+    @keyframes gridScroll { 0%{background-position:0 0} 100%{background-position:44px 44px} }
+    @media (prefers-reduced-motion:reduce) { .grid-bg { animation:none; } }
+
+    .page { position:relative; z-index:1; }
+
+    /* ── NAV ── */
+    nav {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:0 48px; height:68px;
+      border-bottom:1px solid var(--border-blue);
+      background:rgba(0,0,0,.85); backdrop-filter:blur(16px);
+      position:sticky; top:0; z-index:100;
+      box-shadow: 0 1px 0 rgba(0,61,165,.2), 0 4px 24px rgba(0,20,80,.1);
+    }
+    .nav-logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+    .nav-logo img { height:38px; }
+    .nav-logo-text { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:3px; }
+    .nav-title {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:4px; text-transform:uppercase; color:var(--gray);
+    }
+    .nav-back {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; color:var(--gray);
+      text-decoration:none; border-bottom:1px solid rgba(255,255,255,.15);
+      padding-bottom:2px; transition:color .2s;
+    }
+    .nav-back:hover { color:var(--white); }
+
+    /* ── PAGE HERO ── */
+    .page-hero {
+      padding:56px 48px 40px;
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:flex-end; justify-content:space-between; gap:24px;
+    }
+    .hero-eyebrow {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:4px; text-transform:uppercase; color:var(--gray);
+      display:flex; align-items:center; gap:10px; margin-bottom:14px;
+    }
+    .hero-eyebrow::before { content:''; width:24px; height:1px; background:var(--blue); }
+    .page-title { font-family:'Bebas Neue',sans-serif; font-size:clamp(42px,5vw,72px); line-height:.92; letter-spacing:1px; }
+    .page-title .outline { -webkit-text-stroke:1.5px rgba(255,255,255,.45); color:transparent; }
+    .hero-meta { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gray); margin-top:14px; }
+
+    /* ── TABS ── */
+    .tabs {
+      display:flex; border-bottom:1px solid var(--border);
+      background:rgba(0,0,0,.5); position:sticky; top:68px; z-index:90;
+      backdrop-filter:blur(12px);
+    }
+    .tab-btn {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:3px; text-transform:uppercase;
+      padding:16px 32px; background:transparent; border:none; border-bottom:2px solid transparent;
+      color:var(--gray); cursor:pointer; transition:color .2s, border-color .2s; white-space:nowrap;
+    }
+    .tab-btn:hover { color:var(--white); }
+    .tab-btn.active { color:var(--white); border-bottom-color:var(--blue); }
+    .tab-panel { display:none; }
+    .tab-panel.active { display:block; }
+
+    /* ── SECTIONS ── */
+    .section { padding:48px 48px 0; }
+    .section-header {
+      display:flex; align-items:baseline; justify-content:space-between;
+      margin-bottom:28px;
+    }
+    .section-label {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:4px; text-transform:uppercase; color:var(--gray);
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-label::before { content:''; width:18px; height:1px; background:var(--blue); }
+
+    /* ── ARTICLE QUEUE ── */
+    .queue-grid { display:flex; flex-direction:column; gap:1px; }
+    .queue-card {
+      background:#000; border:1px solid var(--border); display:grid;
+      grid-template-columns: 80px 1fr auto; gap:0; overflow:hidden;
+      transition:background .2s, border-color .2s;
+    }
+    .queue-card:hover { background:rgba(0,20,80,.12); border-color:var(--border-blue); }
+    .queue-card.published { opacity:.4; }
+    .queue-card-img { width:80px; height:80px; object-fit:cover; display:block; }
+    .queue-card-img-ph {
+      width:80px; height:80px; background:rgba(255,255,255,.04);
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Bebas Neue',sans-serif; font-size:12px; color:rgba(255,255,255,.1);
+    }
+    .queue-card-body { padding:14px 20px; display:flex; flex-direction:column; justify-content:center; gap:5px; }
+    .queue-card-cat {
+      font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700;
+      letter-spacing:3px; text-transform:uppercase; color:var(--blue-light);
+    }
+    .queue-card-title {
+      font-family:'Barlow Condensed',sans-serif; font-size:15px; font-weight:700;
+      text-transform:uppercase; letter-spacing:.3px; line-height:1.2; color:var(--white);
+    }
+    .queue-card-date { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:var(--gray-low); }
+    .queue-card-actions { display:flex; flex-direction:column; border-left:1px solid var(--border); }
+    .queue-action-btn {
+      flex:1; padding:0 20px; border:none; background:transparent; cursor:pointer;
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; color:var(--gray);
+      display:flex; align-items:center; justify-content:center; gap:6px;
+      transition:background .15s, color .15s; border-bottom:1px solid var(--border);
+      white-space:nowrap;
+    }
+    .queue-action-btn:last-child { border-bottom:none; }
+    .queue-action-btn:hover { background:rgba(255,255,255,.04); color:var(--white); }
+    .queue-action-btn.x-btn:hover { background:rgba(255,255,255,.08); color:#fff; }
+    .queue-action-btn.ig-btn:hover { background:rgba(225,48,108,.12); color:var(--ig-color); }
+    .queue-action-btn.done-btn:hover { background:rgba(0,168,107,.12); color:var(--green); }
+    .queue-card.published .queue-action-btn.done-btn { color:var(--green); background:rgba(0,168,107,.08); }
+
+    /* ── COPY PANEL ── */
+    .copy-panel {
+      background:rgba(0,10,30,.8); border:1px solid var(--border-blue);
+      padding:0; overflow:hidden; margin-bottom:1px;
+      display:none;
+    }
+    .copy-panel.open { display:block; }
+    .copy-panel-inner { padding:24px 28px; }
+    .copy-panel-tabs { display:flex; border-bottom:1px solid var(--border); }
+    .copy-tab {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700;
+      letter-spacing:2.5px; text-transform:uppercase;
+      padding:10px 20px; background:transparent; border:none; border-bottom:2px solid transparent;
+      color:var(--gray); cursor:pointer; transition:color .2s;
+    }
+    .copy-tab.active { color:var(--white); border-bottom-color:var(--blue); }
+    .copy-content { padding:20px 0 0; display:none; }
+    .copy-content.active { display:block; }
+    .copy-textarea {
+      width:100%; background:rgba(255,255,255,.04); border:1px solid var(--border);
+      color:rgba(255,255,255,.85); font-family:'Barlow',sans-serif; font-size:13px;
+      line-height:1.7; padding:14px 16px; resize:none; outline:none;
+      transition:border-color .2s; min-height:100px;
+    }
+    .copy-textarea:focus { border-color:var(--blue-light); }
+    .copy-footer { display:flex; align-items:center; justify-content:space-between; margin-top:12px; gap:12px; }
+    .char-counter { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gray-low); }
+    .char-counter.over { color:#e74c3c; }
+    .btn-copy-text {
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:10px 24px; background:var(--blue); border:none; color:#fff;
+      cursor:pointer; transition:background .2s, transform .15s;
+    }
+    .btn-copy-text:hover { background:var(--blue-mid); transform:translateY(-1px); }
+    .btn-copy-text.copied { background:var(--green); }
+    .ig-hint {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1.5px;
+      text-transform:uppercase; color:rgba(225,48,108,.7);
+      background:rgba(225,48,108,.08); border:1px solid rgba(225,48,108,.2);
+      padding:8px 14px; margin-bottom:14px; display:flex; align-items:center; gap:8px;
+    }
+    .images-needed {
+      margin-top:14px; padding:14px 16px;
+      background:rgba(0,61,165,.08); border:1px solid rgba(0,61,165,.2);
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1px;
+      color:rgba(255,255,255,.6); line-height:1.8;
+    }
+    .images-needed strong { color:var(--blue-light); }
+
+    /* ── PUBLISHED STATS ── */
+    .pub-stats {
+      display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
+      background:var(--border); border:1px solid var(--border); margin-bottom:32px;
+    }
+    .pub-stat { background:#000; padding:20px; text-align:center; }
+    .pub-stat-num { font-family:'Bebas Neue',sans-serif; font-size:42px; line-height:1; color:var(--white); }
+    .pub-stat-num.blue { color:var(--blue-light); }
+    .pub-stat-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:var(--gray); margin-top:4px; }
+
+    /* ── PROMPT LIBRARY ── */
+    .prompt-scenarios { display:flex; flex-direction:column; gap:1px; margin-bottom:48px; }
+    .scenario-card { background:#000; border:1px solid var(--border); overflow:hidden; }
+    .scenario-header {
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 24px; cursor:pointer; transition:background .15s;
+      user-select:none;
+    }
+    .scenario-header:hover { background:rgba(255,255,255,.03); }
+    .scenario-header-left { display:flex; align-items:center; gap:16px; }
+    .scenario-emoji { font-size:20px; flex-shrink:0; }
+    .scenario-name {
+      font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:.5px;
+    }
+    .scenario-platform-tags { display:flex; gap:6px; }
+    .platform-tag {
+      font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; padding:3px 8px;
+    }
+    .platform-tag.x { background:rgba(255,255,255,.08); color:rgba(255,255,255,.6); }
+    .platform-tag.ig { background:rgba(225,48,108,.12); color:var(--ig-color); }
+    .scenario-toggle { font-size:16px; color:var(--gray); transition:transform .3s; }
+    .scenario-card.open .scenario-toggle { transform:rotate(45deg); }
+    .scenario-body { display:none; padding:0 24px 24px; }
+    .scenario-card.open .scenario-body { display:block; }
+
+    .prompt-block { margin-bottom:24px; }
+    .prompt-block:last-child { margin-bottom:0; }
+    .prompt-platform {
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:3px; text-transform:uppercase; color:var(--blue-light);
+      margin-bottom:10px; display:flex; align-items:center; gap:8px;
+    }
+    .prompt-platform::before { content:''; width:12px; height:1px; background:var(--blue); }
+    .prompt-images-box {
+      background:rgba(0,61,165,.08); border:1px solid rgba(0,61,165,.2);
+      padding:10px 14px; margin-bottom:12px;
+      font-family:'Barlow Condensed',sans-serif; font-size:11px;
+      letter-spacing:.5px; color:rgba(255,255,255,.6); line-height:1.7;
+    }
+    .prompt-images-box strong { color:var(--blue-light); }
+    .prompt-text-box {
+      background:rgba(255,255,255,.03); border:1px solid var(--border);
+      border-left:2px solid var(--blue);
+      padding:14px 18px; position:relative;
+    }
+    .prompt-text {
+      font-family:'Barlow',sans-serif; font-size:13px; line-height:1.75;
+      color:rgba(255,255,255,.78); white-space:pre-wrap;
+    }
+    .prompt-text .var { color:var(--blue-light); font-style:italic; }
+    .btn-copy-prompt {
+      position:absolute; top:10px; right:10px;
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:6px 14px; background:rgba(0,61,165,.3); border:1px solid rgba(0,61,165,.4);
+      color:rgba(255,255,255,.6); cursor:pointer; transition:all .2s;
+    }
+    .btn-copy-prompt:hover { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .btn-copy-prompt.copied { background:var(--green); border-color:var(--green); color:#fff; }
+    .prompt-note {
+      font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px;
+      color:rgba(255,255,255,.3); margin-top:8px; font-style:italic;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      margin-top:64px; padding:32px 48px;
+      border-top:1px solid var(--border-blue);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .footer-copy { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:var(--gray-low); }
+
+    /* ── TOAST ── */
+    #toast {
+      position:fixed; bottom:32px; right:48px; z-index:9999;
+      font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase;
+      padding:12px 24px; background:#000; border:1px solid var(--border-blue); color:var(--white);
+      opacity:0; transform:translateY(12px); transition:opacity .3s, transform .3s;
+      pointer-events:none;
+    }
+    #toast.show { opacity:1; transform:translateY(0); }
+    #toast.ok { border-color:rgba(0,168,107,.5); color:var(--green); }
+
+    /* ── LOADING ── */
+    .loading-block { padding:80px 48px; text-align:center; }
+    .loading-spinner {
+      width:32px; height:32px; border:2px solid var(--border);
+      border-top-color:var(--blue); border-radius:50%;
+      animation:spin .8s linear infinite; margin:0 auto 20px;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .loading-text { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase; color:var(--gray); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { padding:64px 48px; text-align:center; }
+    .empty-state-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:1px; margin-bottom:8px; }
+    .empty-state-sub { font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--gray); }
+
+    @media (max-width:768px) {
+      nav, .page-hero, .section, footer { padding-left:20px !important; padding-right:20px !important; }
+      .page-hero { flex-direction:column; align-items:flex-start; }
+      .tabs { overflow-x:auto; }
+      .tab-btn { padding:14px 20px; font-size:10px; }
+      .queue-card { grid-template-columns:60px 1fr; }
+      .queue-card-actions { display:none; }
+      .pub-stats { grid-template-columns:repeat(3,1fr); }
+      .scenario-name { font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="page">
+
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="Logo.png" alt="NewsPorto">
+      <span class="nav-logo-text">NewsPorto</span>
+    </a>
+    <span class="nav-title">Social Media Hub</span>
+    <a href="index.html" class="nav-back">← Accueil</a>
+  </nav>
+
+  <div class="page-hero">
+    <div>
+      <p class="hero-eyebrow">Admin · Publication</p>
+      <h1 class="page-title">Social<br><span class="outline">Media Hub</span></h1>
+      <p class="hero-meta">Queue X · Instagram · Prompts Gemini</p>
+    </div>
+    <div id="pub-stats-mini" style="display:flex;gap:20px;align-items:flex-end;">
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;" id="stat-total">—</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);">Articles</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:var(--blue-light);" id="stat-published">—</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);">Publiés</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:#e74c3c;" id="stat-pending">—</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);">En attente</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('queue')">📋 Queue Articles</button>
+    <button class="tab-btn" onclick="switchTab('prompts')">🤖 Prompts Gemini</button>
+  </div>
+
+  <!-- TAB : QUEUE -->
+  <div id="tab-queue" class="tab-panel active">
+    <div class="section">
+      <div class="section-header">
+        <span class="section-label">— Articles à publier sur les réseaux</span>
+        <button onclick="resetAll()" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.25);padding:6px 14px;cursor:pointer;transition:all .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,.4)'" onmouseout="this.style.color='rgba(255,255,255,.25)';this.style.borderColor='rgba(255,255,255,.1)'">↺ Reset</button>
+      </div>
+      <div id="queue-loading" class="loading-block">
+        <div class="loading-spinner"></div>
+        <p class="loading-text">Chargement des articles...</p>
+      </div>
+      <div id="queue-list" class="queue-grid" style="display:none;"></div>
+      <div id="queue-empty" class="empty-state" style="display:none;">
+        <div class="empty-state-title">Tout est publié ✓</div>
+        <div class="empty-state-sub">Aucun article en attente de publication</div>
+      </div>
+    </div>
+
+    <!-- Published section -->
+    <div class="section" style="padding-top:40px; padding-bottom:64px;">
+      <div class="section-header">
+        <span class="section-label">— Déjà publiés</span>
+      </div>
+      <div id="published-list" class="queue-grid"></div>
+    </div>
+  </div>
+
+  <!-- TAB : PROMPTS -->
+  <div id="tab-prompts" class="tab-panel">
+    <div class="section" style="padding-bottom:64px;">
+      <div class="section-header" style="margin-bottom:8px;">
+        <span class="section-label">— Prompts Gemini · Tous scénarios</span>
+      </div>
+      <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:36px;line-height:1.7;">
+        Pour chaque scénario : copie le prompt → ouvre Gemini → colle → joins les images indiquées → génère.<br>
+        Les variables <span style="color:var(--blue-light);font-style:italic;">[en italique bleu]</span> sont à remplacer par les vraies infos.
+      </p>
+      <div class="prompt-scenarios" id="prompt-scenarios">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 NewsPorto FR</span>
+    <span class="footer-copy">Social Media Hub · Admin</span>
+  </footer>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ── CONSTANTS ────────────────────────────────────────────────────────────────
+const ARTICLES_URL = 'articles/articlestotal.json';
+const STORAGE_KEY  = 'np_social_published'; // { file: { x: bool, ig: bool } }
+const CAT_LABELS   = { europe:'Europa League', analyse:'Analyse', transfert:'Mercato', mercato:'Mercato', liga:'Championnat', interview:'Interview' };
+const SITE_URL     = 'https://newsporto.fr';
+const HASHTAGS_X   = '#FCPorto #Porto #Portistas #LigaPortugal';
+const HASHTAGS_IG  = '#fcporto #porto #portistas #ligaportugal #newsporto #footballportugais #dragoes #portofcportugal';
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let articles = [];
+let published = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+let openPanel = null; // currently open copy panel
+
+// ── UTILS ────────────────────────────────────────────────────────────────────
+function savePublished() { localStorage.setItem(STORAGE_KEY, JSON.stringify(published)); }
+
+function toast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = ''; }, 3000);
+}
+
+function copyText(text, btn) {
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Copié !'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 2000);
+    toast('Copié dans le presse-papier', 'ok');
+  }).catch(() => {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    toast('Copié !', 'ok');
+  });
+}
+
+// ── GENERATE TEXTS ───────────────────────────────────────────────────────────
+function generateTweet(article) {
+  const cat = CAT_LABELS[article.category] || article.category || 'Actu';
+  const url  = `${SITE_URL}/articles/${article.file}`;
+  const excerpt = article.excerpt ? article.excerpt.slice(0, 80) + (article.excerpt.length > 80 ? '…' : '') : '';
+  return `🔵⚪ ${article.title}\n\n${excerpt}\n\n👉 ${url}\n\n${HASHTAGS_X}`;
+}
+
+function generateInstagram(article) {
+  const cat = CAT_LABELS[article.category] || article.category || 'Actu';
+  const excerpt = article.excerpt || '';
+  const teaser = excerpt.length > 150 ? excerpt.slice(0, 147) + '…' : excerpt;
+  return `🔵⚪ ${article.title}\n\n${teaser}\n\n🔗 Lien en bio → newsporto.fr\n\n.\n.\n.\n${HASHTAGS_IG}`;
+}
+
+// ── UPDATE STATS ─────────────────────────────────────────────────────────────
+function updateStats() {
+  const total   = articles.length;
+  const pubCount = articles.filter(a => published[a.file]?.x || published[a.file]?.ig).length;
+  const pending  = total - pubCount;
+  document.getElementById('stat-total').textContent    = total;
+  document.getElementById('stat-published').textContent = pubCount;
+  document.getElementById('stat-pending').textContent   = pending;
+}
+
+// ── RENDER QUEUE ─────────────────────────────────────────────────────────────
+function renderQueue() {
+  updateStats();
+  const queueEl   = document.getElementById('queue-list');
+  const pubEl     = document.getElementById('published-list');
+  const emptyEl   = document.getElementById('queue-empty');
+
+  const pending   = articles.filter(a => !published[a.file]?.x && !published[a.file]?.ig);
+  const pubbed    = articles.filter(a =>  published[a.file]?.x ||  published[a.file]?.ig);
+
+  queueEl.style.display = 'flex';
+  document.getElementById('queue-loading').style.display = 'none';
+  emptyEl.style.display = pending.length === 0 ? 'block' : 'none';
+
+  queueEl.innerHTML   = pending.map(a => renderCard(a, false)).join('');
+  pubEl.innerHTML     = pubbed.map(a => renderCard(a, true)).join('');
+
+  // Re-attach event listeners
+  document.querySelectorAll('.queue-card').forEach(card => {
+    const file = card.dataset.file;
+    card.querySelector('.btn-gen-x')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCopyPanel(file, 'x'); });
+    card.querySelector('.btn-gen-ig')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCopyPanel(file, 'ig'); });
+    card.querySelector('.btn-mark-x')?.addEventListener('click', (e) => { e.stopPropagation(); markPublished(file, 'x'); });
+    card.querySelector('.btn-mark-ig')?.addEventListener('click', (e) => { e.stopPropagation(); markPublished(file, 'ig'); });
+  });
+}
+
+function renderCard(a, isPub) {
+  const cat      = CAT_LABELS[a.category] || a.category || '';
+  const xDone    = published[a.file]?.x;
+  const igDone   = published[a.file]?.ig;
+  const imgHtml  = a.image
+    ? `<img class="queue-card-img" src="${a.image}" alt="${a.title}" loading="lazy" onerror="this.style.display='none'">`
+    : `<div class="queue-card-img-ph">NP</div>`;
+
+  return `
+    <div class="queue-card${isPub ? ' published' : ''}" data-file="${a.file}">
+      ${imgHtml}
+      <div class="queue-card-body">
+        <div class="queue-card-cat">${cat}</div>
+        <div class="queue-card-title">${a.title}</div>
+        <div class="queue-card-date">${a.date || ''}
+          ${xDone  ? ' · <span style="color:var(--green)">✓ X</span>' : ''}
+          ${igDone ? ' · <span style="color:var(--ig-color)">✓ IG</span>' : ''}
+        </div>
+      </div>
+      <div class="queue-card-actions">
+        <button class="queue-action-btn x-btn btn-gen-x" title="Générer tweet">𝕏 Tweet</button>
+        <button class="queue-action-btn ig-btn btn-gen-ig" title="Générer post Instagram">📸 Insta</button>
+        ${!xDone  ? `<button class="queue-action-btn done-btn btn-mark-x" title="Marquer publié sur X">✓ X Publié</button>` : ''}
+        ${!igDone ? `<button class="queue-action-btn done-btn btn-mark-ig" title="Marquer publié sur Instagram">✓ IG Publié</button>` : ''}
+      </div>
+    </div>
+    <div class="copy-panel" id="panel-${a.file.replace('.html','')}">
+      <div class="copy-panel-inner" id="panel-content-${a.file.replace('.html','')}"></div>
+    </div>`;
+}
+
+function toggleCopyPanel(file, platform) {
+  const article  = articles.find(a => a.file === file);
+  if (!article) return;
+  const panelId  = 'panel-' + file.replace('.html','');
+  const contentId = 'panel-content-' + file.replace('.html','');
+  const panel    = document.getElementById(panelId);
+  const content  = document.getElementById(contentId);
+
+  // If same panel open, toggle close
+  if (openPanel === panelId + platform && panel.classList.contains('open')) {
+    panel.classList.remove('open');
+    openPanel = null;
+    return;
+  }
+
+  // Close any open panel
+  document.querySelectorAll('.copy-panel.open').forEach(p => p.classList.remove('open'));
+
+  const tweetText = generateTweet(article);
+  const igText    = generateInstagram(article);
+  const tweetLen  = tweetText.length;
+  const igLen     = igText.length;
+
+  content.innerHTML = `
+    <div class="copy-panel-tabs">
+      <button class="copy-tab${platform === 'x' ? ' active' : ''}" onclick="switchCopyTab('${panelId}','x')">𝕏 Twitter / X</button>
+      <button class="copy-tab${platform === 'ig' ? ' active' : ''}" onclick="switchCopyTab('${panelId}','ig')">📸 Instagram</button>
+    </div>
+    <div class="copy-content${platform === 'x' ? ' active' : ''}" id="${panelId}-x">
+      <textarea class="copy-textarea" id="tweet-${panelId}" rows="5" oninput="updateCounter('tweet-${panelId}','counter-${panelId}-x',280)">${tweetText}</textarea>
+      <div class="copy-footer">
+        <span class="char-counter${tweetLen > 280 ? ' over' : ''}" id="counter-${panelId}-x">${tweetLen} / 280</span>
+        <button class="btn-copy-text" onclick="copyText(document.getElementById('tweet-${panelId}').value, this)">📋 Copier le tweet</button>
+      </div>
+    </div>
+    <div class="copy-content${platform === 'ig' ? ' active' : ''}" id="${panelId}-ig">
+      <div class="ig-hint">⚠️ Le lien ne sera pas cliquable dans la légende — mets newsporto.fr dans ta bio et renvoie en story.</div>
+      <textarea class="copy-textarea" id="ig-${panelId}" rows="8" oninput="updateCounter('ig-${panelId}','counter-${panelId}-ig',2200)">${igText}</textarea>
+      <div class="copy-footer">
+        <span class="char-counter" id="counter-${panelId}-ig">${igLen} / 2200</span>
+        <button class="btn-copy-text" onclick="copyText(document.getElementById('ig-${panelId}').value, this)">📋 Copier la légende</button>
+      </div>
+      <div class="images-needed">
+        📸 <strong>Image à joindre :</strong> Screenshot de l'image de couverture de l'article, ou une photo forte en lien avec le sujet.<br>
+        Format recommandé : <strong>1080×1080</strong> (carré) ou <strong>1080×1350</strong> (portrait)
+      </div>
+    </div>`;
+
+  panel.classList.add('open');
+  openPanel = panelId + platform;
+}
+
+function switchCopyTab(panelId, platform) {
+  document.querySelectorAll(`#panel-content-${panelId.replace('panel-','')} .copy-tab`).forEach(t => t.classList.remove('active'));
+  document.querySelectorAll(`#panel-content-${panelId.replace('panel-','')} .copy-content`).forEach(c => c.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById(`${panelId}-${platform}`)?.classList.add('active');
+}
+
+function updateCounter(inputId, counterId, max) {
+  const len = document.getElementById(inputId)?.value.length || 0;
+  const counter = document.getElementById(counterId);
+  if (counter) {
+    counter.textContent = `${len} / ${max}`;
+    counter.classList.toggle('over', len > max);
+  }
+}
+
+function markPublished(file, platform) {
+  if (!published[file]) published[file] = {};
+  published[file][platform] = true;
+  savePublished();
+  renderQueue();
+  toast(`✓ Marqué publié sur ${platform === 'x' ? 'X' : 'Instagram'}`, 'ok');
+}
+
+function resetAll() {
+  if (!confirm('Réinitialiser tout l\'historique de publication ?')) return;
+  published = {};
+  savePublished();
+  renderQueue();
+  toast('Historique réinitialisé');
+}
+
+// ── LOAD ARTICLES ─────────────────────────────────────────────────────────────
+fetch(ARTICLES_URL)
+  .then(r => r.json())
+  .then(data => {
+    articles = data.articles || [];
+    renderQueue();
+  })
+  .catch(() => {
+    document.getElementById('queue-loading').innerHTML = `<p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#e74c3c;">Impossible de charger articlestotal.json</p>`;
+  });
+
+// ── TABS ─────────────────────────────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── PROMPT SCENARIOS DATA ─────────────────────────────────────────────────────
+const SCENARIOS = [
+  {
+    emoji: '⚽',
+    name: 'Avant-match',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Logo FC Porto + Logo club adverse (PNG fond transparent) + Notre logo NewsPorto',
+        prompt: `Tu es le social media manager de NewsPorto, un média français dédié au FC Porto.
+
+Crée un visuel d'avant-match percutant pour [X / Instagram] avec ces éléments :
+- Match : FC Porto vs [ADVERSAIRE]
+- Compétition : [NOM COMPÉTITION]
+- Date et heure : [DATE] à [HEURE] (heure française)
+- Style : fond noir, bleu Porto (#003DA5), typographie moderne et impactante
+
+Pour le texte d'accompagnement, génère :
+- Un titre accrocheur en 1 ligne (max 8 mots)
+- Un sous-titre avec l'enjeu du match
+- Les hashtags : #FCPorto #Porto [#CompétitionConcernée]
+
+Texte pour la légende/tweet :
+🔵⚪ [TITRE ACCROCHEUR]
+[1-2 phrases sur l'enjeu]
+📅 [DATE] · ⏰ [HEURE]H
+[HASHTAGS]`,
+        note: 'Remplace les [crochets] par les vraies infos du match.'
+      }
+    ]
+  },
+  {
+    emoji: '🎯',
+    name: 'But de Porto',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X (réaction live)',
+        images: '📎 <strong>Joins :</strong> Photo/action du buteur si dispo · Logo Porto',
+        prompt: `Rédige un tweet de réaction EN DIRECT pour un but du FC Porto.
+
+Contexte :
+- Buteur : [PRÉNOM NOM]
+- Minute : [MINUTE]'
+- Score : Porto [X] - [Y] [ADVERSAIRE]
+- Type de but : [normal / penalty / coup franc / tête / contre-attaque]
+- Compétition : [COMPÉTITION]
+
+Format : Tweet percutant, émotionnel, max 220 caractères (garder de la place pour les hashtags)
+Ton : explosion de joie, supporter passionné mais professionnel
+Inclure : emoji(s) feu/ballon, le nom du buteur, le score, la minute
+Finir par : #FCPorto #[NomButeurSansAccents]`
+      },
+      {
+        platform: 'Instagram (post après match)',
+        images: '📎 <strong>Joins :</strong> Meilleure photo du buteur disponible + Logo Porto + Score final en overlay si possible',
+        prompt: `Crée une légende Instagram pour célébrer le but de [PRÉNOM NOM] contre [ADVERSAIRE].
+
+Infos :
+- Minute : [MINUTE]'
+- Score final : [SCORE]
+- Compétition : [COMPÉTITION]
+- Contexte du but : [courte description de l'action]
+
+Format :
+- Ligne 1 : accroche émotionnelle courte (1 ligne max)
+- Ligne 2-3 : description du but (2-3 phrases)
+- Ligne 4 : "🔗 Lien en bio pour l'analyse complète"
+- Séparateurs . pour espacer des hashtags
+- Hashtags : #FCPorto #Porto [#NomButeur] #Portistas #Dragoes #LigaPortugal #newsporto`
+      }
+    ]
+  },
+  {
+    emoji: '⏸️',
+    name: 'Mi-temps',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Logo Porto + Logo adverse + Score actuel (tu peux le mettre en texte sur l\'image)',
+        prompt: `Rédige un post de mi-temps pour NewsPorto.
+
+Infos mi-temps :
+- Match : FC Porto vs [ADVERSAIRE]
+- Score mi-temps : [X] - [Y]
+- Compétition : [COMPÉTITION]
+- Fait marquant de la 1ère mi-temps : [ex: but de X à 23', carton rouge, possession dominée, etc.]
+- Ressenti général : [Porto domine / match serré / Porto en difficulté]
+
+Pour X : tweet d'analyse courte, 200 car. max, ton analytique mais passionné
+Pour Instagram : légende mi-temps avec analyse 3-4 lignes + hashtags
+
+Inclure : score, résumé en 1 phrase de ce qu'on a vu, ce qu'on attend de la 2ème mi-temps
+#FCPorto #Porto #Portistas`
+      }
+    ]
+  },
+  {
+    emoji: '🏁',
+    name: 'Fin de match — Victoire',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Photo de célébration des joueurs ou du buteur décisif + Score final + Logo Porto',
+        prompt: `Crée un post de victoire pour FC Porto.
+
+Résultat :
+- FC Porto [SCORE] [ADVERSAIRE]
+- Compétition : [COMPÉTITION]
+- Buteur(s) : [LISTE DES BUTEURS ET MINUTES]
+- Joueur du match selon toi : [NOM]
+- Contexte : [ex: qualification, derby, remontada, maintien de la 1ère place, etc.]
+
+Pour X : tweet célébration, 200 car., émotionnel et factuel
+Pour Instagram : légende complète avec résumé du match (5-6 lignes), mention du MOTM, hashtags complets
+
+Ton : fierté, célébration maîtrisée, media sérieux
+#FCPorto #Porto #Victoire #Portistas #Dragoes`
+      }
+    ]
+  },
+  {
+    emoji: '😔',
+    name: 'Fin de match — Défaite',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Photo sobre de joueurs (pas de célébration adverse) + Score final + Logo Porto',
+        prompt: `Crée un post sobre et analytique après une défaite du FC Porto.
+
+Résultat :
+- FC Porto [SCORE] [ADVERSAIRE] (défaite)
+- Compétition : [COMPÉTITION]
+- Contexte : [ex: élimination, perte de la 1ère place, etc.]
+- Buteur(s) adverse(s) : [LISTE]
+- Point positif s'il y en a un : [ou "aucun" si pas pertinent]
+
+Ton : analyse calme et honnête, ni catastrophisme ni minimisation
+Pour X : réaction courte, factuelle, 200 car.
+Pour Instagram : analyse en 4-5 lignes, reconnaître la défaite, regarder vers l'avant
+
+Ne jamais insulter les adversaires ni les arbitres
+#FCPorto #Porto #Portistas`
+      }
+    ]
+  },
+  {
+    emoji: '🤝',
+    name: 'Fin de match — Nul',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Photo de fin de match (poignée de mains ou joueurs) + Score + Logo Porto',
+        prompt: `Post de résultat après un match nul du FC Porto.
+
+Résultat :
+- FC Porto [X] - [X] [ADVERSAIRE]
+- Compétition : [COMPÉTITION]
+- Buteurs Porto : [LISTE]
+- Contexte : [ex: point partagé en déplacement, frustrant à domicile, etc.]
+- Impact au classement : [ex: Porto reste 2ème, perd 1 point sur le leader, etc.]
+
+Ton : analyse factuelle, ni positif ni négatif, objectif
+Pour X : 200 car. max avec le score et le contexte
+Pour Instagram : 3-4 lignes d'analyse + hashtags
+#FCPorto #Porto #Portistas #LigaPortugal`
+      }
+    ]
+  },
+  {
+    emoji: '🔴',
+    name: 'Carton rouge',
+    platforms: ['x'],
+    blocks: [
+      {
+        platform: 'X (réaction live)',
+        images: '📎 <strong>Joins :</strong> Pas nécessaire pour X live — tweet text only',
+        prompt: `Tweet de réaction immédiate pour un carton rouge.
+
+Contexte :
+- Joueur expulsé : [NOM] (Porto ou adversaire — préciser)
+- Minute : [MINUTE]'
+- Raison : [faute grossière / double avertissement / violent]
+- Score au moment : Porto [X] - [Y] [ADVERSAIRE]
+
+Si Porto est expulsé : ton de frustration/inquiétude contenu
+Si l'adversaire est expulsé : ton de surprise/avantage à souligner
+Max 200 car., inclure l'emoji 🟥, le nom du joueur, la minute
+#FCPorto #Porto`
+      }
+    ]
+  },
+  {
+    emoji: '🚨',
+    name: 'Transfert — Arrivée',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Photo officielle du joueur (ou si pas dispo, photo de presse) + Logo Porto + Notre logo NewsPorto',
+        prompt: `Annonce de transfert/recrutement au FC Porto pour NewsPorto.
+
+Infos :
+- Joueur : [PRÉNOM NOM]
+- Poste : [POSTE]
+- Club précédent : [CLUB]
+- Type : [transfert définitif / prêt / libre]
+- Montant si connu : [MONTANT ou "montant non divulgué"]
+- Durée contrat : [DURÉE]
+- Caractéristique principale du joueur : [ex: ailier rapide, défenseur rugueux, etc.]
+
+Pour X : tweet d'annonce punchy, 200 car., avec le nom bien en avant
+Pour Instagram : légende complète de présentation (5-6 lignes), ce qu'il apporte à l'équipe, hashtags
+
+Format tweet : 🚨 OFFICIEL | [NOM] rejoint le FC Porto !
+#FCPorto #Mercato #Porto [#NomJoueur]`
+      }
+    ]
+  },
+  {
+    emoji: '👋',
+    name: 'Transfert — Départ',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Belle photo du joueur en maillot Porto + Logo Porto + Notre logo',
+        prompt: `Post d'au revoir pour un départ du FC Porto.
+
+Infos :
+- Joueur : [PRÉNOM NOM]
+- Destination : [CLUB DE DESTINATION]
+- Nombre de saisons à Porto : [N]
+- Stats clés à Porto : [ex: X buts, Y passes, Z titres]
+- Ton : hommage sincère, pas de polémique
+
+Pour X : tweet d'hommage bref et respectueux, 200 car.
+Pour Instagram : hommage en 4-5 lignes, ses meilleurs souvenirs avec Porto, message de bonne chance
+
+Ton : nostalgie bienveillante, fierté du passage au club
+#FCPorto #Porto #Merci[NomJoueur] #Portistas`
+      }
+    ]
+  },
+  {
+    emoji: '🏆',
+    name: 'Titre / Trophée',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Photo de la célébration / remise du trophée + Photo des joueurs + Logo Porto + Notre logo NewsPorto',
+        prompt: `Post de célébration de titre pour FC Porto.
+
+Infos :
+- Titre remporté : [NOM DU TITRE]
+- Adversaire en finale / dernier match : [ADVERSAIRE]
+- Score : [SCORE]
+- Numéro du titre (historique) : [ex: 30ème titre de champion, 20ème Coupe]
+- Héros de la saison : [nom(s)]
+- Contexte particulier : [ex: doublé, remontada incroyable, etc.]
+
+Pour X : tweet explosion de joie, 200 car., tous les caps lock autorisés
+Pour Instagram : légende épique en 6-8 lignes, histoire du titre, chiffres clés, appel à la communauté
+
+Ton : joie maximale, fierté historique, grandeur du club
+#FCPorto #Champions #Porto #Portistas #Dragoes #[NomTitre]`
+      }
+    ]
+  },
+  {
+    emoji: '🎂',
+    name: 'Anniversaire joueur',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Belle photo du joueur + Son numéro ou son nom en overlay + Logo Porto',
+        prompt: `Post d'anniversaire pour un joueur du FC Porto.
+
+Infos :
+- Joueur : [PRÉNOM NOM]
+- Âge qu'il fête : [ÂGE] ans
+- Poste : [POSTE]
+- Stats / faits marquants au club : [ex: X buts cette saison, arrivé en ANNÉE, etc.]
+- Un moment mémorable de sa carrière portiste : [ex: son but contre X, sa passe décisive en finale, etc.]
+
+Pour X : tweet birthday court et chaleureux, 150 car., avec émoji gâteau
+Pour Instagram : légende birthday avec ses stats, un souvenir fort, message de la communauté
+
+Ton : chaleureux, fan sincère, célébration authentique
+#HappyBirthday #FCPorto #Porto [#NomJoueur]`
+      }
+    ]
+  },
+  {
+    emoji: '📰',
+    name: 'Nouvel article publié',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X',
+        images: '📎 <strong>Pas d\'image nécessaire</strong> — le lien génère automatiquement une card sur X si l\'OG image est configurée',
+        prompt: `Génère un tweet pour promouvoir cet article de NewsPorto.
+
+Article :
+- Titre : [TITRE EXACT DE L'ARTICLE]
+- Catégorie : [Analyse / Mercato / Résultat / Interview / Liga]
+- Résumé en 1 phrase : [RÉSUMÉ]
+- URL : https://newsporto.fr/articles/[SLUG].html
+
+Format :
+🔵⚪ [accroche percutante ≠ du titre]
+[1 phrase teaser qui donne envie de cliquer]
+👉 [URL]
+#FCPorto #Porto [hashtag catégorie]
+
+Max 260 caractères (laisser de la place pour l'URL)`
+      },
+      {
+        platform: 'Instagram',
+        images: '📎 <strong>Joins :</strong> Image de couverture de l\'article (screenshot ou téléchargée) · Format 1080×1080 ou 1080×1350',
+        prompt: `Génère une légende Instagram pour promouvoir cet article NewsPorto.
+
+Article :
+- Titre : [TITRE EXACT DE L'ARTICLE]
+- Catégorie : [CATÉGORIE]
+- Points clés (3 max) : [POINT 1] / [POINT 2] / [POINT 3]
+- Public visé : fans FC Porto francophones
+
+Format :
+- Ligne 1 : hook accrocheur (1 ligne, ≠ du titre)
+- Lignes 2-4 : 3 points clés de l'article sous forme de bullets
+- "🔗 Lien complet en bio · newsporto.fr"
+- Séparateurs pour isoler les hashtags
+- Hashtags : #fcporto #porto #newsporto #analyse #portistas #dragoes #ligaportugal
+
+Ton : expert, passionné, accessible`
+      }
+    ]
+  },
+  {
+    emoji: '📊',
+    name: 'Stats / Chiffre fort',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Capture de la stat ou infographie simple que tu as créée + Logo Porto',
+        prompt: `Post autour d'un chiffre ou d'une statistique forte du FC Porto.
+
+Stat :
+- Chiffre : [LE CHIFFRE]
+- Contexte : [ex: Porto est la seule équipe de Liga à ne pas avoir perdu à domicile cette saison]
+- Source : [football-data.org / UEFA / Liga Portugal]
+- Pourquoi c'est impressionnant : [EXPLICATION COURTE]
+
+Pour X : tweet stat percutant, commence par le chiffre en grand, 180 car. max
+Pour Instagram : post infographique textuel, explique la stat en 3-4 lignes, pourquoi ça compte
+
+Ton : analytique mais accessible, rendre la stat émotionnelle
+#FCPorto #Stats #Porto #Portistas #Data`
+      }
+    ]
+  },
+  {
+    emoji: '🎬',
+    name: 'Story Instagram — Avant match',
+    platforms: ['ig'],
+    blocks: [
+      {
+        platform: 'Instagram Story',
+        images: '📎 <strong>Joins :</strong> Logo FC Porto + Logo adverse + Notre logo NewsPorto + Photo Estádio do Dragão si dispo',
+        prompt: `Crée le texte pour une Story Instagram avant-match NewsPorto.
+
+Format Story (format vertical 9:16) :
+- Infos : Porto vs [ADVERSAIRE] · [DATE] · [HEURE]H · [COMPÉTITION]
+- Style : Fond noir/bleu Porto, logos des deux clubs en haut
+- Texte principal : 1 question rhétorique (ex: "Ce soir, les Dragons rugissent ?")
+- Sous-texte : date, heure, compétition
+- CTA : "Swipe up pour l'avant-match complet ↑" (ou lien sticker)
+- Sondage suggéré : "Porto gagne ?" → Oui 🔵 / Non 😬
+
+Donne-moi le texte exact pour chaque élément textuel de la story.`
+      }
+    ]
+  },
+  {
+    emoji: '🌟',
+    name: 'Joueur du match / MOTM',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Meilleure photo du joueur durant le match (action, célébration) + Logo Porto + Note ou stats du match',
+        prompt: `Post "Joueur du match" pour FC Porto.
+
+Infos :
+- Joueur : [PRÉNOM NOM]
+- Match : Porto [SCORE] [ADVERSAIRE]
+- Ses stats du match : [ex: 1 but, 2 passes déc., 87% passes, 6 dribbles réussis]
+- Son moment fort : [ex: son but à 87' qui a tout sauvé / sa masterclass défensive]
+- Note NewsPorto : [NOTE/10]
+
+Pour X : tweet MOTM percutant, 180 car., le stat choc en premier
+Pour Instagram : légende complète avec toutes ses stats, analyse de sa perf en 3-4 lignes, sa note
+
+Ton : objectif mais passionné, crédibiliser l'analyse
+#MOTM #FCPorto #Porto [#NomJoueur] #Portistas`
+      }
+    ]
+  },
+  {
+    emoji: '🔮',
+    name: 'Préview semaine / Programme',
+    platforms: ['x','ig'],
+    blocks: [
+      {
+        platform: 'X & Instagram',
+        images: '📎 <strong>Joins :</strong> Notre logo NewsPorto + Logos des clubs adverses de la semaine (PNG)',
+        prompt: `Post "programme de la semaine" pour FC Porto.
+
+Matchs de la semaine :
+- Match 1 : [DATE] · Porto vs [ADVERSAIRE] · [COMPÉTITION] · [HEURE]H
+- Match 2 (si applicable) : [DATE] · [MATCH] · [COMPÉTITION] · [HEURE]H
+- Match 3 (si applicable) : [DATE] · [MATCH] · [COMPÉTITION] · [HEURE]H
+
+Contexte : [ex: semaine charnière avec Liga + Europa League / match de 6 points, etc.]
+
+Pour X : thread ou tweet récap programme, 200 car.
+Pour Instagram : légende "Agenda de la semaine" avec les 3 matchs listé clairement, enjeux brefs
+
+Ton : anticipation, excitation contenue, professionnel
+#FCPorto #Porto #Portistas #Agenda [#CompétitionsConcernées]`
+      }
+    ]
+  }
+];
+
+// ── RENDER PROMPTS ────────────────────────────────────────────────────────────
+function renderPrompts() {
+  const container = document.getElementById('prompt-scenarios');
+  container.innerHTML = SCENARIOS.map((s, idx) => `
+    <div class="scenario-card" id="scenario-${idx}">
+      <div class="scenario-header" onclick="toggleScenario(${idx})">
+        <div class="scenario-header-left">
+          <span class="scenario-emoji">${s.emoji}</span>
+          <span class="scenario-name">${s.name}</span>
+          <div class="scenario-platform-tags">
+            ${s.platforms.includes('x') ? '<span class="platform-tag x">𝕏 Twitter</span>' : ''}
+            ${s.platforms.includes('ig') ? '<span class="platform-tag ig">📸 Instagram</span>' : ''}
+          </div>
+        </div>
+        <span class="scenario-toggle">+</span>
+      </div>
+      <div class="scenario-body">
+        ${s.blocks.map((b, bi) => `
+          <div class="prompt-block">
+            <div class="prompt-platform">${b.platform}</div>
+            <div class="prompt-images-box">📎 ${b.images}</div>
+            <div class="prompt-text-box">
+              <pre class="prompt-text">${escHtml(b.prompt)}</pre>
+              <button class="btn-copy-prompt" onclick="copyPrompt(${idx},${bi},this)">📋 Copier</button>
+            </div>
+            ${b.note ? `<p class="prompt-note">💡 ${b.note}</p>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toggleScenario(idx) {
+  const card = document.getElementById(`scenario-${idx}`);
+  const wasOpen = card.classList.contains('open');
+  document.querySelectorAll('.scenario-card.open').forEach(c => c.classList.remove('open'));
+  if (!wasOpen) card.classList.add('open');
+}
+
+function copyPrompt(scenarioIdx, blockIdx, btn) {
+  const text = SCENARIOS[scenarioIdx].blocks[blockIdx].prompt;
+  copyText(text, btn);
+}
+
+renderPrompts();
+</script>
+</body>
+</html>
