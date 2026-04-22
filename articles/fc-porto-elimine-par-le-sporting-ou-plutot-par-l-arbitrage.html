@@ -333,7 +333,7 @@
               var word=words[wi].replace(/[^a-zA-ZÀ-ž]/g,'');
               if(!word)continue;
               try{
-                var rx=new RegExp('(?<!["'>])\b('+word+')\b(?!["'])','i');
+                var rx=new RegExp('\\b('+word+')\\b','i');
                 if(rx.test(p.textContent)&&!p.innerHTML.includes('internal-link')){
                   p.innerHTML=p.innerHTML.replace(rx,'<a href="'+a.file+'" class="internal-link" title="'+a.title+'">$1</a>');
                   added++;linkables.splice(i,1);break;
