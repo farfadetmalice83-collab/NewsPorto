@@ -112,7 +112,7 @@
     .queue-grid { display:flex; flex-direction:column; gap:1px; }
     .queue-card {
       background:#000; border:1px solid var(--border); display:grid;
-      grid-template-columns: 80px 1fr auto; gap:0; overflow:hidden;
+      grid-template-columns: 80px 1fr auto auto; gap:0; overflow:hidden;
       transition:background .2s, border-color .2s;
     }
     .queue-card:hover { background:rgba(0,20,80,.12); border-color:var(--border-blue); }
@@ -148,6 +148,45 @@
     .queue-action-btn.ig-btn:hover { background:rgba(225,48,108,.12); color:var(--ig-color); }
     .queue-action-btn.done-btn:hover { background:rgba(0,168,107,.12); color:var(--green); }
     .queue-card.published .queue-action-btn.done-btn { color:var(--green); background:rgba(0,168,107,.08); }
+
+    /* ── PLATFORM CHECKBOXES ── */
+    .platform-checks {
+      display:flex; flex-direction:column; border-left:1px solid var(--border);
+      min-width:72px;
+    }
+    .platform-check-item {
+      flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+      padding:0 14px; border-bottom:1px solid var(--border); cursor:pointer;
+      transition:background .15s; user-select:none;
+    }
+    .platform-check-item:last-child { border-bottom:none; }
+    .platform-check-item:hover { background:rgba(255,255,255,.04); }
+    .platform-check-item input[type="checkbox"] { display:none; }
+    .check-box {
+      width:16px; height:16px; border:1.5px solid rgba(255,255,255,.2);
+      border-radius:2px; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; flex-shrink:0;
+    }
+    .check-box::after { content:''; display:none; }
+    .platform-check-item.checked-x .check-box {
+      background:#111; border-color:#fff;
+    }
+    .platform-check-item.checked-x .check-box::after {
+      display:block; content:'✓'; color:#fff; font-size:10px; font-weight:700; line-height:1;
+    }
+    .platform-check-item.checked-ig .check-box {
+      background:rgba(225,48,108,.2); border-color:var(--ig-color);
+    }
+    .platform-check-item.checked-ig .check-box::after {
+      display:block; content:'✓'; color:var(--ig-color); font-size:10px; font-weight:700; line-height:1;
+    }
+    .check-label {
+      font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+      letter-spacing:2px; text-transform:uppercase; color:var(--gray);
+      transition:color .15s;
+    }
+    .platform-check-item.checked-x .check-label { color:#fff; }
+    .platform-check-item.checked-ig .check-label { color:var(--ig-color); }
 
     /* ── COPY PANEL ── */
     .copy-panel {
@@ -273,6 +312,13 @@
       font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px;
       color:rgba(255,255,255,.3); margin-top:8px; font-style:italic;
     }
+    .img-prompt-box {
+      background:rgba(225,48,108,.06); border-color:rgba(225,48,108,.2);
+    }
+    .img-prompt-text {
+      border-left-color:var(--ig-color);
+      background:rgba(225,48,108,.04);
+    }
 
     /* ── FOOTER ── */
     footer {
@@ -396,8 +442,8 @@
         <span class="section-label">— Prompts Gemini · Tous scénarios</span>
       </div>
       <p style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:36px;line-height:1.7;">
-        Pour chaque scénario : copie le prompt → ouvre Gemini → colle → joins les images indiquées → génère.<br>
-        Les variables <span style="color:var(--blue-light);font-style:italic;">[en italique bleu]</span> sont à remplacer par les vraies infos.
+        Pour chaque scénario : copie le prompt → ouvre ton outil IA de génération d'image (Midjourney, Firefly, DALL-E…) → colle → joins l'image générée au post Instagram.<br>
+        Les variables <span style="color:var(--blue-light);font-style:italic;">[en italique bleu]</span> sont à remplacer par les vraies infos. · Les prompts <span style="color:var(--ig-color);">📸 Instagram</span> génèrent une <strong style="color:#fff;">image</strong>, pas une légende.
       </p>
       <div class="prompt-scenarios" id="prompt-scenarios">
         <!-- filled by JS -->
@@ -500,8 +546,14 @@ function renderQueue() {
     const file = card.dataset.file;
     card.querySelector('.btn-gen-x')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCopyPanel(file, 'x'); });
     card.querySelector('.btn-gen-ig')?.addEventListener('click', (e) => { e.stopPropagation(); toggleCopyPanel(file, 'ig'); });
-    card.querySelector('.btn-mark-x')?.addEventListener('click', (e) => { e.stopPropagation(); markPublished(file, 'x'); });
-    card.querySelector('.btn-mark-ig')?.addEventListener('click', (e) => { e.stopPropagation(); markPublished(file, 'ig'); });
+    card.querySelector('.chk-x')?.addEventListener('change', (e) => {
+      e.stopPropagation();
+      togglePublished(file, 'x', e.target.checked);
+    });
+    card.querySelector('.chk-ig')?.addEventListener('change', (e) => {
+      e.stopPropagation();
+      togglePublished(file, 'ig', e.target.checked);
+    });
   });
 }
 
@@ -519,16 +571,23 @@ function renderCard(a, isPub) {
       <div class="queue-card-body">
         <div class="queue-card-cat">${cat}</div>
         <div class="queue-card-title">${a.title}</div>
-        <div class="queue-card-date">${a.date || ''}
-          ${xDone  ? ' · <span style="color:var(--green)">✓ X</span>' : ''}
-          ${igDone ? ' · <span style="color:var(--ig-color)">✓ IG</span>' : ''}
-        </div>
+        <div class="queue-card-date">${a.date || ''}</div>
       </div>
       <div class="queue-card-actions">
         <button class="queue-action-btn x-btn btn-gen-x" title="Générer tweet">𝕏 Tweet</button>
         <button class="queue-action-btn ig-btn btn-gen-ig" title="Générer post Instagram">📸 Insta</button>
-        ${!xDone  ? `<button class="queue-action-btn done-btn btn-mark-x" title="Marquer publié sur X">✓ X Publié</button>` : ''}
-        ${!igDone ? `<button class="queue-action-btn done-btn btn-mark-ig" title="Marquer publié sur Instagram">✓ IG Publié</button>` : ''}
+      </div>
+      <div class="platform-checks">
+        <label class="platform-check-item${xDone ? ' checked-x' : ''}" title="Publié sur X">
+          <div class="check-box"></div>
+          <span class="check-label">𝕏</span>
+          <input type="checkbox" class="chk-x" data-file="${a.file}"${xDone ? ' checked' : ''}>
+        </label>
+        <label class="platform-check-item${igDone ? ' checked-ig' : ''}" title="Publié sur Instagram">
+          <div class="check-box"></div>
+          <span class="check-label">IG</span>
+          <input type="checkbox" class="chk-ig" data-file="${a.file}"${igDone ? ' checked' : ''}>
+        </label>
       </div>
     </div>
     <div class="copy-panel" id="panel-${a.file.replace('.html','')}">
@@ -604,12 +663,17 @@ function updateCounter(inputId, counterId, max) {
   }
 }
 
-function markPublished(file, platform) {
+function togglePublished(file, platform, checked) {
   if (!published[file]) published[file] = {};
-  published[file][platform] = true;
+  published[file][platform] = checked;
+  if (!checked && !published[file].x && !published[file].ig) delete published[file];
   savePublished();
   renderQueue();
-  toast(`✓ Marqué publié sur ${platform === 'x' ? 'X' : 'Instagram'}`, 'ok');
+  toast(checked ? `✓ Marqué publié sur ${platform === 'x' ? 'X' : 'Instagram'}` : `Dépublié sur ${platform === 'x' ? 'X' : 'Instagram'}`, checked ? 'ok' : '');
+}
+
+function markPublished(file, platform) {
+  togglePublished(file, platform, true);
 }
 
 function resetAll() {
@@ -647,27 +711,46 @@ const SCENARIOS = [
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Logo FC Porto + Logo club adverse (PNG fond transparent) + Notre logo NewsPorto',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Logo FC Porto + Logo club adverse (PNG fond transparent) + Notre logo NewsPorto · La card OG de l\'article peut suffire',
         prompt: `Tu es le social media manager de NewsPorto, un média français dédié au FC Porto.
 
-Crée un visuel d'avant-match percutant pour [X / Instagram] avec ces éléments :
+Crée un tweet d'avant-match percutant :
 - Match : FC Porto vs [ADVERSAIRE]
 - Compétition : [NOM COMPÉTITION]
 - Date et heure : [DATE] à [HEURE] (heure française)
-- Style : fond noir, bleu Porto (#003DA5), typographie moderne et impactante
 
-Pour le texte d'accompagnement, génère :
-- Un titre accrocheur en 1 ligne (max 8 mots)
-- Un sous-titre avec l'enjeu du match
-- Les hashtags : #FCPorto #Porto [#CompétitionConcernée]
-
-Texte pour la légende/tweet :
-🔵⚪ [TITRE ACCROCHEUR]
-[1-2 phrases sur l'enjeu]
+Format :
+🔵⚪ [TITRE ACCROCHEUR — max 8 mots]
+[1-2 phrases sur l'enjeu du match]
 📅 [DATE] · ⏰ [HEURE]H
-[HASHTAGS]`,
+#FCPorto #Porto [#CompétitionConcernée]
+
+Max 260 caractères.`,
         note: 'Remplace les [crochets] par les vraies infos du match.'
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> puis publier · Joins aussi notre logo NewsPorto en overlay dans ton outil de création (Canva, Photoshop…)',
+        prompt: `Create a professional sports editorial Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: deep black (#000000) with subtle blue diagonal light streak (#003DA5)
+- Animated grid texture overlay (very subtle, low opacity white lines)
+- Typography: bold condensed sans-serif (Bebas Neue style), all caps
+- Color palette: black, Porto royal blue (#003DA5), white, electric blue accents (#4d82d4)
+- Overall mood: premium sports media, dark & dramatic, editorial feel
+
+Content to show:
+- Large FC Porto crest centered or slightly left, glowing blue halo effect
+- VS separator with electric blue glow between Porto crest and [ADVERSAIRE] crest
+- [ADVERSAIRE] club crest on the right side
+- Main text: "FC PORTO vs [ADVERSAIRE]" in large Bebas Neue style font
+- Sub-text line: "[COMPÉTITION] · [DATE] · [HEURE]H" in smaller condensed font
+- Bottom bar: thin blue (#003DA5) line, then "NEWSPORTO.FR" in small caps
+
+Do NOT include: people, real photos, logos with copyright. Use vector-style crests only.
+Aspect ratio: 1:1 square. Ultra-sharp, 4K quality editorial sports graphic.`
       }
     ]
   },
@@ -677,8 +760,8 @@ Texte pour la légende/tweet :
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X (réaction live)',
-        images: '📎 <strong>Joins :</strong> Photo/action du buteur si dispo · Logo Porto',
+        platform: 'X — Réaction live',
+        images: '📎 <strong>Image X :</strong> Photo/action du buteur si dispo · Logo Porto',
         prompt: `Rédige un tweet de réaction EN DIRECT pour un but du FC Porto.
 
 Contexte :
@@ -694,22 +777,28 @@ Inclure : emoji(s) feu/ballon, le nom du buteur, le score, la minute
 Finir par : #FCPorto #[NomButeurSansAccents]`
       },
       {
-        platform: 'Instagram (post après match)',
-        images: '📎 <strong>Joins :</strong> Meilleure photo du buteur disponible + Logo Porto + Score final en overlay si possible',
-        prompt: `Crée une légende Instagram pour célébrer le but de [PRÉNOM NOM] contre [ADVERSAIRE].
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Joins ensuite une vraie photo du buteur en story ou en 2ème slide du carrousel',
+        prompt: `Create a dramatic goal celebration Instagram post image (1080x1350px, portrait format).
 
-Infos :
-- Minute : [MINUTE]'
-- Score final : [SCORE]
-- Compétition : [COMPÉTITION]
-- Contexte du but : [courte description de l'action]
+Visual style — NewsPorto brand:
+- Background: pure black to dark blue gradient (#000 → #001a4d), dramatic stadium atmosphere
+- Gold/yellow burst explosion effect from center-bottom (celebration energy)
+- Typography: Bebas Neue style, massive bold condensed, all caps white
+- Blue accent: #003DA5 Porto blue for borders and highlights
+- Bottom NewsPorto signature bar
 
-Format :
-- Ligne 1 : accroche émotionnelle courte (1 ligne max)
-- Ligne 2-3 : description du but (2-3 phrases)
-- Ligne 4 : "🔗 Lien en bio pour l'analyse complète"
-- Séparateurs . pour espacer des hashtags
-- Hashtags : #FCPorto #Porto [#NomButeur] #Portistas #Dragoes #LigaPortugal #newsporto`
+Content to show:
+- Top: FC Porto crest with subtle glow, small — top left corner
+- Center massive text: "BUUUT !" or "GOAL!" in giant white letters with blue shadow
+- Player name: "[PRÉNOM NOM]" in large gold/yellow condensed text below
+- Minute badge: circular badge "[MINUTE]'" in Porto blue (#003DA5)
+- Score display: "PORTO [X] — [Y] [ADVERSAIRE]" in clean white medium text
+- Abstract background: dark blue shapes suggesting a stadium/crowd silhouette
+- Bottom strip: thin Porto blue line + "NEWSPORTO.FR" right-aligned in small caps
+
+Mood: explosive celebration, electric energy, dark & premium editorial.
+Aspect ratio: 4:5 portrait. 4K sharp quality.`
       }
     ]
   },
@@ -719,8 +808,8 @@ Format :
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Logo Porto + Logo adverse + Score actuel (tu peux le mettre en texte sur l\'image)',
+        platform: 'X & Instagram — Texte',
+        images: '📎 <strong>Image X :</strong> Logo Porto + Logo adverse + Score actuel (tu peux le mettre en texte sur l\'image)',
         prompt: `Rédige un post de mi-temps pour NewsPorto.
 
 Infos mi-temps :
@@ -735,6 +824,29 @@ Pour Instagram : légende mi-temps avec analyse 3-4 lignes + hashtags
 
 Inclure : score, résumé en 1 phrase de ce qu'on a vu, ce qu'on attend de la 2ème mi-temps
 #FCPorto #Porto #Portistas`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Format carré 1080×1080',
+        prompt: `Create a clean halftime report Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: dark black with subtle blue vignette, editorial cold tone
+- Split layout: left half slightly darker than right half
+- Typography: Bebas Neue style, condensed, precise — "newsroom" aesthetic
+- Accent color: Porto blue #003DA5
+
+Content to show:
+- Top label: "MI-TEMPS" in small caps, blue color, left-aligned with thin blue underline
+- Center: Large score display "FC PORTO [X] — [Y] [ADVERSAIRE]" in massive white Bebas-style text
+- Under score: "[COMPÉTITION] · [MINUTE]'" in small condensed gray text
+- Left column: FC Porto crest, clean, medium size
+- Right column: [ADVERSAIRE] crest (vector style), medium size
+- Bottom section: thin horizontal blue line, then "NEWSPORTO.FR" small caps right-aligned
+- Subtle texture: very faint stadium atmosphere background
+
+Mood: analytical, composed, mid-game tension. Not celebratory.
+Aspect ratio: 1:1. 4K editorial quality.`
       }
     ]
   },
@@ -744,8 +856,8 @@ Inclure : score, résumé en 1 phrase de ce qu'on a vu, ce qu'on attend de la 2�
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Photo de célébration des joueurs ou du buteur décisif + Score final + Logo Porto',
+        platform: 'X & Instagram — Texte',
+        images: '📎 <strong>Image X :</strong> Photo de célébration des joueurs ou du buteur décisif + Score final + Logo Porto',
         prompt: `Crée un post de victoire pour FC Porto.
 
 Résultat :
@@ -760,6 +872,30 @@ Pour Instagram : légende complète avec résumé du match (5-6 lignes), mention
 
 Ton : fierté, célébration maîtrisée, media sérieux
 #FCPorto #Porto #Victoire #Portistas #Dragoes`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Ajoute ensuite en 2ème slide une vraie photo de célébration',
+        prompt: `Create a victory celebration Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: deep black with electric blue (#003DA5) diagonal light rays from bottom-right
+- Confetti/particle effect: small blue and white particles floating upward
+- Gold championship glow: subtle golden rim light on center elements
+- Typography: Bebas Neue ultra-bold, condensed, dramatic
+- Overall feel: triumphant, premium media brand, dark & electric
+
+Content to show:
+- Top: "VICTOIRE !" or "VAINQUEURS !" in massive white text with blue glow drop-shadow
+- FC Porto crest: center-left, large, with glowing blue halo
+- Score display: large "FC PORTO [SCORE1] — [SCORE2] [ADVERSAIRE]" bold white
+- Adversary small crest: right side, smaller, no glow
+- Buteur(s): "[NOM] [MINUTE]'" in condensed gold/yellow text below score
+- Competition label: "[COMPÉTITION]" in small Porto blue pill badge top-right
+- Bottom bar: thick Porto blue band + "NEWSPORTO.FR" in white caps
+
+Mood: explosive joy, dark cinematic drama, premium editorial sports graphic.
+Aspect ratio: 4:5 portrait. Ultra-sharp 4K.`
       }
     ]
   },
@@ -769,8 +905,8 @@ Ton : fierté, célébration maîtrisée, media sérieux
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Photo sobre de joueurs (pas de célébration adverse) + Score final + Logo Porto',
+        platform: 'X & Instagram — Texte',
+        images: '📎 <strong>Image :</strong> Photo sobre de joueurs (pas de célébration adverse) + Score final + Logo Porto',
         prompt: `Crée un post sobre et analytique après une défaite du FC Porto.
 
 Résultat :
@@ -786,6 +922,29 @@ Pour Instagram : analyse en 4-5 lignes, reconnaître la défaite, regarder vers 
 
 Ne jamais insulter les adversaires ni les arbitres
 #FCPorto #Porto #Portistas`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Ton sobre, pas de célébration. Format 1080×1080',
+        prompt: `Create a somber defeat match result Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: very dark charcoal/near-black, desaturated blue (#00152e tone), heavy vignette
+- No celebratory elements, no gold, no particles — restrained and composed
+- Typography: Bebas Neue condensed, clean, not dramatic — professional media tone
+- Accent: muted Porto blue (darker shade), white for score text
+
+Content to show:
+- Top left: FC Porto crest, desaturated/low brightness — communicates loss
+- Center: clean result display "FC PORTO [SCORE1] — [SCORE2] [ADVERSAIRE]" in white
+- Under score: label "[COMPÉTITION]" in small muted blue pill
+- Adversary crest: right side, neutral, no glow
+- Small text line: date and competition context
+- Horizontal thin gray line above footer
+- Bottom: "NEWSPORTO.FR" right-aligned small caps in muted gray
+
+Mood: dignified and composed in defeat. Dark, serious, no drama. Editorial cold tone.
+Aspect ratio: 1:1 square. 4K quality.`
       }
     ]
   },
@@ -795,8 +954,8 @@ Ne jamais insulter les adversaires ni les arbitres
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Photo de fin de match (poignée de mains ou joueurs) + Score + Logo Porto',
+        platform: 'X & Instagram — Texte',
+        images: '📎 <strong>Image :</strong> Photo de fin de match (poignée de mains ou joueurs) + Score + Logo Porto',
         prompt: `Post de résultat après un match nul du FC Porto.
 
 Résultat :
@@ -810,6 +969,28 @@ Ton : analyse factuelle, ni positif ni négatif, objectif
 Pour X : 200 car. max avec le score et le contexte
 Pour Instagram : 3-4 lignes d'analyse + hashtags
 #FCPorto #Porto #Portistas #LigaPortugal`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Ton neutre. Format 1080×1080',
+        prompt: `Create a match draw result Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: very dark black with muted blue-gray split down the center (neutral, balanced feel)
+- No explosion, no party — calm but present energy
+- Typography: Bebas Neue condensed, clean balanced layout
+- Color palette: Porto blue (#003DA5), white, medium-gray accents
+
+Content to show:
+- Centered layout: FC Porto crest LEFT | large "=" sign in white center | [ADVERSAIRE] crest RIGHT
+- Score display: "FC PORTO [X] — [X] [ADVERSAIRE]" in large bold white text below crests
+- Label: "MATCH NUL" in small blue pill badge top-center
+- Competition: "[COMPÉTITION]" in condensed gray text
+- Classement note: "[PORTO reste Xe au classement]" in small muted text line
+- Bottom: thin Porto blue line + "NEWSPORTO.FR" right-aligned small caps
+
+Mood: balanced, neutral, analytical. Neither victorious nor defeated. Clean dark editorial.
+Aspect ratio: 1:1. 4K sharp quality.`
       }
     ]
   },
@@ -819,8 +1000,8 @@ Pour Instagram : 3-4 lignes d'analyse + hashtags
     platforms: ['x'],
     blocks: [
       {
-        platform: 'X (réaction live)',
-        images: '📎 <strong>Joins :</strong> Pas nécessaire pour X live — tweet text only',
+        platform: 'X — Réaction live',
+        images: '📎 <strong>Pas d\'image nécessaire</strong> — tweet text only',
         prompt: `Tweet de réaction immédiate pour un carton rouge.
 
 Contexte :
@@ -842,8 +1023,8 @@ Max 200 car., inclure l'emoji 🟥, le nom du joueur, la minute
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Photo officielle du joueur (ou si pas dispo, photo de presse) + Logo Porto + Notre logo NewsPorto',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Photo officielle du joueur (ou si pas dispo, photo de presse) + Logo Porto + Notre logo NewsPorto',
         prompt: `Annonce de transfert/recrutement au FC Porto pour NewsPorto.
 
 Infos :
@@ -856,10 +1037,32 @@ Infos :
 - Caractéristique principale du joueur : [ex: ailier rapide, défenseur rugueux, etc.]
 
 Pour X : tweet d'annonce punchy, 200 car., avec le nom bien en avant
-Pour Instagram : légende complète de présentation (5-6 lignes), ce qu'il apporte à l'équipe, hashtags
-
 Format tweet : 🚨 OFFICIEL | [NOM] rejoint le FC Porto !
 #FCPorto #Mercato #Porto [#NomJoueur]`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Ajoute ensuite une vraie photo du joueur en 2ème slide · Format portrait 1080×1350',
+        prompt: `Create a player signing announcement Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: pure black with Porto blue (#003DA5) electric light beam from top-center
+- "Breaking news" graphic energy — bold, dynamic, announcement-style
+- Typography: Bebas Neue ultra-bold condensed — headline magazine feel
+- Accent: electric blue (#4d82d4) neon glow on text highlights
+- Red-blue urgency: "OFFICIEL" badge in Porto blue with white text
+
+Content to show:
+- Top: "🚨 OFFICIEL" in bold blue badge — left-aligned
+- Player silhouette area: dark placeholder space where the real photo would be placed (keep it as a dark-blue rectangle with "PHOTO DU JOUEUR" label — the user will add the real photo in Canva)
+- Player name: "[PRÉNOM NOM]" in massive white Bebas-style all-caps text
+- Position badge: "[POSTE]" in small Porto blue pill shape
+- Club FROM → TO graphic: "[CLUB PRÉCÉDENT]" → Porto crest arrow → "FC PORTO"
+- Contract info line: "[DURÉE]" in small condensed text
+- Bottom bar: Porto blue thick strip + "NEWSPORTO.FR" white caps
+
+Mood: breaking news excitement, dark premium sports media. Bold graphic design.
+Aspect ratio: 4:5 portrait. Ultra-sharp 4K.`
       }
     ]
   },
@@ -869,8 +1072,8 @@ Format tweet : 🚨 OFFICIEL | [NOM] rejoint le FC Porto !
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Belle photo du joueur en maillot Porto + Logo Porto + Notre logo',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Belle photo du joueur en maillot Porto + Logo Porto + Notre logo',
         prompt: `Post d'au revoir pour un départ du FC Porto.
 
 Infos :
@@ -885,6 +1088,30 @@ Pour Instagram : hommage en 4-5 lignes, ses meilleurs souvenirs avec Porto, mess
 
 Ton : nostalgie bienveillante, fierté du passage au club
 #FCPorto #Porto #Merci[NomJoueur] #Portistas`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Ajoute une vraie photo en maillot Porto en 2ème slide · Format 1080×1350',
+        prompt: `Create a player farewell Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: dark black with soft blue-to-transparent fade from top (nostalgic, warm-cool atmosphere)
+- Tone: reflective and dignified — not sad, but emotional and respectful
+- Typography: Bebas Neue condensed, white, with golden-warm accents for the player's name
+- Porto blue #003DA5 as structural color, warm gold (#c9a84c) as emotional accent
+
+Content to show:
+- Top left: FC Porto crest, medium size, with soft glow — heritage feel
+- Arrow graphic: FC Porto crest → thin line → [DESTINATION CLUB] placeholder text
+- Large text: "MERCI [NOM]" in massive white/gold Bebas-style caps
+- Stat line: "[X] buts · [Y] passes · [Z] titres" in condensed white text
+- Seasons badge: "[N] SAISONS" in Porto blue small badge
+- Destination line: "Direction : [CLUB DE DESTINATION]" in small muted text
+- Decorative: faded Porto blue diagonal stripe in background suggesting the maillot
+- Bottom: thin blue line + "NEWSPORTO.FR" small caps
+
+Mood: warm, nostalgic, respectful tribute. Dark but emotionally warm. Premium editorial.
+Aspect ratio: 4:5 portrait. 4K quality.`
       }
     ]
   },
@@ -894,8 +1121,8 @@ Ton : nostalgie bienveillante, fierté du passage au club
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Photo de la célébration / remise du trophée + Photo des joueurs + Logo Porto + Notre logo NewsPorto',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Photo de la célébration / remise du trophée + Photo des joueurs + Logo Porto + Notre logo NewsPorto',
         prompt: `Post de célébration de titre pour FC Porto.
 
 Infos :
@@ -907,10 +1134,31 @@ Infos :
 - Contexte particulier : [ex: doublé, remontada incroyable, etc.]
 
 Pour X : tweet explosion de joie, 200 car., tous les caps lock autorisés
-Pour Instagram : légende épique en 6-8 lignes, histoire du titre, chiffres clés, appel à la communauté
-
-Ton : joie maximale, fierté historique, grandeur du club
 #FCPorto #Champions #Porto #Portistas #Dragoes #[NomTitre]`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Joins ensuite de vraies photos de fête en slides suivantes · Format portrait 1080×1350',
+        prompt: `Create a championship title celebration Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: black with massive Porto blue (#003DA5) stadium light beams from top, gold (#c9a84c) sparkle particles raining down
+- Maximum celebration energy — this is the biggest post of the season
+- Typography: Bebas Neue maximum size, ultra-bold, all caps — every headline massive
+- Color accents: gold championship shimmer, Porto blue electric, pure white
+
+Content to show:
+- Center top: FC Porto crest LARGE with bright gold championship glow halo
+- Main text: "CHAMPIONS !" or "[NOM DU TITRE] !" in MASSIVE white text with blue+gold outline
+- Sub-text: "[NUMÉRO]ème TITRE" in condensed gold text
+- Trophy icon: vector-style abstract trophy silhouette in gold outline below crest
+- Score/context: "PORTO [SCORE1]—[SCORE2] [ADVERSAIRE]" in medium white text
+- Season badge: "[SAISON]" in Porto blue pill badge
+- Particle/confetti: blue and white confetti falling from top
+- Bottom: Porto blue thick celebration bar + "NEWSPORTO.FR" gold caps
+
+Mood: absolute maximum euphoria, dark cinematic dramatic, gold and blue explosion. 
+Aspect ratio: 4:5 portrait. Ultra-sharp 4K championship energy.`
       }
     ]
   },
@@ -920,8 +1168,8 @@ Ton : joie maximale, fierté historique, grandeur du club
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Belle photo du joueur + Son numéro ou son nom en overlay + Logo Porto',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Belle photo du joueur + Son numéro ou son nom en overlay + Logo Porto',
         prompt: `Post d'anniversaire pour un joueur du FC Porto.
 
 Infos :
@@ -932,10 +1180,32 @@ Infos :
 - Un moment mémorable de sa carrière portiste : [ex: son but contre X, sa passe décisive en finale, etc.]
 
 Pour X : tweet birthday court et chaleureux, 150 car., avec émoji gâteau
-Pour Instagram : légende birthday avec ses stats, un souvenir fort, message de la communauté
-
 Ton : chaleureux, fan sincère, célébration authentique
 #HappyBirthday #FCPorto #Porto [#NomJoueur]`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Joins une vraie photo du joueur en 2ème slide · Format 1080×1080',
+        prompt: `Create a player birthday Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: dark black with warm blue glow from top-left and faint birthday confetti (subtle — not childish)
+- Balance between warmth (birthday) and premium sports media feel
+- Typography: Bebas Neue condensed, white primary, gold accent for the player name
+- Porto blue #003DA5 as structural brand color, warm gold for celebratory touch
+
+Content to show:
+- Center: large "🎂 [ÂGE] ANS" badge — white number, gold cake emoji, blue background circle
+- Player name: "[PRÉNOM NOM]" in massive gold/white condensed all-caps text
+- Position + number: "[POSTE] · N°[NUMÉRO]" in smaller muted text
+- FC Porto crest: top-right, small, clean with faint blue glow
+- Birthday stat line: "[X] buts · [Y] matchs cette saison" in condensed white
+- Background texture: subtle Porto maillot blue vertical stripe at 5% opacity
+- Small confetti particles: Porto blue + white, low count, elegant
+- Bottom: thin blue line + "NEWSPORTO.FR" small caps right-aligned
+
+Mood: warm, celebratory but still premium. Not childish. Dark editorial with a birthday energy.
+Aspect ratio: 1:1 square. 4K quality.`
       }
     ]
   },
@@ -945,7 +1215,7 @@ Ton : chaleureux, fan sincère, célébration authentique
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X',
+        platform: 'X — Texte',
         images: '📎 <strong>Pas d\'image nécessaire</strong> — le lien génère automatiquement une card sur X si l\'OG image est configurée',
         prompt: `Génère un tweet pour promouvoir cet article de NewsPorto.
 
@@ -964,24 +1234,28 @@ Format :
 Max 260 caractères (laisser de la place pour l'URL)`
       },
       {
-        platform: 'Instagram',
-        images: '📎 <strong>Joins :</strong> Image de couverture de l\'article (screenshot ou téléchargée) · Format 1080×1080 ou 1080×1350',
-        prompt: `Génère une légende Instagram pour promouvoir cet article NewsPorto.
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Utilise aussi le screenshot de l\'article en 2ème slide · Format 1080×1350',
+        prompt: `Create an article promotion Instagram post image (1080x1350px, portrait format).
 
-Article :
-- Titre : [TITRE EXACT DE L'ARTICLE]
-- Catégorie : [CATÉGORIE]
-- Points clés (3 max) : [POINT 1] / [POINT 2] / [POINT 3]
-- Public visé : fans FC Porto francophones
+Visual style — NewsPorto brand:
+- Background: deep black with subtle Porto blue (#003DA5) light leak from top-right corner
+- Editorial newspaper/media aesthetic — dark, clean, informative
+- Typography: Bebas Neue condensed for headlines, smaller condensed for metadata
+- Color palette: black, Porto blue #003DA5, white, electric blue #4d82d4 accents
 
-Format :
-- Ligne 1 : hook accrocheur (1 ligne, ≠ du titre)
-- Lignes 2-4 : 3 points clés de l'article sous forme de bullets
-- "🔗 Lien complet en bio · newsporto.fr"
-- Séparateurs pour isoler les hashtags
-- Hashtags : #fcporto #porto #newsporto #analyse #portistas #dragoes #ligaportugal
+Content to show:
+- Top left badge: category tag "[CATÉGORIE]" in Porto blue pill — "ANALYSE" / "MERCATO" / "RÉSULTAT"
+- FC Porto crest: small, top-right, subtle, brand presence
+- Headline area: "[TITRE DE L'ARTICLE]" in large bold white condensed text — 2-3 lines max, left-aligned
+- Decorative: thin Porto blue vertical line on far left (like a newspaper column rule)
+- Below title: short excerpt line "[RÉSUMÉ EN 1 PHRASE]" in smaller muted white/gray condensed text
+- NewsPorto wordmark: "NEWSPORTO" in medium Porto blue condensed text
+- URL reminder: "newsporto.fr" in very small muted gray
+- Bottom bar: Porto blue strip + "LIEN EN BIO" white caps bold
 
-Ton : expert, passionné, accessible`
+Mood: premium online media, editorial, informative. Dark and clean, not flashy.
+Aspect ratio: 4:5 portrait. 4K quality.`
       }
     ]
   },
@@ -991,8 +1265,8 @@ Ton : expert, passionné, accessible`
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Capture de la stat ou infographie simple que tu as créée + Logo Porto',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Capture de la stat ou infographie simple que tu as créée + Logo Porto',
         prompt: `Post autour d'un chiffre ou d'une statistique forte du FC Porto.
 
 Stat :
@@ -1002,10 +1276,31 @@ Stat :
 - Pourquoi c'est impressionnant : [EXPLICATION COURTE]
 
 Pour X : tweet stat percutant, commence par le chiffre en grand, 180 car. max
-Pour Instagram : post infographique textuel, explique la stat en 3-4 lignes, pourquoi ça compte
-
 Ton : analytique mais accessible, rendre la stat émotionnelle
 #FCPorto #Stats #Porto #Portistas #Data`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Format 1080×1080 carré — pensé comme une infographie',
+        prompt: `Create a sports statistics infographic Instagram post image (1080x1080px, square format).
+
+Visual style — NewsPorto brand:
+- Background: very dark black (#050505) with subtle Porto blue data-grid lines (like a stats dashboard)
+- Clean data visualization aesthetic — premium analytics feel
+- Typography: Bebas Neue for numbers (massive), Barlow Condensed for labels
+- Color palette: Porto blue #003DA5, white, electric blue #4d82d4, neutral gray for secondary text
+
+Content to show:
+- Center MASSIVE number: "[LE CHIFFRE]" in giant white Bebas-style text — this is the hero element, very large
+- Under the number: "[CONTEXTE STAT — courte description]" in condensed gray-white text, 2 lines max
+- Source badge: "Source : [SOURCE]" in very small muted text bottom-left area
+- FC Porto crest: small, top-right, subtle blue glow
+- Decorative data elements: thin horizontal progress bar below the main number (Porto blue, 80% filled), abstract chart bars very faint in background
+- Top label: "📊 DATA PORTO" in small Porto blue caps
+- Bottom: "NEWSPORTO.FR" right-aligned small caps + thin blue line separator
+
+Mood: analytical, data-driven but visually striking. Dark dashboard meets premium sports editorial.
+Aspect ratio: 1:1 square. 4K sharp quality.`
       }
     ]
   },
@@ -1015,7 +1310,7 @@ Ton : analytique mais accessible, rendre la stat émotionnelle
     platforms: ['ig'],
     blocks: [
       {
-        platform: 'Instagram Story',
+        platform: 'Instagram Story — Texte',
         images: '📎 <strong>Joins :</strong> Logo FC Porto + Logo adverse + Notre logo NewsPorto + Photo Estádio do Dragão si dispo',
         prompt: `Crée le texte pour une Story Instagram avant-match NewsPorto.
 
@@ -1028,6 +1323,30 @@ Format Story (format vertical 9:16) :
 - Sondage suggéré : "Porto gagne ?" → Oui 🔵 / Non 😬
 
 Donne-moi le texte exact pour chaque élément textuel de la story.`
+      },
+      {
+        platform: 'Instagram Story — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Format Story vertical 1080×1920 · Ajoute le sondage natif Instagram ensuite dans l\'app',
+        prompt: `Create an Instagram Story match preview image (1080x1920px, vertical 9:16 format).
+
+Visual style — NewsPorto brand:
+- Background: pure black with Porto blue (#003DA5) diagonal light rays from top corners
+- Animated-feel: design should look dynamic even as static, with motion blur lines suggesting energy
+- Typography: Bebas Neue ultra-bold for main text, condensed for details
+- Color palette: black, Porto blue #003DA5, white, and accent electric blue #4d82d4
+- Mobile-first vertical layout with clear visual hierarchy
+
+Content to show (top to bottom):
+- TOP ZONE: "AVANT-MATCH" label in small blue pill badge, centered
+- CRESTS ROW: FC Porto crest (left) | "VS" in white center with blue glow | [ADVERSAIRE] small crest placeholder (right) — at 35% from top
+- MAIN QUESTION: "[QUESTION RHÉTORIQUE ex: Ce soir, les Dragons rugissent ?]" in large white bold condensed text, centered, max 2 lines
+- INFO ROW: "[DATE] · [HEURE]H · [COMPÉTITION]" in small blue condensed text
+- SPACE: leave empty zone in bottom 30% for Instagram poll sticker overlay
+- BOTTOM: "NEWSPORTO.FR" small caps centered in muted gray just above bottom margin
+
+Background detail: faint Estádio do Dragão aerial silhouette outline (very low opacity, abstract)
+Mood: pre-match tension, anticipation, cinematic. Dark and electric.
+Aspect ratio: 9:16 vertical story. 4K quality.`
       }
     ]
   },
@@ -1037,8 +1356,8 @@ Donne-moi le texte exact pour chaque élément textuel de la story.`
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Meilleure photo du joueur durant le match (action, célébration) + Logo Porto + Note ou stats du match',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Meilleure photo du joueur durant le match (action, célébration) + Logo Porto + Note ou stats du match',
         prompt: `Post "Joueur du match" pour FC Porto.
 
 Infos :
@@ -1049,10 +1368,32 @@ Infos :
 - Note NewsPorto : [NOTE/10]
 
 Pour X : tweet MOTM percutant, 180 car., le stat choc en premier
-Pour Instagram : légende complète avec toutes ses stats, analyse de sa perf en 3-4 lignes, sa note
-
 Ton : objectif mais passionné, crédibiliser l'analyse
 #MOTM #FCPorto #Porto [#NomJoueur] #Portistas`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Joins ensuite une vraie photo du joueur en 2ème slide · Format portrait 1080×1350',
+        prompt: `Create a Man of the Match (MOTM) player spotlight Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: deep black with Porto blue spotlight beam from above-center (like a stadium player spotlight)
+- Gold star/rating energy — this is a player recognition post
+- Typography: Bebas Neue ultra-bold, white for name, gold for rating number
+- Color palette: black, Porto blue #003DA5, gold (#c9a84c), white
+
+Content to show:
+- TOP: "⭐ JOUEUR DU MATCH" in Porto blue badge, centered
+- Player name area: "[PRÉNOM NOM]" in MASSIVE gold/white all-caps Bebas text — main hero element
+- Rating badge: large circular badge with "[NOTE]/10" inside — gold border, Porto blue fill, white number
+- Stats grid (4 cells, 2x2): small clean boxes showing key stats "[STAT1]", "[STAT2]", "[STAT3]", "[STAT4]" — blue background boxes, white numbers
+- Match context: "PORTO [SCORE] [ADVERSAIRE]" in medium condensed white text
+- FC Porto crest: small top-left, subtle
+- Leave space at center for real player photo to be added in Canva overlay
+- Bottom: Porto blue bar + "NEWSPORTO.FR" white caps
+
+Mood: player tribute, cinematic spotlight, premium sports awards graphic.
+Aspect ratio: 4:5 portrait. Ultra-sharp 4K.`
       }
     ]
   },
@@ -1062,8 +1403,8 @@ Ton : objectif mais passionné, crédibiliser l'analyse
     platforms: ['x','ig'],
     blocks: [
       {
-        platform: 'X & Instagram',
-        images: '📎 <strong>Joins :</strong> Notre logo NewsPorto + Logos des clubs adverses de la semaine (PNG)',
+        platform: 'X — Texte',
+        images: '📎 <strong>Image X :</strong> Notre logo NewsPorto + Logos des clubs adverses de la semaine (PNG)',
         prompt: `Post "programme de la semaine" pour FC Porto.
 
 Matchs de la semaine :
@@ -1074,10 +1415,35 @@ Matchs de la semaine :
 Contexte : [ex: semaine charnière avec Liga + Europa League / match de 6 points, etc.]
 
 Pour X : thread ou tweet récap programme, 200 car.
-Pour Instagram : légende "Agenda de la semaine" avec les 3 matchs listé clairement, enjeux brefs
-
 Ton : anticipation, excitation contenue, professionnel
 #FCPorto #Porto #Portistas #Agenda [#CompétitionsConcernées]`
+      },
+      {
+        platform: 'Instagram — Prompt image à générer',
+        images: '📸 <strong>Image à générer</strong> · Format 1080×1350 portrait — style agenda/programme',
+        prompt: `Create a weekly match schedule Instagram post image (1080x1350px, portrait format).
+
+Visual style — NewsPorto brand:
+- Background: dark black with very faint Porto blue timeline line running vertically on left side
+- Clean editorial calendar/agenda aesthetic — organized, informative, premium
+- Typography: Bebas Neue for match titles, Barlow Condensed for dates/times/details
+- Color palette: Porto blue #003DA5, white, electric blue #4d82d4, dark gray dividers
+
+Content to show:
+- TOP: "📅 PROGRAMME DE LA SEMAINE" in Porto blue badge, left-aligned
+- FC Porto crest: top-right small, subtle
+- Match rows (repeat for each match — up to 3 rows):
+  • Date badge: "[JOUR DD/MM]" in small Porto blue square badge on left
+  • "FC PORTO vs [ADVERSAIRE]" in bold white condensed text center
+  • Competition label: "[COMPÉTITION]" in small electric blue italic text
+  • Time: "[HEURE]H" right-aligned in muted gray
+  • Thin gray divider line between each match row
+- Context line at bottom of matches: "[CONTEXTE EX: Semaine décisive pour le titre]" in small italic muted text
+- Bottom: Porto blue strip + "NEWSPORTO.FR" caps
+
+Background texture: ultra-faint calendar grid at ~3% opacity
+Mood: organized, professional, anticipatory. Dark editorial meets sports agenda.
+Aspect ratio: 4:5 portrait. 4K sharp quality.`
       }
     ]
   }
@@ -1100,17 +1466,18 @@ function renderPrompts() {
         <span class="scenario-toggle">+</span>
       </div>
       <div class="scenario-body">
-        ${s.blocks.map((b, bi) => `
+        ${s.blocks.map((b, bi) => {
+          const isImgPrompt = b.platform.toLowerCase().includes('prompt image');
+          return `
           <div class="prompt-block">
-            <div class="prompt-platform">${b.platform}</div>
-            <div class="prompt-images-box">📎 ${b.images}</div>
-            <div class="prompt-text-box">
+            <div class="prompt-platform${isImgPrompt ? ' img-prompt-label' : ''}">${b.platform}${isImgPrompt ? ' <span style="font-size:8px;letter-spacing:1px;background:rgba(225,48,108,.18);color:var(--ig-color);padding:2px 7px;border-radius:2px;margin-left:6px;">🖼 GÉNÉRATION D\'IMAGE</span>' : ''}</div>
+            <div class="prompt-images-box${isImgPrompt ? ' img-prompt-box' : ''}">📎 ${b.images}</div>
+            <div class="prompt-text-box${isImgPrompt ? ' img-prompt-text' : ''}">
               <pre class="prompt-text">${escHtml(b.prompt)}</pre>
               <button class="btn-copy-prompt" onclick="copyPrompt(${idx},${bi},this)">📋 Copier</button>
             </div>
             ${b.note ? `<p class="prompt-note">💡 ${b.note}</p>` : ''}
-          </div>
-        `).join('')}
+          </div>`}).join('')}
       </div>
     </div>
   `).join('');
