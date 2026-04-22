@@ -1256,7 +1256,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     "wordCount":body.split(/\s+/).length,
     "timeRequired":"PT"+readTime+"M"
   });
-  const schemaTag='<script type="application/ld+json">'+schema.replace(/<\/script>/gi,'<\/script>')+'<\/script>';
+  const schemaTag='<script type="application/ld+json">'+schema.replace(/<\//g,'\\u003C/')+'</script>';
 
   // ── SEO : BreadcrumbList schema ──
   const breadcrumbSchema=JSON.stringify({
@@ -1267,7 +1267,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       {"@type":"ListItem","position":3,"name":title,"item":"https://newsporto.fr/articles/"+slug+".html"}
     ]
   });
-  const breadcrumbTag='<script type="application/ld+json">'+breadcrumbSchema.replace(/<\/script>/gi,'<\/script>')+'<\/script>';
+  const breadcrumbTag='<script type="application/ld+json">'+breadcrumbSchema.replace(/<\//g,'\\u003C/')+'</script>';
 
   // ── SEO : Person schema auteur ──
   const authorSchema=JSON.stringify({
@@ -1276,7 +1276,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     "worksFor":{"@type":"Organization","name":"NewsPorto","url":"https://newsporto.fr"},
     "sameAs":["https://twitter.com/NewsPortoFR","https://newsporto.fr"]
   });
-  const authorTag='<script type="application/ld+json">'+authorSchema.replace(/<\/script>/gi,'<\/script>')+'<\/script>';
+  const authorTag='<script type="application/ld+json">'+authorSchema.replace(/<\//g,'\\u003C/')+'</script>';
 
   // ── SEO : WebSite schema ──
   const webSiteSchema=JSON.stringify({
@@ -1284,7 +1284,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     "name":"NewsPorto","url":"https://newsporto.fr",
     "potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://newsporto.fr/actu.html?q={search_term_string}"},"query-input":"required name=search_term_string"}
   });
-  const webSiteTag='<script type="application/ld+json">'+webSiteSchema.replace(/<\/script>/gi,'<\/script>')+'<\/script>';
+  const webSiteTag='<script type="application/ld+json">'+webSiteSchema.replace(/<\//g,'\\u003C/')+'</script>';
 
   // ── Traitement corps : conversion [H2]…[/H2] et [H3]…[/H3] en vrais titres HTML ──
   // Puis séparation en paragraphes
@@ -1387,7 +1387,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   ${schemaTag}
   ${breadcrumbTag}
   ${webSiteTag}
-  ${faqSchema ? '<script type="application/ld+json">'+faqSchema.replace(/<\/script>/gi,'<\\/script>')+'<\\/script>' : ''}
+  ${faqSchema ? '<script type="application/ld+json">'+faqSchema.replace(/<\//g,'\\u003C/')+'<\/script>' : ''}
   <style>
     :root{--white:#fff;--gray:rgba(255,255,255,.45);--border:rgba(255,255,255,.1);--grid:rgba(255,255,255,.055)}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
