@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Thu, 28 May 2026 09:19:27 GMT</lastBuildDate>
+    <lastBuildDate>Thu, 28 May 2026 09:38:40 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[FC Porto officialise le départ de Moffi cet été]]></title>
+      <link>https://newsporto.fr/articles/fc-porto-officialise-le-depart-de-moffi-cet-ete.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/fc-porto-officialise-le-depart-de-moffi-cet-ete.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[[RESUME]Le FC Porto officialise le départ de Terem Moffi après une saison en prêt mitigée, marquant le début d'une restructuration offensive ambitieuse pour la saison prochaine.…]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://www.sofoot.com/convert/LzIwMjYvMDMvMTIyMDQxMjEvMTMzMzc5MTYtMTQwMHg5MzMuanBn/image/terem-moffi-fait-gagner-porto.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[Kauã Elias : le FC Porto frappe fort pour la pépite brésilienne]]></title>
       <link>https://newsporto.fr/articles/kaua-elias-le-fc-porto-frappe-fort-pour-la-pepite-bresilienn.html</link>
@@ -204,16 +214,6 @@
       <description><![CDATA[Les Dragons défient Nottingham Forest en quart de finale retour d'Europa League. Découvrez les compositions probables, les forces en présence et les enjeux de ce choc décisif.]]></description>
       <category><![CDATA[Europa League]]></category>
       <enclosure url="https://editorial.uefa.com/resources/02a4-205b4128cdcf-e59863bd8f5d-1000/fc_porto_v_nottingham_forest_fc_-_uefa_europa_league_2025_26_quarter-final_first_leg.jpeg" type="image/jpeg"/>
-      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
-    </item>
-    <item>
-      <title><![CDATA[Mercato : Le Bayern Munich s'intéresse de près à une pépite du FC Porto]]></title>
-      <link>https://newsporto.fr/articles/la-bayern-se-penche-sur-une-pepite-du-fc-porto.html</link>
-      <guid isPermaLink="true">https://newsporto.fr/articles/la-bayern-se-penche-sur-une-pepite-du-fc-porto.html</guid>
-      <pubDate>Invalid Date</pubDate>
-      <description><![CDATA[Le géant bavarois aurait ciblé l'un des jeunes talents les plus prometteurs des Dragons pour le prochain mercato estival. Une offre record pourrait bientôt arriver sur la table.]]></description>
-      <category><![CDATA[Mercato]]></category>
-      <enclosure url="https://images.impresa.pt/sicnot/2026-01-07-oskar-pietuszewski--7686bc06/original" type="image/jpeg"/>
       <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
     </item>
   </channel>
