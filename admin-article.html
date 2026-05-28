@@ -1801,15 +1801,21 @@ async function publish() {
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
     .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
   const readTime = Math.max(2,Math.ceil(body.split(/\s+/).length/200));
+  const stripTags = s => s
+    .replace(/\[BREF\].*?\[\/BREF\]/gs,'')
+    .replace(/\[RESUME\](.*?)\[\/RESUME\]/gs,'$1')
+    .replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1')
+    .replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1')
+    .trim();
   const firstPara = (()=>{
     const paras = body.split(/\n\n/);
     for(const p of paras){
-      const clean = p.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+      const clean = stripTags(p);
       if(clean.length > 30) return clean;
     }
     return paras[0]||'';
   })();
-  const firstParaClean = firstPara.replace(/\[BREF\].*?\[\/BREF\]/gs,'').replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const firstParaClean = stripTags(firstPara);
   const excerpt  = firstParaClean.length>180 ? firstParaClean.slice(0,177)+'…' : firstParaClean;
   const fileName = `${slug}.html`;
   const filePath = `articles/${fileName}`;
