@@ -1324,12 +1324,14 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       // Retirer d'éventuels [BREF], [RESUME] ou [QUOTE] résiduels inline
       const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[RESUME\](.*?)\[\/RESUME\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
       if (!clean) return;
-      const isDc = !firstParaInserted; firstParaInserted=true;
+      const looksLikeTitle = /^[A-ZÀÂÄÉÈÊËÎÏÔÖÙÛÜÇ0-9\s:!?«»—–]{12,}$/.test(clean.trim());
+      const isDc = !firstParaInserted && !looksLikeTitle;
+      if (!looksLikeTitle) firstParaInserted = true;
       parasArr.push(`      <p${isDc?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
       // Insérer l'image inline après le 3e paragraphe de texte
       if (!imgInserted && inlineUrl) {
         const textParas = parasArr.filter(p => p.trim().startsWith('<p')).length;
-        if (textParas === 3) {
+        if (textParas === 4) {
           const altTxt = (typeof imgAlt!=='undefined'&&imgAlt) ? imgAlt : title+' — FC Porto';
           parasArr.push(`      <figure class="afig">\n        <img src="${inlineUrl}" alt="${altTxt}" loading="lazy">\n      </figure>`);
           imgInserted = true;
@@ -1526,7 +1528,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   <div class="gbg"></div>
   <div class="pg">
     <nav>
-      <a href="../index.html" class="nlogo">
+      <a href="/" class="nlogo">
         <img src="../Logo.png" alt="NewsPorto — Actualité FC Porto" onerror="this.style.display='none'">
         <span class="nlogt">NewsPorto</span>
       </a>
@@ -1587,7 +1589,7 @@ ${paras}
       <button class="popup-close" onclick="closePopup()">✕</button>
       <p class="popup-eyebrow">NewsPorto · Rester informé</p>
       <p class="popup-title">Rejoins la <span>communauté</span></p>
-      <p class="popup-desc">Plus de 500 Portistas déjà présents. Reçois toute l'actu du FC Porto directement dans ta boîte mail.</p>
+      <p class="popup-desc">Reçois toute l'actu du FC Porto directement dans ta boîte mail.</p>
       <div class="popup-form">
         <input class="popup-input" type="email" id="popup-email" placeholder="ton@email.com" autocomplete="email">
         <button class="popup-submit" id="popup-submit-btn" onclick="subscribeEmail()">S'abonner</button>
