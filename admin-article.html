@@ -1060,20 +1060,26 @@ MISSION STRICTE — ne fais QUE ces 4 actions :
    - Identifie les titres/sous-titres existants dans l'article et entoure-les : [H2]Titre[/H2] ou [H3]Sous-titre[/H3]
    - S'il n'y a pas de titres évidents, insère des [H2] thématiques pertinents tous les 2-3 paragraphes (texte court du titre uniquement, sans modifier les paragraphes)
 
-2. ENCADRÉ EN BREF :
-   - Au tout début (avant le premier paragraphe), insère une ligne : [BREF]point 1|point 2|point 3[/BREF]
-   - Les 3 points résument l'article en moins de 10 mots chacun, basés sur le contenu existant
+2. ENCADRÉ EN BREF (à CRÉER obligatoirement) :
+   - Au tout début (avant le premier paragraphe), insère : [BREF]point 1|point 2|point 3[/BREF]
+   - Les 3 points sont rédigés par toi en résumant les faits clés de l'article, moins de 10 mots chacun
+   - Exemple : [BREF]Porto s'impose 2-1 face au Sporting|Diogo Costa auteur d'un arrêt décisif|Porto reste 1er de Liga[/BREF]
 
-3. CITATION FORTE :
+3. RÉSUMÉ INTRODUCTIF (à CRÉER obligatoirement) :
+   - Juste après le [BREF] et avant le premier paragraphe du texte, insère 1 à 2 phrases percutantes qui synthétisent l'essentiel de l'article
+   - Marque ce résumé avec [RESUME]texte du résumé[/RESUME]
+   - Exemple : [RESUME]Dans un match intense à l'Estádio do Dragão, le FC Porto a arraché la victoire en toute fin de match grâce à un but de Galeno.[/RESUME]
+
+4. CITATION FORTE :
    - Si l'article contient une citation directe, un chiffre marquant ou une phrase d'accroche forte, entoure-la : [QUOTE]texte[/QUOTE] (1 seule fois)
    - Si aucune n'est évidente, ne pas en créer
 
-4. CORRECTIONS DE FORME (uniquement) :
+5. CORRECTIONS DE FORME (uniquement) :
    - Supprime les ** * # en début de ligne (Markdown résiduel)
    - Assure-toi que les paragraphes sont bien séparés par une ligne vide
    - Ne corrige PAS le style, le vocabulaire ou les faits — texte inchangé sinon
 
-RÈGLE ABSOLUE : Le texte de l'article (tous les mots, phrases, paragraphes) doit rester IDENTIQUE à ce qui t'est envoyé. Tu ajoutes uniquement les balises ci-dessus autour ou entre les blocs existants. Aucune réécriture, aucun ajout de contenu.
+RÈGLE ABSOLUE : Le texte de l'article (tous les mots, phrases, paragraphes) doit rester IDENTIQUE à ce qui t'est envoyé. Seuls le [BREF], le [RESUME] et les balises de structure sont créés/ajoutés par toi. Aucune autre réécriture ou ajout.
 
 FORMAT SORTIE : texte brut avec balises, paragraphes séparés par ligne vide. Pas de Markdown. Pas de commentaires ni d'explications.`;
 
@@ -1227,7 +1233,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
   const titleTag=`${title} — FC Porto · NewsPorto`;
 
   // ── SEO : meta description enrichie — nettoyée de toutes balises ──
-  const excerptClean=excerpt.replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
+  const excerptClean=excerpt.replace(/\[H[23]\](.*?)\[\/H[23]\]/g,'$1').replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[RESUME\](.*?)\[\/RESUME\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'$1').trim();
   const metaDesc=excerptClean.length>155?excerptClean.slice(0,152)+'…':excerptClean;
 
   // ── SEO : mots-clés keywords ──
@@ -1306,12 +1312,15 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
       const points = brefContent.split('|').map(p=>p.trim()).filter(Boolean);
       parasArr.push(`      <div class="a-bref"><p class="a-bref-label">En bref</p><ul>${points.map(p=>`<li>${p}</li>`).join('')}</ul></div>`);
       brefInserted=true;
+    } else if (/^\[RESUME\]/.test(trimmed)) {
+      const rt = trimmed.replace(/^\[RESUME\]/,'').replace(/\[\/RESUME\]$/,'').trim();
+      parasArr.push(`      <p class="a-resume">${rt}</p>`);
     } else if (/^\[QUOTE\]/.test(trimmed)) {
       const qt = trimmed.replace(/^\[QUOTE\]/,'').replace(/\[\/QUOTE\]$/,'').trim();
       parasArr.push(`      <blockquote class="a-quote">${qt}</blockquote>`);
     } else {
-      // Retirer d'éventuels [BREF] ou [QUOTE] résiduels inline
-      const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
+      // Retirer d'éventuels [BREF], [RESUME] ou [QUOTE] résiduels inline
+      const clean = trimmed.replace(/\[BREF\].*?\[\/BREF\]/g,'').replace(/\[RESUME\](.*?)\[\/RESUME\]/g,'$1').replace(/\[QUOTE\](.*?)\[\/QUOTE\]/g,'<blockquote class="a-quote">$1</blockquote>').trim();
       if (!clean) return;
       const isDc = !firstParaInserted; firstParaInserted=true;
       parasArr.push(`      <p${isDc?' class="dc"':''}>${clean.replace(/\n/g,'<br>')}</p>`);
@@ -1409,6 +1418,7 @@ function buildHTML(slug,title,cat,coverUrl,inlineUrl,body,excerpt,dateStr,readTi
     .abdy{padding:52px 52px 52px 48px;border-right:1px solid var(--border)}
     .abdy p{font-size:17px;line-height:1.9;color:rgba(255,255,255,.82);margin-bottom:28px}
     .abdy p.dc::first-letter{font-family:'Bebas Neue',sans-serif;font-size:72px;line-height:.82;float:left;margin-right:12px;margin-top:4px;color:var(--white)}
+    .a-resume{font-size:16px!important;line-height:1.75!important;color:rgba(255,255,255,.65)!important;font-style:italic;border-left:2px solid rgba(0,61,165,.55);padding-left:16px;margin-bottom:32px!important}
     .a-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3vw,38px);letter-spacing:.5px;line-height:1;color:var(--white);margin:52px 0 20px;padding-top:16px;border-top:1px solid rgba(255,255,255,.1)}
     .a-h3{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,.75);margin:28px 0 14px}
     .apull{border-left:2px solid rgba(255,255,255,.15);padding:20px 24px;margin:32px 0;font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:rgba(255,255,255,.6);line-height:1.3}
