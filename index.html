@@ -2869,10 +2869,10 @@ img[loading="lazy"].loaded { opacity: 1; }
       }
 
 
-      // --- GRILLE : 3 derniers articles ---
+      // --- GRILLE : 3 articles suivants (skip le 1er = déjà à la une) ---
       const grid = document.getElementById('articles-grid');
       const cards = grid.querySelectorAll('.article-card');
-      articles.slice(0, 3).forEach((a, i) => {
+      articles.slice(1, 4).forEach((a, i) => {
         const card = cards[i];
         if (!card) return;
         const cat = catLabels[a.category] || a.category;
