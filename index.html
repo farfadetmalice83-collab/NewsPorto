@@ -2009,6 +2009,17 @@ img[loading="lazy"].loaded { opacity: 1; }
   #back-to-top { position: fixed !important; right: 28px !important; left: auto !important; bottom: 28px !important; }
   @media (max-width:600px) { #back-to-top { right:16px !important; bottom:16px !important; } }
   </style>
+  <style>
+  /* ── SUPPRIME L'ESPACE AU DESSUS DU MENU ── */
+  html, body { margin: 0 !important; padding: 0 !important; }
+  .skip-to-content { position: fixed !important; top: -100px !important; }
+  #nav-progress { top: 0 !important; }
+  .page, #main-content { margin-top: 0 !important; padding-top: 0 !important; }
+  nav { margin-top: 0 !important; top: 0 !important; }
+  body > .grid-bg,
+  body > #cursor-glow,
+  body > #page-loader { position: fixed !important; }
+  </style>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
@@ -2461,7 +2472,7 @@ img[loading="lazy"].loaded { opacity: 1; }
   <!-- NEWSLETTER -->
   <section class="newsletter-section reveal">
     <h2 class="newsletter-title">Rejoins la communauté</h2>
-    <p class="newsletter-sub">Plus de 500 Portistas déjà présents · Actu, débats &amp; lives</p>
+
     <div class="discord-members"><span>★</span> Serveur Discord officiel NewsPorto</div>
     <a href="https://discord.gg/YCcuMHmGcH" target="_blank" class="discord-btn">
       <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
