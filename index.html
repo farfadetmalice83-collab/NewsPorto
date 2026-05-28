@@ -231,9 +231,10 @@
     /* ── HERO CENTRE : team photo ── */
     .hero-visual {
       display: flex;
-      align-items: flex-end;
+      align-items: stretch;
       justify-content: center;
       position: relative;
+      overflow: hidden;
     }
     /* Glow bleu foncé — z-index 0, DERRIÈRE l'image */
     .hero-visual::before {
@@ -246,15 +247,79 @@
       pointer-events: none;
       filter: blur(32px);
     }
+    /* ── HERO IMAGE WRAPPER — adapte tous les formats ── */
+    .hero-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 420px;
+      overflow: hidden;
+      z-index: 1;
+    }
     .hero-team-img {
       display: block;
       width: 100%;
-      height: auto;
-      position: relative;
-      z-index: 1; /* au-dessus du glow */
-      /* Fondu bas */
-      mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
-      -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      object-fit: cover;
+      object-position: center top;
+      z-index: 1;
+      /* Fondu bas + droite */
+      mask-image:
+        linear-gradient(to bottom, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%),
+        linear-gradient(to left,   rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image:
+        linear-gradient(to bottom, rgba(0,0,0,1) 30%, rgba(0,0,0,0) 100%),
+        linear-gradient(to left,   rgba(0,0,0,1) 60%, rgba(0,0,0,0) 100%);
+      mask-composite: intersect;
+      -webkit-mask-composite: destination-in;
+    }
+    /* Effet : scan line bleu qui passe sur l'image */
+    .hero-img-wrapper::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      background: linear-gradient(
+        105deg,
+        transparent 0%,
+        transparent 40%,
+        rgba(0,61,165,0.12) 50%,
+        transparent 60%,
+        transparent 100%
+      );
+      animation: imgScan 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes imgScan {
+      0%   { background-position: -100% 0; opacity: 0; }
+      20%  { opacity: 1; }
+      80%  { opacity: 1; }
+      100% { background-position: 200% 0; opacity: 0; }
+    }
+    /* Vignette bleue en bas */
+    .hero-img-wrapper::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 60%;
+      background: linear-gradient(to top, rgba(0,20,80,0.35) 0%, transparent 100%);
+      z-index: 2;
+      pointer-events: none;
+    }
+    /* Bordure lumineuse bleue animée sur le contour gauche */
+    .hero-img-edge {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(to bottom, transparent, rgba(0,80,220,0.8), rgba(0,61,165,0.4), transparent);
+      z-index: 3;
+      animation: edgePulse 3s ease-in-out infinite;
+    }
+    @keyframes edgePulse {
+      0%, 100% { opacity: 0.4; box-shadow: 0 0 6px rgba(0,80,220,0.4); }
+      50%       { opacity: 1;   box-shadow: 0 0 18px rgba(0,80,220,0.9); }
     }
     /* ── HERO RIGHT : logo + wordmark ── */
     .hero-logo-wrap {
@@ -985,14 +1050,13 @@
 
     /* Image : monte depuis le bas + flash bleu + scale dramatique */
     .hero-team-img {
-      animation: imgReveal 1.6s cubic-bezier(.16,1,.3,1) both;
-      animation-delay: 0.2s;
+      animation: imgReveal 1.4s cubic-bezier(.16,1,.3,1) both, heroZoom 10s ease-in-out 1.4s infinite;
+      animation-delay: 0.2s, 1.4s;
     }
     @keyframes imgReveal {
-      0%   { opacity: 0; transform: translateY(80px) scale(0.88); filter: drop-shadow(0 0 0px rgba(0,61,165,0)) brightness(0.3); }
-      45%  { opacity: 1; transform: translateY(-8px) scale(1.03); filter: drop-shadow(0 0 100px rgba(0,120,255,0.9)) brightness(1.4); }
-      65%  { filter: drop-shadow(0 0 60px rgba(0,80,220,0.7)) brightness(1.1); }
-      100% { opacity: 1; transform: translateY(0) scale(1); filter: drop-shadow(0 0 40px rgba(0,61,165,0.5)) brightness(1); }
+      0%   { opacity: 0; transform: scale(1.08); filter: brightness(0.4) saturate(0.5); }
+      60%  { opacity: 1; transform: scale(1.02); filter: brightness(1.1) saturate(1.15); }
+      100% { opacity: 1; transform: scale(1);    filter: brightness(1) saturate(1.05); }
     }
 
     /* Rings : explosent vers l'extérieur à l'arrivée */
@@ -1129,14 +1193,14 @@
       50% { opacity: 1; transform: translateX(-50%) scale(1.12); }
     }
 
-    /* ══ HERO IMG FLOAT ══════════════════════════════════ */
+    /* ══ HERO IMG SUBTLE ZOOM ══════════════════════════════════ */
     .hero-team-img {
-      animation: heroFloat 6s ease-in-out infinite;
+      animation: heroZoom 10s ease-in-out infinite;
       will-change: transform;
     }
-    @keyframes heroFloat {
-      0%, 100% { filter: drop-shadow(0 0 40px rgba(0,61,165,0.5)); }
-      50% { filter: drop-shadow(0 0 80px rgba(0,100,255,0.7)); }
+    @keyframes heroZoom {
+      0%, 100% { transform: scale(1);    filter: brightness(0.95) saturate(1.05); }
+      50%       { transform: scale(1.04); filter: brightness(1.02) saturate(1.12); }
     }
 
     /* ══ RING ORBITS ════════════════════════════════════ */
@@ -1301,20 +1365,26 @@
         position: relative !important;
         order: 0;
         width: 100% !important;
-        min-height: 320px !important;
-        max-height: 420px !important;
+        min-height: 260px !important;
+        max-height: 360px !important;
         overflow: hidden !important;
         display: flex !important;
-        align-items: flex-end !important;
+        align-items: stretch !important;
         justify-content: center !important;
+      }
+      .hero-img-wrapper {
+        min-height: 260px !important;
+        max-height: 360px !important;
+        height: 360px !important;
       }
       .hero-team-img {
         width: 100% !important;
-        max-width: 100% !important;
-        height: auto !important;
-        max-height: 420px !important;
+        height: 100% !important;
+        max-height: none !important;
         object-fit: cover !important;
-        object-position: center top !important;
+        object-position: center 20% !important;
+        mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%) !important;
+        -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%) !important;
       }
       .hero-logo-wrap { display: none !important; }
       #particles-canvas { display: none !important; }
@@ -2112,7 +2182,10 @@ img[loading="lazy"].loaded { opacity: 1; }
       <div class="hero-ring hero-ring-1"></div>
       <div class="hero-ring hero-ring-2"></div>
       <div class="hero-ring hero-ring-3"></div>
-      <img id="hero-side-img" src="" alt="" class="hero-team-img" loading="eager">
+      <div class="hero-img-wrapper">
+        <div class="hero-img-edge"></div>
+        <img id="hero-side-img" src="" alt="" class="hero-team-img" loading="eager">
+      </div>
     </div>
 
   </section>
