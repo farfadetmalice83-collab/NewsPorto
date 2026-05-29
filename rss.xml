@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Fri, 29 May 2026 13:34:56 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 13:44:32 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -16,6 +16,16 @@
       <link>https://newsporto.fr</link>
     </image>
     
+    <item>
+      <title><![CDATA[Seko Fofana quitte le FC Porto après un prêt couronné de succès]]></title>
+      <link>https://newsporto.fr/articles/seko-fofana-quitte-le-fc-porto-apres-un-pret-couronne-de-suc.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/seko-fofana-quitte-le-fc-porto-apres-un-pret-couronne-de-suc.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le FC Porto officialise le départ de Seko Fofana, dont le passage éclair a marqué l'histoire du club en contribuant au titre de Liga. L'Ivoirien retrouve le Stade Rennais et son…]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://footafrique24.com/wp-content/uploads/2026/04/image_1200x675_v26.webp" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
     <item>
       <title><![CDATA[Mauro Júnior FC Porto la pépite brésilienne qui fait rêver Farioli]]></title>
       <link>https://newsporto.fr/articles/mauro-junior-fc-porto-la-pepite-bresilienne-qui-fait-rever-f.html</link>
@@ -204,16 +214,6 @@
       <description><![CDATA[Le président André Villas-Boas a officialisé un partenariat entre le club et l'Association Commerciale du Porto (ACP). Une alliance ancrée dans l'histoire et le développement économique de la ville.]]></description>
       <category><![CDATA[Analyse]]></category>
       <enclosure url="https://cdn-s-www.ledauphine.com/images/9438FD0D-2EA7-4CAA-8B3F-2BD77DA6E12F/NW_raw/andre-villas-boas-a-detrone-l-ancien-president-du-fc-porto-a-la-tete-du-club-depuis-42-ans-photo-sipa-pedro-granadeiro-1714296257.jpg" type="image/jpeg"/>
-      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
-    </item>
-    <item>
-      <title><![CDATA[Le FC Porto et l'Université de Porto s'unissent pour l'innovation numérique]]></title>
-      <link>https://newsporto.fr/articles/partenariat-stategique-entre-l-universite-de-porto-et-le-fc-.html</link>
-      <guid isPermaLink="true">https://newsporto.fr/articles/partenariat-stategique-entre-l-universite-de-porto-et-le-fc-.html</guid>
-      <pubDate>Invalid Date</pubDate>
-      <description><![CDATA[Une collaboration stratégique vient d'être scellée pour révolutionner l'usage de la Data Science au sein du club. Cette alliance promet de moderniser l'analyse des performances sportives.]]></description>
-      <category><![CDATA[Analyse]]></category>
-      <enclosure url="https://www.eugloh.eu/fileadmin/_processed_/2/b/csm_University-of-Porto_b117dc0d54.jpg" type="image/jpeg"/>
       <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
     </item>
   </channel>
