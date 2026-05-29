@@ -8,7 +8,7 @@
     <link>https://newsporto.fr</link>
     <description>Le média FC Porto en français. Transferts, analyses, Liga Portugal, Europa League.</description>
     <language>fr-FR</language>
-    <lastBuildDate>Thu, 28 May 2026 09:38:40 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 29 May 2026 13:34:56 GMT</lastBuildDate>
     <atom:link href="https://newsporto.fr/rss.xml" rel="self" type="application/rss+xml"/>
     <image>
       <url>https://newsporto.fr/Logo.png</url>
@@ -17,11 +17,21 @@
     </image>
     
     <item>
+      <title><![CDATA[Mauro Júnior FC Porto la pépite brésilienne qui fait rêver Farioli]]></title>
+      <link>https://newsporto.fr/articles/mauro-junior-fc-porto-la-pepite-bresilienne-qui-fait-rever-f.html</link>
+      <guid isPermaLink="true">https://newsporto.fr/articles/mauro-junior-fc-porto-la-pepite-bresilienne-qui-fait-rever-f.html</guid>
+      <pubDate>Invalid Date</pubDate>
+      <description><![CDATA[Le FC Porto lance une offensive pour recruter Mauro Júnior, le polyvalent Brésilien du PSV Eindhoven, dont la clause libératoire attractive de 18M€ attire plusieurs grands clubs…]]></description>
+      <category><![CDATA[Mercato]]></category>
+      <enclosure url="https://a2.espncdn.com/combiner/i?img=%2Fphoto%2F2022%2F0217%2Fr975409_1296x729_16%2D9.jpg" type="image/jpeg"/>
+      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
+    </item>
+    <item>
       <title><![CDATA[FC Porto officialise le départ de Moffi cet été]]></title>
       <link>https://newsporto.fr/articles/fc-porto-officialise-le-depart-de-moffi-cet-ete.html</link>
       <guid isPermaLink="true">https://newsporto.fr/articles/fc-porto-officialise-le-depart-de-moffi-cet-ete.html</guid>
       <pubDate>Invalid Date</pubDate>
-      <description><![CDATA[[RESUME]Le FC Porto officialise le départ de Terem Moffi après une saison en prêt mitigée, marquant le début d'une restructuration offensive ambitieuse pour la saison prochaine.…]]></description>
+      <description><![CDATA[Le FC Porto officialise le départ de Terem Moffi après une saison en prêt mitigée, marquant le début d'une restructuration offensive ambitieuse pour la saison prochaine.…]]></description>
       <category><![CDATA[Mercato]]></category>
       <enclosure url="https://www.sofoot.com/convert/LzIwMjYvMDMvMTIyMDQxMjEvMTMzMzc5MTYtMTQwMHg5MzMuanBn/image/terem-moffi-fait-gagner-porto.jpg" type="image/jpeg"/>
       <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
@@ -31,7 +41,7 @@
       <link>https://newsporto.fr/articles/kaua-elias-le-fc-porto-frappe-fort-pour-la-pepite-bresilienn.html</link>
       <guid isPermaLink="true">https://newsporto.fr/articles/kaua-elias-le-fc-porto-frappe-fort-pour-la-pepite-bresilienn.html</guid>
       <pubDate>Invalid Date</pubDate>
-      <description><![CDATA[[RESUME]Le FC Porto mise gros sur le jeune prodige brésilien Kauã Elias, avec une offre record de 22 millions d'euros pour structurer son attaque autour d'un talent générationne…]]></description>
+      <description><![CDATA[Le FC Porto mise gros sur le jeune prodige brésilien Kauã Elias, avec une offre record de 22 millions d'euros pour structurer son attaque autour d'un talent générationne…]]></description>
       <category><![CDATA[Mercato]]></category>
       <enclosure url="https://pictures.tribuna.com/image/6833b2fb-b089-4ec8-90ff-f61dd6310904?width=1920&quality=70" type="image/jpeg"/>
       <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
@@ -204,16 +214,6 @@
       <description><![CDATA[Une collaboration stratégique vient d'être scellée pour révolutionner l'usage de la Data Science au sein du club. Cette alliance promet de moderniser l'analyse des performances sportives.]]></description>
       <category><![CDATA[Analyse]]></category>
       <enclosure url="https://www.eugloh.eu/fileadmin/_processed_/2/b/csm_University-of-Porto_b117dc0d54.jpg" type="image/jpeg"/>
-      <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
-    </item>
-    <item>
-      <title><![CDATA[Nottingham Forest – FC Porto : Le grand soir européen approche au City Ground]]></title>
-      <link>https://newsporto.fr/articles/nottingham-forest-fc-porto-jeudi-a-21h-les-compos-probables.html</link>
-      <guid isPermaLink="true">https://newsporto.fr/articles/nottingham-forest-fc-porto-jeudi-a-21h-les-compos-probables.html</guid>
-      <pubDate>Invalid Date</pubDate>
-      <description><![CDATA[Les Dragons défient Nottingham Forest en quart de finale retour d'Europa League. Découvrez les compositions probables, les forces en présence et les enjeux de ce choc décisif.]]></description>
-      <category><![CDATA[Europa League]]></category>
-      <enclosure url="https://editorial.uefa.com/resources/02a4-205b4128cdcf-e59863bd8f5d-1000/fc_porto_v_nottingham_forest_fc_-_uefa_europa_league_2025_26_quarter-final_first_leg.jpeg" type="image/jpeg"/>
       <source url="https://newsporto.fr/rss.xml">NewsPorto</source>
     </item>
   </channel>
