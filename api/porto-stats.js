@@ -1,307 +1,168 @@
 // api/porto-stats.js — Vercel Serverless Function
-//
-// DEUX APIs :
-//   football-data.org  → classement, calendrier, résultats  (clé : FOOTBALL_API_KEY)
-//   API-Football       → stats live pendant un match         (clé : API_FOOTBALL_KEY)
-//
-// STRATÉGIE QUOTA API-Football (100 req/jour) :
-//   - Hors match  : 0 requête API-Football
-//   - Pendant match : 1 requête toutes les 2 min = ~50 req/match
-//   - Le frontend poll toutes les 120s (pas 60s)
+// Utilise UNIQUEMENT API-Football (v3.football.api-sports.io)
+// Clé : AF_KEY (100 req/jour sur plan gratuit)
 
-const FD_BASE    = 'https://api.football-data.org/v4';
-const AF_BASE    = 'https://v3.football.api-sports.io';
-const PORTO_FD   = 503;    // ID FC Porto sur football-data.org
-const PORTO_AF   = 212;    // ID FC Porto sur API-Football
-const LIGA_CODE  = 'PPL';
-const LIGA_AF    = 94;     // ID Liga Portugal sur API-Football
-const SEASON     = 2025;
-
-// ── Helpers fetch ────────────────────────────────────────────────────────────
-
-async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-async function fetchFD(path, retries = 2) {
-  const res = await fetch(`${FD_BASE}${path}`, {
-    headers: { 'X-Auth-Token': process.env.FOOTBALL_API_KEY }
-  });
-  if (res.status === 404) return null;
-  if (res.status === 429 && retries > 0) {
-    // Rate limited — wait 6s and retry
-    await sleep(6000);
-    return fetchFD(path, retries - 1);
-  }
-  if (!res.ok) throw new Error(`football-data ${res.status} ${path}`);
-  return res.json();
-}
+const AF_BASE  = 'https://v3.football.api-sports.io';
+const PORTO_ID = 212;   // FC Porto sur API-Football
+const LIGA_ID  = 94;    // Liga Portugal
+const SEASON   = 2025;
 
 async function fetchAF(path) {
   const res = await fetch(`${AF_BASE}${path}`, {
     headers: { 'x-apisports-key': process.env.AF_KEY }
   });
   if (!res.ok) throw new Error(`api-football ${res.status} ${path}`);
-  return res.json();
-}
-
-// ── Extraire lineup depuis football-data.org ─────────────────────────────────
-
-function extractLineup(detail, competition) {
-  if (!detail?.lineups) return null;
-  const porto = detail.lineups.find(l => l.team?.id === PORTO_FD);
-  if (!porto) return null;
-  const map = p => ({
-    number:   p.shirtNumber ?? p.shirt_number ?? null,
-    name:     p.player?.name ?? p.name ?? '—',
-    position: p.position ?? null,
-  });
-  return {
-    competition: competition ?? '',
-    formation:   porto.formation ?? null,
-    startXI:     (porto.startXIs ?? porto.lineup ?? []).map(map),
-    bench:       (porto.bench ?? []).map(map),
-  };
-}
-
-// ── Extraire events depuis football-data.org ─────────────────────────────────
-
-function extractEvents(detail) {
-  if (!detail) return [];
-  const events = [];
-  (detail.goals || []).forEach(g => events.push({
-    minute:     g.minute ?? null,
-    type:       g.type === 'OWN_GOAL' ? 'OWN_GOAL' : g.type === 'PENALTY' ? 'PENALTY' : 'GOAL',
-    playerName: g.scorer?.name ?? '—',
-    assistName: g.assist?.name ?? null,
-    teamId:     g.team?.id ?? null,
-    teamName:   g.team?.shortName ?? g.team?.name ?? null,
-  }));
-  (detail.bookings || []).forEach(b => events.push({
-    minute:     b.minute ?? null,
-    type:       b.card === 'RED_CARD' ? 'RED_CARD' : 'YELLOW_CARD',
-    playerName: b.player?.name ?? '—',
-    teamId:     b.team?.id ?? null,
-    teamName:   b.team?.shortName ?? b.team?.name ?? null,
-  }));
-  (detail.substitutions || []).forEach(s => events.push({
-    minute:        s.minute ?? null,
-    type:          'SUBSTITUTION',
-    playerName:    s.playerIn?.name ?? '—',
-    playerOutName: s.playerOut?.name ?? null,
-    teamId:        s.team?.id ?? null,
-    teamName:      s.team?.shortName ?? s.team?.name ?? null,
-  }));
-  return events.sort((a, b) => (a.minute ?? 0) - (b.minute ?? 0));
-}
-
-// Version optimisée : 1 seule requête AF pour fixture ID + stats
-async function fetchLiveStatsAFDirect() {
-  try {
-    const data = await fetchAF(`/fixtures?team=${PORTO_AF}&live=all`);
-    const fix  = data?.response?.[0];
-    if (!fix) return null;
-
-    const rawStats  = fix.statistics || [];
-    const homeStats = rawStats.find(s => s.team?.id === PORTO_AF)?.statistics || [];
-    const awayStats = rawStats.find(s => s.team?.id !== PORTO_AF)?.statistics || [];
-
-    const statMap = (arr) => {
-      const m = {};
-      arr.forEach(s => { m[s.type] = s.value ?? 0; });
-      return m;
-    };
-    const hs  = statMap(homeStats);
-    const as_ = statMap(awayStats);
-
-    const matchStats = [];
-    const addStat = (label, key) => {
-      const h = parseInt(hs[key] ?? 0) || 0;
-      const a = parseInt(as_[key] ?? 0) || 0;
-      if (h > 0 || a > 0) matchStats.push({ label, home: h, away: a });
-    };
-
-    const posH = parseInt(String(hs['Ball Possession'] ?? '0').replace('%','')) || 0;
-    const posA = parseInt(String(as_['Ball Possession'] ?? '0').replace('%','')) || 0;
-    if (posH > 0 || posA > 0) matchStats.push({ label: 'Possession %', home: posH, away: posA });
-
-    addStat('Tirs cadrés',    'Shots on Goal');
-    addStat('Tirs totaux',    'Total Shots');
-    addStat('Corners',        'Corner Kicks');
-    addStat('Fautes',         'Fouls');
-    addStat('Hors-jeux',      'Offsides');
-    addStat('Arrêts',         'Goalkeeper Saves');
-    addStat('Cartons jaunes', 'Yellow Cards');
-    addStat('Cartons rouges', 'Red Cards');
-
-    return { matchStats, elapsed: fix.fixture?.status?.elapsed ?? null };
-  } catch (e) {
-    console.error('fetchLiveStatsAFDirect error:', e.message);
-    return null;
+  const json = await res.json();
+  if (json.errors && Object.keys(json.errors).length > 0) {
+    throw new Error(`api-football error: ${JSON.stringify(json.errors)}`);
   }
+  return json;
 }
-
-// ── Handler principal ────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
   try {
 
-    // ── 1. Données football-data.org (classement + matchs) ──────────────────
-    // Plan Free football-data.org = 10 req/min — on minimise avec un seul appel live
-    const [standingsData, matchesData, liveData] = await Promise.all([
-      fetchFD(`/competitions/${LIGA_CODE}/standings`),
-      fetchFD(`/teams/${PORTO_FD}/matches?status=SCHEDULED,FINISHED&limit=20`),
-      fetchFD(`/teams/${PORTO_FD}/matches?status=IN_PLAY,PAUSED,HALF_TIME`).catch(() => null),
+    // ── 1. Classement + matchs récents + matchs à venir en parallèle ─────────
+    // 3 requêtes max (on reste bien dans les 100/jour)
+    const [standingsData, finishedData, scheduledData] = await Promise.all([
+      fetchAF(`/standings?league=${LIGA_ID}&season=${SEASON}`),
+      fetchAF(`/fixtures?team=${PORTO_ID}&season=${SEASON}&status=FT&last=10`),
+      fetchAF(`/fixtures?team=${PORTO_ID}&season=${SEASON}&status=NS&next=5`),
     ]);
 
     // ── 2. Classement Liga ───────────────────────────────────────────────────
-    const table    = standingsData?.standings?.find(s => s.type === 'TOTAL')?.table ?? [];
-    const sorted   = [...table].sort((a, b) => a.position - b.position);
-    const portoRow = table.find(r => r.team.id === PORTO_FD) ?? {};
+    const table    = standingsData?.response?.[0]?.league?.standings?.[0] ?? [];
+    const sorted   = [...table].sort((a, b) => a.rank - b.rank);
+    const portoRow = table.find(r => r.team.id === PORTO_ID) ?? {};
 
-    const stats = {
-      position:     portoRow.position       ?? '—',
-      played:       portoRow.playedGames    ?? 0,
-      wins:         portoRow.won            ?? 0,
-      draws:        portoRow.draw           ?? 0,
-      losses:       portoRow.lost           ?? 0,
-      goalsFor:     portoRow.goalsFor       ?? 0,
-      goalsAgainst: portoRow.goalsAgainst   ?? 0,
-      goalDiff:     portoRow.goalDifference ?? 0,
-      points:       portoRow.points         ?? 0,
-    };
-    stats.gapPoints  = stats.position === 1
-      ? stats.points - (sorted[1]?.points ?? 0)
-      : stats.points - (sorted[0]?.points ?? 0);
-    stats.secondTeam = stats.position === 1
-      ? (sorted[1]?.team?.shortName ?? sorted[1]?.team?.name ?? '—')
-      : (sorted[0]?.team?.shortName ?? sorted[0]?.team?.name ?? '—');
+    const played       = portoRow.all?.played ?? 0;
+    const wins         = portoRow.all?.win ?? 0;
+    const draws        = portoRow.all?.draw ?? 0;
+    const losses       = portoRow.all?.lose ?? 0;
+    const goalsFor     = portoRow.all?.goals?.for ?? 0;
+    const goalsAgainst = portoRow.all?.goals?.against ?? 0;
+    const points       = portoRow.points ?? 0;
+    const position     = portoRow.rank ?? '—';
+
+    const gapPoints  = position === 1
+      ? points - (sorted[1]?.points ?? 0)
+      : points - (sorted[0]?.points ?? 0);
+    const secondTeam = position === 1
+      ? (sorted[1]?.team?.name ?? '—')
+      : (sorted[0]?.team?.name ?? '—');
 
     const standings = sorted.slice(0, 10).map(r => ({
-      position: r.position, teamId: r.team.id,
-      teamName: r.team.shortName ?? r.team.name, teamCrest: r.team.crest,
-      played: r.playedGames, won: r.won, draw: r.draw, lost: r.lost,
-      goalsFor: r.goalsFor, goalsAgainst: r.goalsAgainst,
-      goalDiff: r.goalDifference, points: r.points, isPorto: r.team.id === PORTO_FD,
+      position:     r.rank,
+      teamId:       r.team.id,
+      teamName:     r.team.name,
+      teamCrest:    r.team.logo,
+      played:       r.all?.played ?? 0,
+      won:          r.all?.win ?? 0,
+      draw:         r.all?.draw ?? 0,
+      lost:         r.all?.lose ?? 0,
+      goalsFor:     r.all?.goals?.for ?? 0,
+      goalsAgainst: r.all?.goals?.against ?? 0,
+      goalDiff:     r.goalsDiff ?? 0,
+      points:       r.points ?? 0,
+      isPorto:      r.team.id === PORTO_ID,
     }));
 
-    // ── 3. Match en cours ────────────────────────────────────────────────────
-    const allMatches  = matchesData?.matches ?? [];
-    const liveMatches = liveData?.matches ?? [];
+    // ── 3. Résultats récents ─────────────────────────────────────────────────
+    const finished = finishedData?.response ?? [];
+    finished.sort((a, b) => new Date(b.fixture.date) - new Date(a.fixture.date));
 
-    let liveMatch = null;
-    let lineup    = null;
-
-    if (liveMatches.length > 0) {
-      const lm     = liveMatches[0];
-      const detail = await fetchFD(`/matches/${lm.id}`);
-      const events = extractEvents(detail);
-
-      // ── Stats live depuis API-Football (1 requête) ──
-      let matchStats  = [];
-      let liveMinute  = lm.minute ?? null;
-
-      // 1 seule requête AF : on récupère fixture ID + stats en même temps
-      const afLiveData = await fetchLiveStatsAFDirect();
-      if (afLiveData) {
-        matchStats = afLiveData.matchStats;
-        if (afLiveData.elapsed) liveMinute = afLiveData.elapsed;
-      }
-      // Total : 1 requête API-Football par poll
-
-      liveMatch = {
-        id:          lm.id,
-        competition: lm.competition?.name ?? '—',
-        homeTeam:    lm.homeTeam?.shortName ?? lm.homeTeam?.name ?? '—',
-        awayTeam:    lm.awayTeam?.shortName ?? lm.awayTeam?.name ?? '—',
-        homeCrest:   lm.homeTeam?.crest ?? null,
-        awayCrest:   lm.awayTeam?.crest ?? null,
-        homeGoals:   lm.score?.fullTime?.home ?? lm.score?.halfTime?.home ?? 0,
-        awayGoals:   lm.score?.fullTime?.away ?? lm.score?.halfTime?.away ?? 0,
-        minute:      liveMinute,
-        status:      lm.status,
-        venue:       lm.venue ?? null,
-        events,
-        matchStats,
-      };
-      lineup = extractLineup(detail, lm.competition?.name);
-    }
-
-    // ── 4. Prochain match + calendrier ───────────────────────────────────────
-    const scheduled = allMatches
-      .filter(m => m.status === 'SCHEDULED' || m.status === 'TIMED')
-      .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
-
-    const PORTO_CREST_URL = 'https://crests.football-data.org/503.png';
-    const mapMatch = m => {
-      const isHomePorto = m.homeTeam?.id === PORTO_FD;
+    const recentMatches = finished.slice(0, 5).map(f => {
+      const isHome   = f.teams.home.id === PORTO_ID;
+      const opponent = isHome ? f.teams.away : f.teams.home;
+      const pg       = isHome ? f.goals.home : f.goals.away;
+      const og       = isHome ? f.goals.away : f.goals.home;
       return {
-        id: m.id, date: m.utcDate,
-        competition: m.competition?.name ?? '—',
-        competitionCode: m.competition?.code ?? '',
-        homeTeam:  m.homeTeam?.shortName ?? m.homeTeam?.name ?? '—',
-        awayTeam:  m.awayTeam?.shortName ?? m.awayTeam?.name ?? '—',
-        homeCrest: m.homeTeam?.crest ?? (isHomePorto ? PORTO_CREST_URL : null),
-        awayCrest: m.awayTeam?.crest ?? (!isHomePorto ? PORTO_CREST_URL : null),
-        venue:     m.venue ?? null,
-      };
-    };
-
-    const upcomingMatches = scheduled.slice(0, 5).map(mapMatch);
-    const nextMatch       = upcomingMatches[0] ?? null;
-
-    // Lineup pre-match si disponible
-    if (!liveMatch && nextMatch?.id) {
-      const detail = await fetchFD(`/matches/${nextMatch.id}`);
-      if (detail) {
-        const pre = extractLineup(detail, nextMatch.competition);
-        if (pre?.startXI?.length > 0) lineup = pre;
-      }
-    }
-
-    // ── 5. Résultats récents ─────────────────────────────────────────────────
-    const finished = allMatches
-      .filter(m => m.status === 'FINISHED')
-      .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
-      .slice(0, 5);
-
-    const recentMatches = finished.map(m => {
-      const isHome = m.homeTeam.id === PORTO_FD;
-      const opp    = isHome ? m.awayTeam : m.homeTeam;
-      const pg     = isHome ? m.score.fullTime.home : m.score.fullTime.away;
-      const og     = isHome ? m.score.fullTime.away : m.score.fullTime.home;
-      return {
-        date: m.utcDate, competition: m.competition?.name ?? '—',
-        competitionCode: m.competition?.code ?? '', isHome,
-        opponentName:  opp.shortName ?? opp.name,
-        opponentCrest: opp.crest ?? null,
-        portoGoals: pg, oppGoals: og,
-        result: pg > og ? 'W' : pg < og ? 'L' : 'D',
-        venue: m.venue ?? null,
+        date:          f.fixture.date,
+        competition:   f.league.name,
+        competitionCode: f.league.country,
+        isHome,
+        opponentName:  opponent.name,
+        opponentCrest: opponent.logo,
+        portoGoals:    pg ?? 0,
+        oppGoals:      og ?? 0,
+        result:        pg > og ? 'W' : pg < og ? 'L' : 'D',
+        venue:         f.fixture.venue?.name ?? null,
       };
     });
 
-    // ── 6. Stats Europe ──────────────────────────────────────────────────────
-    const euroMatches = allMatches.filter(
-      m => !['PPL','PL1'].includes(m.competition?.code) && m.status === 'FINISHED'
-    );
+    // Série de victoires
     let winStreak = 0;
-    for (const m of recentMatches) { if (m.result === 'W') winStreak++; else break; }
+    for (const m of recentMatches) {
+      if (m.result === 'W') winStreak++;
+      else break;
+    }
+
+    // ── 4. Prochains matchs ──────────────────────────────────────────────────
+    const scheduled = scheduledData?.response ?? [];
+    scheduled.sort((a, b) => new Date(a.fixture.date) - new Date(b.fixture.date));
+
+    const upcomingMatches = scheduled.slice(0, 5).map(f => ({
+      id:          f.fixture.id,
+      date:        f.fixture.date,
+      competition: f.league.name,
+      homeTeam:    f.teams.home.name,
+      awayTeam:    f.teams.away.name,
+      homeCrest:   f.teams.home.logo,
+      awayCrest:   f.teams.away.logo,
+      venue:       f.fixture.venue?.name ?? null,
+    }));
+
+    const nextMatch = upcomingMatches[0] ?? null;
+
+    // ── 5. Stats européennes ─────────────────────────────────────────────────
+    const euroMatches = finished.filter(f => f.league.id !== LIGA_ID);
+    const euroByComp  = {};
+    euroMatches.forEach(f => {
+      const name = f.league.name;
+      if (!euroByComp[name]) euroByComp[name] = { name, played: 0, won: 0, goals: 0 };
+      const isHome = f.teams.home.id === PORTO_ID;
+      const pg     = isHome ? f.goals.home : f.goals.away;
+      const og     = isHome ? f.goals.away : f.goals.home;
+      euroByComp[name].played++;
+      if (pg > og) euroByComp[name].won++;
+      euroByComp[name].goals += pg ?? 0;
+    });
+    const euroComps = Object.values(euroByComp);
+    const europeanStats = euroComps.length > 0 ? {
+      played:       euroMatches.length,
+      wins:         euroMatches.filter(f => {
+                      const isHome = f.teams.home.id === PORTO_ID;
+                      const pg = isHome ? f.goals.home : f.goals.away;
+                      const og = isHome ? f.goals.away : f.goals.home;
+                      return pg > og;
+                    }).length,
+      goals:        euroMatches.reduce((acc, f) => {
+                      const isHome = f.teams.home.id === PORTO_ID;
+                      return acc + (isHome ? f.goals.home : f.goals.away ?? 0);
+                    }, 0),
+      competitions: euroComps,
+    } : null;
 
     // ── Réponse ──────────────────────────────────────────────────────────────
-    // Cache : 120s si match en cours (aligne avec le poll frontend), 300s sinon
-    const isLive = liveMatch && liveMatch.status !== 'FINISHED';
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', `public, max-age=${isLive ? 120 : 600}, s-maxage=${isLive ? 120 : 600}, stale-while-revalidate=60`);
+    res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600, stale-while-revalidate=60');
 
     res.status(200).json({
-      stats:          { ...stats, winStreak },
+      stats: {
+        position, played, wins, draws, losses,
+        goalsFor, goalsAgainst,
+        goalDiff: goalsFor - goalsAgainst,
+        points, gapPoints, secondTeam, winStreak,
+      },
       nextMatch,
-      liveMatch,
-      lineup,
+      liveMatch:      null,
+      lineup:         null,
       recentMatches,
       upcomingMatches,
       standings,
-      pollInterval:   isLive ? 120 : 300, // indique au frontend le délai optimal
+      europeanStats,
+      pollInterval:   300,
       updatedAt:      new Date().toISOString(),
     });
 
