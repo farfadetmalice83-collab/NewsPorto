@@ -2342,14 +2342,26 @@ img[loading="lazy"].loaded { opacity: 1; }
   </div>
 
   <script>
-  let pollInterval = null;
-  let lineupData   = null;
+  let pollInterval  = null;
+  let lineupData    = null;
+  let _isLiveActive = false;
 
+  // ── Clé chat quotidienne ──────────────────────────────────────────────────
+  function todayChatKey() {
+    const d = new Date();
+    return 'np_chat_' + d.getFullYear() + '_' + (d.getMonth()+1) + '_' + d.getDate();
+  }
+  window.todayChatKey = todayChatKey;
+
+  // ── RENDER MATCH ──────────────────────────────────────────────────────────
   function renderMatch(data) {
     const s = data.stats;
-    if (s) {
-      const gap = s.gapPoints > 0 ? `+${s.gapPoints} pts sur ${s.secondTeam}` : `${s.gapPoints} pts vs ${s.secondTeam}`;
-      document.getElementById('stats-label').textContent = `— Stats · Liga Portugal · ${s.played} journées`;
+    if (s && s.played > 0) {
+      const gap = s.gapPoints > 0
+        ? `+${s.gapPoints} pts sur ${s.secondTeam}`
+        : `${s.gapPoints} pts vs ${s.secondTeam}`;
+      document.getElementById('stats-label').textContent =
+        `— Stats · Liga Portugal · ${s.played} journées`;
       document.getElementById('stats-grid').innerHTML = `
         <div class="stat-cell"><div class="stat-num">${s.position}${s.position === 1 ? 'er' : 'e'}</div><div class="stat-label">Classement</div><div class="stat-sub">${s.position === 1 ? gap : 'Liga Portugal'}</div></div>
         <div class="stat-cell"><div class="stat-num">${s.wins}</div><div class="stat-label">Victoires</div><div class="stat-sub">${s.played} matchs joués</div></div>
@@ -2359,10 +2371,32 @@ img[loading="lazy"].loaded { opacity: 1; }
 
     const m    = data.liveMatch || data.nextMatch;
     const live = !!data.liveMatch;
-    _isLiveActive = live; // met à jour le flag pour handleMatchCardClick
-    if (!m) { document.getElementById('match-competition').textContent = 'Aucun match programmé'; return; }
+    _isLiveActive = live;
 
-    document.getElementById('match-section-label').textContent = live ? '— Match en cours 🔴' : '— Prochain match';
+    // ── Aucun match programmé ─────────────────────────────────────────────
+    if (!m) {
+      document.getElementById('match-section-label').textContent = '— Calendrier';
+      document.getElementById('match-competition').textContent   = 'FC Porto';
+      document.getElementById('team-home').textContent           = 'FC Porto';
+      document.getElementById('team-away').textContent           = 'À venir';
+      document.getElementById('match-score').textContent         = '—';
+      document.getElementById('match-status').textContent        = 'Aucun match programmé';
+      document.getElementById('match-date').textContent          = '—';
+      document.getElementById('match-heure').textContent         = '—';
+      document.getElementById('match-comp').textContent          = '—';
+      document.getElementById('live-badge').style.display        = 'none';
+      document.getElementById('lineup-cta').style.display        = 'none';
+      const hint = document.getElementById('click-hint-text');
+      if (hint) {
+        hint.textContent     = 'Voir le calendrier complet →';
+        hint.style.color     = 'rgba(255,255,255,0.2)';
+        hint.style.animation = 'none';
+      }
+      return;
+    }
+
+    document.getElementById('match-section-label').textContent =
+      live ? '— Match en cours 🔴' : '— Prochain match';
     document.getElementById('match-competition').textContent = m.competition;
     document.getElementById('match-comp').textContent        = m.competition;
     document.getElementById('team-home').textContent         = m.homeTeam;
@@ -2373,7 +2407,7 @@ img[loading="lazy"].loaded { opacity: 1; }
     if (m.homeCrest) { logoHome.src = m.homeCrest; logoHome.style.display = 'block'; }
     if (m.awayCrest) { logoAway.src = m.awayCrest; logoAway.style.display = 'block'; }
 
-    const scoreEl  = document.getElementById('match-score');
+    const scoreEl   = document.getElementById('match-score');
     const liveBadge = document.getElementById('live-badge');
     const liveMin   = document.getElementById('live-minute');
 
@@ -2382,14 +2416,16 @@ img[loading="lazy"].loaded { opacity: 1; }
       if (m.status === 'FINISHED') {
         liveBadge.style.display = 'none';
         document.getElementById('match-status').textContent = 'Terminé';
+        document.getElementById('match-status').classList.remove('live');
       } else if (m.status === 'HALF_TIME' || m.status === 'PAUSED') {
-        liveBadge.style.display = 'block';
-        liveMin.textContent = 'MI-TEMPS';
+        liveBadge.style.display  = 'block';
+        liveMin.textContent      = 'MI-TEMPS';
         liveMin.style.background = '#f0a500';
         document.getElementById('match-status').textContent = 'Mi-temps';
+        document.getElementById('match-status').classList.remove('live');
       } else {
-        liveBadge.style.display = 'block';
-        liveMin.textContent = m.minute ? `${m.minute}'` : 'LIVE';
+        liveBadge.style.display  = 'block';
+        liveMin.textContent      = m.minute ? `${m.minute}'` : 'LIVE';
         liveMin.style.background = '#ff4444';
         document.getElementById('match-status').textContent = m.minute ? `${m.minute}'` : 'En cours';
         document.getElementById('match-status').classList.add('live');
@@ -2397,45 +2433,52 @@ img[loading="lazy"].loaded { opacity: 1; }
     } else {
       scoreEl.textContent = 'VS';
       liveBadge.style.display = 'none';
+      document.getElementById('match-status').classList.remove('live');
       const date = new Date(m.date);
-      document.getElementById('match-date').textContent  = date.toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'Europe/Paris' });
-      document.getElementById('match-heure').textContent = date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Paris' });
+      document.getElementById('match-date').textContent  =
+        date.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long', timeZone:'Europe/Paris' });
+      document.getElementById('match-heure').textContent =
+        date.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', timeZone:'Europe/Paris' });
     }
 
-    if (data.lineup) { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
-    else if (live)   { document.getElementById('lineup-cta').style.display = 'block'; }
-    else             { document.getElementById('lineup-cta').style.display = 'none'; }
+    if (data.lineup)  { lineupData = data.lineup; document.getElementById('lineup-cta').style.display = 'block'; }
+    else if (live)    { document.getElementById('lineup-cta').style.display = 'block'; }
+    else              { document.getElementById('lineup-cta').style.display = 'none'; }
 
-    // Update click hint
     const hint = document.getElementById('click-hint-text');
     if (hint) {
       if (live) {
-        hint.textContent = '🔴 Cliquer ici pour les stats en direct';
-        hint.style.color = 'rgba(255,68,68,0.7)';
+        hint.textContent     = '🔴 Cliquer ici pour les stats en direct';
+        hint.style.color     = 'rgba(255,68,68,0.7)';
         hint.style.animation = 'blink-hint 1.5s ease infinite';
       } else {
-        hint.textContent = 'Cliquer pour le calendrier →';
-        hint.style.color = 'rgba(255,255,255,0.2)';
+        hint.textContent     = 'Cliquer pour le calendrier →';
+        hint.style.color     = 'rgba(255,255,255,0.2)';
         hint.style.animation = 'none';
       }
     }
   }
 
-  // URL absolue Vercel — le site est sur GitHub Pages, les API sur Vercel
-  
-
+  // ── LOAD DATA ─────────────────────────────────────────────────────────────
   function loadData() {
     fetch('/api/porto-stats')
       .then(r => r.json())
       .then(data => {
         renderMatch(data);
-        if (data.liveMatch && !pollInterval) pollInterval = setInterval(loadData, 60000);
-        else if (!data.liveMatch && pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        if (data.liveMatch && data.liveMatch.status !== 'FINISHED') {
+          if (!pollInterval) pollInterval = setInterval(loadData, 60000);
+        } else {
+          if (pollInterval) { clearInterval(pollInterval); pollInterval = null; }
+        }
       })
-      .catch(() => { document.getElementById('match-competition').textContent = 'Données indisponibles'; });
+      .catch(() => {
+        document.getElementById('match-competition').textContent = 'Données indisponibles';
+        document.getElementById('match-status').textContent      = 'Vérifier la connexion';
+      });
   }
   loadData();
 
+  // ── LINEUP MODAL ──────────────────────────────────────────────────────────
   function openLineupModal() {
     document.getElementById('lineup-modal').style.display = 'block';
     document.body.style.overflow = 'hidden';
@@ -2449,10 +2492,10 @@ img[loading="lazy"].loaded { opacity: 1; }
   window.closeLineupModal = closeLineupModal;
 
   function renderLineup() {
-    const pitchEl       = document.getElementById('pitch-players');
-    const benchEl       = document.getElementById('bench-players');
-    const benchSection  = document.getElementById('bench-section');
-    const noLineup      = document.getElementById('no-lineup-msg');
+    const pitchEl      = document.getElementById('pitch-players');
+    const benchEl      = document.getElementById('bench-players');
+    const benchSection = document.getElementById('bench-section');
+    const noLineup     = document.getElementById('no-lineup-msg');
     if (!lineupData || !lineupData.startXI?.length) {
       pitchEl.innerHTML = ''; benchSection.style.display = 'none'; noLineup.style.display = 'block';
       document.getElementById('modal-formation').textContent = 'Composition non encore disponible'; return;
@@ -2485,7 +2528,7 @@ img[loading="lazy"].loaded { opacity: 1; }
       benchEl.innerHTML = bench.map(p => `<div style="display:flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid rgba(255,255,255,0.08);font-family:'Barlow Condensed',sans-serif;"><span style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1px;min-width:18px;text-align:center;">${p.number||'—'}</span><span style="font-size:12px;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.6);">${p.name||'—'}</span></div>`).join('');
     } else benchSection.style.display = 'none';
   }
-    </script>
+  </script>
 
   <!-- SHOP TEASER -->
   <section class="shop-section reveal">
