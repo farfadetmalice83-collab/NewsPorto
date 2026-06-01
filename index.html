@@ -3268,13 +3268,13 @@ img[loading="lazy"].loaded { opacity: 1; }
   };
 
   // Gestion du clic sur la match card :
-  // → modal live si match en cours, sinon redirection vers match.html
+  // → modal live si match en cours, sinon redirection vers pronostics.html
   let _isLiveActive = false;
   window.handleMatchCardClick = function() {
     if (_isLiveActive && window._openLiveModal) {
       window._openLiveModal();
     } else {
-      window.location.href = 'match.html';
+      window.location.href = 'pronostics.html';
     }
   };
 
@@ -3845,5 +3845,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 })();
 </script>
 
+<script type="module" src="supabase-client.js"></script>
+<script type="module" src="auth-nav.js"></script>
 </body>
 </html>
