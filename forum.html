@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forum · NewsPorto</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root{--white:#fff;--gray:rgba(255,255,255,0.45);--border:rgba(255,255,255,0.1);--border-blue:rgba(0,61,165,0.38);--blue:#003DA5;--blue-mid:#0050CC;--blue-light:#4d82d4;--green:#00c87a;--red:#e74c3c;--yellow:#f0a500;--grid:rgba(255,255,255,0.05);}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{background:#000;color:#fff;font-family:'Barlow',sans-serif;overflow-x:hidden;}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:44px 44px;animation:gridScroll 14s linear infinite;}
+    @keyframes gridScroll{0%{background-position:0 0}100%{background-position:44px 44px}}
+    nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:72px;border-bottom:1px solid var(--border-blue);background:rgba(0,0,0,0.85);backdrop-filter:blur(16px);transition:background .3s,box-shadow .3s;}
+    nav.scrolled{background:rgba(0,0,0,0.96)!important;box-shadow:0 1px 0 0 rgba(0,61,165,0.5),0 8px 40px rgba(0,20,80,0.35)!important;}
+    .nav-logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .nav-logo img{height:42px;}
+    .nav-logo-text{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:#fff;}
+    .nav-links{display:flex;gap:32px;list-style:none;}
+    .nav-links a{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--blue);transition:width .3s cubic-bezier(.22,1,.36,1);}
+    .nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+    .nav-links a:hover,.nav-links a.active{color:#fff;}
+    .nav-cta{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid #fff;color:#fff;background:transparent;padding:8px 20px;cursor:pointer;text-decoration:none;transition:.2s;}
+    .nav-cta:hover{background:#fff;color:#000;}
+    .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
+    .nav-hamburger span{display:block;width:22px;height:1.5px;background:#fff;transition:transform .3s,opacity .3s;}
+    .page{position:relative;z-index:1;}
+
+    /* PAGE HEADER */
+    .page-header{padding:48px 48px 36px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:24px;}
+    .page-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+    .page-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--blue);}
+    .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,7vw,100px);line-height:.88;letter-spacing:1px;}
+    .page-title .outline{-webkit-text-stroke:1.5px #fff;color:transparent;}
+    .btn-new-thread{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:12px 24px;cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0;}
+    .btn-new-thread:hover{background:var(--blue-mid);}
+
+    /* LAYOUT */
+    .forum-layout{display:grid;grid-template-columns:220px 1fr;gap:0;border-top:1px solid var(--border);}
+
+    /* SIDEBAR */
+    .forum-sidebar{border-right:1px solid var(--border);padding:28px 0;}
+    .sidebar-section{margin-bottom:28px;}
+    .sidebar-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 24px;margin-bottom:8px;}
+    .sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;cursor:pointer;transition:background .15s;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border:none;background:none;width:100%;text-align:left;}
+    .sidebar-item:hover,.sidebar-item.active{background:rgba(0,61,165,0.08);color:#fff;}
+    .sidebar-item.active{border-left:2px solid var(--blue);}
+    .sidebar-count{font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,0.2);}
+    .online-section{padding:0 24px;}
+    .online-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
+    .online-av{width:24px;height:24px;border-radius:50%;background:rgba(0,61,165,0.4);border:1px solid rgba(0,61,165,0.6);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:#4d82d4;flex-shrink:0;overflow:hidden;}
+    .online-av img{width:100%;height:100%;object-fit:cover;}
+    .online-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.6);}
+    .online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulseG 2s ease-in-out infinite;}
+    @keyframes pulseG{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* MAIN */
+    .forum-main{padding:0;}
+
+    /* FILTER BAR */
+    .filter-bar{padding:16px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .filter-tabs{display:flex;gap:0;}
+    .filter-tab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:8px 16px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;transition:.2s;}
+    .filter-tab.active{color:#fff;border-bottom-color:var(--blue);}
+    .forum-search{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px 14px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:220px;}
+    .forum-search:focus{border-color:var(--blue);}
+    .forum-search::placeholder{color:rgba(255,255,255,0.2);}
+
+    /* THREAD LIST */
+    .thread-list{border-bottom:1px solid var(--border);}
+    .thread-row{display:grid;grid-template-columns:1fr auto;gap:16px;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;}
+    .thread-row:last-child{border-bottom:none;}
+    .thread-row:hover{background:rgba(0,61,165,0.04);}
+    .thread-row.pinned{background:rgba(0,61,165,0.03);border-left:2px solid rgba(0,61,165,0.4);}
+    .thread-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+    .thread-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:2px 8px;border:1px solid;}
+    .cat-general{color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.15);}
+    .cat-matchs{color:#4d82d4;border-color:#003DA5;}
+    .cat-transferts{color:#f0a500;border-color:#f0a500;}
+    .cat-debats{color:#e74c3c;border-color:#e74c3c;}
+    .cat-tactique{color:#00c87a;border-color:#00c87a;}
+    .thread-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:6px;line-height:1.3;}
+    .thread-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:8px;}
+    .thread-author-av{width:16px;height:16px;border-radius:50%;background:rgba(0,61,165,0.4);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-family:'Bebas Neue',sans-serif;color:#4d82d4;vertical-align:middle;overflow:hidden;}
+    .thread-author-av img{width:100%;height:100%;object-fit:cover;}
+    .thread-rank-badge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:1px 5px;border:1px solid;}
+    .thread-stats{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .thread-replies{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:rgba(255,255,255,0.2);}
+    .thread-replies-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .thread-new-badge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--blue);color:#fff;padding:2px 6px;}
+
+    /* THREAD VIEW */
+    #thread-view{display:none;}
+    .thread-view-header{padding:28px 32px;border-bottom:1px solid var(--border);}
+    .back-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);background:none;border:none;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;transition:color .2s;}
+    .back-btn:hover{color:#fff;}
+    .thread-view-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-bottom:8px;line-height:1.1;}
+    .thread-view-meta{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--gray);}
+    .replies-list{padding:0 32px;}
+    .reply-item{padding:24px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:grid;grid-template-columns:48px 1fr;gap:16px;}
+    .reply-item:last-child{border-bottom:none;}
+    .reply-av{width:40px;height:40px;border-radius:50%;background:rgba(0,61,165,0.3);border:1.5px solid rgba(0,61,165,0.5);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .reply-av img{width:100%;height:100%;object-fit:cover;}
+    .reply-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+    .reply-author{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .reply-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);}
+    .reply-body{font-family:'Barlow',sans-serif;font-size:14px;color:rgba(255,255,255,0.8);line-height:1.7;}
+    .reply-best{background:rgba(0,200,122,0.06);border:1px solid rgba(0,200,122,0.25);padding:16px;border-radius:2px;}
+    .best-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:6px;}
+    .reply-actions{display:flex;align-items:center;gap:8px;margin-top:10px;}
+    .reply-action-btn{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);padding:4px 10px;cursor:pointer;background:none;transition:.2s;}
+    .reply-action-btn:hover{border-color:var(--green);color:var(--green);}
+
+    /* REPLY FORM */
+    .reply-form{padding:24px 32px;border-top:1px solid var(--border);}
+    .reply-form-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:block;}
+    .reply-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;resize:vertical;min-height:100px;}
+    .reply-textarea:focus{border-color:var(--blue);}
+    .reply-textarea::placeholder{color:rgba(255,255,255,0.2);}
+    .reply-form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+    .reply-pts-hint{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+    .btn-reply{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:10px 24px;cursor:pointer;transition:.2s;}
+    .btn-reply:hover{background:var(--blue-mid);}
+    .btn-reply:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;}
+
+    /* NEW THREAD MODAL */
+    #new-thread-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);align-items:center;justify-content:center;}
+    #new-thread-modal.open{display:flex;}
+    .new-thread-box{background:#05090f;border:1px solid rgba(0,61,165,0.35);width:100%;max-width:560px;padding:40px;position:relative;animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    .nt-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;transition:color .2s;}
+    .nt-close:hover{color:#fff;}
+    .nt-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:24px;}
+    .nt-field{margin-bottom:16px;}
+    .nt-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;}
+    .nt-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+    .nt-input:focus{border-color:var(--blue);}
+    .nt-input::placeholder{color:rgba(255,255,255,0.2);}
+    .nt-select{width:100%;background:#05090f;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;outline:none;cursor:pointer;transition:border-color .2s;}
+    .nt-select:focus{border-color:var(--blue);}
+    .nt-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .2s;}
+    .nt-textarea:focus{border-color:var(--blue);}
+    .nt-textarea::placeholder{color:rgba(255,255,255,0.2);}
+    .nt-pts-hint{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;}
+    .nt-submit{width:100%;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s;}
+    .nt-submit:hover{background:var(--blue-mid);}
+    .nt-submit:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;}
+
+    /* MOBILE NAV */
+    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.97);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:translateY(-8px);transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
+    .mobile-nav-overlay.open{opacity:1;transform:translateY(0);pointer-events:all;display:flex;}
+    .mobile-nav-item{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,12vw,64px);letter-spacing:4px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color .2s,letter-spacing .2s;line-height:1.15;padding:6px 0;}
+    .mobile-nav-item:hover,.mobile-nav-item.active{color:#fff;letter-spacing:6px;}
+    .mobile-nav-bottom{position:absolute;bottom:48px;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.18);}
+    .nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
+    .nav-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
+    .nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+    /* FOOTER */
+    footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
+    .footer-logo{display:flex;align-items:center;gap:10px;}
+    .footer-logo img{height:36px;}
+    .footer-logo-text{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:#fff;}
+    .footer-copy{font-size:12px;color:var(--gray);letter-spacing:1px;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;}
+    .footer-links{display:flex;gap:28px;list-style:none;}
+    .footer-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;}
+    .footer-links a:hover{color:#fff;}
+
+    /* RESPONSIVE */
+    @media(max-width:1024px){.forum-layout{grid-template-columns:180px 1fr;}nav{padding:0 24px;}.page-header{padding:40px 24px 28px;}}
+    @media(max-width:768px){nav{padding:0 20px;height:62px;}.nav-links,.nav-cta{display:none;}.nav-hamburger{display:flex;}.forum-layout{grid-template-columns:1fr;}.forum-sidebar{display:none;}.page-header{flex-direction:column;align-items:flex-start;padding:32px 20px 24px;}.filter-bar{padding:12px 20px;flex-direction:column;align-items:flex-start;gap:10px;}.forum-search{width:100%;}.thread-row{padding:16px 20px;}.replies-list{padding:0 20px;}.reply-form{padding:20px;}.new-thread-box{padding:28px 20px;}footer{flex-direction:column;gap:16px;padding:24px 20px;align-items:flex-start;}.footer-links{flex-wrap:wrap;gap:16px;}}
+
+    .empty-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .loading-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.15);animation:blink 1.5s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="page">
+
+  <nav id="main-nav">
+    <a class="nav-logo" href="index.html"><img src="Logo.png" alt="NewsPorto"><span class="nav-logo-text">NewsPorto</span></a>
+    <ul class="nav-links">
+      <li><a href="actu.html">Actu</a></li>
+      <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="match.html">Matchs</a></li>
+      <li><a href="pronostics.html">Pronostics</a></li>
+      <li><a href="forum.html" class="active">Forum</a></li>
+      <li><a href="shop.html">Shop</a></li>
+    </ul>
+    <a href="#" class="nav-cta" onclick="event.preventDefault();AuthNav?.openAuthModal('signup')">S'inscrire</a>
+    <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="mobile-nav-overlay" id="mobile-nav">
+    <a href="index.html" class="mobile-nav-item">Accueil</a>
+    <a href="actu.html" class="mobile-nav-item">Actu</a>
+    <a href="match.html" class="mobile-nav-item">Matchs</a>
+    <a href="pronostics.html" class="mobile-nav-item">Pronostics</a>
+    <a href="forum.html" class="mobile-nav-item active">Forum</a>
+    <a href="shop.html" class="mobile-nav-item">Shop</a>
+    <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
+  </div>
+
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Communauté</div>
+      <h1 class="page-title">Forum<br><span class="outline">Porto</span></h1>
+    </div>
+    <button class="btn-new-thread" onclick="openNewThread()">+ Nouveau thread</button>
+  </div>
+
+  <div class="forum-layout">
+    <!-- SIDEBAR -->
+    <aside class="forum-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégories</div>
+        <button class="sidebar-item active" onclick="filterCat('all',this)">Tous les threads <span class="sidebar-count" id="count-all">—</span></button>
+        <button class="sidebar-item" onclick="filterCat('matchs',this)">Matchs <span class="sidebar-count" id="count-matchs">—</span></button>
+        <button class="sidebar-item" onclick="filterCat('transferts',this)">Transferts <span class="sidebar-count" id="count-transferts">—</span></button>
+        <button class="sidebar-item" onclick="filterCat('debats',this)">Débats <span class="sidebar-count" id="count-debats">—</span></button>
+        <button class="sidebar-item" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
+        <button class="sidebar-item" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">En ligne</div>
+        <div class="online-section" id="online-list">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.15);">—</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="forum-main">
+      <!-- THREAD LIST VIEW -->
+      <div id="thread-list-view">
+        <div class="filter-bar">
+          <div class="filter-tabs">
+            <button class="filter-tab active" onclick="sortThreads('recent',this)">Récents</button>
+            <button class="filter-tab" onclick="sortThreads('popular',this)">Populaires</button>
+          </div>
+          <input class="forum-search" type="text" placeholder="Rechercher un thread..." id="forum-search" oninput="searchThreads(this.value)">
+        </div>
+        <div class="thread-list" id="thread-list">
+          <div class="loading-state">Chargement des threads...</div>
+        </div>
+      </div>
+
+      <!-- THREAD VIEW -->
+      <div id="thread-view">
+        <div class="thread-view-header">
+          <button class="back-btn" onclick="backToList()">← Retour au forum</button>
+          <div id="tv-cat-wrap"></div>
+          <div class="thread-view-title" id="tv-title"></div>
+          <div class="thread-view-meta" id="tv-meta"></div>
+        </div>
+        <div class="replies-list" id="replies-list"></div>
+        <div class="reply-form" id="reply-form">
+          <span class="reply-form-label">Répondre</span>
+          <textarea class="reply-textarea" id="reply-input" placeholder="Partage ton avis..."></textarea>
+          <div class="reply-form-footer">
+            <span class="reply-pts-hint" id="reply-pts-hint">Connecte-toi pour répondre</span>
+            <button class="btn-reply" id="btn-reply" onclick="submitReply()" disabled>Répondre →</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <footer>
+    <div class="footer-logo"><img src="Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
+    <span class="footer-copy">© 2026 NewsPorto FR</span>
+    <ul class="footer-links"><li><a href="actu.html">Actu</a></li><li><a href="match.html">Matchs</a></li><li><a href="pronostics.html">Pronostics</a></li><li><a href="contact.html">Contact</a></li></ul>
+  </footer>
+</div>
+
+<!-- NEW THREAD MODAL -->
+<div id="new-thread-modal">
+  <div class="new-thread-box">
+    <button class="nt-close" onclick="closeNewThread()">✕</button>
+    <div class="nt-title">Nouveau Thread</div>
+    <div class="nt-field"><label class="nt-label">Titre</label><input class="nt-input" type="text" id="nt-title" placeholder="Titre du thread" maxlength="120"></div>
+    <div class="nt-field">
+      <label class="nt-label">Catégorie</label>
+      <select class="nt-select" id="nt-cat">
+        <option value="general">Général</option>
+        <option value="matchs">Matchs</option>
+        <option value="transferts">Transferts</option>
+        <option value="debats">Débats</option>
+        <option value="tactique">Tactique</option>
+      </select>
+    </div>
+    <div class="nt-field"><label class="nt-label">Contenu</label><textarea class="nt-textarea" id="nt-content" placeholder="Développe ta pensée..."></textarea></div>
+    <div class="nt-pts-hint">🎁 +5 pts pour chaque thread créé</div>
+    <button class="nt-submit" id="nt-submit" onclick="submitThread()">Publier le thread →</button>
+  </div>
+</div>
+
+<script type="module">
+import { supabase } from './supabase-client.js'
+
+// ── STATE ──
+let currentUser = null
+let currentProfile = null
+let allThreads = []
+let currentThread = null
+let currentCat = 'all'
+let currentSort = 'recent'
+let realtimeChannel = null
+
+const RANK_COLORS = { Adepto:'rgba(255,255,255,0.5)', Dragão:'#4d82d4', Ultras:'#f0a500', Lenda:'#e74c3c', Invicta:'#c9a84c' }
+const RANK_EMOJI = { Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴', Invicta:'💎' }
+const CAT_LABELS = { general:'Général', matchs:'Matchs', transferts:'Transferts', debats:'Débats', tactique:'Tactique' }
+
+// ── NAV ──
+window.addEventListener('scroll', () => document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 40))
+document.getElementById('hamburger-btn').addEventListener('click', () => {
+  const mn = document.getElementById('mobile-nav'), btn = document.getElementById('hamburger-btn')
+  const open = mn.classList.toggle('open'); btn.classList.toggle('open', open); document.body.style.overflow = open ? 'hidden' : ''
+})
+
+// ── AUTH ──
+supabase.auth.onAuthStateChange(async (_, session) => {
+  if (session) {
+    currentUser = session.user
+    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+    currentProfile = data
+    updateReplyForm()
+  } else { currentUser = null; currentProfile = null; updateReplyForm() }
+})
+const { data: { session } } = await supabase.auth.getSession()
+if (session) {
+  currentUser = session.user
+  const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+  currentProfile = data
+}
+
+// ── LOAD THREADS ──
+async function loadThreads() {
+  const { data, error } = await supabase
+    .from('forum_threads')
+    .select(`id, title, content, category, reply_count, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  if (error) { document.getElementById('thread-list').innerHTML = '<div class="empty-state">Erreur de chargement</div>'; return }
+  allThreads = data || []
+  renderThreadList()
+  updateCounts()
+  subscribeRealtime()
+}
+loadThreads()
+
+// ── RENDER LIST ──
+function renderThreadList() {
+  let filtered = currentCat === 'all' ? allThreads : allThreads.filter(t => t.category === currentCat)
+  const q = document.getElementById('forum-search')?.value?.toLowerCase() || ''
+  if (q) filtered = filtered.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+  if (currentSort === 'popular') filtered = [...filtered].sort((a,b) => b.reply_count - a.reply_count)
+
+  const list = document.getElementById('thread-list')
+  if (!filtered.length) { list.innerHTML = '<div class="empty-state">Aucun thread · Sois le premier !</div>'; return }
+
+  list.innerHTML = filtered.map(t => {
+    const a = t.author || {}
+    const rank = a.rank || 'Adepto'
+    const color = RANK_COLORS[rank] || '#fff'
+    const emoji = RANK_EMOJI[rank] || '⚪'
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'})
+    const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+    return `
+    <div class="thread-row" onclick="openThread(${t.id})">
+      <div>
+        <div class="thread-top">
+          <span class="thread-cat cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
+        </div>
+        <div class="thread-title">${t.title}</div>
+        <div class="thread-meta">
+          <span class="thread-author-av">${avHTML}</span>
+          <span>${a.display_name||a.username||'Anonyme'}</span>
+          <span class="thread-rank-badge" style="color:${color};border-color:${color}">${emoji} ${rank}</span>
+          <span>·</span><span>${date}</span>
+        </div>
+      </div>
+      <div class="thread-stats">
+        <div class="thread-replies">${t.reply_count}</div>
+        <div class="thread-replies-label">réponses</div>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function updateCounts() {
+  const cats = ['matchs','transferts','debats','tactique','general']
+  document.getElementById('count-all').textContent = allThreads.length
+  cats.forEach(c => {
+    const el = document.getElementById('count-' + c)
+    if (el) el.textContent = allThreads.filter(t => t.category === c).length
+  })
+}
+
+// ── OPEN THREAD ──
+window.openThread = async function(threadId) {
+  const { data: thread } = await supabase
+    .from('forum_threads')
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .eq('id', threadId).single()
+  if (!thread) return
+  currentThread = thread
+
+  const { data: replies } = await supabase
+    .from('forum_replies')
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .eq('thread_id', threadId)
+    .order('created_at', { ascending: true })
+
+  // Render header
+  const date = new Date(thread.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})
+  document.getElementById('tv-cat-wrap').innerHTML = `<span class="thread-cat cat-${thread.category}" style="display:inline-block;margin-bottom:10px">${CAT_LABELS[thread.category]||thread.category}</span>`
+  document.getElementById('tv-title').textContent = thread.title
+  const a = thread.author || {}
+  document.getElementById('tv-meta').innerHTML = `Par <strong>${a.display_name||a.username||'?'}</strong> · ${date}`
+
+  // Render replies (incl. original post)
+  const all = [{ ...thread, author: thread.author, content: thread.content, is_original: true }, ...(replies||[])]
+  const repliesList = document.getElementById('replies-list')
+  repliesList.innerHTML = all.map((r, i) => {
+    const ra = r.author || {}
+    const rrank = ra.rank || 'Adepto'
+    const rcolor = RANK_COLORS[rrank] || '#fff'
+    const remoji = RANK_EMOJI[rrank] || '⚪'
+    const rdate = new Date(r.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})
+    const avHTML = ra.avatar_url ? `<img src="${ra.avatar_url}">` : (ra.display_name||ra.username||'?')[0].toUpperCase()
+    const isBest = r.is_best_answer
+    const isAuthor = currentUser && thread.author?.id === currentUser.id
+    const canMarkBest = isAuthor && !r.is_original && !isBest
+    const likeCount = r.likes_count || 0
+    const isOwnReply = currentUser && ra.id === currentUser.id
+
+    return `
+    <div class="reply-item${isBest?' reply-best':''}">
+      <div class="reply-av">${avHTML}</div>
+      <div>
+        ${isBest?'<div class="best-label">✅ Meilleure réponse</div>':''}
+        <div class="reply-header">
+          <span class="reply-author">${ra.display_name||ra.username||'?'}</span>
+          <span class="thread-rank-badge" style="color:${rcolor};border-color:${rcolor}">${remoji} ${rrank}</span>
+          <span class="reply-date">${rdate}</span>
+          ${r.is_original?'<span class="thread-new-badge">OP</span>':''}
+        </div>
+        <div class="reply-body">${r.content}</div>
+        <div class="reply-actions">
+          ${!r.is_original && !isOwnReply && currentUser ? '<button class="reply-action-btn" onclick="likeReply('+r.id+',\''+ra.id+'\','+likeCount+')" style="color:rgba(231,76,60,0.6);border-color:rgba(231,76,60,0.25)">❤️ '+likeCount+'</button>' : likeCount > 0 ? '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(231,76,60,0.5)">❤️ '+likeCount+'</span>' : ''}
+          ${canMarkBest?'<button class="reply-action-btn" onclick="markBest('+r.id+')">✓ Meilleure réponse (+10 pts)</button>':''}
+        </div>
+      </div>
+    </div>`
+  }).join('')
+
+  document.getElementById('thread-list-view').style.display = 'none'
+  document.getElementById('thread-view').style.display = 'block'
+  updateReplyForm()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+window.backToList = function() {
+  document.getElementById('thread-view').style.display = 'none'
+  document.getElementById('thread-list-view').style.display = 'block'
+  currentThread = null
+}
+
+// ── REPLY FORM ──
+function updateReplyForm() {
+  const btn = document.getElementById('btn-reply')
+  const hint = document.getElementById('reply-pts-hint')
+  if (!btn) return
+  if (currentUser && currentProfile) {
+    btn.disabled = false
+    hint.textContent = '+3 pts pour ta première réponse dans ce thread'
+  } else {
+    btn.disabled = true
+    hint.innerHTML = '<span style="cursor:pointer;color:#4d82d4" onclick="AuthNav?.openAuthModal()">Connecte-toi</span> pour répondre'
+  }
+}
+
+window.submitReply = async function() {
+  if (!currentUser || !currentThread) return
+  const content = document.getElementById('reply-input').value.trim()
+  if (!content) return
+  const btn = document.getElementById('btn-reply')
+  btn.disabled = true; btn.textContent = 'Envoi...'
+  try {
+    const { data, error } = await supabase
+      .from('forum_replies')
+      .insert({ thread_id: currentThread.id, author_id: currentUser.id, content })
+      .select().single()
+
+    if (error) {
+      if (error.code === '23505') { showToast('Tu as déjà répondu à ce thread (pas de points supplémentaires)', ''); }
+      else throw error
+    } else {
+      // +3 pts
+      const newPts = (currentProfile.points || 0) + 3
+      await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+      await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 3, reason: 'forum_reply', ref_id: String(currentThread.id) })
+      // Notif au créateur du thread
+      if (currentThread.author_id !== currentUser.id) {
+        const title = currentThread.title.substring(0,60)
+        await supabase.from('notifications').insert({ user_id: currentThread.author_id, type: 'reply', from_user_id: currentUser.id, ref_id: String(currentThread.id), ref_label: title })
+      }
+      // increment reply count
+      await supabase.rpc('increment_reply_count', { thread_id: currentThread.id })
+      showToast('+3 pts ! Réponse publiée', 'success')
+    }
+
+    document.getElementById('reply-input').value = ''
+    await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = 'Répondre →' }
+}
+
+window.markBest = async function(replyId) {
+  if (!currentUser || !currentThread) return
+  try {
+    const { data: reply } = await supabase.from('forum_replies').select('author_id').eq('id', replyId).single()
+    await supabase.from('forum_replies').update({ is_best_answer: true }).eq('id', replyId)
+    // +10 pts au répondant
+    const { data: rp } = await supabase.from('profiles').select('points').eq('id', reply.author_id).single()
+    await supabase.from('profiles').update({ points: (rp.points||0) + 10 }).eq('id', reply.author_id)
+    await supabase.from('points_log').insert({ user_id: reply.author_id, amount: 10, reason: 'best_answer', ref_id: String(currentThread.id) })
+    showToast('Meilleure réponse marquée ! +10 pts offerts', 'success')
+    await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
+}
+
+// ── NEW THREAD ──
+window.openNewThread = function() {
+  if (!currentUser) { AuthNav?.openAuthModal(); return }
+  document.getElementById('new-thread-modal').classList.add('open')
+  document.body.style.overflow = 'hidden'
+}
+window.closeNewThread = function() {
+  document.getElementById('new-thread-modal').classList.remove('open')
+  document.body.style.overflow = ''
+}
+document.getElementById('new-thread-modal').addEventListener('click', e => { if(e.target.id==='new-thread-modal') closeNewThread() })
+
+window.submitThread = async function() {
+  if (!currentUser) return
+  const title = document.getElementById('nt-title').value.trim()
+  const category = document.getElementById('nt-cat').value
+  const content = document.getElementById('nt-content').value.trim()
+  if (!title || !content) { showToast('Remplis le titre et le contenu', 'error'); return }
+  const btn = document.getElementById('nt-submit')
+  btn.disabled = true; btn.textContent = 'Publication...'
+  try {
+    await supabase.from('forum_threads').insert({ author_id: currentUser.id, title, content, category })
+    // +5 pts
+    const newPts = (currentProfile.points || 0) + 5
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 5, reason: 'forum_thread', ref_id: null })
+    document.getElementById('nt-title').value = ''
+    document.getElementById('nt-content').value = ''
+    closeNewThread()
+    await loadThreads()
+    showToast('+5 pts ! Thread publié', 'success')
+  } catch(e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = 'Publier le thread →' }
+}
+
+// ── FILTERS ──
+window.filterCat = function(cat, btn) {
+  currentCat = cat
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderThreadList()
+}
+window.sortThreads = function(sort, btn) {
+  currentSort = sort
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderThreadList()
+}
+window.searchThreads = function(q) { renderThreadList() }
+
+// ── REALTIME ──
+function subscribeRealtime() {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+  realtimeChannel = supabase.channel('forum-realtime')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, () => loadThreads())
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, () => loadThreads())
+    .subscribe()
+}
+
+// ── ONLINE ──
+supabase.channel('online-users')
+  .on('presence', { event:'sync' }, function() {
+    const state = this.presenceState()
+    const users = Object.values(state).flat()
+    const list = document.getElementById('online-list')
+    if (!users.length) { list.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.15);">Personne en ligne</div>'; return }
+    list.innerHTML = users.slice(0,8).map(u => `
+      <div class="online-row">
+        <div class="online-dot"></div>
+        <span class="online-name">${u.username||'?'}</span>
+      </div>`).join('')
+  })
+  .subscribe()
+
+// ── TOAST ──
+function showToast(msg, type='') {
+  let t = document.getElementById('forum-toast')
+  if (!t) { t=document.createElement('div');t.id='forum-toast';t.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#05090f;border:1px solid rgba(0,61,165,0.4);padding:10px 24px;z-index:600;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;';document.body.appendChild(t) }
+  t.textContent=msg; t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; t.style.borderColor=type==='success'?'#00c87a':type==='error'?'#e74c3c':'rgba(0,61,165,0.4)'; t.style.color=type==='success'?'#00c87a':type==='error'?'#e74c3c':'#fff'
+  clearTimeout(t._t); t._t=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(12px)'},3000)
+}
+
+window.likeReply = async function(replyId, authorId, currentCount) {
+  if (!currentUser) { AuthNav?.openAuthModal(); return }
+  try {
+    const { error } = await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: currentUser.id })
+    if (error && error.code === '23505') { showToast('Déjà liké !', ''); return }
+    // Update likes_count
+    await supabase.from('forum_replies').update({ likes_count: currentCount + 1 }).eq('id', replyId)
+    // Notif à l'auteur
+    if (authorId && authorId !== currentUser.id) {
+      await supabase.from('notifications').insert({ user_id: authorId, type: 'like', from_user_id: currentUser.id, ref_id: String(replyId) })
+    }
+    showToast('❤️ Liké !', 'success')
+    if (currentThread) await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
+}
+</script>
+
+<script type="module" src="supabase-client.js"></script>
+<script type="module" src="auth-nav.js"></script>
+</body>
+</html>
