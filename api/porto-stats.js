@@ -35,8 +35,8 @@ export default async function handler(req, res) {
       fetchFD('/competitions/PPL/standings'),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=FINISHED`),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`),
-      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=FINISHED`).catch(() => null),
-      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`).catch(() => null),
+      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=FINISHED&season=2025`).catch(() => null),
+      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED&season=2025`).catch(() => null),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=IN_PLAY,PAUSED,HALF_TIME`).catch(() => null),
     ]);
 
