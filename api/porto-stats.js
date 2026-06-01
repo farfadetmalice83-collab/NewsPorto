@@ -1,10 +1,8 @@
 // api/porto-stats.js — Vercel Serverless Function
-// football-data.org — endpoints GRATUITS uniquement
-// Compétitions : Liga Portugal (PPL) + Europa League (EL)
+// football-data.org — Liga Portugal uniquement
 
 const FD_BASE  = 'https://api.football-data.org/v4';
 const PORTO_ID = 503;
-const SEASON_START = new Date('2025-07-01');
 
 async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -24,23 +22,13 @@ async function fetchFD(path, retries = 2) {
 export default async function handler(req, res) {
   try {
 
-    const [
-      standingsData,
-      ligaFinished,
-      ligaScheduled,
-      elFinished,
-      elScheduled,
-      liveData,
-    ] = await Promise.all([
+    const [standingsData, finishedData, scheduledData] = await Promise.all([
       fetchFD('/competitions/PPL/standings'),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=FINISHED`),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`),
-      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=FINISHED&season=2025`).catch(() => null),
-      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED&season=2025`).catch(() => null),
-      fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=IN_PLAY,PAUSED,HALF_TIME`).catch(() => null),
     ]);
 
-    // ── Classement Liga ───────────────────────────────────────────────────────
+    // ── Classement ────────────────────────────────────────────────────────────
     const table    = standingsData?.standings?.find(s => s.type === 'TOTAL')?.table ?? [];
     const sorted   = [...table].sort((a, b) => a.position - b.position);
     const portoRow = table.find(r => r.team.id === PORTO_ID) ?? {};
@@ -77,35 +65,10 @@ export default async function handler(req, res) {
       isPorto:      r.team.id === PORTO_ID,
     }));
 
-    // ── Match en cours ────────────────────────────────────────────────────────
-    const liveMatches = liveData?.matches ?? [];
-    let liveMatch = null;
-    if (liveMatches.length > 0) {
-      const lm = liveMatches[0];
-      liveMatch = {
-        id:          lm.id,
-        competition: lm.competition?.name ?? '—',
-        homeTeam:    lm.homeTeam?.shortName ?? lm.homeTeam?.name ?? '—',
-        awayTeam:    lm.awayTeam?.shortName ?? lm.awayTeam?.name ?? '—',
-        homeCrest:   lm.homeTeam?.crest ?? null,
-        awayCrest:   lm.awayTeam?.crest ?? null,
-        homeGoals:   lm.score?.fullTime?.home ?? lm.score?.halfTime?.home ?? 0,
-        awayGoals:   lm.score?.fullTime?.away ?? lm.score?.halfTime?.away ?? 0,
-        minute:      lm.minute ?? null,
-        status:      lm.status,
-        venue:       lm.venue ?? null,
-      };
-    }
-
-    // ── EL filtrée saison 2025/26 ─────────────────────────────────────────────
-    const elDone = (elFinished?.matches ?? []).filter(m => new Date(m.utcDate) >= SEASON_START);
-    const elNext = (elScheduled?.matches ?? []).filter(m => new Date(m.utcDate) >= SEASON_START);
-
-    // ── Résultats récents (Liga + EL) ─────────────────────────────────────────
-    const allFinished = [
-      ...(ligaFinished?.matches ?? []),
-      ...elDone,
-    ].sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate)).slice(0, 5);
+    // ── Résultats récents ─────────────────────────────────────────────────────
+    const allFinished = (finishedData?.matches ?? [])
+      .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+      .slice(0, 5);
 
     const recentMatches = allFinished.map(m => {
       const isHome = m.homeTeam.id === PORTO_ID;
@@ -129,14 +92,13 @@ export default async function handler(req, res) {
     let winStreak = 0;
     for (const m of recentMatches) { if (m.result === 'W') winStreak++; else break; }
 
-    // ── Prochains matchs (Liga + EL) ──────────────────────────────────────────
+    // ── Prochains matchs ──────────────────────────────────────────────────────
     const PORTO_CREST = 'https://crests.football-data.org/503.png';
-    const allScheduled = [
-      ...(ligaScheduled?.matches ?? []),
-      ...elNext,
-    ].sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
+    const allScheduled = (scheduledData?.matches ?? [])
+      .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
+      .slice(0, 5);
 
-    const upcomingMatches = allScheduled.slice(0, 5).map(m => {
+    const upcomingMatches = allScheduled.map(m => {
       const isHomePorto = m.homeTeam?.id === PORTO_ID;
       return {
         id:              m.id,
@@ -153,43 +115,21 @@ export default async function handler(req, res) {
 
     const nextMatch = upcomingMatches[0] ?? null;
 
-    // ── Stats Europa League saison 2025/26 ────────────────────────────────────
-    let europeanStats = null;
-    if (elDone.length > 0) {
-      const elWins  = elDone.filter(m => {
-        const isHome = m.homeTeam.id === PORTO_ID;
-        const pg = isHome ? m.score.fullTime.home : m.score.fullTime.away;
-        const og = isHome ? m.score.fullTime.away : m.score.fullTime.home;
-        return pg > og;
-      }).length;
-      const elGoals = elDone.reduce((acc, m) => {
-        const isHome = m.homeTeam.id === PORTO_ID;
-        return acc + ((isHome ? m.score.fullTime.home : m.score.fullTime.away) ?? 0);
-      }, 0);
-      europeanStats = {
-        played:       elDone.length,
-        wins:         elWins,
-        goals:        elGoals,
-        competitions: [{ name: 'UEFA Europa League', played: elDone.length, won: elWins, goals: elGoals }],
-      };
-    }
-
     // ── Réponse ───────────────────────────────────────────────────────────────
-    const isLive = liveMatch && liveMatch.status !== 'FINISHED';
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Cache-Control', `public, max-age=${isLive ? 60 : 600}, s-maxage=${isLive ? 60 : 600}, stale-while-revalidate=30`);
+    res.setHeader('Cache-Control', 'public, max-age=600, s-maxage=600, stale-while-revalidate=60');
 
     res.status(200).json({
       stats: { position, played, wins, draws, losses, goalsFor, goalsAgainst, goalDiff: goalsFor - goalsAgainst, points, gapPoints, secondTeam, winStreak },
       nextMatch,
-      liveMatch,
+      liveMatch:     null,
       lineup:        null,
       recentMatches,
       upcomingMatches,
       standings,
-      europeanStats,
-      pollInterval:  isLive ? 60 : 300,
+      europeanStats: null,
+      pollInterval:  300,
       updatedAt:     new Date().toISOString(),
     });
 
