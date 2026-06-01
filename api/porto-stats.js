@@ -1,9 +1,14 @@
 // api/porto-stats.js — Vercel Serverless Function
 // football-data.org — endpoints GRATUITS uniquement
-// Compétitions : Liga Portugal (PPL) + Champions League (CL)
+//
+// Logique compétition européenne (auto-détectée) :
+//   Saison 2025/26 → Europa League (EL)
+//   Saison 2026/27 → Champions League (CL)
+//   Les deux sont tentés, seul celui qui retourne des données est utilisé
 
 const FD_BASE  = 'https://api.football-data.org/v4';
 const PORTO_ID = 503;
+const SEASON_START = new Date('2025-07-01'); // début saison 2025/26
 
 async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
@@ -23,11 +28,13 @@ async function fetchFD(path, retries = 2) {
 export default async function handler(req, res) {
   try {
 
-    // ── 1. Requêtes parallèles (5 max, bien dans les 10/min) ─────────────────
+    // ── 1. Requêtes parallèles ────────────────────────────────────────────────
     const [
       standingsData,
       ligaFinished,
       ligaScheduled,
+      elFinished,
+      elScheduled,
       clFinished,
       clScheduled,
       liveData,
@@ -35,6 +42,10 @@ export default async function handler(req, res) {
       fetchFD('/competitions/PPL/standings'),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=FINISHED`),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`),
+      // Europa League (saison en cours)
+      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=FINISHED`).catch(() => null),
+      fetchFD(`/competitions/EL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`).catch(() => null),
+      // Champions League (saison prochaine / si qualifiés)
       fetchFD(`/competitions/CL/matches?team=${PORTO_ID}&status=FINISHED`).catch(() => null),
       fetchFD(`/competitions/CL/matches?team=${PORTO_ID}&status=SCHEDULED,TIMED`).catch(() => null),
       fetchFD(`/competitions/PPL/matches?team=${PORTO_ID}&status=IN_PLAY,PAUSED,HALF_TIME`).catch(() => null),
@@ -77,10 +88,9 @@ export default async function handler(req, res) {
       isPorto:      r.team.id === PORTO_ID,
     }));
 
-    // ── 3. Match en cours (Liga seulement, CL live nécessite plan payant) ────
+    // ── 3. Match en cours ─────────────────────────────────────────────────────
     const liveMatches = liveData?.matches ?? [];
     let liveMatch = null;
-
     if (liveMatches.length > 0) {
       const lm = liveMatches[0];
       liveMatch = {
@@ -98,10 +108,21 @@ export default async function handler(req, res) {
       };
     }
 
-    // ── 4. Résultats récents (Liga + CL fusionnés, triés par date) ───────────
+    // ── 4. Matchs européens — EL + CL fusionnés, filtrés saison en cours ─────
+    const euroFinished = [
+      ...(elFinished?.matches ?? []),
+      ...(clFinished?.matches ?? []),
+    ].filter(m => new Date(m.utcDate) >= SEASON_START);
+
+    const euroScheduled = [
+      ...(elScheduled?.matches ?? []),
+      ...(clScheduled?.matches ?? []),
+    ].filter(m => new Date(m.utcDate) >= SEASON_START);
+
+    // ── 5. Résultats récents (Liga + Europe, triés par date) ─────────────────
     const allFinished = [
       ...(ligaFinished?.matches ?? []),
-      ...(clFinished?.matches   ?? []),
+      ...euroFinished,
     ].sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate)).slice(0, 5);
 
     const recentMatches = allFinished.map(m => {
@@ -110,27 +131,27 @@ export default async function handler(req, res) {
       const pg     = isHome ? m.score.fullTime.home : m.score.fullTime.away;
       const og     = isHome ? m.score.fullTime.away : m.score.fullTime.home;
       return {
-        date:          m.utcDate,
-        competition:   m.competition?.name ?? '—',
+        date:            m.utcDate,
+        competition:     m.competition?.name ?? '—',
         competitionCode: m.competition?.code ?? '',
         isHome,
-        opponentName:  opp.shortName ?? opp.name,
-        opponentCrest: opp.crest ?? null,
-        portoGoals:    pg ?? 0,
-        oppGoals:      og ?? 0,
-        result:        pg > og ? 'W' : pg < og ? 'L' : 'D',
-        venue:         m.venue ?? null,
+        opponentName:    opp.shortName ?? opp.name,
+        opponentCrest:   opp.crest ?? null,
+        portoGoals:      pg ?? 0,
+        oppGoals:        og ?? 0,
+        result:          pg > og ? 'W' : pg < og ? 'L' : 'D',
+        venue:           m.venue ?? null,
       };
     });
 
     let winStreak = 0;
     for (const m of recentMatches) { if (m.result === 'W') winStreak++; else break; }
 
-    // ── 5. Prochains matchs (Liga + CL, triés par date) ──────────────────────
+    // ── 6. Prochains matchs (Liga + Europe) ──────────────────────────────────
     const PORTO_CREST = 'https://crests.football-data.org/503.png';
     const allScheduled = [
       ...(ligaScheduled?.matches ?? []),
-      ...(clScheduled?.matches   ?? []),
+      ...euroScheduled,
     ].sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
 
     const upcomingMatches = allScheduled.slice(0, 5).map(m => {
@@ -150,25 +171,28 @@ export default async function handler(req, res) {
 
     const nextMatch = upcomingMatches[0] ?? null;
 
-    // ── 6. Stats européennes (CL) ─────────────────────────────────────────────
-    const clDone = clFinished?.matches ?? [];
+    // ── 7. Stats européennes — par compétition ────────────────────────────────
     let europeanStats = null;
-    if (clDone.length > 0) {
-      const clWins  = clDone.filter(m => {
+    if (euroFinished.length > 0) {
+      // Grouper par compétition
+      const byComp = {};
+      euroFinished.forEach(m => {
+        const code = m.competition?.code ?? 'EUR';
+        const name = m.competition?.name ?? '—';
+        if (!byComp[code]) byComp[code] = { name, played: 0, won: 0, goals: 0 };
         const isHome = m.homeTeam.id === PORTO_ID;
         const pg = isHome ? m.score.fullTime.home : m.score.fullTime.away;
         const og = isHome ? m.score.fullTime.away : m.score.fullTime.home;
-        return pg > og;
-      }).length;
-      const clGoals = clDone.reduce((acc, m) => {
-        const isHome = m.homeTeam.id === PORTO_ID;
-        return acc + ((isHome ? m.score.fullTime.home : m.score.fullTime.away) ?? 0);
-      }, 0);
+        byComp[code].played++;
+        if (pg > og) byComp[code].won++;
+        byComp[code].goals += pg ?? 0;
+      });
+      const competitions = Object.values(byComp);
       europeanStats = {
-        played:       clDone.length,
-        wins:         clWins,
-        goals:        clGoals,
-        competitions: [{ name: 'UEFA Champions League', played: clDone.length, won: clWins, goals: clGoals }],
+        played: euroFinished.length,
+        wins:   competitions.reduce((a, c) => a + c.won, 0),
+        goals:  competitions.reduce((a, c) => a + c.goals, 0),
+        competitions,
       };
     }
 
