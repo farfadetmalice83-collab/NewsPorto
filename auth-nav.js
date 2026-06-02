@@ -568,28 +568,41 @@ class AN {
   async _onLogin(authUser) {
     this.u = authUser
     let { data: profile } = await supabase.from('profiles').select('*').eq('id', authUser.id).single()
-    // Auto-create profile for Google OAuth users
+
+    // Profile not found yet (timing) — retry once after short delay
     if (!profile) {
-      const username = authUser.email.split('@')[0].replace(/[^a-z0-9]/gi,'').toLowerCase() + Math.floor(Math.random()*999)
+      await new Promise(r => setTimeout(r, 800))
+      const { data: retryProfile } = await supabase.from('profiles').select('*').eq('id', authUser.id).single()
+      profile = retryProfile
+    }
+
+    // Auto-create profile for Google OAuth users (still no profile after retry)
+    if (!profile) {
+      const username = (authUser.email || 'user').split('@')[0].replace(/[^a-z0-9]/gi,'').toLowerCase() + Math.floor(Math.random()*999)
       const display_name = authUser.user_metadata?.full_name || username
       const avatar_url = authUser.user_metadata?.avatar_url || null
       const { data: newProfile } = await supabase.from('profiles').insert({ id: authUser.id, username, display_name, avatar_url, newsletter: true, points: 500, rank: 'Dragão' }).select().single()
-      await supabase.from('points_log').insert({ user_id: authUser.id, amount: 500, reason: 'welcome' })
-      // Auto-subscribe newsletter
+      await supabase.from('points_log').insert({ user_id: authUser.id, amount: 500, reason: 'welcome' }).catch(()=>{})
       try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: authUser.email }) }) } catch {}
       localStorage.setItem('np_email_subscribed', '1')
       profile = newProfile
     }
+
+    // Still null — abort silently (shouldn't happen)
+    if (!profile) { console.warn('Profile still null after retries'); return }
+
     // Check if banned
-    const { data: ban } = await supabase.from('bans').select('reason').eq('user_id', authUser.id).single()
+    const { data: ban } = await supabase.from('bans').select('reason').eq('user_id', authUser.id).single().catch(()=>({ data: null }))
     if (ban) {
       await supabase.auth.signOut()
       alert(`Ton compte a été banni.\nRaison : ${ban.reason || 'Non précisée'}`)
       return
     }
     this.p = profile
-    document.getElementById('an-signin-btn').style.display = 'none'
-    document.getElementById('an-trigger-btn').style.display = 'flex'
+    const signinBtn = document.getElementById('an-signin-btn')
+    const triggerBtn = document.getElementById('an-trigger-btn')
+    if (signinBtn) signinBtn.style.display = 'none'
+    if (triggerBtn) triggerBtn.style.display = 'flex'
     this._updateNav()
     this._checkNotifs()
     this._subscribePoints()
@@ -692,6 +705,7 @@ class AN {
     try {
       const { data, error } = await supabase.auth.signUp({ email, password: pwd })
       if (error) throw error
+      // Insert profile
       await supabase.from('profiles').insert({ id: data.user.id, username, display_name: username, newsletter: nl, points: 500, rank: 'Dragão' })
       await supabase.from('points_log').insert({ user_id: data.user.id, amount: 500, reason: 'welcome' })
       if (nl) {
@@ -700,6 +714,8 @@ class AN {
         const popup = document.getElementById('notif-popup')
         if (popup) popup.classList.remove('show')
       }
+      // Auto sign in immediately after signup (no email confirmation needed)
+      await supabase.auth.signInWithPassword({ email, password: pwd })
       this.closeAuth()
       this._toast('Bienvenue ! 500 pts offerts 🎁', 'ok')
     } catch(e) { this._authErr(e.message.includes('already') ? 'Email déjà utilisé' : e.message) }
