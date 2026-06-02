@@ -346,9 +346,8 @@
     <a href="index.html" class="mobile-nav-item">Accueil</a>
     <a href="actu.html" class="mobile-nav-item">Actu</a>
     <a href="effectif.html" class="mobile-nav-item">Effectif</a>
-    <a href="stats.html" class="mobile-nav-item">Stats</a>
-    <a href="pronostics.html" class="mobile-nav-item active">Pronostics</a>
     <a href="forum.html" class="mobile-nav-item">Forum</a>
+    <a href="pronostics.html" class="mobile-nav-item active">Pronostics</a>
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <a href="contact.html" class="mobile-nav-item">Contact</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
@@ -409,10 +408,10 @@
     <div class="tab-content" id="tab-regles">
       <p class="section-label">— Comment ça marche</p>
       <div class="rules-grid reveal">
-        <div class="rule-cell"><div class="rule-icon">🎯</div><div class="rule-title">Choisir</div><div class="rule-desc">Sélectionne ton pronostic : victoire Porto (1), match nul (X), ou défaite (2). Une seule mise par match.</div></div>
+        <div class="rule-cell"><div class="rule-icon">🎯</div><div class="rule-title">Choisir</div><div class="rule-desc">Sélectionne ton pronostic : victoire Porto, match nul ou défaite. Une seule mise par match.</div></div>
         <div class="rule-cell"><div class="rule-icon">💰</div><div class="rule-title">Miser</div><div class="rule-desc">Définis ta mise en points. Le minimum est de 10 pts. Le maximum dépend de ton rang.</div><div class="rule-highlight">Min: 10 pts</div></div>
         <div class="rule-cell"><div class="rule-icon">⏰</div><div class="rule-title">Deadline</div><div class="rule-desc">Les mises ferment 1h avant le coup d'envoi. Plus de modifications après la clôture.</div></div>
-        <div class="rule-cell"><div class="rule-icon">📊</div><div class="rule-title">Cotes</div><div class="rule-desc">Porto favori = ×1.5, nul = ×3, défaite = ×4 à ×5.</div></div>
+        <div class="rule-cell"><div class="rule-icon">📊</div><div class="rule-title">Cotes</div><div class="rule-desc">Les cotes sont calculées selon les probabilités du match — plus la victoire est incertaine, plus le gain potentiel est élevé.</div></div>
         <div class="rule-cell"><div class="rule-icon">🏆</div><div class="rule-title">Gagner</div><div class="rule-desc">Si ton pronostic est correct, ta mise est multipliée par la cote et créditée automatiquement.</div></div>
         <div class="rule-cell"><div class="rule-icon">🚫</div><div class="rule-title">Perdre</div><div class="rule-desc">En cas d'erreur, ta mise est perdue. Les points ne peuvent pas être récupérés.</div></div>
       </div>
@@ -449,6 +448,8 @@
 </div>
 <div id="toast"></div>
 
+<script type="module" src="supabase-client.js"></script>
+<script type="module" src="auth-nav.js"></script>
 <script type="module">
 import { supabase, placeBet, getUserBets, getBetsLeaderboard } from './supabase-client.js'
 
@@ -523,7 +524,7 @@ function updatePointsBanner() {
     document.getElementById('user-rank-wrap').innerHTML = `<span class="rank-badge ${rankClass[rank]||'rank-adepto'}">${rankEmoji[rank]||'⚪'} ${rank}</span>`
   } else {
     document.getElementById('user-points').textContent = '—'
-    document.getElementById('user-rank-wrap').innerHTML = `<button class="btn-primary" onclick="AN.openAuth()">Se connecter</button>`
+    document.getElementById('user-rank-wrap').innerHTML = `<button class="btn-primary" onclick="AuthNav.openAuthModal()">Se connecter</button>`
   }
 }
 updatePointsBanner()
@@ -606,7 +607,7 @@ async function loadCustomBets() {
           <span class="stake-preview-value zero" id="cb-preview-${b.id}">0 pts</span>
           ${currentUser
             ? `<button class="btn-bet" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider →</button>`
-            : `<button class="btn-bet" onclick="AN.openAuth()">Connexion requise</button>`
+            : `<button class="btn-bet" onclick="AuthNav.openAuth()">Connexion requise</button>`
           }
         </div>
       </div>
@@ -797,7 +798,7 @@ function renderBetCard(m, idx) {
         <span class="stake-preview-value zero" id="preview-${m.id}">0 pts</span>
         ${currentUser
           ? `<button class="btn-bet" id="btn-bet-${m.id}" onclick="openConfirmMatch('${m.id}','${m.homeTeam} vs ${m.awayTeam}')" disabled>Valider →</button>`
-          : `<button class="btn-bet" onclick="AN.openAuth()">Connexion requise</button>`
+          : `<button class="btn-bet" onclick="AuthNav.openAuthModal()">Connexion requise</button>`
         }
       </div>
     </div>` : `<div style="padding:16px 32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;">Mises fermées pour ce match</div>`}
@@ -813,7 +814,7 @@ function formatDeadline(ms) {
 
 // ── SELECT OPTION ──
 window.selectOption = function(matchId, opt) {
-  if (!currentUser) { AN.openAuth(); return }
+  if (!currentUser) { AuthNav.openAuthModal(); return }
   selectedOptions[matchId] = opt
   ;['win','draw','lose'].forEach(o => document.getElementById(`opt-${matchId}-${o}`)?.classList.remove('selected'))
   document.getElementById(`opt-${matchId}-${opt}`)?.classList.add('selected')
@@ -940,22 +941,21 @@ async function loadLeaderboard() {
   if (!data?.length) { container.innerHTML = '<div class="empty-state">Aucun joueur pour l\'instant</div>'; return }
   container.innerHTML = data.map((u, i) => {
     const topClass = i===0?'top1':i===1?'top2':i===2?'top3':''
-    const isMe = currentUser && u.id === currentUser.id
-    const meStyle = isMe ? ' style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"' : ''
-    const meRank = isMe ? ' style="color:var(--blue-light)"' : ''
-    const meAv = isMe ? ' style="border-color:var(--blue-light)"' : ''
+        const meStyle = isMe ? ' style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"' : ''
+    const meColor = isMe ? ' style="color:var(--blue-light)"' : ''
+    const meAvStyle = isMe ? ' style="border-color:var(--blue-light)"' : ''
     const avContent = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
     return `<div class="lb-row ${topClass}"${meStyle}>
-      <div class="lb-rank"${meRank}>${i+1}</div>
+      <div class="lb-rank"${meColor}>${i+1}</div>
       <div class="lb-user">
-        <div class="lb-avatar"${meAv}>${avContent}</div>
+        <div class="lb-avatar"${meAvStyle}>${avContent}</div>
         <div>
-          <div class="lb-name"${meRank}>${u.display_name||u.username}</div>
+          <div class="lb-name"${meColor}>${u.display_name||u.username}</div>
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3)">${rankEmoji[u.rank]||'⚪'} ${u.rank}</span>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="lb-pts"${meRank}>${u.points} pts</div>
+        <div class="lb-pts"${meColor}>${u.points} pts</div>
       </div>
     </div>`
   }).join('')
@@ -988,7 +988,5 @@ function toggleMobileNav() {
   document.body.style.overflow = open ? 'hidden' : '';
 }
 </script>
-<script type="module" src="supabase-client.js"></script>
-<script type="module" src="auth-nav.js"></script>
 </body>
 </html>
