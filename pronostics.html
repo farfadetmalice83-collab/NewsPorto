@@ -488,14 +488,19 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   }
 })
 
-// Init
-const { data: { session } } = await supabase.auth.getSession()
-if (session) {
-  currentUser = session.user
-  const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
-  currentProfile = data
-  await loadExistingBets()
+// Init — wrapped to avoid top-level await blocking window.* definitions
+async function initAuth() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      currentUser = session.user
+      const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+      currentProfile = data
+      await loadExistingBets()
+    }
+  } catch(e) { console.warn('Auth init error:', e) }
 }
+initAuth()
 
 // Realtime points update
 window.addEventListener('points-updated', e => {
