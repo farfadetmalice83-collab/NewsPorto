@@ -197,9 +197,117 @@
     .footer-links{display:flex;gap:28px;list-style:none;}
     .footer-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;}
     .footer-links a:hover{color:#fff;}
-    @media(max-width:1024px){.main-content{padding:40px 24px 80px;}.page-header,.points-banner{padding-left:24px;padding-right:24px;}.rules-grid{grid-template-columns:1fr 1fr;}nav{padding:0 24px;}}
-    @media(max-width:768px){nav{padding:0 20px;height:62px;}.nav-links,.nav-cta{display:none;}.nav-hamburger{display:flex;}.page-header{padding:40px 20px 28px;}.points-banner{padding:16px 20px;flex-direction:column;align-items:flex-start;gap:12px;}.main-content{padding:28px 20px 80px;}.bet-card-header{padding:20px 20px 0;}.bet-teams{padding:20px;gap:20px;}.bet-options{padding:16px 20px 20px;flex-wrap:wrap;}.bet-option{min-width:calc(50% - 6px);}.bet-stake{flex-direction:column;align-items:stretch;padding:20px;}.stake-preview{text-align:left;}.rules-grid{grid-template-columns:1fr;}.history-row{grid-template-columns:1fr 1fr 1fr;}.history-row .history-date,.history-row .history-result{display:none;}.history-row.header span:nth-child(4),.history-row.header span:nth-child(5){display:none;}.lb-row{grid-template-columns:40px 1fr auto;}footer{flex-direction:column;gap:16px;padding:24px 20px;align-items:flex-start;}.footer-links{flex-wrap:wrap;gap:16px;}}
-    @media(max-width:480px){.bet-option{min-width:100%;}}
+    @media(max-width:1024px){
+      .main-content{padding:40px 24px 80px;}
+      .page-header,.points-banner{padding-left:24px;padding-right:24px;}
+      .rules-grid{grid-template-columns:1fr 1fr;}
+      nav{padding:0 24px;}
+    }
+
+    /* ── MOBILE ── */
+    @media(max-width:768px){
+      /* Nav */
+      nav{padding:0 16px;height:58px;}
+      .nav-links,.nav-cta{display:none;}
+      .nav-hamburger{display:flex;}
+      .nav-logo img{height:36px;}
+      .nav-logo-text{font-size:18px;}
+
+      /* Header */
+      .page-header{padding:24px 16px 20px;}
+      .page-title{font-size:clamp(44px,12vw,70px);}
+
+      /* Points banner */
+      .points-banner{padding:12px 16px;flex-direction:row;flex-wrap:wrap;gap:8px;}
+      .points-num{font-size:28px;}
+      .points-label{font-size:9px;}
+
+      /* Tabs - scrollable */
+      .tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-wrap:nowrap;}
+      .tabs::-webkit-scrollbar{display:none;}
+      .tab-btn{flex-shrink:0;padding:12px 14px;font-size:10px;letter-spacing:2px;}
+
+      /* Main content */
+      .main-content{padding:16px 0 100px;}
+
+      /* Bet card */
+      .bet-card{margin-bottom:1px;}
+      .bet-card-header{padding:14px 16px 0;flex-wrap:wrap;gap:6px;}
+      .bet-competition{font-size:9px;}
+      .bet-deadline{font-size:9px;}
+
+      /* Teams */
+      .bet-teams{padding:16px;gap:12px;}
+      .bet-logo{width:40px;height:40px;}
+      .bet-logo-placeholder{width:40px;height:40px;font-size:13px;}
+      .bet-team-name{font-size:16px;}
+      .bet-vs{font-size:32px;min-width:56px;}
+
+      /* Bet infos */
+      .bet-infos{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+      .bet-info{border-right:none;border-bottom:1px solid var(--border);padding:10px 14px;}
+      .bet-info:nth-child(odd){border-right:1px solid var(--border);}
+      .bet-info:nth-last-child(-n+2){border-bottom:none;}
+      .bet-info-value{font-size:13px;}
+
+      /* Options - stack vertically on very small, 2-col on normal mobile */
+      .bet-options{padding:12px 16px 16px;gap:8px;flex-wrap:wrap;}
+      .bet-option{min-width:calc(50% - 4px);padding:14px 10px;}
+      .bet-option-mult{font-size:22px;}
+      .bet-option-result{font-size:18px;}
+      .bet-option-sub{font-size:8px;}
+
+      /* Stake */
+      .bet-stake{flex-direction:column;align-items:stretch;padding:0 16px 16px;gap:12px;border-top:1px solid var(--border);padding-top:14px;}
+      .stake-input{font-size:20px;padding:10px 12px;}
+      .stake-preview{text-align:left;display:flex;align-items:center;gap:12px;justify-content:space-between;}
+      .stake-preview-label{display:none;}
+      .stake-preview-value{font-size:24px;margin-bottom:0;}
+      .btn-bet{padding:14px;font-size:12px;}
+      .stake-quick{gap:5px;}
+      .stake-quick-btn{padding:6px 10px;font-size:10px;}
+
+      /* Result banner */
+      .bet-result-banner{padding:10px 16px;}
+      .result-label{font-size:9px;}
+      .result-points{font-size:18px;}
+
+      /* History */
+      .history-row{grid-template-columns:1fr 1fr;padding:12px 16px;gap:8px;}
+      .history-row .history-date,.history-row .history-result{display:none;}
+      .history-row.header span:nth-child(3),.history-row.header span:nth-child(4),.history-row.header span:nth-child(5){display:none;}
+      .history-match{font-size:12px;}
+
+      /* Leaderboard */
+      .lb-row{grid-template-columns:36px 1fr auto;padding:12px 16px;gap:10px;}
+      .lb-rank{font-size:22px;}
+      .lb-avatar{width:30px;height:30px;font-size:13px;}
+      .lb-name{font-size:12px;}
+      .lb-pts{font-size:18px;}
+
+      /* Rules */
+      .rules-grid{grid-template-columns:1fr;}
+      .rule-cell{padding:20px 16px;}
+
+      /* Confirm modal */
+      .confirm-box{padding:28px 20px;}
+      .confirm-title{font-size:24px;}
+      .confirm-potential{font-size:32px;}
+
+      footer{flex-direction:column;gap:14px;padding:24px 16px;align-items:flex-start;}
+      .footer-links{flex-wrap:wrap;gap:12px;}
+    }
+
+    @media(max-width:400px){
+      .bet-option{min-width:100%;}
+      .tabs{gap:0;}
+      .tab-btn{padding:11px 10px;font-size:9px;letter-spacing:1.5px;}
+    }
+
+    /* iPhone safe area */
+    @supports(padding-bottom: env(safe-area-inset-bottom)){
+      .main-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
+    }
     .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
     .reveal.visible{opacity:1;transform:none;}
     .reveal-delay-1{transition-delay:.1s;}.reveal-delay-2{transition-delay:.2s;}.reveal-delay-3{transition-delay:.3s;}
@@ -384,6 +492,8 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     await loadExistingBets()
     renderMatches()
     loadHistory()
+    // Re-enable bet options now that user is logged in
+    document.querySelectorAll('.bet-option.disabled').forEach(btn => btn.classList.remove('disabled'))
   } else {
     currentUser = null
     currentProfile = null
@@ -582,12 +692,26 @@ async function loadExistingBets() {
 function renderMatches() {
   const container = document.getElementById('matches-container')
   if (!upcomingMatches.length) {
-    container.innerHTML = '<div class="empty-state">Aucun match à venir programmé</div>'
+    container.innerHTML = `
+      <div style="border:1px solid var(--border);padding:40px 32px;text-align:center">
+        <div style="font-size:32px;margin-bottom:12px">⚽</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:8px">Hors saison</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);line-height:1.6;max-width:320px;margin:0 auto 20px">
+          Aucun match programmé pour l'instant.<br>Les paris sur les matchs seront disponibles dès la reprise.
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,61,165,0.6)">
+          👇 Les paris spéciaux restent disponibles ci-dessous
+        </div>
+      </div>`
     return
   }
   container.innerHTML = upcomingMatches.slice(0, 5).map((m, i) => renderBetCard(m, i)).join('')
   // Re-observe reveals
   container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+  // Fix: ensure options are clickable when user is logged in
+  if (currentUser) {
+    container.querySelectorAll('.bet-option.disabled').forEach(btn => btn.classList.remove('disabled'))
+  }
 }
 
 function renderBetCard(m, idx) {
@@ -660,7 +784,7 @@ function renderBetCard(m, idx) {
     ${isOpen ? `
     <div class="bet-options" id="options-${m.id}">
       ${['win','draw','lose'].map(opt => `
-      <button class="bet-option ${opt}-option${!currentUser||!isOpen?' disabled':''}" onclick="selectOption('${m.id}','${opt}')" id="opt-${m.id}-${opt}">
+      <button class="bet-option ${opt}-option" onclick="selectOption('${m.id}','${opt}')" id="opt-${m.id}-${opt}">
         <span class="bet-option-label">${ODDS[opt].label}</span>
         <span class="bet-option-result">${opt==='win'?'1':opt==='draw'?'X':'2'}</span>
         <span class="bet-option-mult">×${ODDS[opt].mult}</span>
