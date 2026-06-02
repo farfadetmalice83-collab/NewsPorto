@@ -502,21 +502,20 @@ class AN {
     document.body.insertAdjacentHTML('beforeend', html())
     this._mountNav()
 
-    // Register auth listener FIRST — catches SIGNED_IN from OAuth redirect
+    // Check existing session FIRST (page reload / OAuth redirect already processed)
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) await this._onLogin(session.user)
+
+    // Listen for future changes — guard !this.u to avoid double _onLogin
     supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
+      if (event === 'SIGNED_IN' && session && !this.u) {
         await this._onLogin(session.user)
       } else if (event === 'SIGNED_OUT') {
         this._onLogout()
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        // Keep nav in sync after token refresh
-        if (!this.u) await this._onLogin(session.user)
+      } else if (event === 'TOKEN_REFRESHED' && session && !this.u) {
+        await this._onLogin(session.user)
       }
     })
-
-    // Also check existing session (for page reloads)
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) await this._onLogin(session.user)
   }
 
   _mountNav() {
