@@ -2110,11 +2110,13 @@ img[loading="lazy"].loaded { opacity: 1; }
       <li><a href="actu.html">Actu</a></li>
       <li><a href="effectif.html">Effectif</a></li>
       <li><a href="stats.html">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="match.html">Matchs</a></li>
+      <li><a href="pronostics.html">Pronostics</a></li>
+      <li><a href="forum.html">Forum</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
-    <a href="shop.html" class="nav-cta">Shop →</a>
+    <a href="#" class="nav-cta" onclick="event.preventDefault();AN?.openAuth('signup')">S'inscrire</a>
     <button class="hamburger" id="hamburger-btn" aria-label="Menu" onclick="toggleMobileNav()">
       <span></span><span></span><span></span>
     </button>
@@ -2127,7 +2129,9 @@ img[loading="lazy"].loaded { opacity: 1; }
     <a href="actu.html" class="mobile-nav-item">Actu</a>
     <a href="effectif.html" class="mobile-nav-item">Effectif</a>
     <a href="stats.html" class="mobile-nav-item">Stats</a>
-    <a href="videos.html" class="mobile-nav-item">Vidéos</a>
+    <a href="match.html" class="mobile-nav-item">Matchs</a>
+    <a href="pronostics.html" class="mobile-nav-item">Pronostics</a>
+    <a href="forum.html" class="mobile-nav-item">Forum</a>
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <a href="contact.html" class="mobile-nav-item">Contact</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
@@ -3268,13 +3272,13 @@ img[loading="lazy"].loaded { opacity: 1; }
   };
 
   // Gestion du clic sur la match card :
-  // → modal live si match en cours, sinon redirection vers pronostics.html
+  // → modal live si match en cours, sinon redirection vers match.html
   let _isLiveActive = false;
   window.handleMatchCardClick = function() {
     if (_isLiveActive && window._openLiveModal) {
       window._openLiveModal();
     } else {
-      window.location.href = 'pronostics.html';
+      window.location.href = 'match.html';
     }
   };
 
@@ -3492,30 +3496,21 @@ img[loading="lazy"].loaded { opacity: 1; }
   }
 </style>
 
-<!-- Popup HTML -->
+<!-- Popup HTML — remplacé par notre système d'inscription -->
 <div id="notif-popup">
   <div class="popup-box">
     <button class="popup-close" onclick="closePopup()">✕</button>
 
-    <p class="popup-eyebrow">NewsPorto · Rester informé</p>
-    <h2 class="popup-title">Ne rate <span>aucun</span> moment Porto</h2>
-    <p class="popup-desc">Choisis comment tu veux recevoir les actus du FC Porto.</p>
+    <p class="popup-eyebrow">NewsPorto · Communauté</p>
+    <h2 class="popup-title">Rejoins la <span>communauté</span></h2>
+    <p class="popup-desc">Crée ton compte pour accéder au forum, miser sur les matchs et rejoindre la newsletter.</p>
 
-    <!-- EMAIL -->
-    <div class="popup-section-label">📬 Par email</div>
-    <div class="popup-form">
-      <input type="email" id="popup-email" class="popup-input" placeholder="ton@email.com" autocomplete="email">
-      <button class="popup-submit" id="popup-submit-btn" onclick="subscribeEmail()">S'abonner</button>
-    </div>
-
-    <!-- SÉPARATEUR -->
-    <div class="popup-or"><span>ou</span></div>
-
-    <!-- PUSH -->
-    <button class="popup-push-btn" id="popup-push-btn" onclick="subscribePush()">
-      🔔 Activer les notifications du navigateur
+    <button class="popup-submit" style="width:100%;margin-bottom:10px" onclick="closePopup();AN?.openAuth('signup')">
+      Créer mon compte gratuit →
     </button>
-    <p class="popup-push-hint" id="popup-push-hint">Reçois une alerte instantanée à chaque article</p>
+    <button class="popup-submit" style="width:100%;background:transparent;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);margin-bottom:10px" onclick="closePopup();AN?.openAuth('login')">
+      Déjà membre ? Se connecter
+    </button>
 
     <p class="popup-msg" id="popup-msg"></p>
     <button class="popup-skip" onclick="closePopup()">Non merci, continuer sans</button>
@@ -3844,6 +3839,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 
 })();
 </script>
+
 
 <script type="module" src="supabase-client.js"></script>
 <script type="module" src="auth-nav.js"></script>
