@@ -331,8 +331,10 @@
     <ul class="nav-links">
       <li><a href="actu.html">Actu</a></li>
       <li><a href="effectif.html">Effectif</a></li>
+      <li><a href="stats.html">Stats</a></li>
+      <li><a href="match.html">Matchs</a></li>
+      <li><a href="pronostics.html"  class="active">Pronostics</a></li>
       <li><a href="forum.html">Forum</a></li>
-      <li><a href="pronostics.html" class="active">Pronostics</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
@@ -346,8 +348,9 @@
     <a href="index.html" class="mobile-nav-item">Accueil</a>
     <a href="actu.html" class="mobile-nav-item">Actu</a>
     <a href="effectif.html" class="mobile-nav-item">Effectif</a>
-    <a href="forum.html" class="mobile-nav-item">Forum</a>
+    <a href="stats.html" class="mobile-nav-item">Stats</a>
     <a href="pronostics.html" class="mobile-nav-item active">Pronostics</a>
+    <a href="forum.html" class="mobile-nav-item">Forum</a>
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <a href="contact.html" class="mobile-nav-item">Contact</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
@@ -488,7 +491,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
   }
 })
 
-// Init — wrapped to avoid top-level await blocking window.* definitions
+// Init
 async function initAuth() {
   try {
     const { data: { session } } = await supabase.auth.getSession()
@@ -522,7 +525,7 @@ function updatePointsBanner() {
     document.getElementById('user-rank-wrap').innerHTML = `<span class="rank-badge ${rankClass[rank]||'rank-adepto'}">${rankEmoji[rank]||'⚪'} ${rank}</span>`
   } else {
     document.getElementById('user-points').textContent = '—'
-    document.getElementById('user-rank-wrap').innerHTML = `<button class="btn-primary" onclick="AN.openAuth()">Se connecter</button>`
+    document.getElementById('user-rank-wrap').innerHTML = `<button class="btn-primary" onclick="AuthNav.openAuthModal()">Se connecter</button>`
   }
 }
 updatePointsBanner()
@@ -605,7 +608,7 @@ async function loadCustomBets() {
           <span class="stake-preview-value zero" id="cb-preview-${b.id}">0 pts</span>
           ${currentUser
             ? `<button class="btn-bet" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider →</button>`
-            : `<button class="btn-bet" onclick="AN.openAuth()">Connexion requise</button>`
+            : `<button class="btn-bet" onclick="AuthNav.openAuth()">Connexion requise</button>`
           }
         </div>
       </div>
@@ -796,7 +799,7 @@ function renderBetCard(m, idx) {
         <span class="stake-preview-value zero" id="preview-${m.id}">0 pts</span>
         ${currentUser
           ? `<button class="btn-bet" id="btn-bet-${m.id}" onclick="openConfirmMatch('${m.id}','${m.homeTeam} vs ${m.awayTeam}')" disabled>Valider →</button>`
-          : `<button class="btn-bet" onclick="AN.openAuth()">Connexion requise</button>`
+          : `<button class="btn-bet" onclick="AuthNav.openAuthModal()">Connexion requise</button>`
         }
       </div>
     </div>` : `<div style="padding:16px 32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;">Mises fermées pour ce match</div>`}
@@ -812,7 +815,7 @@ function formatDeadline(ms) {
 
 // ── SELECT OPTION ──
 window.selectOption = function(matchId, opt) {
-  if (!currentUser) { AN.openAuth(); return }
+  if (!currentUser) { AuthNav.openAuthModal(); return }
   selectedOptions[matchId] = opt
   ;['win','draw','lose'].forEach(o => document.getElementById(`opt-${matchId}-${o}`)?.classList.remove('selected'))
   document.getElementById(`opt-${matchId}-${opt}`)?.classList.add('selected')
