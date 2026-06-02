@@ -347,7 +347,7 @@
   <footer>
     <div class="footer-logo"><img src="Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
     <span class="footer-copy">© 2026 NewsPorto FR</span>
-    <ul class="footer-links"><li><a href="actu.html">Actu</a></li><li><a href="match.html">Matchs</a></li><li><a href="pronostics.html">Pronostics</a></li><li><a href="contact.html">Contact</a></li></ul>
+    
   </footer>
 </div>
 
@@ -373,6 +373,8 @@
   </div>
 </div>
 
+<script type="module" src="supabase-client.js"></script>
+<script type="module" src="auth-nav.js"></script>
 <script type="module">
 import { supabase } from './supabase-client.js'
 
@@ -721,7 +723,5 @@ window.likeReply = async function(replyId, authorId, currentCount) {
 }
 </script>
 
-<script type="module" src="supabase-client.js"></script>
-<script type="module" src="auth-nav.js"></script>
 </body>
 </html>
