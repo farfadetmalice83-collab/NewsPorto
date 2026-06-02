@@ -401,27 +401,20 @@ document.getElementById('hamburger-btn').addEventListener('click', () => {
   const open = mn.classList.toggle('open'); btn.classList.toggle('open', open); document.body.style.overflow = open ? 'hidden' : ''
 })
 
-// ── AUTH ──
-supabase.auth.onAuthStateChange(async (_, session) => {
-  if (session) {
-    currentUser = session.user
-    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
-    currentProfile = data
-    updateReplyForm()
-  } else { currentUser = null; currentProfile = null; updateReplyForm() }
+// ── AUTH — use auth-nav events instead of own getSession (avoids race condition) ──
+window.addEventListener('an:login', (e) => {
+  currentUser = e.detail.user
+  currentProfile = e.detail.profile
+  updateReplyForm()
 })
-// Wrap in async init to avoid top-level await blocking window.* function definitions
-async function initAuth() {
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      currentUser = session.user
-      const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
-      currentProfile = data
-    }
-  } catch(e) { console.warn('Auth init error:', e) }
+window.addEventListener('an:logout', () => {
+  currentUser = null; currentProfile = null; updateReplyForm()
+})
+// Fallback: if auth-nav already fired before this script loaded
+if (window.AN?.u) {
+  currentUser = window.AN.u
+  currentProfile = window.AN.p
 }
-initAuth()
 
 // ── LOAD THREADS ──
 async function loadThreads() {
