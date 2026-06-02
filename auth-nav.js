@@ -4,10 +4,10 @@
 import { supabase, signOut, sendFriendRequest, getFriends, acceptFriendRequest, getConversation, sendMessage, markMessagesRead, startPresence, stopPresence } from './supabase-client.js'
 
 const RANKS = [
-  { id:'Supporter',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
-  { id:'Dragon',  emoji:'🔵', cost:2000,   color:'#4d82d4', border:'#003DA5' },
-  { id:'Socio',  emoji:'🟡', cost:8000,   color:'#f0a500', border:'#f0a500' },
-  { id:'Légende',   emoji:'🔴', cost:40000,  color:'#e74c3c', border:'#e74c3c' },
+  { id:'Adepto',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
+  { id:'Dragão',  emoji:'🔵', cost:2000,   color:'#4d82d4', border:'#003DA5' },
+  { id:'Ultras',  emoji:'🟡', cost:8000,   color:'#f0a500', border:'#f0a500' },
+  { id:'Lenda',   emoji:'🔴', cost:40000,  color:'#e74c3c', border:'#e74c3c' },
   { id:'Invicta', emoji:'💎', cost:300000, color:'#c9a84c', border:'#c9a84c' },
 ]
 
@@ -55,8 +55,9 @@ const CSS = `
 #an-overlay {
   position:fixed; inset:0; z-index:799; background:rgba(0,0,0,0.5);
   backdrop-filter:blur(4px); display:none; cursor:pointer;
+  pointer-events:none;
 }
-#an-overlay.on { display:block; }
+#an-overlay.on { display:block; pointer-events:all; }
 
 /* PANEL HEADER */
 .an-panel-head {
@@ -500,18 +501,22 @@ class AN {
     const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s)
     document.body.insertAdjacentHTML('beforeend', html())
     this._mountNav()
-    supabase.auth.onAuthStateChange(async (ev, session) => {
-      if (session) await this._onLogin(session.user)
-      else this._onLogout()
+
+    // Register auth listener FIRST — catches SIGNED_IN from OAuth redirect
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        await this._onLogin(session.user)
+      } else if (event === 'SIGNED_OUT') {
+        this._onLogout()
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        // Keep nav in sync after token refresh
+        if (!this.u) await this._onLogin(session.user)
+      }
     })
+
+    // Also check existing session (for page reloads)
     const { data: { session } } = await supabase.auth.getSession()
     if (session) await this._onLogin(session.user)
-    // Handle Google OAuth redirect
-    const hash = window.location.hash
-    if (hash.includes('access_token')) {
-      const { data: { session: oauthSession } } = await supabase.auth.getSession()
-      if (oauthSession) await this._onLogin(oauthSession.user)
-    }
   }
 
   _mountNav() {
