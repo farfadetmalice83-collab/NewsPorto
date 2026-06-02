@@ -596,7 +596,7 @@ class AN {
     if (!profile) { console.warn('Profile still null after retries'); return }
 
     // Check if banned
-    const { data: ban } = await supabase.from('bans').select('reason').eq('user_id', authUser.id).single().catch(()=>({ data: null }))
+    const { data: ban } = await supabase.from('bans').select('reason').eq('user_id', authUser.id).maybeSingle()
     if (ban) {
       await supabase.auth.signOut()
       alert(`Ton compte a été banni.\nRaison : ${ban.reason || 'Non précisée'}`)
