@@ -375,11 +375,11 @@
   </div>
 
   <div class="main-content">
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('paris',this)">Matchs à miser</button>
-      <button class="tab-btn" onclick="switchTab('historique',this)">Mon historique</button>
-      <button class="tab-btn" onclick="switchTab('classement',this)">Classement</button>
-      <button class="tab-btn" onclick="switchTab('regles',this)">Règles</button>
+    <div class="tabs" id="prono-tabs">
+      <button class="tab-btn active" data-tab="paris" onclick="switchTab('paris')">Matchs à miser</button>
+      <button class="tab-btn" data-tab="historique" onclick="switchTab('historique')">Mon historique</button>
+      <button class="tab-btn" data-tab="classement" onclick="switchTab('classement')">Classement</button>
+      <button class="tab-btn" data-tab="regles" onclick="switchTab('regles')">Règles</button>
     </div>
 
     <!-- TAB PARIS -->
@@ -432,12 +432,6 @@
   <footer>
     <div class="footer-logo"><img src="Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
     <span class="footer-copy">© 2026 NewsPorto FR</span>
-    <ul class="footer-links">
-      <li><a href="actu.html">Actu</a></li>
-      <li><a href="match.html">Matchs</a></li>
-      <li><a href="forum.html">Forum</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
   </footer>
 </div>
 
@@ -693,14 +687,12 @@ function renderMatches() {
   const container = document.getElementById('matches-container')
   if (!upcomingMatches.length) {
     container.innerHTML = `
-      <div style="border:1px solid var(--border);padding:40px 32px;text-align:center">
-        <div style="font-size:32px;margin-bottom:12px">⚽</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:8px">Hors saison</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);line-height:1.6;max-width:320px;margin:0 auto 20px">
-          Aucun match programmé pour l'instant.<br>Les paris sur les matchs seront disponibles dès la reprise.
-        </div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(0,61,165,0.6)">
-          👇 Les paris spéciaux restent disponibles ci-dessous
+      <div style="border:1px solid rgba(255,255,255,0.08);padding:48px 24px;text-align:center;background:rgba(255,255,255,0.01)">
+        <div style="font-size:40px;margin-bottom:16px">⚽</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:10px">Hors Saison</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);line-height:1.8;max-width:300px;margin:0 auto">
+          Aucun match ni pari prévu pour l'instant.<br>
+          On revient dès la reprise de la saison.
         </div>
       </div>`
     return
@@ -968,11 +960,9 @@ async function loadLeaderboard() {
 }
 
 // ── TABS ──
-window.switchTab = function(tab, btn) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'))
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'))
-  document.getElementById('tab-'+tab).classList.add('active')
-  btn.classList.add('active')
+window.switchTab = function(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab))
   if (tab === 'historique') loadHistory()
   if (tab === 'classement') loadLeaderboard()
 }
