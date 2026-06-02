@@ -231,6 +231,30 @@ const CSS = `
 #an-toast.ok { border-color:#00c87a; color:#00c87a; }
 #an-toast.err { border-color:#e74c3c; color:#e74c3c; }
 
+
+/* ── ADMIN TAB ── */
+.an-admin-badge { display:inline-block; background:#e74c3c; color:#fff; font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:2px 5px; margin-left:4px; vertical-align:middle; }
+.an-admin-row { display:flex; align-items:center; justify-content:space-between; padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.05); transition:background .15s; }
+.an-admin-row:hover { background:rgba(255,255,255,0.02); }
+.an-admin-row-info { flex:1; }
+.an-admin-row-title { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
+.an-admin-row-sub { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.35); margin-top:2px; }
+.an-admin-acts { display:flex; gap:5px; flex-shrink:0; }
+.an-micro-btn.red { border-color:#e74c3c; color:#e74c3c; }
+.an-micro-btn.red:hover { background:#e74c3c; color:#fff; border-color:#e74c3c; }
+.an-micro-btn.orange { border-color:#f0a500; color:#f0a500; }
+.an-micro-btn.orange:hover { background:#f0a500; color:#000; }
+.an-admin-section { padding:0; }
+.an-admin-sub-tabs { display:flex; border-bottom:1px solid rgba(255,255,255,0.06); }
+.an-admin-sub-tab { flex:1; padding:9px 4px; background:none; border:none; border-bottom:2px solid transparent; font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.3); cursor:pointer; transition:.2s; margin-bottom:-1px; }
+.an-admin-sub-tab.active { color:#fff; border-bottom-color:#e74c3c; }
+.an-admin-sub-content { display:none; }
+.an-admin-sub-content.active { display:block; }
+/* Custom bet form */
+.an-admin-form { padding:12px 20px; }
+.an-admin-form .an-label { margin-top:10px; }
+.an-odds-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
 @media(max-width:768px) {
   #an-panel { width:100%; }
   #an-pill-info { display:none; }
@@ -303,6 +327,7 @@ function html() { return `
     <button class="an-tab"        data-tab="amis"    onclick="AN.tabTo('amis')">Amis<span class="an-tab-dot" id="tab-dot-amis"></span></button>
     <button class="an-tab"        data-tab="mp"      onclick="AN.tabTo('mp')">Messages<span class="an-tab-dot" id="tab-dot-mp"></span></button>
     <button class="an-tab"        data-tab="rangs"   onclick="AN.tabTo('rangs')">Rangs</button>
+    <button class="an-tab" id="an-tab-admin" data-tab="admin" onclick="AN.tabTo('admin')" style="display:none">Admin<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#e74c3c;margin-left:4px;vertical-align:middle"></span></button>
   </div>
 
   <!-- Body -->
@@ -355,6 +380,60 @@ function html() { return `
             <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." onkeydown="if(event.key==='Enter')AN.sendMsg()">
             <button class="an-chat-send" onclick="AN.sendMsg()">Envoyer</button>
           </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ADMIN -->
+    <div class="an-section" id="an-sec-admin">
+      <div class="an-admin-sub-tabs">
+        <button class="an-admin-sub-tab active" onclick="AN.adminSubTab('forum',this)">Forum</button>
+        <button class="an-admin-sub-tab" onclick="AN.adminSubTab('users',this)">Users</button>
+        <button class="an-admin-sub-tab" onclick="AN.adminSubTab('bets',this)">Paris</button>
+      </div>
+
+      <!-- FORUM -->
+      <div class="an-admin-sub-content active" id="an-admin-forum">
+        <div class="an-row-label">Threads récents</div>
+        <div id="an-admin-threads"><div class="an-empty">Chargement...</div></div>
+      </div>
+
+      <!-- USERS -->
+      <div class="an-admin-sub-content" id="an-admin-users">
+        <div class="an-search-wrap" style="padding:12px 20px">
+          <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-admin-user-search" oninput="AN.adminSearchUsers(this.value)">
+        </div>
+        <div id="an-admin-users-list"><div class="an-empty">Recherche un utilisateur</div></div>
+      </div>
+
+      <!-- PARIS CUSTOM -->
+      <div class="an-admin-sub-content" id="an-admin-bets">
+        <div class="an-row-label">Paris actifs</div>
+        <div id="an-admin-custom-bets"><div class="an-empty">Aucun pari actif</div></div>
+        <div class="an-row-label" style="margin-top:8px">Créer un pari</div>
+        <div class="an-admin-form">
+          <label class="an-label">Question / Titre</label>
+          <input class="an-input" type="text" id="an-cb-title" placeholder="Mora va marquer avant 60 min ?">
+          <label class="an-label">Description (optionnel)</label>
+          <input class="an-input" type="text" id="an-cb-desc" placeholder="Plus de détails...">
+          <label class="an-label">Option Oui</label>
+          <input class="an-input" type="text" id="an-cb-yes" value="Oui">
+          <label class="an-label">Option Non</label>
+          <input class="an-input" type="text" id="an-cb-no" value="Non">
+          <div class="an-odds-row" style="margin-top:10px">
+            <div>
+              <label class="an-label">Cote Oui</label>
+              <input class="an-input" type="number" id="an-cb-odds-yes" value="2.0" step="0.1" min="1.1">
+            </div>
+            <div>
+              <label class="an-label">Cote Non</label>
+              <input class="an-input" type="number" id="an-cb-odds-no" value="2.0" step="0.1" min="1.1">
+            </div>
+          </div>
+          <label class="an-label">Ferme le (optionnel)</label>
+          <input class="an-input" type="datetime-local" id="an-cb-closes">
+          <button class="an-btn" style="width:100%;margin-top:12px" onclick="AN.createCustomBet()">Lancer le pari →</button>
         </div>
       </div>
     </div>
@@ -459,6 +538,13 @@ class AN {
       localStorage.setItem('np_email_subscribed', '1')
       profile = newProfile
     }
+    // Check if banned
+    const { data: ban } = await supabase.from('bans').select('reason').eq('user_id', authUser.id).single()
+    if (ban) {
+      await supabase.auth.signOut()
+      alert(`Ton compte a été banni.\nRaison : ${ban.reason || 'Non précisée'}`)
+      return
+    }
     this.p = profile
     document.getElementById('an-signin-btn').style.display = 'none'
     document.getElementById('an-trigger-btn').style.display = 'flex'
@@ -473,6 +559,11 @@ class AN {
       if (popup) popup.classList.remove('show')
     }
     startPresence(authUser.id, profile?.username || '')
+    // Show admin tab if admin
+    if (profile?.role === 'admin') {
+      const adminTab = document.getElementById('an-tab-admin')
+      if (adminTab) adminTab.style.display = ''
+    }
   }
 
   _onLogout() {
@@ -505,6 +596,7 @@ class AN {
     if (tab === 'amis') this._loadFriends()
     if (tab === 'mp') this._loadConvList()
     if (tab === 'rangs') this._renderRanks()
+    if (tab === 'admin') this._loadAdminForum()
   }
 
   // AUTH
@@ -830,6 +922,182 @@ class AN {
       this._toast(`${rankId} obtenu ! 🎉`, 'ok')
     } catch(e) { this._toast(e.message, 'err') }
   }
+
+  // ── ADMIN ──
+  isAdmin() { return this.p?.role === 'admin' }
+
+  adminSubTab(tab, btn) {
+    document.querySelectorAll('.an-admin-sub-tab').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('.an-admin-sub-content').forEach(c => c.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById(`an-admin-${tab}`).classList.add('active')
+    if (tab === 'forum') this._loadAdminForum()
+    if (tab === 'bets') this._loadAdminBets()
+  }
+
+  async _loadAdminForum() {
+    if (!this.isAdmin()) return
+    const el = document.getElementById('an-admin-threads'); if (!el) return
+    const { data } = await supabase.from('forum_threads')
+      .select('id, title, category, reply_count, created_at, author:author_id(username, display_name)')
+      .order('created_at', { ascending: false }).limit(20)
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun thread</div>'; return }
+    el.innerHTML = data.map(t => `
+      <div class="an-admin-row">
+        <div class="an-admin-row-info">
+          <div class="an-admin-row-title">${t.title.substring(0,40)}</div>
+          <div class="an-admin-row-sub">${t.author?.display_name||t.author?.username||'?'} · ${t.reply_count} rép. · ${t.category}</div>
+        </div>
+        <div class="an-admin-acts">
+          <button class="an-micro-btn red" onclick="AN.adminDeleteThread(${t.id})">✕</button>
+        </div>
+      </div>`).join('')
+  }
+
+  async adminDeleteThread(id) {
+    if (!this.isAdmin() || !confirm('Supprimer ce thread ?')) return
+    await supabase.from('forum_threads').delete().eq('id', id)
+    this._toast('Thread supprimé', 'ok')
+    this._loadAdminForum()
+    // Reload forum if on forum page
+    if (window.loadThreads) window.loadThreads()
+  }
+
+  async adminSearchUsers(q) {
+    if (!this.isAdmin() || !q || q.length < 2) {
+      document.getElementById('an-admin-users-list').innerHTML = '<div class="an-empty">Recherche un utilisateur</div>'
+      return
+    }
+    const { data } = await supabase.from('profiles')
+      .select('id, username, display_name, rank, points, role')
+      .ilike('username', `%${q}%`).limit(10)
+    const el = document.getElementById('an-admin-users-list'); if (!el) return
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun résultat</div>'; return }
+    // Check bans
+    const { data: bans } = await supabase.from('bans').select('user_id')
+    const bannedIds = new Set((bans||[]).map(b => b.user_id))
+    el.innerHTML = data.map(u => {
+      const isBanned = bannedIds.has(u.id)
+      const isMe = u.id === this.u?.id
+      return `<div class="an-admin-row">
+        <div class="an-admin-row-info">
+          <div class="an-admin-row-title">${u.display_name||u.username} ${u.role==='admin'?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
+          <div class="an-admin-row-sub">${u.rank} · ${u.points} pts</div>
+        </div>
+        <div class="an-admin-acts">
+          ${!isMe ? (isBanned
+            ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
+            : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
+          ) : ''}
+        </div>
+      </div>`
+    }).join('')
+  }
+
+  async adminBan(userId, username) {
+    if (!this.isAdmin()) return
+    const reason = prompt(`Raison du bannissement de ${username} :`)
+    if (reason === null) return
+    await supabase.from('bans').upsert({ user_id: userId, banned_by: this.u.id, reason })
+    this._toast(`${username} banni`, 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminUnban(userId) {
+    if (!this.isAdmin()) return
+    await supabase.from('bans').delete().eq('user_id', userId)
+    this._toast('Utilisateur débanni', 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async _loadAdminBets() {
+    if (!this.isAdmin()) return
+    const el = document.getElementById('an-admin-custom-bets'); if (!el) return
+    const { data } = await supabase.from('custom_bets').select('*').order('created_at', { ascending: false }).limit(10)
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun pari actif</div>'; return }
+    el.innerHTML = data.map(b => `
+      <div class="an-admin-row">
+        <div class="an-admin-row-info">
+          <div class="an-admin-row-title">${b.title.substring(0,40)}</div>
+          <div class="an-admin-row-sub">${b.option_yes} ×${b.odds_yes} / ${b.option_no} ×${b.odds_no} · <span style="color:${b.status==='open'?'#00c87a':'#f0a500'}">${b.status}</span></div>
+        </div>
+        <div class="an-admin-acts">
+          ${b.status==='open'?`
+            <button class="an-micro-btn green" onclick="AN.resolveCustomBet(${b.id},'yes')">✓ Oui</button>
+            <button class="an-micro-btn red" onclick="AN.resolveCustomBet(${b.id},'no')">✕ Non</button>
+          `:''}
+          <button class="an-micro-btn" onclick="AN.editCustomBetOdds(${b.id},${b.odds_yes},${b.odds_no})">Cotes</button>
+        </div>
+      </div>`).join('')
+  }
+
+  async createCustomBet() {
+    if (!this.isAdmin()) return
+    const title = document.getElementById('an-cb-title')?.value.trim()
+    const desc  = document.getElementById('an-cb-desc')?.value.trim()
+    const optYes = document.getElementById('an-cb-yes')?.value.trim() || 'Oui'
+    const optNo  = document.getElementById('an-cb-no')?.value.trim() || 'Non'
+    const oddsYes = parseFloat(document.getElementById('an-cb-odds-yes')?.value) || 2.0
+    const oddsNo  = parseFloat(document.getElementById('an-cb-odds-no')?.value) || 2.0
+    const closesAt = document.getElementById('an-cb-closes')?.value || null
+    if (!title) { this._toast('Titre requis', 'err'); return }
+    const { error } = await supabase.from('custom_bets').insert({
+      created_by: this.u.id, title, description: desc,
+      option_yes: optYes, option_no: optNo,
+      odds_yes: oddsYes, odds_no: oddsNo,
+      closes_at: closesAt || null
+    })
+    if (error) { this._toast(error.message, 'err'); return }
+    // Reset form
+    ;['an-cb-title','an-cb-desc','an-cb-closes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = '' })
+    document.getElementById('an-cb-yes').value = 'Oui'
+    document.getElementById('an-cb-no').value = 'Non'
+    document.getElementById('an-cb-odds-yes').value = '2.0'
+    document.getElementById('an-cb-odds-no').value = '2.0'
+    this._toast('Pari lancé ! 🎲', 'ok')
+    this._loadAdminBets()
+    // Dispatch event so pronostics page can refresh
+    window.dispatchEvent(new CustomEvent('custom-bet-created'))
+  }
+
+  async editCustomBetOdds(betId, currentYes, currentNo) {
+    if (!this.isAdmin()) return
+    const newYes = parseFloat(prompt(`Nouvelle cote OUI (actuelle: ${currentYes}) :`, currentYes))
+    if (isNaN(newYes)) return
+    const newNo = parseFloat(prompt(`Nouvelle cote NON (actuelle: ${currentNo}) :`, currentNo))
+    if (isNaN(newNo)) return
+    await supabase.from('custom_bets').update({ odds_yes: newYes, odds_no: newNo }).eq('id', betId)
+    this._toast('Cotes mises à jour', 'ok')
+    this._loadAdminBets()
+    window.dispatchEvent(new CustomEvent('custom-bet-updated'))
+  }
+
+  async resolveCustomBet(betId, result) {
+    if (!this.isAdmin()) return
+    if (!confirm(`Résoudre ce pari : résultat = "${result}" ?`)) return
+    const newStatus = result === 'yes' ? 'resolved_yes' : 'resolved_no'
+    await supabase.from('custom_bets').update({ status: newStatus }).eq('id', betId)
+    // Payer les gagnants
+    const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('bet_id', betId).eq('status', 'pending')
+    for (const entry of entries || []) {
+      if (entry.pick === result) {
+        // Gagné
+        const { data: prof } = await supabase.from('profiles').select('points').eq('id', entry.user_id).single()
+        const newPts = (prof?.points || 0) + entry.potential_gain
+        await supabase.from('profiles').update({ points: newPts }).eq('id', entry.user_id)
+        await supabase.from('points_log').insert({ user_id: entry.user_id, amount: entry.potential_gain, reason: 'custom_bet_win', ref_id: String(betId) })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_won', from_user_id: this.u.id, ref_label: `+${entry.potential_gain} pts` })
+        await supabase.from('custom_bet_entries').update({ status: 'won' }).eq('id', entry.id)
+      } else {
+        await supabase.from('custom_bet_entries').update({ status: 'lost' }).eq('id', entry.id)
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_lost', from_user_id: this.u.id, ref_label: entry.potential_gain + ' pts perdus' })
+      }
+    }
+    this._toast('Pari résolu, gains distribués ✅', 'ok')
+    this._loadAdminBets()
+    window.dispatchEvent(new CustomEvent('custom-bet-updated'))
+  }
+
 
   _toast(msg, type = '') {
     const t = document.getElementById('an-toast'); if (!t) return
