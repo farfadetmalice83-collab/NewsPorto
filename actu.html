@@ -778,11 +778,13 @@ img[loading="lazy"].loaded { opacity: 1; }
       <li><a href="actu.html" class="active">Actu</a></li>
       <li><a href="effectif.html">Effectif</a></li>
       <li><a href="stats.html">Stats</a></li>
-      <li><a href="videos.html">Vidéos</a></li>
+      <li><a href="match.html">Matchs</a></li>
+      <li><a href="pronostics.html">Pronostics</a></li>
+      <li><a href="forum.html">Forum</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
-    <a href="shop.html" class="nav-cta">Shop →</a>
+    <a href="#" class="nav-cta" onclick="event.preventDefault();AN?.openAuth('signup')">S'inscrire</a>
       <button class="hamburger" id="hamburger-btn" aria-label="Menu" onclick="toggleMobileNav()">
       <span></span><span></span><span></span>
     </button>
@@ -790,11 +792,13 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   <!-- MOBILE NAV -->
   <div class="mobile-nav-overlay" id="mobile-nav">
-    <a href="index.html" class="mobile-nav-item">Accueil</a>
-    <a href="actu.html" class="mobile-nav-item active">Actu</a>
+    <a href="/" class="mobile-nav-item">Accueil</a>
+    <a href="actu.html" class="mobile-nav-item  active">Actu</a>
     <a href="effectif.html" class="mobile-nav-item">Effectif</a>
     <a href="stats.html" class="mobile-nav-item">Stats</a>
-    <a href="videos.html" class="mobile-nav-item">Vidéos</a>
+    <a href="match.html" class="mobile-nav-item">Matchs</a>
+    <a href="pronostics.html" class="mobile-nav-item">Pronostics</a>
+    <a href="forum.html" class="mobile-nav-item">Forum</a>
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <a href="contact.html" class="mobile-nav-item">Contact</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
@@ -1234,6 +1238,7 @@ img[loading="lazy"].loaded { opacity: 1; }
 
 })();
 </script>
+
 
 <script type="module" src="supabase-client.js"></script>
 <script type="module" src="auth-nav.js"></script>
