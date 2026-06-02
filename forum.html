@@ -401,7 +401,7 @@ document.getElementById('hamburger-btn').addEventListener('click', () => {
   const open = mn.classList.toggle('open'); btn.classList.toggle('open', open); document.body.style.overflow = open ? 'hidden' : ''
 })
 
-// ── AUTH — use auth-nav events instead of own getSession (avoids race condition) ──
+// ── AUTH ──
 window.addEventListener('an:login', (e) => {
   currentUser = e.detail.user
   currentProfile = e.detail.profile
@@ -410,11 +410,18 @@ window.addEventListener('an:login', (e) => {
 window.addEventListener('an:logout', () => {
   currentUser = null; currentProfile = null; updateReplyForm()
 })
-// Fallback: if auth-nav already fired before this script loaded
-if (window.AN?.u) {
-  currentUser = window.AN.u
-  currentProfile = window.AN.p
-}
+// Fallback: auth-nav may have already fired — use supabase directly
+supabase.auth.getSession().then(async ({ data: { session } }) => {
+  if (session && !currentUser) {
+    currentUser = session.user
+    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+    currentProfile = data
+    updateReplyForm()
+  }
+})
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; updateReplyForm() }
+})
 
 // ── LOAD THREADS ──
 async function loadThreads() {
