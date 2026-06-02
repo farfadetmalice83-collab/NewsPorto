@@ -256,8 +256,50 @@ const CSS = `
 .an-odds-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
 @media(max-width:768px) {
-  #an-panel { width:100%; }
+  /* Panel takes full screen */
+  #an-panel { width:100%; border-left:none; }
   #an-pill-info { display:none; }
+  /* Bigger touch targets */
+  .an-tab { padding:12px 2px; font-size:8px; letter-spacing:1.5px; }
+  .an-friend-row { padding:12px 16px; }
+  .an-notif-item { padding:12px 16px; }
+  .an-admin-row { padding:12px 16px; }
+  .an-conv-row { padding:14px 16px; }
+  .an-rank-row { padding:14px 16px; }
+  /* Input fields bigger for mobile */
+  .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; } /* 16px prevents iOS zoom */
+  .an-auth-input { font-size:16px; } /* prevents iOS zoom */
+  .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
+  /* Chat full height */
+  .an-chat-wrap { height:calc(100vh - 120px); }
+  .an-chat-msgs { flex:1; }
+  /* Auth modal */
+  #an-auth-modal { align-items:flex-end; }
+  .an-auth-box { border-radius:0; border-bottom:none; padding:28px 20px; padding-bottom:calc(28px + env(safe-area-inset-bottom,0px)); max-width:100%; }
+  /* Panel head smaller */
+  .an-panel-head { padding:12px 16px; }
+  .an-head-avatar { width:38px; height:38px; font-size:17px; }
+  .an-head-name { font-size:13px; }
+  .an-head-pts { font-size:18px; }
+  /* Row labels */
+  .an-row-label { padding:12px 16px 4px; }
+  .an-field { padding:0 16px 10px; }
+  .an-save-row { padding:10px 16px 16px; }
+  .an-search-wrap { padding:10px 16px; }
+  /* Admin sub tabs */
+  .an-admin-sub-tab { font-size:8px; padding:10px 4px; letter-spacing:1.5px; }
+  .an-admin-form { padding:10px 16px; }
+  /* Rank rows */
+  .an-rank-emoji { font-size:20px; }
+  .an-rank-name { font-size:17px; }
+  /* Trigger button */
+  #an-trigger-btn { padding:4px 8px 4px 4px; gap:6px; }
+  #an-avatar-pill { width:28px; height:28px; font-size:12px; }
+}
+/* Safe area for panel */
+@supports(padding-bottom: env(safe-area-inset-bottom)){
+  .an-chat-input-row { padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
+  .an-save-row { padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
 }
 `
 
