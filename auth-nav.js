@@ -679,7 +679,7 @@ class AN {
   _authErr(msg) { const e = document.getElementById('an-auth-err'); e.textContent = msg; e.classList.add('on') }
 
   async googleLogin() {
-    const { error } = await supabase.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href } })
+    const { error } = await supabase.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: 'https://newsporto.fr' } })
     if (error) this._authErr(error.message)
   }
 
