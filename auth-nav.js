@@ -947,8 +947,29 @@ class AN {
     const content = input.value.trim(); if (!content || !this.mpFriend || !this.u) return
     input.value = ''
     await sendMessage(this.u.id, this.mpFriend.id, content)
-    // Notif
+    // Notif in-app
     await supabase.from('notifications').insert({ user_id: this.mpFriend.id, type:'mp', from_user_id: this.u.id })
+    // Email notification (only if recipient not active on site — best effort)
+    try {
+      const { data: recipientProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', this.mpFriend.id)
+        .single()
+      // Get email from auth (only available server-side, so we use a serverless function)
+      const fromName = this.p?.display_name || this.p?.username || 'Un membre'
+      const preview = content.length > 80 ? content.substring(0, 80) + '…' : content
+      // Call our notify-mp API — it handles email lookup server-side
+      fetch('/api/notify-mp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          toUserId: this.mpFriend.id,
+          fromName,
+          messagePreview: preview,
+        })
+      }).catch(() => {}) // fire and forget
+    } catch {}
     await this._loadMsgs()
   }
 
