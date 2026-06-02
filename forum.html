@@ -50,12 +50,6 @@
     .sidebar-item:hover,.sidebar-item.active{background:rgba(0,61,165,0.08);color:#fff;}
     .sidebar-item.active{border-left:2px solid var(--blue);}
     .sidebar-count{font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,0.2);}
-    .online-section{padding:0 24px;}
-    .online-row{display:flex;align-items:center;gap:8px;padding:6px 0;}
-    .online-av{width:24px;height:24px;border-radius:50%;background:rgba(0,61,165,0.4);border:1px solid rgba(0,61,165,0.6);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:11px;color:#4d82d4;flex-shrink:0;overflow:hidden;}
-    .online-av img{width:100%;height:100%;object-fit:cover;}
-    .online-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.6);}
-    .online-dot{width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0;animation:pulseG 2s ease-in-out infinite;}
     @keyframes pulseG{0%,100%{opacity:1}50%{opacity:.4}}
 
     /* MAIN */
@@ -302,12 +296,6 @@
         <button class="sidebar-item" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
         <button class="sidebar-item" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
       </div>
-      <div class="sidebar-section">
-        <div class="sidebar-label">En ligne</div>
-        <div class="online-section" id="online-list">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.15);">—</div>
-        </div>
-      </div>
     </aside>
 
     <!-- MAIN -->
@@ -420,12 +408,18 @@ supabase.auth.onAuthStateChange(async (_, session) => {
     updateReplyForm()
   } else { currentUser = null; currentProfile = null; updateReplyForm() }
 })
-const { data: { session } } = await supabase.auth.getSession()
-if (session) {
-  currentUser = session.user
-  const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
-  currentProfile = data
+// Wrap in async init to avoid top-level await blocking window.* function definitions
+async function initAuth() {
+  try {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      currentUser = session.user
+      const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+      currentProfile = data
+    }
+  } catch(e) { console.warn('Auth init error:', e) }
 }
+initAuth()
 
 // ── LOAD THREADS ──
 async function loadThreads() {
