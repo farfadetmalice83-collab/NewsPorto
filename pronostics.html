@@ -444,6 +444,132 @@ async function loadMatches() {
 }
 loadMatches()
 
+// ── CUSTOM BETS ──
+async function loadCustomBets() {
+  const { data } = await supabase.from('custom_bets').select('*').eq('status','open').order('created_at', { ascending: false })
+  const container = document.getElementById('custom-bets-container')
+  const label = document.getElementById('custom-bets-label')
+  if (!data?.length) { container.innerHTML = ''; if(label) label.style.display='none'; return }
+  if(label) label.style.display = ''
+  // Load user's entries
+  let userEntries = {}
+  if (currentUser) {
+    const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('user_id', currentUser.id)
+    ;(entries||[]).forEach(e => userEntries[e.bet_id] = e)
+  }
+  container.innerHTML = data.map(b => {
+    const entry = userEntries[b.id]
+    const maxS = currentProfile ? (RANK_MAX[currentProfile.rank] || 200) : 200
+    const userPts = currentProfile ? currentProfile.points : 0
+    if (entry) {
+      return `<div class="bet-card">
+        <div class="bet-card-header"><span class="bet-competition">Pari Spécial</span><div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mise enregistrée</span></div></div>
+        <div style="padding:20px 32px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:6px">${b.title}</div>${b.description?`<div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">${b.description}</div>`:''}</div>
+        <div class="bet-result-banner ${entry.status}">
+          <span class="result-label">${entry.pick==='yes'?b.option_yes:b.option_no} · ${entry.status==='won'?'✅ Gagné':entry.status==='lost'?'❌ Perdu':'⏳ En attente'}</span>
+          <span class="result-points">${entry.status==='won'?'+'+entry.potential_gain+' pts':entry.status==='lost'?'-'+entry.stake+' pts':'Gain potentiel : +'+entry.potential_gain+' pts'}</span>
+        </div>
+      </div>`
+    }
+    return `<div class="bet-card">
+      <div class="bet-card-header"><span class="bet-competition">🎲 Pari Spécial</span><div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">Ouvert</span></div></div>
+      <div style="padding:20px 32px 0">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:6px">${b.title}</div>
+        ${b.description?`<div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">${b.description}</div>`:''}
+      </div>
+      <div class="bet-options" id="cb-options-${b.id}">
+        <button class="bet-option win-option" onclick="selectCustomOpt(${b.id},'yes')" id="cb-opt-${b.id}-yes">
+          <span class="bet-option-label">${b.option_yes}</span>
+          <span class="bet-option-result">OUI</span>
+          <span class="bet-option-mult">×${b.odds_yes}</span>
+        </button>
+        <button class="bet-option lose-option" onclick="selectCustomOpt(${b.id},'no')" id="cb-opt-${b.id}-no">
+          <span class="bet-option-label">${b.option_no}</span>
+          <span class="bet-option-result">NON</span>
+          <span class="bet-option-mult">×${b.odds_no}</span>
+        </button>
+      </div>
+      <div class="bet-stake">
+        <div class="stake-input-wrap">
+          <span class="stake-label">Mise (pts) · Max ${Math.min(maxS,userPts)} pts</span>
+          <input type="number" class="stake-input" id="cb-stake-${b.id}" placeholder="0" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCustomPreview(${b.id},${b.odds_yes},${b.odds_no})">
+          <div class="stake-quick">
+            <button class="stake-quick-btn" onclick="setCbStake(${b.id},50,${Math.min(maxS,userPts)})">50</button>
+            <button class="stake-quick-btn" onclick="setCbStake(${b.id},100,${Math.min(maxS,userPts)})">100</button>
+            <button class="stake-quick-btn" onclick="setCbStake(${b.id},'all',${Math.min(maxS,userPts)})">TOUT</button>
+          </div>
+        </div>
+        <div class="stake-preview">
+          <span class="stake-preview-label">Gain potentiel</span>
+          <span class="stake-preview-value zero" id="cb-preview-${b.id}">0 pts</span>
+          ${currentUser
+            ? `<button class="btn-bet" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider →</button>`
+            : `<button class="btn-bet" onclick="AuthNav.openAuth()">Connexion requise</button>`
+          }
+        </div>
+      </div>
+    </div>`
+  }).join('')
+}
+loadCustomBets()
+window.addEventListener('custom-bet-created', loadCustomBets)
+window.addEventListener('custom-bet-updated', loadCustomBets)
+
+const cbSelected = {}
+window.selectCustomOpt = function(betId, pick) {
+  cbSelected[betId] = pick
+  ;['yes','no'].forEach(p => document.getElementById(`cb-opt-${betId}-${p}`)?.classList.remove('selected'))
+  document.getElementById(`cb-opt-${betId}-${pick}`)?.classList.add('selected')
+  updateCustomPreview(betId)
+}
+window.setCbStake = function(betId, val, max) {
+  const input = document.getElementById(`cb-stake-${betId}`)
+  if (input) { input.value = val==='all'?max:Math.min(val,max); updateCustomPreview(betId) }
+}
+window.updateCustomPreview = function(betId) {
+  const pick = cbSelected[betId]
+  const stake = parseInt(document.getElementById(`cb-stake-${betId}`)?.value) || 0
+  const { data: bet } = { data: null } // odds from data attr
+  const btnEl = document.getElementById(`cb-btn-${betId}`)
+  const prevEl = document.getElementById(`cb-preview-${betId}`)
+  // Get odds from option buttons
+  const yesBtn = document.getElementById(`cb-opt-${betId}-yes`)
+  const noBtn = document.getElementById(`cb-opt-${betId}-no`)
+  if (!yesBtn || !noBtn || !prevEl) return
+  const oddsYes = parseFloat(yesBtn.querySelector('.bet-option-mult')?.textContent?.replace('×','')) || 2
+  const oddsNo  = parseFloat(noBtn.querySelector('.bet-option-mult')?.textContent?.replace('×','')) || 2
+  const mult = pick === 'yes' ? oddsYes : pick === 'no' ? oddsNo : 1
+  const gain = pick && stake >= 10 ? Math.floor(stake * mult) : 0
+  if (gain > 0) { prevEl.textContent = '+'+gain+' pts'; prevEl.classList.remove('zero'); if(btnEl) btnEl.disabled = false }
+  else { prevEl.textContent = '0 pts'; prevEl.classList.add('zero'); if(btnEl) btnEl.disabled = true }
+}
+window.submitCustomBet = async function(betId, title, oddsYes, oddsNo) {
+  if (!currentUser || !currentProfile) return
+  const pick = cbSelected[betId]
+  const stake = parseInt(document.getElementById(`cb-stake-${betId}`)?.value) || 0
+  if (!pick || stake < 10) { showToast('Sélectionne une option et une mise ≥ 10 pts', 'error'); return }
+  if (stake > currentProfile.points) { showToast('Pas assez de points', 'error'); return }
+  const mult = pick === 'yes' ? oddsYes : oddsNo
+  const potential_gain = Math.floor(stake * mult)
+  const btn = document.getElementById(`cb-btn-${betId}`)
+  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement...' }
+  try {
+    // Débit points
+    const newPts = currentProfile.points - stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: -stake, reason: 'custom_bet', ref_id: String(betId) })
+    await supabase.from('custom_bet_entries').insert({ bet_id: betId, user_id: currentUser.id, pick, stake, potential_gain })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(`Mise de ${stake} pts enregistrée ! Gain potentiel : +${potential_gain} pts`, 'success')
+    await loadCustomBets()
+  } catch(e) {
+    showToast(e.message.includes('unique') ? 'Tu as déjà misé sur ce pari' : e.message, 'error')
+    if (btn) { btn.disabled = false; btn.textContent = 'Valider →' }
+  }
+}
+
+
 // ── LOAD EXISTING BETS ──
 async function loadExistingBets() {
   if (!currentUser) return
