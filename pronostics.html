@@ -470,7 +470,7 @@ window.addEventListener('scroll', () => document.getElementById('main-nav').clas
 const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)} }), {threshold:0.1})
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
 
-// ── AUTH — use auth-nav events instead of own getSession (avoids race condition) ──
+// ── AUTH ──
 window.addEventListener('an:login', async (e) => {
   currentUser = e.detail.user
   currentProfile = e.detail.profile
@@ -478,32 +478,26 @@ window.addEventListener('an:login', async (e) => {
   await loadExistingBets()
   renderMatches()
   loadHistory()
-  document.querySelectorAll('.bet-option.disabled').forEach(btn => btn.classList.remove('disabled'))
 })
 window.addEventListener('an:logout', () => {
   currentUser = null; currentProfile = null
-  updatePointsBanner()
-  renderMatches()
+  updatePointsBanner(); renderMatches()
 })
-// Fallback: if auth-nav already fired before this script loaded
-if (window.AN?.u && window.AN?.p) {
-  currentUser = window.AN.u
-  currentProfile = window.AN.p
-  updatePointsBanner()
-  loadExistingBets().then(() => renderMatches())
-  loadHistory()
-} {
-  try {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      currentUser = session.user
-      const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
-      currentProfile = data
-      await loadExistingBets()
-    }
-  } catch(e) { console.warn('Auth init error:', e) }
-}
-initAuth()
+// Fallback: auth-nav may have already fired
+supabase.auth.getSession().then(async ({ data: { session } }) => {
+  if (session && !currentUser) {
+    currentUser = session.user
+    const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
+    currentProfile = data
+    updatePointsBanner()
+    await loadExistingBets()
+    renderMatches()
+    loadHistory()
+  }
+})
+supabase.auth.onAuthStateChange((event) => {
+  if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; updatePointsBanner(); renderMatches() }
+})
 
 // Realtime points update
 window.addEventListener('points-updated', e => {
