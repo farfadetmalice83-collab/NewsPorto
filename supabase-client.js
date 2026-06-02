@@ -7,7 +7,14 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const SUPABASE_URL  = 'https://eaiiesiouwqpwtxrebax.supabase.co'
 const SUPABASE_KEY  = 'sb_publishable_6SQ19mCtNnlXk5tCHEFnQw_BKOzdbor'
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY)
+export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    detectSessionInUrl: true,
+    persistSession: true,
+    autoRefreshToken: true,
+    storageKey: 'newsporto-auth',
+  }
+})
 
 // ─────────────────────────────────────────────────────────────────────────────
 // AUTH
