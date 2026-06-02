@@ -4,10 +4,10 @@
 import { supabase, signOut, sendFriendRequest, getFriends, acceptFriendRequest, getConversation, sendMessage, markMessagesRead, startPresence, stopPresence } from './supabase-client.js'
 
 const RANKS = [
-  { id:'Adepto',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
-  { id:'Dragão',  emoji:'🔵', cost:2000,   color:'#4d82d4', border:'#003DA5' },
-  { id:'Ultras',  emoji:'🟡', cost:8000,   color:'#f0a500', border:'#f0a500' },
-  { id:'Lenda',   emoji:'🔴', cost:40000,  color:'#e74c3c', border:'#e74c3c' },
+  { id:'Supporter',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
+  { id:'Dragon',  emoji:'🔵', cost:2000,   color:'#4d82d4', border:'#003DA5' },
+  { id:'Socio',  emoji:'🟡', cost:8000,   color:'#f0a500', border:'#f0a500' },
+  { id:'Légende',   emoji:'🔴', cost:40000,  color:'#e74c3c', border:'#e74c3c' },
   { id:'Invicta', emoji:'💎', cost:300000, color:'#c9a84c', border:'#c9a84c' },
 ]
 
