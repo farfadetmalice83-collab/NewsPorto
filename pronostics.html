@@ -941,17 +941,21 @@ async function loadLeaderboard() {
   container.innerHTML = data.map((u, i) => {
     const topClass = i===0?'top1':i===1?'top2':i===2?'top3':''
     const isMe = currentUser && u.id === currentUser.id
-    return `<div class="lb-row ${topClass}" ${isMe?'style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"':''}>
-      <div class="lb-rank" ${isMe?'style="color:var(--blue-light)"'}>${i+1}</div>
+    const meStyle = isMe ? ' style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"' : ''
+    const meRank = isMe ? ' style="color:var(--blue-light)"' : ''
+    const meAv = isMe ? ' style="border-color:var(--blue-light)"' : ''
+    const avContent = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
+    return `<div class="lb-row ${topClass}"${meStyle}>
+      <div class="lb-rank"${meRank}>${i+1}</div>
       <div class="lb-user">
-        <div class="lb-avatar" ${isMe?'style="border-color:var(--blue-light)"'}>${u.avatar_url?`<img src="${u.avatar_url}">`:((u.display_name||u.username||'?')[0].toUpperCase())}</div>
+        <div class="lb-avatar"${meAv}>${avContent}</div>
         <div>
-          <div class="lb-name" ${isMe?'style="color:var(--blue-light)"'}>${u.display_name||u.username}</div>
+          <div class="lb-name"${meRank}>${u.display_name||u.username}</div>
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3)">${rankEmoji[u.rank]||'⚪'} ${u.rank}</span>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="lb-pts" ${isMe?'style="color:var(--blue-light)"'}>${u.points} pts</div>
+        <div class="lb-pts"${meRank}>${u.points} pts</div>
       </div>
     </div>`
   }).join('')
