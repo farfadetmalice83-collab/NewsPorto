@@ -302,6 +302,17 @@ const CSS = `
   .an-chat-input-row { padding-bottom:calc(10px + env(safe-area-inset-bottom)); }
   .an-save-row { padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
 }
+
+/* ── CROPPER MODAL ── */
+#an-crop-modal { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.95); align-items:center; justify-content:center; flex-direction:column; gap:16px; }
+#an-crop-modal.open { display:flex; }
+#an-crop-wrap { position:relative; width:300px; height:300px; overflow:hidden; border-radius:50%; border:2px solid #003DA5; cursor:move; touch-action:none; }
+#an-crop-img { position:absolute; transform-origin:0 0; pointer-events:none; }
+.an-crop-hint { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+.an-crop-actions { display:flex; gap:10px; }
+.an-crop-zoom { display:flex; align-items:center; gap:10px; }
+.an-crop-zoom input { accent-color:#003DA5; width:120px; }
+.an-crop-zoom span { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.4); }
 `
 
 // ─── HTML ──────────────────────────────────────────────────────────────────
@@ -487,6 +498,23 @@ function html() { return `
       <div id="an-rank-list"></div>
     </div>
 
+  </div>
+</div>
+
+<!-- CROP MODAL -->
+<div id="an-crop-modal">
+  <div class="an-crop-hint">Déplace · Pinche pour zoomer</div>
+  <div id="an-crop-wrap">
+    <img id="an-crop-img" src="" alt="">
+  </div>
+  <div class="an-crop-zoom">
+    <span>−</span>
+    <input type="range" id="an-crop-zoom-range" min="1" max="3" step="0.01" value="1">
+    <span>+</span>
+  </div>
+  <div class="an-crop-actions">
+    <button class="an-btn-ghost" onclick="AN.closeCrop()">Annuler</button>
+    <button class="an-btn" onclick="AN.confirmCrop()">Valider →</button>
   </div>
 </div>
 
@@ -737,27 +765,116 @@ class AN {
     const err = document.getElementById('an-prof-err')
     err.classList.remove('on')
     try {
-      await supabase.from('profiles').update({ display_name, bio, updated_at: new Date().toISOString() }).eq('id', this.u.id)
-      if (pwd) await supabase.auth.updateUser({ password: pwd })
+      const { error } = await supabase.from('profiles').update({ display_name, bio, updated_at: new Date().toISOString() }).eq('id', this.u.id)
+      if (error) throw error
+      if (pwd) { const { error: pe } = await supabase.auth.updateUser({ password: pwd }); if (pe) throw pe }
+      // Reload profile and force nav update
       const { data } = await supabase.from('profiles').select('*').eq('id', this.u.id).single()
-      this.p = data; this._updateNav()
+      if (data) { this.p = data; this._updateNav() }
       this._toast('Profil mis à jour ✓', 'ok')
+      // Clear password field
+      const pwdEl = document.getElementById('an-prof-pwd'); if (pwdEl) pwdEl.value = ''
     } catch(e) { err.textContent = e.message; err.classList.add('on') }
+  }
+
+  // ── CROPPER ──
+  _cropState = { x:0, y:0, scale:1, dragging:false, startX:0, startY:0, imgW:0, imgH:0, blob:null }
+
+  openCropModal(file) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = document.getElementById('an-crop-img')
+      const wrap = document.getElementById('an-crop-wrap')
+      img.onload = () => {
+        const wrapW = 300, wrapH = 300
+        const ratio = Math.max(wrapW / img.naturalWidth, wrapH / img.naturalHeight)
+        this._cropState = { x:0, y:0, scale:ratio, minScale:ratio, dragging:false, startX:0, startY:0, imgW:img.naturalWidth, imgH:img.naturalHeight, file }
+        img.style.width = img.naturalWidth + 'px'
+        img.style.height = img.naturalHeight + 'px'
+        this._applyCropTransform()
+        document.getElementById('an-crop-zoom-range').min = ratio
+        document.getElementById('an-crop-zoom-range').max = ratio * 4
+        document.getElementById('an-crop-zoom-range').step = ratio * 0.01
+        document.getElementById('an-crop-zoom-range').value = ratio
+      }
+      img.src = e.target.result
+      document.getElementById('an-crop-modal').classList.add('open')
+      this._initCropEvents()
+    }
+    reader.readAsDataURL(file)
+  }
+
+  _applyCropTransform() {
+    const s = this._cropState
+    const img = document.getElementById('an-crop-img')
+    const wrap = document.getElementById('an-crop-wrap')
+    // Clamp so image always covers the 300x300 wrap
+    const scaledW = s.imgW * s.scale, scaledH = s.imgH * s.scale
+    s.x = Math.min(0, Math.max(300 - scaledW, s.x))
+    s.y = Math.min(0, Math.max(300 - scaledH, s.y))
+    img.style.transform = `translate(${s.x}px,${s.y}px) scale(${s.scale})`
+    img.style.transformOrigin = '0 0'
+  }
+
+  _initCropEvents() {
+    const wrap = document.getElementById('an-crop-wrap')
+    const zoom = document.getElementById('an-crop-zoom-range')
+    // Remove old listeners by cloning
+    const nw = wrap.cloneNode(true); wrap.parentNode.replaceChild(nw, wrap)
+    const nz = zoom.cloneNode(true); zoom.parentNode.replaceChild(nz, zoom)
+    const newWrap = document.getElementById('an-crop-wrap')
+    const newZoom = document.getElementById('an-crop-zoom-range')
+    // Mouse drag
+    newWrap.addEventListener('mousedown', (e) => { this._cropState.dragging=true; this._cropState.startX=e.clientX-this._cropState.x; this._cropState.startY=e.clientY-this._cropState.y; e.preventDefault() })
+    document.addEventListener('mousemove', (e) => { if(!this._cropState.dragging) return; this._cropState.x=e.clientX-this._cropState.startX; this._cropState.y=e.clientY-this._cropState.startY; this._applyCropTransform() })
+    document.addEventListener('mouseup', () => { this._cropState.dragging=false })
+    // Touch drag
+    newWrap.addEventListener('touchstart', (e) => { const t=e.touches[0]; this._cropState.dragging=true; this._cropState.startX=t.clientX-this._cropState.x; this._cropState.startY=t.clientY-this._cropState.y }, {passive:true})
+    newWrap.addEventListener('touchmove', (e) => { if(!this._cropState.dragging) return; const t=e.touches[0]; this._cropState.x=t.clientX-this._cropState.startX; this._cropState.y=t.clientY-this._cropState.startY; this._applyCropTransform() }, {passive:true})
+    newWrap.addEventListener('touchend', () => { this._cropState.dragging=false })
+    // Zoom
+    newZoom.addEventListener('input', (e) => { this._cropState.scale=parseFloat(e.target.value); this._applyCropTransform() })
+  }
+
+  closeCrop() {
+    document.getElementById('an-crop-modal').classList.remove('open')
+    document.getElementById('an-avatar-input').value = ''
+  }
+
+  async confirmCrop() {
+    const s = this._cropState
+    const img = document.getElementById('an-crop-img')
+    const canvas = document.createElement('canvas')
+    canvas.width = 300; canvas.height = 300
+    const ctx = canvas.getContext('2d')
+    ctx.beginPath(); ctx.arc(150,150,150,0,Math.PI*2); ctx.clip()
+    ctx.drawImage(img, s.x, s.y, s.imgW * s.scale, s.imgH * s.scale)
+    canvas.toBlob(async (blob) => {
+      this.closeCrop()
+      await this._doUploadBlob(blob)
+    }, 'image/jpeg', 0.9)
   }
 
   async uploadAvatar(input) {
     const file = input.files[0]; if (!file || !this.u) return
-    if (file.size > 2*1024*1024) { this._toast('Image trop lourde (max 2MB)', 'err'); return }
+    if (file.size > 10*1024*1024) { this._toast('Image trop lourde (max 10MB)', 'err'); return }
+    this.openCropModal(file)
+  }
+
+  async _doUploadBlob(blob) {
     try {
-      const ext = file.name.split('.').pop()
-      const path = `${this.u.id}/avatar.${ext}`
-      await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      const path = `${this.u.id}/avatar.jpg`
+      const { error } = await supabase.storage.from('avatars').upload(path, blob, { upsert: true, contentType: 'image/jpeg' })
+      if (error) throw error
       const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-      await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', this.u.id)
-      const profAv = document.getElementById('an-prof-av'); if (profAv) profAv.innerHTML = `<img src="${data.publicUrl}">`
-      if (this.p) this.p.avatar_url = data.publicUrl
-      this._updateNav(); this._toast('Photo mise à jour ✓', 'ok')
-    } catch { this._toast('Erreur upload', 'err') }
+      // Cache-bust
+      const url = data.publicUrl + '?t=' + Date.now()
+      await supabase.from('profiles').update({ avatar_url: url }).eq('id', this.u.id)
+      if (this.p) this.p.avatar_url = url
+      const profAv = document.getElementById('an-prof-av'); if (profAv) profAv.innerHTML = `<img src="${url}">`
+      this._updateNav()
+      this._toast('Photo mise à jour ✓', 'ok')
+    } catch(e) { this._toast('Erreur upload: ' + e.message, 'err') }
   }
 
   // NOTIFS
