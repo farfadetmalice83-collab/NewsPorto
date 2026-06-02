@@ -1,758 +1,843 @@
-// auth-nav.js — NewsPorto v2
+// auth-nav.js — NewsPorto v3
 // <script type="module" src="auth-nav.js"></script> avant </body>
 
-import {
-  supabase, signOut,
-  sendFriendRequest, getFriends, acceptFriendRequest,
-  getConversation, sendMessage, markMessagesRead,
-  startPresence, stopPresence,
-} from './supabase-client.js'
+import { supabase, signOut, sendFriendRequest, getFriends, acceptFriendRequest, getConversation, sendMessage, markMessagesRead, startPresence, stopPresence } from './supabase-client.js'
 
 const RANKS = [
-  { id:'Adepto',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.6)', border:'rgba(255,255,255,0.3)' },
-  { id:'Dragão',  emoji:'🔵', cost:2000,   color:'#4d82d4',               border:'#003DA5' },
-  { id:'Ultras',  emoji:'🟡', cost:8000,   color:'#f0a500',               border:'#f0a500' },
-  { id:'Lenda',   emoji:'🔴', cost:40000,  color:'#e74c3c',               border:'#e74c3c' },
-  { id:'Invicta', emoji:'💎', cost:300000, color:'#c9a84c',               border:'#c9a84c' },
+  { id:'Adepto',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
+  { id:'Dragão',  emoji:'🔵', cost:2000,   color:'#4d82d4', border:'#003DA5' },
+  { id:'Ultras',  emoji:'🟡', cost:8000,   color:'#f0a500', border:'#f0a500' },
+  { id:'Lenda',   emoji:'🔴', cost:40000,  color:'#e74c3c', border:'#e74c3c' },
+  { id:'Invicta', emoji:'💎', cost:300000, color:'#c9a84c', border:'#c9a84c' },
 ]
 
+// ─── CSS ───────────────────────────────────────────────────────────────────
 const CSS = `
-  #auth-trigger{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.3);color:rgba(255,255,255,0.7);background:transparent;padding:8px 20px;cursor:pointer;transition:.2s;white-space:nowrap;}
-  #auth-trigger:hover{border-color:#fff;color:#fff;}
-  #profile-pill{display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px 12px 6px 6px;border:1px solid rgba(255,255,255,0.1);transition:border-color .2s;position:relative;background:transparent;}
-  #profile-pill:hover{border-color:rgba(0,61,165,0.5);}
-  #profile-avatar{width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(0,61,165,0.6);background:rgba(0,61,165,0.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:14px;color:#4d82d4;flex-shrink:0;overflow:hidden;}
-  #profile-avatar img{width:100%;height:100%;object-fit:cover;}
-  #profile-info{display:flex;flex-direction:column;gap:1px;}
-  #profile-name{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff;line-height:1;}
-  #profile-points{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:#4d82d4;line-height:1;}
+/* TRIGGER BUTTON */
+#an-trigger-btn {
+  display:flex; align-items:center; gap:8px; cursor:pointer;
+  background:transparent; border:1px solid rgba(255,255,255,0.15);
+  padding:5px 10px 5px 5px; transition:border-color .2s; position:relative; flex-shrink:0;
+}
+#an-trigger-btn:hover { border-color:rgba(0,61,165,0.6); }
+#an-avatar-pill {
+  width:30px; height:30px; border-radius:50%;
+  background:rgba(0,61,165,0.4); border:1.5px solid rgba(0,61,165,0.7);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:13px; color:#4d82d4;
+  flex-shrink:0; overflow:hidden;
+}
+#an-avatar-pill img { width:100%; height:100%; object-fit:cover; }
+#an-pill-info { display:flex; flex-direction:column; gap:0; }
+#an-pill-name { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; line-height:1.1; }
+#an-pill-pts  { font-family:'Bebas Neue',sans-serif; font-size:12px; letter-spacing:1px; color:#4d82d4; line-height:1.1; }
+#an-notif-dot { position:absolute; top:-3px; right:-3px; width:10px; height:10px; border-radius:50%; background:#e74c3c; border:2px solid #000; display:none; }
+#an-notif-dot.on { display:block; }
 
-  /* NOTIF BADGE global */
-  #notif-badge{position:absolute;top:-4px;right:-4px;width:18px;height:18px;border-radius:50%;background:#e74c3c;border:2px solid #000;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;color:#fff;display:none;align-items:center;justify-content:center;}
-  #notif-badge.visible{display:flex;}
+/* SIGN IN BUTTON */
+#an-signin-btn {
+  font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  border:1px solid rgba(255,255,255,0.3); color:rgba(255,255,255,0.8);
+  background:transparent; padding:8px 18px; cursor:pointer; transition:.2s; white-space:nowrap;
+}
+#an-signin-btn:hover { border-color:#fff; color:#fff; }
 
-  /* DROPDOWN */
-  #profile-dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:250px;background:#05090f;border:1px solid rgba(0,61,165,0.35);z-index:300;display:none;animation:ddIn .2s cubic-bezier(.22,1,.36,1);}
-  #profile-dropdown.open{display:block;}
-  @keyframes ddIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-  .dd-header{padding:16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;gap:10px;}
-  .dd-avatar-lg{width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(0,61,165,0.6);flex-shrink:0;overflow:hidden;background:rgba(0,61,165,0.3);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:18px;color:#4d82d4;}
-  .dd-avatar-lg img{width:100%;height:100%;object-fit:cover;}
-  .dd-user-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;}
-  .dd-user-rank{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-top:2px;}
-  .dd-points-row{padding:10px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;}
-  .dd-points-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
-  .dd-points-val{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#4d82d4;}
-  .dd-item{display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;transition:background .15s;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);text-decoration:none;border:none;background:none;width:100%;text-align:left;}
-  .dd-item:hover{background:rgba(0,61,165,0.1);color:#fff;}
-  .dd-item.danger:hover{background:rgba(231,76,60,0.1);color:#e74c3c;}
-  .dd-item svg{opacity:.5;flex-shrink:0;}.dd-item:hover svg{opacity:1;}
-  .dd-sep{height:1px;background:rgba(255,255,255,0.08);}
-  .dd-notif-dot{width:6px;height:6px;border-radius:50%;background:#e74c3c;margin-left:auto;}
-  .dd-notif-count{font-family:'Bebas Neue',sans-serif;font-size:13px;color:#e74c3c;margin-left:auto;}
+/* SIDE PANEL */
+#an-panel {
+  position:fixed; top:0; right:0; width:360px; height:100vh;
+  background:#04070d; border-left:1px solid rgba(0,61,165,0.3);
+  z-index:800; display:flex; flex-direction:column;
+  transform:translateX(100%); transition:transform .35s cubic-bezier(.22,1,.36,1);
+  overflow:hidden;
+}
+#an-panel.open { transform:translateX(0); }
+#an-overlay {
+  position:fixed; inset:0; z-index:799; background:rgba(0,0,0,0.5);
+  backdrop-filter:blur(4px); display:none; cursor:pointer;
+}
+#an-overlay.on { display:block; }
 
-  /* NOTIF PANEL */
-  #notif-panel{position:absolute;top:calc(100% + 8px);right:0;width:320px;background:#05090f;border:1px solid rgba(0,61,165,0.35);z-index:400;display:none;animation:ddIn .2s cubic-bezier(.22,1,.36,1);}
-  #notif-panel.open{display:block;}
-  .notif-panel-header{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;}
-  .notif-panel-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;}
-  .notif-mark-all{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);cursor:pointer;background:none;border:none;transition:color .2s;}
-  .notif-mark-all:hover{color:#fff;}
-  .notif-list{max-height:320px;overflow-y:auto;}
-  .notif-item{padding:12px 16px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;display:flex;align-items:flex-start;gap:10px;}
-  .notif-item:hover{background:rgba(0,61,165,0.06);}
-  .notif-item.unread{background:rgba(0,61,165,0.04);}
-  .notif-item.unread::before{content:'';display:block;width:4px;background:#003DA5;align-self:stretch;flex-shrink:0;margin:-12px 6px -12px -16px;}
-  .notif-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
-  .notif-text{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.7);line-height:1.4;}
-  .notif-text strong{color:#fff;}
-  .notif-time{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);margin-top:3px;}
-  .notif-empty{padding:24px 16px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+/* PANEL HEADER */
+.an-panel-head {
+  padding:16px 20px; border-bottom:1px solid rgba(255,255,255,0.07);
+  display:flex; align-items:center; gap:12px; flex-shrink:0;
+}
+.an-head-avatar {
+  width:44px; height:44px; border-radius:50%;
+  background:rgba(0,61,165,0.3); border:2px solid rgba(0,61,165,0.6);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:20px; color:#4d82d4;
+  flex-shrink:0; overflow:hidden; cursor:pointer; transition:border-color .2s;
+}
+.an-head-avatar:hover { border-color:#4d82d4; }
+.an-head-avatar img { width:100%; height:100%; object-fit:cover; }
+.an-head-info { flex:1; min-width:0; }
+.an-head-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.an-head-rank { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-top:1px; }
+.an-head-pts  { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; color:#4d82d4; }
+.an-head-close { background:none; border:none; color:rgba(255,255,255,0.3); font-family:'Bebas Neue',sans-serif; font-size:22px; cursor:pointer; transition:color .2s; flex-shrink:0; }
+.an-head-close:hover { color:#fff; }
 
-  /* MODALS */
-  .np-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);align-items:center;justify-content:center;}
-  .np-modal.open{display:flex;}
-  .np-box{background:#05090f;border:1px solid rgba(0,61,165,0.35);width:100%;padding:40px;position:relative;animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-  .np-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;transition:color .2s;}
-  .np-close:hover{color:#fff;}
-  .np-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:10px;}
-  .np-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:28px;}
-  #auth-modal .np-box{max-width:420px;}
-  .auth-tabs{display:flex;margin-bottom:28px;border-bottom:1px solid rgba(255,255,255,0.1);}
-  .auth-tab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);padding:10px 20px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.2s;}
-  .auth-tab.active{color:#fff;border-bottom-color:#003DA5;}
-  .np-field{margin-bottom:16px;}
-  .np-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;}
-  .np-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
-  .np-input:focus{border-color:#003DA5;background:rgba(0,20,80,0.1);}
-  .np-input::placeholder{color:rgba(255,255,255,0.2);}
-  .np-newsletter{display:flex;align-items:center;gap:10px;margin-bottom:20px;cursor:pointer;}
-  .np-newsletter input{accent-color:#003DA5;width:14px;height:14px;}
-  .np-newsletter span{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);}
-  .np-btn{width:100%;background:#003DA5;color:#fff;border:1px solid #003DA5;padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s;margin-bottom:12px;}
-  .np-btn:hover{background:#0050CC;}
-  .np-btn:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);cursor:not-allowed;}
-  .np-error{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;color:#e74c3c;margin-bottom:12px;display:none;}
-  .np-error.visible{display:block;}
-  .auth-bonus{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#4d82d4;text-align:center;}
+/* PANEL TABS */
+.an-tabs { display:flex; border-bottom:1px solid rgba(255,255,255,0.07); flex-shrink:0; }
+.an-tab {
+  flex:1; padding:10px 4px; background:none; border:none; border-bottom:2px solid transparent;
+  font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.35);
+  cursor:pointer; transition:color .2s,border-color .2s; position:relative;
+}
+.an-tab:hover { color:rgba(255,255,255,0.7); }
+.an-tab.active { color:#fff; border-bottom-color:#003DA5; }
+.an-tab-dot { position:absolute; top:6px; right:6px; width:6px; height:6px; border-radius:50%; background:#e74c3c; display:none; }
+.an-tab-dot.on { display:block; }
 
-  /* SETTINGS */
-  #settings-modal .np-box{max-width:520px;max-height:90vh;overflow-y:auto;}
-  .settings-section{margin-bottom:28px;}
-  .settings-section-title{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:16px;display:flex;align-items:center;gap:10px;}
-  .settings-section-title::after{content:'';flex:1;height:1px;background:rgba(255,255,255,0.08);}
-  .avatar-upload-wrap{display:flex;align-items:center;gap:20px;margin-bottom:20px;}
-  #settings-avatar-preview{width:64px;height:64px;border-radius:50%;border:2px solid rgba(0,61,165,0.5);overflow:hidden;background:rgba(0,61,165,0.2);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:#4d82d4;flex-shrink:0;}
-  #settings-avatar-preview img{width:100%;height:100%;object-fit:cover;}
-  .avatar-upload-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.6);padding:8px 16px;cursor:pointer;background:none;transition:.2s;}
-  .avatar-upload-btn:hover{border-color:#fff;color:#fff;}
-  #avatar-file-input{display:none;}
+/* PANEL BODY */
+.an-body { flex:1; overflow-y:auto; padding:0; }
+.an-section { display:none; }
+.an-section.active { display:block; }
 
-  /* RANK SHOP */
-  #rank-shop-modal .np-box{max-width:560px;max-height:90vh;overflow-y:auto;}
-  .rank-shop-row{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border:1px solid rgba(255,255,255,0.08);margin-bottom:2px;transition:border-color .2s;}
-  .rank-shop-row:hover{border-color:rgba(0,61,165,0.3);}
-  .rank-shop-row.current{border-color:rgba(0,61,165,0.5);background:rgba(0,61,165,0.06);}
-  .rank-info{display:flex;align-items:center;gap:14px;}
-  .rank-emoji-big{font-size:28px;line-height:1;}
-  .rank-name-big{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
-  .rank-cost-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:2px;}
-  .rank-buy-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;cursor:pointer;transition:.2s;border:1px solid;background:none;}
-  .rank-buy-btn:disabled{opacity:.3;cursor:not-allowed;}
+/* SHARED COMPONENTS */
+.an-row-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); padding:14px 20px 6px; }
+.an-field { padding:0 20px 12px; }
+.an-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.35); display:block; margin-bottom:5px; }
+.an-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:10px 12px; font-family:'Barlow',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.an-input:focus { border-color:#003DA5; }
+.an-input::placeholder { color:rgba(255,255,255,0.2); }
+.an-btn { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; background:#003DA5; color:#fff; border:1px solid #003DA5; padding:10px 20px; cursor:pointer; transition:.2s; }
+.an-btn:hover { background:#0050CC; }
+.an-btn:disabled { background:rgba(255,255,255,0.05); border-color:rgba(255,255,255,0.1); color:rgba(255,255,255,0.3); cursor:not-allowed; }
+.an-btn-ghost { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; background:transparent; color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.15); padding:10px 20px; cursor:pointer; transition:.2s; }
+.an-btn-ghost:hover { color:#fff; border-color:#fff; }
+.an-divider { height:1px; background:rgba(255,255,255,0.06); margin:4px 0; }
+.an-empty { padding:28px 20px; text-align:center; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.2); }
+.an-error { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; color:#e74c3c; padding:0 20px 10px; display:none; }
+.an-error.on { display:block; }
 
-  /* FRIENDS */
-  #friends-panel .np-box{max-width:480px;max-height:80vh;display:flex;flex-direction:column;padding:0;}
-  .friends-header{padding:24px 28px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;}
-  .friends-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;}
-  .friends-search-wrap{padding:16px 28px;border-bottom:1px solid rgba(255,255,255,0.08);}
-  .friends-search{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 14px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-  .friends-search:focus{border-color:#003DA5;}
-  .friends-search::placeholder{color:rgba(255,255,255,0.2);}
-  .friends-list{flex:1;overflow-y:auto;padding:8px 0;}
-  .friend-row{display:flex;align-items:center;gap:12px;padding:12px 28px;transition:background .15s;}
-  .friend-row:hover{background:rgba(255,255,255,0.02);}
-  .friend-avatar{width:36px;height:36px;border-radius:50%;background:rgba(0,61,165,0.3);border:1.5px solid rgba(0,61,165,0.5);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:15px;color:#4d82d4;flex-shrink:0;overflow:hidden;position:relative;}
-  .friend-avatar img{width:100%;height:100%;object-fit:cover;}
-  .online-dot-sm{width:8px;height:8px;border-radius:50%;background:#00c87a;border:2px solid #05090f;position:absolute;bottom:0;right:0;}
-  .friend-info{flex:1;}
-  .friend-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#fff;}
-  .friend-rank-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);}
-  .friend-actions{display:flex;gap:6px;}
-  .friend-btn{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);padding:5px 10px;cursor:pointer;background:none;transition:.2s;}
-  .friend-btn:hover{border-color:#fff;color:#fff;}
-  .friend-btn.primary{border-color:#003DA5;color:#4d82d4;}
-  .friend-btn.primary:hover{background:#003DA5;color:#fff;}
-  .friend-btn.green{border-color:#00c87a;color:#00c87a;}
-  .friends-section-label{padding:8px 28px 4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);}
-  .friends-empty{padding:40px 28px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+/* ── PROFIL TAB ── */
+.an-avatar-upload { padding:16px 20px; display:flex; align-items:center; gap:16px; }
+.an-avatar-big { width:64px; height:64px; border-radius:50%; border:2px solid rgba(0,61,165,0.5); background:rgba(0,61,165,0.2); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:28px; color:#4d82d4; flex-shrink:0; overflow:hidden; cursor:pointer; transition:border-color .2s; }
+.an-avatar-big:hover { border-color:#4d82d4; }
+.an-avatar-big img { width:100%; height:100%; object-fit:cover; }
+.an-avatar-hint { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.25); margin-top:4px; }
+#an-avatar-input { display:none; }
+.an-save-row { padding:12px 20px 20px; }
 
-  /* MP */
-  #mp-modal{display:none;position:fixed;inset:0;z-index:600;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);align-items:flex-end;justify-content:flex-end;padding:80px 24px 24px;}
-  #mp-modal.open{display:flex;}
-  .mp-box{background:#05090f;border:1px solid rgba(0,61,165,0.35);width:360px;height:480px;display:flex;flex-direction:column;animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
-  .mp-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:space-between;}
-  .mp-with{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.5);}
-  .mp-username{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:#fff;}
-  .mp-close{background:none;border:none;color:rgba(255,255,255,0.3);font-size:18px;cursor:pointer;transition:color .2s;font-family:'Bebas Neue',sans-serif;}
-  .mp-close:hover{color:#fff;}
-  .mp-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:8px;}
-  .mp-msg{max-width:80%;padding:8px 12px;font-family:'Barlow',sans-serif;font-size:13px;line-height:1.5;}
-  .mp-msg.mine{align-self:flex-end;background:#003DA5;color:#fff;}
-  .mp-msg.theirs{align-self:flex-start;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.85);}
-  .mp-msg-time{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-top:4px;display:block;}
-  .mp-input-row{padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);display:flex;gap:8px;}
-  .mp-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:10px 12px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-  .mp-input:focus{border-color:#003DA5;}
-  .mp-input::placeholder{color:rgba(255,255,255,0.2);}
-  .mp-send{background:#003DA5;border:none;color:#fff;padding:10px 16px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.2s;}
-  .mp-send:hover{background:#0050CC;}
+/* ── AMIS TAB ── */
+.an-search-wrap { padding:12px 20px; }
+.an-search { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); color:#fff; padding:9px 12px; font-family:'Barlow',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.an-search:focus { border-color:#003DA5; }
+.an-search::placeholder { color:rgba(255,255,255,0.2); }
+.an-friend-row { display:flex; align-items:center; gap:10px; padding:10px 20px; transition:background .15s; }
+.an-friend-row:hover { background:rgba(255,255,255,0.02); }
+.an-friend-av { width:32px; height:32px; border-radius:50%; background:rgba(0,61,165,0.3); border:1px solid rgba(0,61,165,0.5); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:14px; color:#4d82d4; flex-shrink:0; overflow:hidden; position:relative; }
+.an-friend-av img { width:100%; height:100%; object-fit:cover; }
+.an-online-pip { position:absolute; bottom:0; right:0; width:8px; height:8px; border-radius:50%; background:#00c87a; border:2px solid #04070d; }
+.an-friend-info { flex:1; min-width:0; }
+.an-friend-name { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.an-friend-sub  { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+.an-friend-acts { display:flex; gap:5px; flex-shrink:0; }
+.an-micro-btn { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.5); padding:4px 9px; cursor:pointer; background:none; transition:.2s; white-space:nowrap; }
+.an-micro-btn:hover { border-color:#fff; color:#fff; }
+.an-micro-btn.blue { border-color:#003DA5; color:#4d82d4; }
+.an-micro-btn.blue:hover { background:#003DA5; color:#fff; }
+.an-micro-btn.green { border-color:#00c87a; color:#00c87a; }
 
-  /* TOAST */
-  #an-toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#05090f;border:1px solid rgba(0,61,165,0.4);padding:10px 24px;z-index:700;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;}
-  #an-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-  #an-toast.success{border-color:#00c87a;color:#00c87a;}
-  #an-toast.error{border-color:#e74c3c;color:#e74c3c;}
+/* ── RANGS TAB ── */
+.an-rank-row { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; border-bottom:1px solid rgba(255,255,255,0.05); transition:background .15s; }
+.an-rank-row:hover { background:rgba(255,255,255,0.02); }
+.an-rank-row.current { background:rgba(0,61,165,0.06); }
+.an-rank-left { display:flex; align-items:center; gap:12px; }
+.an-rank-emoji { font-size:24px; }
+.an-rank-name  { font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; }
+.an-rank-price { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-top:1px; }
 
-  @media(max-width:768px){#profile-info{display:none;}.mp-box{width:100%;height:100%;}#mp-modal{padding:0;align-items:stretch;justify-content:stretch;}}
+/* ── MP TAB ── */
+.an-conv-list { padding:0; }
+.an-conv-row { display:flex; align-items:center; gap:10px; padding:12px 20px; cursor:pointer; transition:background .15s; border-bottom:1px solid rgba(255,255,255,0.04); }
+.an-conv-row:hover { background:rgba(0,61,165,0.06); }
+.an-conv-row.active { background:rgba(0,61,165,0.1); }
+.an-conv-av { width:34px; height:34px; border-radius:50%; background:rgba(0,61,165,0.3); border:1px solid rgba(0,61,165,0.5); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:15px; color:#4d82d4; flex-shrink:0; overflow:hidden; }
+.an-conv-av img { width:100%; height:100%; object-fit:cover; }
+.an-conv-name { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
+.an-conv-preview { font-family:'Barlow',sans-serif; font-size:11px; color:rgba(255,255,255,0.3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.an-unread-pip { width:8px; height:8px; border-radius:50%; background:#003DA5; flex-shrink:0; }
+/* Chat */
+.an-chat-wrap { display:flex; flex-direction:column; height:100%; }
+.an-chat-header { padding:10px 20px; border-bottom:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.an-chat-back { background:none; border:none; color:rgba(255,255,255,0.4); font-size:18px; cursor:pointer; transition:color .2s; }
+.an-chat-back:hover { color:#fff; }
+.an-chat-name { font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; }
+.an-chat-msgs { flex:1; overflow-y:auto; padding:12px 16px; display:flex; flex-direction:column; gap:6px; }
+.an-msg { max-width:82%; padding:7px 11px; font-family:'Barlow',sans-serif; font-size:12px; line-height:1.5; }
+.an-msg.mine { align-self:flex-end; background:#003DA5; color:#fff; }
+.an-msg.theirs { align-self:flex-start; background:rgba(255,255,255,0.07); color:rgba(255,255,255,0.85); }
+.an-msg-time { font-family:'Barlow Condensed',sans-serif; font-size:8px; letter-spacing:1px; color:rgba(255,255,255,0.3); margin-top:3px; display:block; }
+.an-chat-input-row { padding:10px 12px; border-top:1px solid rgba(255,255,255,0.07); display:flex; gap:6px; flex-shrink:0; }
+.an-chat-input { flex:1; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:8px 10px; font-family:'Barlow',sans-serif; font-size:13px; outline:none; transition:border-color .2s; }
+.an-chat-input:focus { border-color:#003DA5; }
+.an-chat-input::placeholder { color:rgba(255,255,255,0.2); }
+.an-chat-send { background:#003DA5; border:none; color:#fff; padding:8px 14px; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; cursor:pointer; transition:.2s; }
+.an-chat-send:hover { background:#0050CC; }
+
+/* ── NOTIFS TAB ── */
+.an-notif-item { display:flex; align-items:flex-start; gap:10px; padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer; transition:background .15s; }
+.an-notif-item:hover { background:rgba(255,255,255,0.02); }
+.an-notif-item.unread { background:rgba(0,61,165,0.05); border-left:2px solid #003DA5; }
+.an-notif-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+.an-notif-body { flex:1; }
+.an-notif-txt  { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:1px; color:rgba(255,255,255,0.75); line-height:1.4; }
+.an-notif-txt strong { color:#fff; }
+.an-notif-sub  { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:1px; color:rgba(255,255,255,0.3); margin-top:2px; }
+.an-notif-time { font-family:'Barlow Condensed',sans-serif; font-size:9px; letter-spacing:1px; color:rgba(255,255,255,0.25); flex-shrink:0; margin-top:2px; }
+.an-mark-all { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.3); background:none; border:none; cursor:pointer; padding:10px 20px; transition:color .2s; width:100%; text-align:right; }
+.an-mark-all:hover { color:#fff; }
+
+/* AUTH MODAL */
+#an-auth-modal { display:none; position:fixed; inset:0; z-index:900; background:rgba(0,0,0,0.92); backdrop-filter:blur(14px); align-items:center; justify-content:center; }
+#an-auth-modal.open { display:flex; }
+.an-auth-box { background:#05090f; border:1px solid rgba(0,61,165,0.35); width:100%; max-width:420px; padding:40px; position:relative; animation:anFadeUp .3s cubic-bezier(.22,1,.36,1); }
+@keyframes anFadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+.an-auth-close { position:absolute; top:14px; right:18px; background:none; border:none; color:rgba(255,255,255,0.3); font-family:'Bebas Neue',sans-serif; font-size:22px; cursor:pointer; transition:color .2s; }
+.an-auth-close:hover { color:#fff; }
+.an-auth-eyebrow { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:4px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px; }
+.an-auth-title { font-family:'Bebas Neue',sans-serif; font-size:38px; letter-spacing:2px; margin-bottom:24px; }
+.an-auth-tabs { display:flex; margin-bottom:24px; border-bottom:1px solid rgba(255,255,255,0.1); }
+.an-auth-tab { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.4); padding:9px 18px; cursor:pointer; background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px; transition:.2s; }
+.an-auth-tab.active { color:#fff; border-bottom-color:#003DA5; }
+.an-auth-field { margin-bottom:14px; }
+.an-auth-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.4); display:block; margin-bottom:5px; }
+.an-auth-input { width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.1); color:#fff; padding:11px 13px; font-family:'Barlow',sans-serif; font-size:14px; outline:none; transition:border-color .2s; }
+.an-auth-input:focus { border-color:#003DA5; background:rgba(0,20,80,0.1); }
+.an-auth-input::placeholder { color:rgba(255,255,255,0.2); }
+.an-auth-check { display:flex; align-items:center; gap:9px; margin-bottom:18px; cursor:pointer; }
+.an-auth-check input { accent-color:#003DA5; width:14px; height:14px; }
+.an-auth-check span { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.4); }
+.an-auth-btn { width:100%; background:#003DA5; color:#fff; border:none; padding:13px; font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:3px; text-transform:uppercase; cursor:pointer; transition:.2s; margin-bottom:10px; }
+.an-auth-btn:hover { background:#0050CC; }
+.an-auth-btn:disabled { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.3); cursor:not-allowed; }
+.an-google-btn { width:100%; background:transparent; color:rgba(255,255,255,0.7); border:1px solid rgba(255,255,255,0.2); padding:11px; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2.5px; text-transform:uppercase; cursor:pointer; transition:.2s; margin-bottom:14px; display:flex; align-items:center; justify-content:center; gap:8px; }
+.an-google-btn:hover { border-color:#fff; color:#fff; }
+.an-auth-sep { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.an-auth-sep::before,.an-auth-sep::after { content:''; flex:1; height:1px; background:rgba(255,255,255,0.1); }
+.an-auth-sep span { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.3); }
+.an-auth-error { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:1.5px; color:#e74c3c; margin-bottom:10px; display:none; }
+.an-auth-error.on { display:block; }
+.an-auth-bonus { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#4d82d4; text-align:center; }
+
+/* TOAST */
+#an-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(10px); background:#05090f; border:1px solid rgba(0,61,165,0.4); padding:9px 22px; z-index:1000; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; opacity:0; transition:opacity .25s,transform .25s; pointer-events:none; white-space:nowrap; }
+#an-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
+#an-toast.ok { border-color:#00c87a; color:#00c87a; }
+#an-toast.err { border-color:#e74c3c; color:#e74c3c; }
+
+@media(max-width:768px) {
+  #an-panel { width:100%; }
+  #an-pill-info { display:none; }
+}
 `
 
-function buildHTML() {
-  return `
-  <div id="auth-modal" class="np-modal">
-    <div class="np-box">
-      <button class="np-close" onclick="AuthNav.closeAuthModal()">✕</button>
-      <div class="np-eyebrow">NewsPorto</div>
-      <div class="np-title" id="auth-modal-title">Connexion</div>
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="AuthNav.switchAuthTab('login')">Connexion</button>
-        <button class="auth-tab" onclick="AuthNav.switchAuthTab('signup')">Inscription</button>
-      </div>
-      <div class="np-error" id="auth-error"></div>
-      <div id="auth-login-form">
-        <div class="np-field"><label class="np-label">Email</label><input class="np-input" type="email" id="login-email" placeholder="ton@email.com"></div>
-        <div class="np-field"><label class="np-label">Mot de passe</label><input class="np-input" type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')AuthNav.handleLogin()"></div>
-        <button class="np-btn" id="login-btn" onclick="AuthNav.handleLogin()">Se connecter →</button>
-      </div>
-      <div id="auth-signup-form" style="display:none">
-        <div class="np-field"><label class="np-label">Nom d'utilisateur</label><input class="np-input" type="text" id="signup-username" placeholder="MonPseudo"></div>
-        <div class="np-field"><label class="np-label">Email</label><input class="np-input" type="email" id="signup-email" placeholder="ton@email.com"></div>
-        <div class="np-field"><label class="np-label">Mot de passe</label><input class="np-input" type="password" id="signup-password" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')AuthNav.handleSignup()"></div>
-        <label class="np-newsletter"><input type="checkbox" id="signup-newsletter" checked><span>Rejoindre la newsletter NewsPorto</span></label>
-        <button class="np-btn" id="signup-btn" onclick="AuthNav.handleSignup()">Créer mon compte →</button>
-        <div class="auth-bonus">🎁 500 points offerts à l'inscription</div>
-      </div>
+// ─── HTML ──────────────────────────────────────────────────────────────────
+function html() { return `
+<!-- AUTH MODAL -->
+<div id="an-auth-modal">
+  <div class="an-auth-box">
+    <button class="an-auth-close" onclick="AN.closeAuth()">✕</button>
+    <div class="an-auth-eyebrow">NewsPorto</div>
+    <div class="an-auth-title" id="an-auth-title">Connexion</div>
+    <div class="an-auth-tabs">
+      <button class="an-auth-tab active" onclick="AN.authTab('login')">Connexion</button>
+      <button class="an-auth-tab" onclick="AN.authTab('signup')">Inscription</button>
+    </div>
+    <div class="an-auth-error" id="an-auth-err"></div>
+
+    <!-- LOGIN -->
+    <div id="an-login-form">
+      <button class="an-google-btn" onclick="AN.googleLogin()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuer avec Google
+      </button>
+      <div class="an-auth-sep"><span>ou</span></div>
+      <div class="an-auth-field"><label class="an-auth-label">Email</label><input class="an-auth-input" type="email" id="an-login-email" placeholder="ton@email.com"></div>
+      <div class="an-auth-field"><label class="an-auth-label">Mot de passe</label><input class="an-auth-input" type="password" id="an-login-pwd" placeholder="••••••••" onkeydown="if(event.key==='Enter')AN.login()"></div>
+      <button class="an-auth-btn" id="an-login-btn" onclick="AN.login()">Se connecter →</button>
+    </div>
+
+    <!-- SIGNUP -->
+    <div id="an-signup-form" style="display:none">
+      <button class="an-google-btn" onclick="AN.googleLogin()">
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continuer avec Google
+      </button>
+      <div class="an-auth-sep"><span>ou</span></div>
+      <div class="an-auth-field"><label class="an-auth-label">Nom d'utilisateur</label><input class="an-auth-input" type="text" id="an-signup-user" placeholder="MonPseudo"></div>
+      <div class="an-auth-field"><label class="an-auth-label">Email</label><input class="an-auth-input" type="email" id="an-signup-email" placeholder="ton@email.com"></div>
+      <div class="an-auth-field"><label class="an-auth-label">Mot de passe</label><input class="an-auth-input" type="password" id="an-signup-pwd" placeholder="Min. 8 caractères" onkeydown="if(event.key==='Enter')AN.signup()"></div>
+      <label class="an-auth-check"><input type="checkbox" id="an-signup-nl" checked><span>Rejoindre la newsletter NewsPorto</span></label>
+      <button class="an-auth-btn" id="an-signup-btn" onclick="AN.signup()">Créer mon compte →</button>
+      <div class="an-auth-bonus">🎁 500 points offerts à l'inscription</div>
     </div>
   </div>
+</div>
 
-  <div id="settings-modal" class="np-modal">
-    <div class="np-box">
-      <button class="np-close" onclick="AuthNav.closeSettings()">✕</button>
-      <div class="np-eyebrow">NewsPorto</div>
-      <div class="np-title">Paramètres</div>
-      <div class="settings-section">
-        <div class="settings-section-title">Photo de profil</div>
-        <div class="avatar-upload-wrap">
-          <div id="settings-avatar-preview"></div>
-          <div>
-            <button class="avatar-upload-btn" onclick="document.getElementById('avatar-file-input').click()">Changer la photo</button>
-            <input type="file" id="avatar-file-input" accept="image/*" onchange="AuthNav.handleAvatarUpload(this)">
-            <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-top:6px;">JPG, PNG · Max 2MB</div>
+<!-- OVERLAY -->
+<div id="an-overlay" onclick="AN.closePanel()"></div>
+
+<!-- SIDE PANEL -->
+<div id="an-panel">
+  <!-- Header -->
+  <div class="an-panel-head">
+    <div class="an-head-avatar" id="an-head-av" onclick="AN.tabTo('profil')" title="Modifier le profil"></div>
+    <div class="an-head-info">
+      <div class="an-head-name" id="an-head-name">—</div>
+      <div class="an-head-rank" id="an-head-rank"></div>
+      <div class="an-head-pts"  id="an-head-pts">0 pts</div>
+    </div>
+    <button class="an-head-close" onclick="AN.closePanel()">✕</button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="an-tabs">
+    <button class="an-tab active" data-tab="profil"  onclick="AN.tabTo('profil')">Profil</button>
+    <button class="an-tab"        data-tab="notifs"  onclick="AN.tabTo('notifs')">Notifs<span class="an-tab-dot" id="tab-dot-notifs"></span></button>
+    <button class="an-tab"        data-tab="amis"    onclick="AN.tabTo('amis')">Amis<span class="an-tab-dot" id="tab-dot-amis"></span></button>
+    <button class="an-tab"        data-tab="mp"      onclick="AN.tabTo('mp')">Messages<span class="an-tab-dot" id="tab-dot-mp"></span></button>
+    <button class="an-tab"        data-tab="rangs"   onclick="AN.tabTo('rangs')">Rangs</button>
+  </div>
+
+  <!-- Body -->
+  <div class="an-body">
+
+    <!-- PROFIL -->
+    <div class="an-section active" id="an-sec-profil">
+      <div class="an-avatar-upload">
+        <div class="an-avatar-big" id="an-prof-av" onclick="document.getElementById('an-avatar-input').click()" title="Changer la photo"></div>
+        <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5)">Changer la photo</div><div class="an-avatar-hint">JPG / PNG · Max 2MB</div></div>
+      </div>
+      <input type="file" id="an-avatar-input" accept="image/*" onchange="AN.uploadAvatar(this)">
+      <div class="an-field"><label class="an-label">Prénom affiché</label><input class="an-input" type="text" id="an-prof-name" placeholder="Ton prénom"></div>
+      <div class="an-field"><label class="an-label">Bio</label><input class="an-input" type="text" id="an-prof-bio" placeholder="Fan du FC Porto depuis toujours" maxlength="120"></div>
+      <div class="an-field"><label class="an-label">Nouveau mot de passe</label><input class="an-input" type="password" id="an-prof-pwd" placeholder="Laisser vide pour ne pas changer"></div>
+      <div class="an-error" id="an-prof-err"></div>
+      <div class="an-save-row" style="display:flex;gap:8px">
+        <button class="an-btn" style="flex:1" onclick="AN.saveProfile()">Sauvegarder →</button>
+        <button class="an-btn-ghost" onclick="AN.logout()">Déconnexion</button>
+      </div>
+    </div>
+
+    <!-- NOTIFS -->
+    <div class="an-section" id="an-sec-notifs">
+      <button class="an-mark-all" onclick="AN.markAllRead()">Tout marquer comme lu</button>
+      <div id="an-notif-list"><div class="an-empty">Aucune notification</div></div>
+    </div>
+
+    <!-- AMIS -->
+    <div class="an-section" id="an-sec-amis">
+      <div class="an-search-wrap">
+        <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-friends-search" oninput="AN.searchUsers(this.value)">
+      </div>
+      <div id="an-friends-list"><div class="an-empty">Chargement...</div></div>
+    </div>
+
+    <!-- MP -->
+    <div class="an-section" id="an-sec-mp">
+      <div id="an-conv-view">
+        <div class="an-conv-list" id="an-conv-list"><div class="an-empty">Aucune conversation</div></div>
+      </div>
+      <div id="an-chat-view" style="display:none;height:calc(100vh - 160px);flex-direction:column">
+        <div class="an-chat-wrap">
+          <div class="an-chat-header">
+            <button class="an-chat-back" onclick="AN.backToConvList()">←</button>
+            <div class="an-chat-name" id="an-chat-name"></div>
+          </div>
+          <div class="an-chat-msgs" id="an-chat-msgs"></div>
+          <div class="an-chat-input-row">
+            <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." onkeydown="if(event.key==='Enter')AN.sendMsg()">
+            <button class="an-chat-send" onclick="AN.sendMsg()">Envoyer</button>
           </div>
         </div>
       </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Profil public</div>
-        <div class="np-field"><label class="np-label">Prénom affiché</label><input class="np-input" type="text" id="settings-displayname" placeholder="Ton prénom"></div>
-        <div class="np-field"><label class="np-label">Bio</label><input class="np-input" type="text" id="settings-bio" placeholder="Fan du FC Porto depuis toujours" maxlength="120"></div>
-      </div>
-      <div class="settings-section">
-        <div class="settings-section-title">Sécurité</div>
-        <div class="np-field"><label class="np-label">Nouveau mot de passe</label><input class="np-input" type="password" id="settings-password" placeholder="Laisser vide pour ne pas changer"></div>
-      </div>
-      <div class="np-error" id="settings-error"></div>
-      <button class="np-btn" onclick="AuthNav.saveSettings()">Sauvegarder →</button>
     </div>
-  </div>
 
-  <div id="rank-shop-modal" class="np-modal">
-    <div class="np-box">
-      <button class="np-close" onclick="AuthNav.closeRankShop()">✕</button>
-      <div class="np-eyebrow">NewsPorto · Boutique</div>
-      <div class="np-title">Acheter un Rang</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:24px;">Solde : <span id="shop-points-val" style="color:#4d82d4">—</span> pts</div>
-      <div id="rank-shop-grid"></div>
+    <!-- RANGS -->
+    <div class="an-section" id="an-sec-rangs">
+      <div class="an-row-label">Solde : <span id="an-rangs-pts" style="color:#4d82d4">—</span> pts</div>
+      <div id="an-rank-list"></div>
     </div>
+
   </div>
+</div>
 
-  <div id="friends-panel" class="np-modal">
-    <div class="np-box">
-      <div class="friends-header">
-        <div class="friends-title">Amis</div>
-        <button class="np-close" style="position:static" onclick="AuthNav.closeFriends()">✕</button>
-      </div>
-      <div class="friends-search-wrap">
-        <input class="friends-search" type="text" placeholder="Rechercher un utilisateur..." id="friends-search-input" oninput="AuthNav.searchUsers(this.value)">
-      </div>
-      <div class="friends-list" id="friends-list"></div>
-    </div>
-  </div>
+<div id="an-toast"></div>
+`}
 
-  <div id="mp-modal">
-    <div class="mp-box">
-      <div class="mp-header">
-        <div><div class="mp-with">Message privé avec</div><div class="mp-username" id="mp-username">—</div></div>
-        <button class="mp-close" onclick="AuthNav.closeMP()">✕</button>
-      </div>
-      <div class="mp-messages" id="mp-messages"></div>
-      <div class="mp-input-row">
-        <input class="mp-input" type="text" id="mp-input" placeholder="Écrire..." onkeydown="if(event.key==='Enter')AuthNav.sendMP()">
-        <button class="mp-send" onclick="AuthNav.sendMP()">Envoyer</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="an-toast"></div>
-  `
-}
-
-class AuthNavController {
-  constructor() { this.user = null; this.currentMPFriend = null; this.mpChannel = null; this.onlineUsers = new Set() }
+// ─── CONTROLLER ────────────────────────────────────────────────────────────
+class AN {
+  constructor() { this.u = null; this.p = null; this.mpFriend = null; this.mpCh = null; this.onlineIds = new Set() }
 
   async init() {
     const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s)
-    document.body.insertAdjacentHTML('beforeend', buildHTML())
-    this._mountNavButton()
-    supabase.auth.onAuthStateChange(async (_, session) => {
+    document.body.insertAdjacentHTML('beforeend', html())
+    this._mountNav()
+    supabase.auth.onAuthStateChange(async (ev, session) => {
       if (session) await this._onLogin(session.user)
       else this._onLogout()
     })
     const { data: { session } } = await supabase.auth.getSession()
     if (session) await this._onLogin(session.user)
-    ;['auth-modal','settings-modal','rank-shop-modal','friends-panel'].forEach(id => {
-      document.getElementById(id)?.addEventListener('click', e => { if (e.target.id === id) this._closeById(id) })
-    })
+    // Handle Google OAuth redirect
+    const hash = window.location.hash
+    if (hash.includes('access_token')) {
+      const { data: { session: oauthSession } } = await supabase.auth.getSession()
+      if (oauthSession) await this._onLogin(oauthSession.user)
+    }
   }
 
-  _closeById(id) {
-    const map = { 'auth-modal': () => this.closeAuthModal(), 'settings-modal': () => this.closeSettings(), 'rank-shop-modal': () => this.closeRankShop(), 'friends-panel': () => this.closeFriends() }
-    map[id]?.()
-  }
-
-  _mountNavButton() {
+  _mountNav() {
     const nav = document.querySelector('nav')
     if (!nav) return
     const wrap = document.createElement('div')
-    wrap.id = 'auth-nav-wrap'
-    wrap.style.cssText = 'display:flex;align-items:center;gap:8px;position:relative;flex-shrink:0;'
+    wrap.style.cssText = 'display:flex;align-items:center;gap:8px;flex-shrink:0;'
 
-    const trigger = document.createElement('button')
-    trigger.id = 'auth-trigger'
-    trigger.textContent = "S'inscrire"
-    trigger.onclick = () => this.openAuthModal('signup')
+    // Not logged in button
+    const signinBtn = document.createElement('button')
+    signinBtn.id = 'an-signin-btn'
+    signinBtn.textContent = "S'inscrire"
+    signinBtn.onclick = () => this.openAuth('signup')
 
-    const pill = document.createElement('div')
-    pill.id = 'profile-pill'
+    // Profile pill
+    const pill = document.createElement('button')
+    pill.id = 'an-trigger-btn'
     pill.style.display = 'none'
-    pill.innerHTML = `<div id="profile-avatar"></div><div id="profile-info"><div id="profile-name">—</div><div id="profile-points">0 pts</div></div><div id="notif-badge">0</div><div id="profile-dropdown"></div>`
-    pill.onclick = e => { if (!e.target.closest('#profile-dropdown') && !e.target.closest('#notif-panel')) this._toggleDropdown() }
+    pill.innerHTML = `<div id="an-avatar-pill"></div><div id="an-pill-info"><div id="an-pill-name">—</div><div id="an-pill-pts">0 pts</div></div><div id="an-notif-dot"></div>`
+    pill.onclick = () => this.togglePanel()
 
-    wrap.appendChild(trigger)
+    wrap.appendChild(signinBtn)
     wrap.appendChild(pill)
+
+    // Replace .nav-cta or append
     const cta = nav.querySelector('.nav-cta')
     if (cta) cta.replaceWith(wrap)
     else nav.appendChild(wrap)
+  }
 
-    document.addEventListener('click', e => {
-      if (!e.target.closest('#profile-pill')) { this._closeDropdown(); this._closeNotifPanel() }
-    })
+  _updateNav() {
+    const p = this.p
+    if (!p) return
+    // pill
+    const av = document.getElementById('an-avatar-pill')
+    if (av) av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
+    const pn = document.getElementById('an-pill-name'); if (pn) pn.textContent = p.display_name || p.username
+    const pp = document.getElementById('an-pill-pts');  if (pp) pp.textContent = `${p.points} pts`
+    // panel header
+    const ha = document.getElementById('an-head-av')
+    if (ha) ha.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
+    const hn = document.getElementById('an-head-name'); if (hn) hn.textContent = p.display_name || p.username
+    const hr = document.getElementById('an-head-rank')
+    const hpts = document.getElementById('an-head-pts'); if (hpts) hpts.textContent = `${p.points} pts`
+    const rk = RANKS.find(r => r.id === p.rank) || RANKS[0]
+    if (hr) { hr.textContent = `${rk.emoji} ${p.rank}`; hr.style.color = rk.color }
+    // profile form
+    const pname = document.getElementById('an-prof-name'); if (pname) pname.value = p.display_name || ''
+    const pbio  = document.getElementById('an-prof-bio');  if (pbio)  pbio.value  = p.bio || ''
+    const pavBig = document.getElementById('an-prof-av')
+    if (pavBig) pavBig.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
   }
 
   async _onLogin(authUser) {
-    const { data: profile } = await supabase.from('profiles').select('*').eq('id', authUser.id).single()
-    if (!profile) return
-    this.user = { ...authUser, profile }
-    document.getElementById('auth-trigger').style.display = 'none'
-    document.getElementById('profile-pill').style.display = 'flex'
-    this._updatePill(profile)
-    this._buildDropdown(profile)
-    startPresence(authUser.id, profile.username)
-    this._checkNotifications()
-    this._subscribeToPoints(authUser.id)
-    this._subscribeToNotifs(authUser.id)
-    // Masque le popup newsletter si déjà inscrit
-    if (profile.newsletter) localStorage.setItem('np_email_subscribed', '1')
+    this.u = authUser
+    let { data: profile } = await supabase.from('profiles').select('*').eq('id', authUser.id).single()
+    // Auto-create profile for Google OAuth users
+    if (!profile) {
+      const username = authUser.email.split('@')[0].replace(/[^a-z0-9]/gi,'').toLowerCase() + Math.floor(Math.random()*999)
+      const display_name = authUser.user_metadata?.full_name || username
+      const avatar_url = authUser.user_metadata?.avatar_url || null
+      const { data: newProfile } = await supabase.from('profiles').insert({ id: authUser.id, username, display_name, avatar_url, newsletter: true, points: 500, rank: 'Dragão' }).select().single()
+      await supabase.from('points_log').insert({ user_id: authUser.id, amount: 500, reason: 'welcome' })
+      // Auto-subscribe newsletter
+      try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: authUser.email }) }) } catch {}
+      localStorage.setItem('np_email_subscribed', '1')
+      profile = newProfile
+    }
+    this.p = profile
+    document.getElementById('an-signin-btn').style.display = 'none'
+    document.getElementById('an-trigger-btn').style.display = 'flex'
+    this._updateNav()
+    this._checkNotifs()
+    this._subscribePoints()
+    this._subscribeNotifs()
+    // Masque le popup newsletter
+    if (profile?.newsletter) {
+      localStorage.setItem('np_email_subscribed', '1')
+      const popup = document.getElementById('notif-popup')
+      if (popup) popup.classList.remove('show')
+    }
+    startPresence(authUser.id, profile?.username || '')
   }
 
   _onLogout() {
-    this.user = null
-    document.getElementById('auth-trigger').style.display = ''
-    document.getElementById('profile-pill').style.display = 'none'
+    this.u = null; this.p = null
+    document.getElementById('an-signin-btn').style.display = ''
+    document.getElementById('an-trigger-btn').style.display = 'none'
     stopPresence()
+    this.closePanel()
   }
 
-  _updatePill(p) {
-    const av = document.getElementById('profile-avatar')
-    av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
-    document.getElementById('profile-name').textContent = p.display_name || p.username
-    document.getElementById('profile-points').textContent = `${p.points} pts`
+  // Panel
+  togglePanel() {
+    const panel = document.getElementById('an-panel')
+    const overlay = document.getElementById('an-overlay')
+    const isOpen = panel.classList.toggle('open')
+    overlay.classList.toggle('on', isOpen)
+    document.body.style.overflow = isOpen ? 'hidden' : ''
+    if (isOpen) { this._loadNotifs(); this._loadFriends(); this._loadConvList() }
+  }
+  closePanel() {
+    document.getElementById('an-panel').classList.remove('open')
+    document.getElementById('an-overlay').classList.remove('on')
+    document.body.style.overflow = ''
   }
 
-  _buildDropdown(p) {
-    const r = RANKS.find(r => r.id === p.rank) || RANKS[0]
-    // Injecte aussi le notif panel dans le dropdown
-    document.getElementById('profile-dropdown').innerHTML = `
-      <div id="notif-panel">
-        <div class="notif-panel-header">
-          <div class="notif-panel-title">Notifications</div>
-          <button class="notif-mark-all" onclick="AuthNav.markAllNotifsRead()">Tout marquer lu</button>
-        </div>
-        <div class="notif-list" id="notif-list"><div class="notif-empty">Aucune notification</div></div>
-      </div>
-      <div class="dd-header">
-        <div class="dd-avatar-lg">${p.avatar_url?`<img src="${p.avatar_url}">`:(p.display_name||p.username||'?')[0].toUpperCase()}</div>
-        <div><div class="dd-user-name">${p.display_name||p.username}</div><div class="dd-user-rank" style="color:${r.color}">${r.emoji} ${p.rank}</div></div>
-      </div>
-      <div class="dd-points-row">
-        <span class="dd-points-label">Points</span>
-        <span class="dd-points-val" id="dd-points-val">${p.points}</span>
-      </div>
-      <button class="dd-item" onclick="AuthNav.toggleNotifPanel()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-        Notifications <span id="dd-notif-count" class="dd-notif-count" style="display:none">0</span>
-      </button>
-      <a href="forum.html" class="dd-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Forum
-      </a>
-      <a href="pronostics.html" class="dd-item">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Pronostics
-      </a>
-      <button class="dd-item" onclick="AuthNav.openFriends()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Amis <span id="dd-friend-notif" class="dd-notif-dot" style="display:none"></span>
-      </button>
-      <button class="dd-item" onclick="AuthNav.openRankShop()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        Acheter un rang
-      </button>
-      <div class="dd-sep"></div>
-      <button class="dd-item" onclick="AuthNav.openSettings()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
-        Paramètres
-      </button>
-      <button class="dd-item danger" onclick="AuthNav.handleLogout()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Déconnexion
-      </button>`
-    this._checkNotifications()
+  tabTo(tab) {
+    document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
+    document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
+    if (tab === 'notifs') this._loadNotifs()
+    if (tab === 'amis') this._loadFriends()
+    if (tab === 'mp') this._loadConvList()
+    if (tab === 'rangs') this._renderRanks()
   }
 
-  _toggleDropdown() { document.getElementById('profile-dropdown').classList.toggle('open') }
-  _closeDropdown() { document.getElementById('profile-dropdown').classList.remove('open') }
-  toggleNotifPanel() {
-    const p = document.getElementById('notif-panel')
-    p.classList.toggle('open')
-    if (p.classList.contains('open')) this._loadNotifs()
+  // AUTH
+  openAuth(tab = 'login') {
+    this.authTab(tab)
+    document.getElementById('an-auth-modal').classList.add('open')
+    document.body.style.overflow = 'hidden'
   }
-  _closeNotifPanel() { document.getElementById('notif-panel')?.classList.remove('open') }
+  closeAuth() {
+    document.getElementById('an-auth-modal').classList.remove('open')
+    document.body.style.overflow = ''
+    document.getElementById('an-auth-err').classList.remove('on')
+  }
+  authTab(tab) {
+    document.querySelectorAll('.an-auth-tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')))
+    document.getElementById('an-login-form').style.display = tab==='login'?'':'none'
+    document.getElementById('an-signup-form').style.display = tab==='signup'?'':'none'
+    document.getElementById('an-auth-title').textContent = tab==='login'?'Connexion':'Inscription'
+    document.getElementById('an-auth-err').classList.remove('on')
+  }
+  _authErr(msg) { const e = document.getElementById('an-auth-err'); e.textContent = msg; e.classList.add('on') }
 
-  // ── NOTIFICATIONS ──
-  async _checkNotifications() {
-    if (!this.user) return
-    const { data } = await supabase.from('notifications').select('id').eq('user_id', this.user.id).eq('read', false)
-    const count = data?.length || 0
-    const badge = document.getElementById('notif-badge')
-    const ddCount = document.getElementById('dd-notif-count')
-    badge?.classList.toggle('visible', count > 0)
-    if (count > 0 && badge) badge.textContent = count
-    if (ddCount) { ddCount.style.display = count > 0 ? '' : 'none'; ddCount.textContent = count }
+  async googleLogin() {
+    const { error } = await supabase.auth.signInWithOAuth({ provider:'google', options:{ redirectTo: window.location.href } })
+    if (error) this._authErr(error.message)
+  }
+
+  async login() {
+    const btn = document.getElementById('an-login-btn')
+    const email = document.getElementById('an-login-email').value.trim()
+    const pwd   = document.getElementById('an-login-pwd').value
+    if (!email || !pwd) return this._authErr('Remplis tous les champs')
+    btn.disabled = true; btn.textContent = 'Connexion...'
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password: pwd })
+      if (error) throw error
+      this.closeAuth()
+    } catch(e) { this._authErr(e.message.includes('Invalid') ? 'Email ou mot de passe incorrect' : e.message) }
+    finally { btn.disabled = false; btn.textContent = 'Se connecter →' }
+  }
+
+  async signup() {
+    const btn = document.getElementById('an-signup-btn')
+    const username = document.getElementById('an-signup-user').value.trim()
+    const email    = document.getElementById('an-signup-email').value.trim()
+    const pwd      = document.getElementById('an-signup-pwd').value
+    const nl       = document.getElementById('an-signup-nl').checked
+    if (!username || !email || !pwd) return this._authErr('Remplis tous les champs')
+    if (pwd.length < 8) return this._authErr('Mot de passe trop court (min. 8 car.)')
+    btn.disabled = true; btn.textContent = 'Création...'
+    try {
+      const { data, error } = await supabase.auth.signUp({ email, password: pwd })
+      if (error) throw error
+      await supabase.from('profiles').insert({ id: data.user.id, username, display_name: username, newsletter: nl, points: 500, rank: 'Dragão' })
+      await supabase.from('points_log').insert({ user_id: data.user.id, amount: 500, reason: 'welcome' })
+      if (nl) {
+        try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) }) } catch {}
+        localStorage.setItem('np_email_subscribed', '1')
+        const popup = document.getElementById('notif-popup')
+        if (popup) popup.classList.remove('show')
+      }
+      this.closeAuth()
+      this._toast('Bienvenue ! 500 pts offerts 🎁', 'ok')
+    } catch(e) { this._authErr(e.message.includes('already') ? 'Email déjà utilisé' : e.message) }
+    finally { btn.disabled = false; btn.textContent = 'Créer mon compte →' }
+  }
+
+  async logout() { await supabase.auth.signOut() }
+
+  // PROFILE
+  async saveProfile() {
+    if (!this.u) return
+    const display_name = document.getElementById('an-prof-name').value.trim()
+    const bio = document.getElementById('an-prof-bio').value.trim()
+    const pwd = document.getElementById('an-prof-pwd').value
+    const err = document.getElementById('an-prof-err')
+    err.classList.remove('on')
+    try {
+      await supabase.from('profiles').update({ display_name, bio, updated_at: new Date().toISOString() }).eq('id', this.u.id)
+      if (pwd) await supabase.auth.updateUser({ password: pwd })
+      const { data } = await supabase.from('profiles').select('*').eq('id', this.u.id).single()
+      this.p = data; this._updateNav()
+      this._toast('Profil mis à jour ✓', 'ok')
+    } catch(e) { err.textContent = e.message; err.classList.add('on') }
+  }
+
+  async uploadAvatar(input) {
+    const file = input.files[0]; if (!file || !this.u) return
+    if (file.size > 2*1024*1024) { this._toast('Image trop lourde (max 2MB)', 'err'); return }
+    try {
+      const ext = file.name.split('.').pop()
+      const path = `${this.u.id}/avatar.${ext}`
+      await supabase.storage.from('avatars').upload(path, file, { upsert: true })
+      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
+      await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', this.u.id)
+      const profAv = document.getElementById('an-prof-av'); if (profAv) profAv.innerHTML = `<img src="${data.publicUrl}">`
+      if (this.p) this.p.avatar_url = data.publicUrl
+      this._updateNav(); this._toast('Photo mise à jour ✓', 'ok')
+    } catch { this._toast('Erreur upload', 'err') }
+  }
+
+  // NOTIFS
+  async _checkNotifs() {
+    if (!this.u) return
+    const { data } = await supabase.from('notifications').select('id').eq('user_id', this.u.id).eq('read', false)
+    const n = data?.length || 0
+    const dot = document.getElementById('an-notif-dot'); if (dot) dot.classList.toggle('on', n > 0)
+    const tdot = document.getElementById('tab-dot-notifs'); if (tdot) tdot.classList.toggle('on', n > 0)
     // friend requests
-    const { data: fr } = await supabase.from('friendships').select('id').eq('addressee_id', this.user.id).eq('status', 'pending')
-    const frCount = fr?.length || 0
-    const dot = document.getElementById('dd-friend-notif')
-    if (dot) dot.style.display = frCount > 0 ? 'block' : 'none'
+    const { data: fr } = await supabase.from('friendships').select('id').eq('addressee_id', this.u.id).eq('status','pending')
+    const frdot = document.getElementById('tab-dot-amis'); if (frdot) frdot.classList.toggle('on', (fr?.length||0) > 0)
   }
 
   async _loadNotifs() {
-    if (!this.user) return
-    const { data } = await supabase
-      .from('notifications')
-      .select('*, from_user:from_user_id(username, display_name, avatar_url)')
-      .eq('user_id', this.user.id)
-      .order('created_at', { ascending: false })
-      .limit(20)
-    const list = document.getElementById('notif-list')
-    if (!list) return
-    if (!data?.length) { list.innerHTML = '<div class="notif-empty">Aucune notification</div>'; return }
-    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝' }
-    const labels = {
-      reply: (n) => `<strong>${n.from_user?.display_name||n.from_user?.username||'?'}</strong> a répondu à ton thread`,
-      like: (n) => `<strong>${n.from_user?.display_name||n.from_user?.username||'?'}</strong> a liké ta réponse`,
-      best_answer: (n) => `Ta réponse a été marquée comme meilleure réponse 🎉`,
-      friend_request: (n) => `<strong>${n.from_user?.display_name||n.from_user?.username||'?'}</strong> t'a envoyé une demande d'ami`,
-      friend_accepted: (n) => `<strong>${n.from_user?.display_name||n.from_user?.username||'?'}</strong> a accepté ta demande d'ami`,
+    if (!this.u) return
+    const { data } = await supabase.from('notifications')
+      .select('*, from_user:from_user_id(username, display_name)')
+      .eq('user_id', this.u.id).order('created_at', { ascending: false }).limit(30)
+    const el = document.getElementById('an-notif-list'); if (!el) return
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune notification</div>'; return }
+    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️' }
+    const label = (n) => {
+      const from = n.from_user?.display_name || n.from_user?.username || '?'
+      const map = {
+        reply: `<strong>${from}</strong> a répondu à ton thread`,
+        like: `<strong>${from}</strong> a liké ta réponse`,
+        best_answer: `Ta réponse a été marquée ✅ meilleure réponse`,
+        friend_request: `<strong>${from}</strong> t'a envoyé une demande d'ami`,
+        friend_accepted: `<strong>${from}</strong> a accepté ta demande d'ami`,
+        bet_won: `🏆 Tu as gagné ton pari sur <strong>${n.ref_label||'un match'}</strong>`,
+        bet_lost: `💸 Tu as perdu ton pari sur <strong>${n.ref_label||'un match'}</strong>`,
+        mp: `<strong>${from}</strong> t'a envoyé un message`,
+      }
+      return map[n.type] || n.type
     }
-    list.innerHTML = data.map(n => {
+    el.innerHTML = data.map(n => {
       const t = new Date(n.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})
-      return `<div class="notif-item${n.read?'':' unread'}" onclick="AuthNav.clickNotif(${n.id},'${n.type}','${n.ref_id||''}')">
-        <div class="notif-icon">${icons[n.type]||'🔔'}</div>
-        <div><div class="notif-text">${(labels[n.type]?.(n))||n.type}</div>${n.ref_label?`<div class="notif-time" style="color:rgba(255,255,255,0.4);font-size:10px;margin-top:2px">"${n.ref_label}"</div>`:''}
-        <div class="notif-time">${t}</div></div>
+      return `<div class="an-notif-item${n.read?'':' unread'}" onclick="AN.clickNotif(${n.id},'${n.type}','${n.ref_id||''}')">
+        <div class="an-notif-icon">${icons[n.type]||'🔔'}</div>
+        <div class="an-notif-body">
+          <div class="an-notif-txt">${label(n)}</div>
+          ${n.ref_label?`<div class="an-notif-sub">"${n.ref_label.substring(0,50)}"</div>`:''}
+        </div>
+        <div class="an-notif-time">${t}</div>
       </div>`
     }).join('')
   }
 
   async clickNotif(id, type, refId) {
     await supabase.from('notifications').update({ read: true }).eq('id', id)
-    this._checkNotifications()
-    if ((type === 'reply' || type === 'like' || type === 'best_answer') && refId) window.location.href = `forum.html#thread-${refId}`
-    else if (type === 'friend_request') this.openFriends()
+    this._checkNotifs()
+    if (['reply','like','best_answer'].includes(type) && refId) window.location.href = `forum.html#thread-${refId}`
+    else if (type === 'friend_request') this.tabTo('amis')
+    else if (type === 'mp') this.tabTo('mp')
   }
 
-  async markAllNotifsRead() {
-    if (!this.user) return
-    await supabase.from('notifications').update({ read: true }).eq('user_id', this.user.id)
-    this._checkNotifications()
-    this._loadNotifs()
+  async markAllRead() {
+    if (!this.u) return
+    await supabase.from('notifications').update({ read: true }).eq('user_id', this.u.id)
+    this._checkNotifs(); this._loadNotifs()
   }
 
-  _subscribeToNotifs(userId) {
-    supabase.channel('notifs-' + userId)
-      .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${userId}` }, (payload) => {
-        this._checkNotifications()
-        // Pop-up toast discret
-        const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝' }
-        const msgs = { reply:'Quelqu\'un a répondu à ton thread', like:'Quelqu\'un a liké ta réponse', best_answer:'Ta réponse est la meilleure ! +10 pts', friend_request:'Nouvelle demande d\'ami', friend_accepted:'Demande d\'ami acceptée !' }
-        this._toast(msgs[payload.new.type] || 'Nouvelle notification', '')
-      })
-      .subscribe()
+  _subscribeNotifs() {
+    supabase.channel('notifs-' + this.u.id)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${this.u.id}` }, (payload) => {
+        this._checkNotifs()
+        const msgs = { reply:'💬 Quelqu\'un a répondu à ton thread', like:'❤️ Quelqu\'un a liké ta réponse', best_answer:'✅ Meilleure réponse ! +10 pts', friend_request:'👋 Nouvelle demande d\'ami', friend_accepted:'🤝 Demande acceptée !', bet_won:'🏆 Pari gagné !', bet_lost:'💸 Pari perdu', mp:'✉️ Nouveau message' }
+        this._toast(msgs[payload.new.type] || '🔔 Notification', '')
+        if (document.getElementById('an-sec-notifs')?.classList.contains('active')) this._loadNotifs()
+      }).subscribe()
   }
 
-  _subscribeToPoints(userId) {
-    supabase.channel('pts-' + userId)
-      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:`id=eq.${userId}` }, payload => {
+  _subscribePoints() {
+    supabase.channel('pts-' + this.u.id)
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:`id=eq.${this.u.id}` }, payload => {
         const p = payload.new
-        if (this.user) { this.user.profile.points = p.points; this.user.profile.rank = p.rank }
-        document.getElementById('profile-points').textContent = `${p.points} pts`
-        const ddPts = document.getElementById('dd-points-val')
-        if (ddPts) ddPts.textContent = p.points
+        if (this.p) { this.p.points = p.points; this.p.rank = p.rank }
+        const pp = document.getElementById('an-pill-pts'); if (pp) pp.textContent = `${p.points} pts`
+        const hp = document.getElementById('an-head-pts'); if (hp) hp.textContent = `${p.points} pts`
         window.dispatchEvent(new CustomEvent('points-updated', { detail: { points: p.points, rank: p.rank } }))
       }).subscribe()
   }
 
-  // ── AUTH ──
-  openAuthModal(tab = 'login') { this.switchAuthTab(tab); document.getElementById('auth-modal').classList.add('open'); document.body.style.overflow = 'hidden' }
-  closeAuthModal() { document.getElementById('auth-modal').classList.remove('open'); document.body.style.overflow = ''; document.getElementById('auth-error').classList.remove('visible') }
-
-  switchAuthTab(tab) {
-    document.querySelectorAll('.auth-tab').forEach((t,i) => t.classList.toggle('active',(i===0&&tab==='login')||(i===1&&tab==='signup')))
-    document.getElementById('auth-login-form').style.display = tab==='login'?'':'none'
-    document.getElementById('auth-signup-form').style.display = tab==='signup'?'':'none'
-    document.getElementById('auth-modal-title').textContent = tab==='login'?'Connexion':'Inscription'
-    document.getElementById('auth-error').classList.remove('visible')
-  }
-
-  async handleLogin() {
-    const btn = document.getElementById('login-btn')
-    const email = document.getElementById('login-email').value.trim()
-    const password = document.getElementById('login-password').value
-    if (!email || !password) return this._authError('Remplis tous les champs')
-    btn.disabled = true; btn.textContent = 'Connexion...'
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password })
-      if (error) throw error
-      this.closeAuthModal()
-    } catch(e) { this._authError(e.message.includes('Invalid') ? 'Email ou mot de passe incorrect' : e.message) }
-    finally { btn.disabled = false; btn.textContent = 'Se connecter →' }
-  }
-
-  async handleSignup() {
-    const btn = document.getElementById('signup-btn')
-    const username = document.getElementById('signup-username').value.trim()
-    const email = document.getElementById('signup-email').value.trim()
-    const password = document.getElementById('signup-password').value
-    const newsletter = document.getElementById('signup-newsletter').checked
-    if (!username || !email || !password) return this._authError('Remplis tous les champs')
-    if (password.length < 8) return this._authError('Mot de passe trop court (min. 8 car.)')
-    btn.disabled = true; btn.textContent = 'Création...'
-    try {
-      const { data, error } = await supabase.auth.signUp({ email, password })
-      if (error) throw error
-      // Crée le profil
-      await supabase.from('profiles').insert({ id: data.user.id, username, display_name: username, newsletter, points: 500, rank: 'Dragão' })
-      await supabase.from('points_log').insert({ user_id: data.user.id, amount: 500, reason: 'welcome' })
-      // Newsletter : appel API existante
-      if (newsletter) {
-        try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) }) } catch {}
-        localStorage.setItem('np_email_subscribed', '1')
-        // Ferme le popup newsletter si ouvert
-        const popup = document.getElementById('notif-popup')
-        if (popup) popup.classList.remove('show')
-      }
-      this.closeAuthModal()
-      this._toast('Bienvenue ! 500 pts offerts 🎁', 'success')
-    } catch(e) { this._authError(e.message.includes('already') ? 'Email déjà utilisé' : e.message) }
-    finally { btn.disabled = false; btn.textContent = 'Créer mon compte →' }
-  }
-
-  async handleLogout() { this._closeDropdown(); await supabase.auth.signOut() }
-  _authError(msg) { const el = document.getElementById('auth-error'); el.textContent = msg; el.classList.add('visible') }
-
-  // ── SETTINGS ──
-  openSettings() {
-    this._closeDropdown()
-    if (!this.user) return
-    const p = this.user.profile
-    document.getElementById('settings-displayname').value = p.display_name || ''
-    document.getElementById('settings-bio').value = p.bio || ''
-    document.getElementById('settings-password').value = ''
-    const prev = document.getElementById('settings-avatar-preview')
-    prev.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
-    document.getElementById('settings-modal').classList.add('open'); document.body.style.overflow = 'hidden'
-  }
-  closeSettings() { document.getElementById('settings-modal').classList.remove('open'); document.body.style.overflow = '' }
-
-  async saveSettings() {
-    if (!this.user) return
-    const display_name = document.getElementById('settings-displayname').value.trim()
-    const bio = document.getElementById('settings-bio').value.trim()
-    const password = document.getElementById('settings-password').value
-    try {
-      await supabase.from('profiles').update({ display_name, bio, updated_at: new Date().toISOString() }).eq('id', this.user.id)
-      if (password) await supabase.auth.updateUser({ password })
-      const { data } = await supabase.from('profiles').select('*').eq('id', this.user.id).single()
-      this.user.profile = data; this._updatePill(data); this._buildDropdown(data)
-      this.closeSettings(); this._toast('Profil mis à jour ✓', 'success')
-    } catch(e) { const el = document.getElementById('settings-error'); el.textContent = e.message; el.classList.add('visible') }
-  }
-
-  async handleAvatarUpload(input) {
-    const file = input.files[0]
-    if (!file || !this.user) return
-    if (file.size > 2 * 1024 * 1024) { this._toast('Image trop lourde (max 2MB)', 'error'); return }
-    try {
-      const ext = file.name.split('.').pop()
-      const path = `${this.user.id}/avatar.${ext}`
-      await supabase.storage.from('avatars').upload(path, file, { upsert: true })
-      const { data } = supabase.storage.from('avatars').getPublicUrl(path)
-      await supabase.from('profiles').update({ avatar_url: data.publicUrl }).eq('id', this.user.id)
-      document.getElementById('settings-avatar-preview').innerHTML = `<img src="${data.publicUrl}">`
-      this._toast('Photo mise à jour ✓', 'success')
-    } catch { this._toast('Erreur upload', 'error') }
-  }
-
-  // ── RANK SHOP ──
-  openRankShop() {
-    this._closeDropdown()
-    if (!this.user) return
-    const p = this.user.profile
-    document.getElementById('shop-points-val').textContent = p.points
-    document.getElementById('rank-shop-grid').innerHTML = RANKS.map(r => {
-      const isCurrent = p.rank === r.id
-      const canAfford = p.points >= r.cost
-      return `<div class="rank-shop-row${isCurrent?' current':''}">
-        <div class="rank-info">
-          <div class="rank-emoji-big">${r.emoji}</div>
-          <div><div class="rank-name-big" style="color:${r.color}">${r.id}</div>
-          <div class="rank-cost-label">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
-        </div>
-        ${isCurrent
-          ? `<button class="rank-buy-btn" style="color:${r.color};border-color:${r.border}" disabled>Actuel</button>`
-          : r.cost===0 ? `<button class="rank-buy-btn" disabled style="color:rgba(255,255,255,0.2);border-color:rgba(255,255,255,0.1)">Gratuit</button>`
-          : `<button class="rank-buy-btn" style="color:${r.color};border-color:${r.border}" ${!canAfford?'disabled':''} onclick="AuthNav.buyRank('${r.id}',${r.cost})">${canAfford?'Acheter':'Insuffisant'}</button>`
-        }
-      </div>`
-    }).join('')
-    document.getElementById('rank-shop-modal').classList.add('open'); document.body.style.overflow = 'hidden'
-  }
-  closeRankShop() { document.getElementById('rank-shop-modal').classList.remove('open'); document.body.style.overflow = '' }
-
-  async buyRank(rankId, cost) {
-    if (!this.user || this.user.profile.points < cost) { this._toast('Pas assez de points', 'error'); return }
-    try {
-      const newPoints = this.user.profile.points - cost
-      await supabase.from('profiles').update({ rank: rankId, points: newPoints }).eq('id', this.user.id)
-      await supabase.from('points_log').insert({ user_id: this.user.id, amount: -cost, reason: 'rank_purchase', ref_id: rankId })
-      this.user.profile.rank = rankId; this.user.profile.points = newPoints
-      this._updatePill(this.user.profile); this._buildDropdown(this.user.profile)
-      this.closeRankShop(); this._toast(`Rang ${rankId} obtenu ! 🎉`, 'success')
-    } catch(e) { this._toast('Erreur : ' + e.message, 'error') }
-  }
-
-  // ── FRIENDS ──
-  async openFriends() {
-    this._closeDropdown()
-    if (!this.user) return
-    document.getElementById('friends-panel').classList.add('open'); document.body.style.overflow = 'hidden'
-    document.getElementById('friends-search-input').value = ''
-    await this._loadFriends()
-  }
-  closeFriends() { document.getElementById('friends-panel').classList.remove('open'); document.body.style.overflow = '' }
-
+  // AMIS
   async _loadFriends() {
-    const list = document.getElementById('friends-list')
-    list.innerHTML = '<div class="friends-empty">Chargement...</div>'
+    if (!this.u) return
+    const list = document.getElementById('an-friends-list'); if (!list) return
+    list.innerHTML = '<div class="an-empty">Chargement...</div>'
     try {
-      const friends = await getFriends(this.user.id)
-      const { data: pending } = await supabase.from('friendships').select('id, requester:requester_id(id,username,display_name,avatar_url,rank)').eq('addressee_id', this.user.id).eq('status','pending')
+      const friends = await getFriends(this.u.id)
+      const { data: pending } = await supabase.from('friendships').select('id, requester:requester_id(id,username,display_name,avatar_url,rank)').eq('addressee_id', this.u.id).eq('status','pending')
       let html = ''
       if (pending?.length) {
-        html += `<div class="friends-section-label">Demandes reçues (${pending.length})</div>`
-        html += pending.map(f => `<div class="friend-row">
-          <div class="friend-avatar">${f.requester.avatar_url?`<img src="${f.requester.avatar_url}">`:(f.requester.display_name||f.requester.username||'?')[0].toUpperCase()}</div>
-          <div class="friend-info"><div class="friend-name">${f.requester.display_name||f.requester.username}</div><div class="friend-rank-label">${f.requester.rank}</div></div>
-          <div class="friend-actions"><button class="friend-btn green" onclick="AuthNav.acceptFriend(${f.id})">Accepter</button><button class="friend-btn" onclick="AuthNav.declineFriend(${f.id})">Refuser</button></div>
+        html += `<div class="an-row-label">Demandes reçues (${pending.length})</div>`
+        html += pending.map(f => `<div class="an-friend-row">
+          <div class="an-friend-av">${f.requester.avatar_url?`<img src="${f.requester.avatar_url}">`:(f.requester.display_name||f.requester.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info"><div class="an-friend-name">${f.requester.display_name||f.requester.username}</div><div class="an-friend-sub">${f.requester.rank}</div></div>
+          <div class="an-friend-acts">
+            <button class="an-micro-btn green" onclick="AN.acceptFriend(${f.id})">✓</button>
+            <button class="an-micro-btn" onclick="AN.declineFriend(${f.id})">✕</button>
+          </div>
         </div>`).join('')
-        html += `<div style="height:1px;background:rgba(255,255,255,0.08);margin:4px 0"></div>`
+        html += '<div class="an-divider"></div>'
       }
       if (friends.length) {
-        html += `<div class="friends-section-label">Mes amis (${friends.length})</div>`
-        html += friends.map(f => `<div class="friend-row">
-          <div class="friend-avatar">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
-          <div class="friend-info"><div class="friend-name">${f.display_name||f.username}</div><div class="friend-rank-label">${f.rank}</div></div>
-          <div class="friend-actions"><button class="friend-btn primary" onclick="AuthNav.openMP('${f.id}','${(f.display_name||f.username).replace(/'/g,"'")}')">MP</button></div>
+        html += `<div class="an-row-label">Mes amis (${friends.length})</div>`
+        html += friends.map(f => `<div class="an-friend-row">
+          <div class="an-friend-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info"><div class="an-friend-name">${f.display_name||f.username}</div><div class="an-friend-sub">${f.rank}</div></div>
+          <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">MP</button></div>
         </div>`).join('')
       }
-      list.innerHTML = html || '<div class="friends-empty">Aucun ami · Recherche ↑</div>'
-    } catch { list.innerHTML = '<div class="friends-empty">Erreur de chargement</div>' }
+      list.innerHTML = html || '<div class="an-empty">Aucun ami · Recherche un utilisateur ↑</div>'
+    } catch { list.innerHTML = '<div class="an-empty">Erreur de chargement</div>' }
   }
 
-  async searchUsers(query) {
-    if (!query || query.length < 2) { await this._loadFriends(); return }
-    const { data } = await supabase.from('profiles').select('id,username,display_name,avatar_url,rank').ilike('username',`%${query}%`).neq('id', this.user.id).limit(10)
-    const list = document.getElementById('friends-list')
-    if (!data?.length) { list.innerHTML = '<div class="friends-empty">Aucun résultat</div>'; return }
-    list.innerHTML = `<div class="friends-section-label">Résultats</div>` + data.map(u => `<div class="friend-row">
-      <div class="friend-avatar">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
-      <div class="friend-info"><div class="friend-name">${u.display_name||u.username}</div><div class="friend-rank-label">${u.rank}</div></div>
-      <div class="friend-actions"><button class="friend-btn primary" onclick="AuthNav.addFriend('${u.id}')">+ Ajouter</button></div>
+  async searchUsers(q) {
+    if (!q || q.length < 2) { this._loadFriends(); return }
+    const { data } = await supabase.from('profiles').select('id,username,display_name,avatar_url,rank').ilike('username',`%${q}%`).neq('id', this.u.id).limit(10)
+    const list = document.getElementById('an-friends-list'); if (!list) return
+    if (!data?.length) { list.innerHTML = '<div class="an-empty">Aucun résultat</div>'; return }
+    list.innerHTML = `<div class="an-row-label">Résultats</div>` + data.map(u => `<div class="an-friend-row">
+      <div class="an-friend-av">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
+      <div class="an-friend-info"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
+      <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.addFriend('${u.id}')">+ Ajouter</button></div>
     </div>`).join('')
   }
 
   async addFriend(id) {
     try {
-      await sendFriendRequest(this.user.id, id)
-      // Notif pour l'autre user
-      await supabase.from('notifications').insert({ user_id: id, type:'friend_request', from_user_id: this.user.id })
-      this._toast('Demande envoyée !', 'success')
-    } catch { this._toast('Demande déjà envoyée', 'error') }
+      await sendFriendRequest(this.u.id, id)
+      await supabase.from('notifications').insert({ user_id: id, type:'friend_request', from_user_id: this.u.id })
+      this._toast('Demande envoyée !', 'ok')
+    } catch { this._toast('Déjà envoyée', '') }
   }
-
   async acceptFriend(id) {
     await acceptFriendRequest(id)
-    // Récupère requester pour notif
     const { data: f } = await supabase.from('friendships').select('requester_id').eq('id', id).single()
-    if (f) await supabase.from('notifications').insert({ user_id: f.requester_id, type:'friend_accepted', from_user_id: this.user.id })
-    await this._checkNotifications(); await this._loadFriends()
+    if (f) await supabase.from('notifications').insert({ user_id: f.requester_id, type:'friend_accepted', from_user_id: this.u.id })
+    this._checkNotifs(); this._loadFriends()
+  }
+  async declineFriend(id) { await supabase.from('friendships').delete().eq('id', id); this._checkNotifs(); this._loadFriends() }
+
+  // MP
+  async _loadConvList() {
+    if (!this.u) return
+    const friends = await getFriends(this.u.id)
+    const convView = document.getElementById('an-conv-view')
+    const convList = document.getElementById('an-conv-list')
+    if (!convList) return
+    convView.style.display = ''; document.getElementById('an-chat-view').style.display = 'none'
+    if (!friends.length) { convList.innerHTML = '<div class="an-empty">Ajoute des amis pour écrire</div>'; return }
+    convList.innerHTML = '<div class="an-row-label">Conversations</div>' + friends.map(f => `<div class="an-conv-row" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">
+      <div class="an-conv-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
+      <div><div class="an-conv-name">${f.display_name||f.username}</div><div class="an-conv-preview">${f.rank}</div></div>
+    </div>`).join('')
   }
 
-  async declineFriend(id) { await supabase.from('friendships').delete().eq('id', id); await this._checkNotifications(); await this._loadFriends() }
-
-  // ── MP ──
-  async openMP(friendId, friendName) {
-    this.currentMPFriend = { id: friendId, name: friendName }
-    document.getElementById('mp-username').textContent = friendName
-    document.getElementById('mp-messages').innerHTML = ''
-    document.getElementById('mp-modal').classList.add('open')
-    await this._loadMessages()
-    await markMessagesRead(friendId, this.user.id)
-    this._subscribeMP(friendId)
-  }
-  closeMP() { document.getElementById('mp-modal').classList.remove('open'); if (this.mpChannel) supabase.removeChannel(this.mpChannel); this.currentMPFriend = null }
-
-  async _loadMessages() {
-    if (!this.currentMPFriend) return
-    const msgs = await getConversation(this.user.id, this.currentMPFriend.id)
-    const c = document.getElementById('mp-messages')
-    c.innerHTML = msgs.map(m => `<div class="mp-msg ${m.sender_id===this.user.id?'mine':'theirs'}">${m.content}<span class="mp-msg-time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('')
-    c.scrollTop = c.scrollHeight
-  }
-
-  _subscribeMP(friendId) {
-    if (this.mpChannel) supabase.removeChannel(this.mpChannel)
-    this.mpChannel = supabase.channel('mp-'+friendId)
-      .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages', filter:`receiver_id=eq.${this.user.id}` }, () => this._loadMessages())
+  async openChat(friendId, friendName) {
+    this.mpFriend = { id: friendId, name: friendName }
+    document.getElementById('an-chat-name').textContent = friendName
+    document.getElementById('an-conv-view').style.display = 'none'
+    const cv = document.getElementById('an-chat-view'); cv.style.display = 'flex'; cv.style.flexDirection = 'column'
+    this.tabTo('mp')
+    await this._loadMsgs()
+    await markMessagesRead(friendId, this.u.id)
+    if (this.mpCh) supabase.removeChannel(this.mpCh)
+    this.mpCh = supabase.channel('mp-'+friendId)
+      .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages', filter:`receiver_id=eq.${this.u.id}` }, () => this._loadMsgs())
       .subscribe()
   }
 
-  async sendMP() {
-    const input = document.getElementById('mp-input')
-    const content = input.value.trim()
-    if (!content || !this.currentMPFriend || !this.user) return
+  backToConvList() { this._loadConvList(); this.mpFriend = null }
+
+  async _loadMsgs() {
+    if (!this.mpFriend) return
+    const msgs = await getConversation(this.u.id, this.mpFriend.id)
+    const c = document.getElementById('an-chat-msgs'); if (!c) return
+    c.innerHTML = msgs.map(m => `<div class="an-msg ${m.sender_id===this.u.id?'mine':'theirs'}">${m.content}<span class="an-msg-time">${new Date(m.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>`).join('')
+    c.scrollTop = c.scrollHeight
+  }
+
+  async sendMsg() {
+    const input = document.getElementById('an-chat-input')
+    const content = input.value.trim(); if (!content || !this.mpFriend || !this.u) return
     input.value = ''
-    await sendMessage(this.user.id, this.currentMPFriend.id, content)
-    await this._loadMessages()
+    await sendMessage(this.u.id, this.mpFriend.id, content)
+    // Notif
+    await supabase.from('notifications').insert({ user_id: this.mpFriend.id, type:'mp', from_user_id: this.u.id })
+    await this._loadMsgs()
+  }
+
+  // RANGS
+  _renderRanks() {
+    if (!this.p) return
+    const el = document.getElementById('an-rank-list'); if (!el) return
+    const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
+    el.innerHTML = RANKS.map(r => {
+      const isCurrent = this.p.rank === r.id
+      const canAfford = this.p.points >= r.cost
+      return `<div class="an-rank-row${isCurrent?' current':''}">
+        <div class="an-rank-left">
+          <div class="an-rank-emoji">${r.emoji}</div>
+          <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
+        </div>
+        ${isCurrent
+          ? `<button class="an-micro-btn" style="color:${r.color};border-color:${r.border}" disabled>Actuel</button>`
+          : r.cost===0 ? ''
+          : `<button class="an-micro-btn${canAfford?' blue':''}" ${!canAfford?'disabled':''} style="${canAfford?'':'opacity:.4'}" onclick="AN.buyRank('${r.id}',${r.cost})">${canAfford?'Acheter':'Insuffisant'}</button>`
+        }
+      </div>`
+    }).join('')
+  }
+
+  async buyRank(rankId, cost) {
+    if (!this.u || !this.p || this.p.points < cost) { this._toast('Pas assez de points', 'err'); return }
+    try {
+      const newPts = this.p.points - cost
+      await supabase.from('profiles').update({ rank: rankId, points: newPts }).eq('id', this.u.id)
+      await supabase.from('points_log').insert({ user_id: this.u.id, amount: -cost, reason: 'rank_purchase', ref_id: rankId })
+      this.p.rank = rankId; this.p.points = newPts
+      this._updateNav(); this._renderRanks()
+      this._toast(`${rankId} obtenu ! 🎉`, 'ok')
+    } catch(e) { this._toast(e.message, 'err') }
   }
 
   _toast(msg, type = '') {
-    const t = document.getElementById('an-toast')
-    t.textContent = msg; t.className = 'show ' + type
+    const t = document.getElementById('an-toast'); if (!t) return
+    t.textContent = msg; t.className = 'on ' + type
     clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000)
   }
 }
 
-const AuthNav = new AuthNavController()
-window.AuthNav = AuthNav
-AuthNav.init()
+const ANInstance = new AN()
+window.AN = ANInstance
+ANInstance.init()
