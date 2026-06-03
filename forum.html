@@ -40,7 +40,47 @@
     .btn-new-thread:hover{background:var(--blue-mid);}
 
     /* LAYOUT */
-    .forum-layout{display:grid;grid-template-columns:220px 1fr;gap:0;border-top:1px solid var(--border);}
+    .forum-layout{display:grid;grid-template-columns:220px 1fr 240px;gap:0;border-top:1px solid var(--border);}
+
+    /* RIGHT SIDEBAR */
+    .forum-right{border-left:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;gap:0;}
+    .rs-section{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .rs-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+    .rs-label span{font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4d82d4;letter-spacing:1px;}
+    .online-dot{width:6px;height:6px;border-radius:50%;background:#00c87a;display:inline-block;margin-right:5px;box-shadow:0 0 4px #00c87a;}
+    .lb-mini-row{display:flex;align-items:center;gap:8px;padding:5px 0;}
+    .lb-mini-rank{font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,0.2);width:16px;text-align:center;flex-shrink:0;}
+    .lb-mini-av{width:22px;height:22px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .lb-mini-av img{width:100%;height:100%;object-fit:cover;}
+    .lb-mini-info{flex:1;min-width:0;}
+    .lb-mini-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .lb-mini-pts{font-family:'Bebas Neue',sans-serif;font-size:11px;color:#4d82d4;flex-shrink:0;}
+    .level-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(0,61,165,0.25);border:1px solid rgba(0,61,165,0.5);color:#4d82d4;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;padding:1px 5px;flex-shrink:0;}
+    .online-user-row{display:flex;align-items:center;gap:6px;padding:4px 0;}
+    .online-user-av{width:20px;height:20px;border-radius:50%;background:rgba(0,61,165,0.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Bebas Neue',sans-serif;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .online-user-av img{width:100%;height:100%;object-fit:cover;}
+    .online-user-name{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* CHAT GÉNÉRAL */
+    #chat-general-view{display:none;flex-direction:column;height:calc(100vh - 72px);position:sticky;top:72px;}
+    #chat-general-view.active{display:flex;}
+    .chat-gen-msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:rgba(0,61,165,0.3) transparent;}
+    .chat-gen-msg{display:flex;gap:8px;align-items:flex-start;}
+    .chat-gen-av{width:28px;height:28px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .chat-gen-av img{width:100%;height:100%;object-fit:cover;}
+    .chat-gen-body{flex:1;min-width:0;}
+    .chat-gen-meta{display:flex;align-items:baseline;gap:6px;margin-bottom:2px;}
+    .chat-gen-author{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#fff;cursor:pointer;}
+    .chat-gen-author:hover{color:#4d82d4;}
+    .chat-gen-lvl{font-family:'Bebas Neue',sans-serif;font-size:9px;color:#4d82d4;background:rgba(0,61,165,0.2);border:1px solid rgba(0,61,165,0.4);padding:0 4px;}
+    .chat-gen-time{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(255,255,255,0.2);}
+    .chat-gen-text{font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5;word-break:break-word;}
+    .chat-gen-input-row{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:rgba(0,0,0,0.5);}
+    .chat-gen-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px 12px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+    .chat-gen-input:focus{border-color:var(--blue);}
+    .chat-gen-input::placeholder{color:rgba(255,255,255,0.2);}
+    .chat-gen-send{background:#003DA5;border:none;color:#fff;padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.2s;white-space:nowrap;}
+    .chat-gen-send:hover{background:#0050CC;}
 
     /* SIDEBAR */
     .forum-sidebar{border-right:1px solid var(--border);padding:28px 0;}
@@ -86,6 +126,7 @@
     .thread-replies{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:rgba(255,255,255,0.2);}
     .thread-replies-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
     .thread-new-badge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--blue);color:#fff;padding:2px 6px;}
+    .nv-badge{display:inline-flex;align-items:center;background:rgba(0,61,165,0.2);border:1px solid rgba(0,61,165,0.45);color:#4d82d4;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;padding:1px 5px;vertical-align:middle;}
 
     /* THREAD VIEW */
     #thread-view{display:none;}
@@ -165,7 +206,8 @@
     .footer-links a:hover{color:#fff;}
 
     /* RESPONSIVE */
-    @media(max-width:1024px){.forum-layout{grid-template-columns:180px 1fr;}nav{padding:0 24px;}.page-header{padding:40px 24px 28px;}}
+    @media(max-width:1200px){.forum-layout{grid-template-columns:180px 1fr 200px;}}
+    @media(max-width:1024px){.forum-layout{grid-template-columns:180px 1fr;}.forum-right{display:none;}nav{padding:0 24px;}.page-header{padding:40px 24px 28px;}}
 
     /* ── MOBILE ── */
     @media(max-width:768px){
@@ -319,7 +361,7 @@
   </div>
 
   <div class="forum-layout">
-    <!-- SIDEBAR -->
+    <!-- SIDEBAR GAUCHE -->
     <aside class="forum-sidebar">
       <div class="sidebar-section">
         <div class="sidebar-label">Catégories</div>
@@ -329,6 +371,10 @@
         <button class="sidebar-item" data-cat="debats" onclick="filterCat('debats',this)">Débats <span class="sidebar-count" id="count-debats">—</span></button>
         <button class="sidebar-item" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
         <button class="sidebar-item" data-cat="general" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Live</div>
+        <button class="sidebar-item" id="chat-gen-btn" onclick="toggleChatGeneral(this)">💬 Discussion <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;color:#00c87a;letter-spacing:1px">LIVE</span></button>
       </div>
     </aside>
 
@@ -352,6 +398,7 @@
           <button class="mobile-cat-pill" data-cat="debats" onclick="filterCat('debats',this)">Débats</button>
           <button class="mobile-cat-pill" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique</button>
           <button class="mobile-cat-pill" data-cat="general" onclick="filterCat('general',this)">Général</button>
+          <button class="mobile-cat-pill" onclick="toggleChatGeneral(this)">💬 Live</button>
         </div>
         <div class="thread-list" id="thread-list">
           <div class="loading-state">Chargement des threads...</div>
@@ -376,7 +423,41 @@
           </div>
         </div>
       </div>
+
+      <!-- CHAT GÉNÉRAL VIEW -->
+      <div id="chat-general-view">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+          <button class="back-btn" style="margin:0" onclick="toggleChatGeneral()">← Retour</button>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;">Discussion Générale</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:#00c87a;border:1px solid #00c87a;padding:2px 6px">LIVE</span>
+          <span id="chat-online-count" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);margin-left:auto"></span>
+        </div>
+        <div class="chat-gen-msgs" id="chat-gen-msgs"></div>
+        <div class="chat-gen-input-row">
+          <input class="chat-gen-input" id="chat-gen-input" placeholder="Envoie un message..." maxlength="500" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg()}">
+          <button class="chat-gen-send" onclick="sendChatMsg()">Envoyer</button>
+        </div>
+      </div>
     </main>
+
+    <!-- SIDEBAR DROITE -->
+    <aside class="forum-right" id="forum-right">
+      <!-- Online -->
+      <div class="rs-section">
+        <div class="rs-label">🟢 En ligne <span id="rs-online-count">0</span></div>
+        <div id="rs-online-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
+      </div>
+      <!-- Classement hebdo -->
+      <div class="rs-section">
+        <div class="rs-label">🏆 Cette semaine <span id="rs-week-label"></span></div>
+        <div id="rs-weekly-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
+      </div>
+      <!-- All-time -->
+      <div class="rs-section">
+        <div class="rs-label">👑 All Time</div>
+        <div id="rs-alltime-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
+      </div>
+    </aside>
   </div>
 
   <!-- COMMUNAUTÉ MONDIALE -->
@@ -486,7 +567,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 async function loadThreads() {
   const { data, error } = await supabase
     .from('forum_threads')
-    .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
     .order('created_at', { ascending: false })
     .limit(50)
   if (error) { document.getElementById('thread-list').innerHTML = '<div class="empty-state">Erreur de chargement</div>'; return }
@@ -525,6 +606,7 @@ function renderThreadList() {
     const score = t.votes || 0
     const uv = userVotesMap[t.id] || 0
     const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : ''
+    const lvl = a.level || 1
     return `
     <div class="thread-row" onclick="openThread(${t.id})">
       <div class="vote-col" onclick="event.stopPropagation()">
@@ -540,6 +622,7 @@ function renderThreadList() {
         <div class="thread-meta">
           <span class="thread-author-av">${avHTML}</span>
           <span class="an-clickable-user" onclick="event.stopPropagation();AN?.openProfileCard('${a.id}',this)" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='#4d82d4'" onmouseout="this.style.color=''">${a.display_name||a.username||'Anonyme'}</span>
+          <span class="nv-badge">Nv${lvl}</span>
           <span class="thread-rank-badge" style="color:${color};border-color:${color}">${emoji} ${rank}</span>
           <span>·</span><span>${date}</span>
         </div>
@@ -566,14 +649,14 @@ function updateCounts() {
 window.openThread = async function(threadId) {
   const { data: thread } = await supabase
     .from('forum_threads')
-    .select(`*, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank, level)`)
     .eq('id', threadId).single()
   if (!thread) return
   currentThread = thread
 
   const { data: replies } = await supabase
     .from('forum_replies')
-    .select(`*, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank, level)`)
     .eq('thread_id', threadId)
     .order('created_at', { ascending: true })
 
@@ -607,6 +690,7 @@ window.openThread = async function(threadId) {
         ${isBest?'<div class="best-label">✅ Meilleure réponse</div>':''}
         <div class="reply-header">
           <span class="reply-author" style="cursor:pointer" onclick="AN?.openProfileCard('${ra.id}',this)">${ra.display_name||ra.username||'?'}</span>
+          <span class="nv-badge">Nv${ra.level||1}</span>
           <span class="thread-rank-badge" style="color:${rcolor};border-color:${rcolor}">${remoji} ${rrank}</span>
           <span class="reply-date">${rdate}</span>
           ${r.is_original?'<span class="thread-new-badge">OP</span>':''}
@@ -799,7 +883,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, async () => {
       const { data } = await supabase
         .from('forum_threads')
-        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
         .order('created_at', { ascending: false })
         .limit(50)
       if (data) {
@@ -814,7 +898,7 @@ function subscribeRealtime() {
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, async () => {
       const { data } = await supabase
         .from('forum_threads')
-        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
         .order('created_at', { ascending: false })
         .limit(50)
       if (data) {
@@ -963,5 +1047,182 @@ window.likeReply = async function(replyId, authorId, currentCount) {
 
 </script>
 
-</body>
-</html>
+<script type="module">
+import { supabase } from './supabase-client.js'
+
+// ── CHAT GÉNÉRAL ──
+let chatActive = false
+let chatChannel = null
+let chatUser = null
+let chatProfile = null
+
+window.addEventListener('an:login', e => { chatUser = e.detail.user; chatProfile = e.detail.profile })
+window.addEventListener('an:logout', () => { chatUser = null; chatProfile = null })
+// Fallback
+supabase.auth.getSession().then(async ({ data: { session } }) => {
+  if (session) {
+    chatUser = session.user
+    const { data } = await supabase.from('profiles').select('id,username,display_name,avatar_url,level').eq('id', session.user.id).single()
+    chatProfile = data
+  }
+})
+
+window.toggleChatGeneral = function(btn) {
+  chatActive = !chatActive
+  const chatView = document.getElementById('chat-general-view')
+  const threadListView = document.getElementById('thread-list-view')
+  const threadView = document.getElementById('thread-view')
+  if (chatActive) {
+    threadListView.style.display = 'none'
+    threadView.style.display = 'none'
+    chatView.classList.add('active')
+    document.getElementById('chat-gen-btn')?.classList.add('active')
+    loadChatMsgs()
+    subscribeChatRealtime()
+  } else {
+    chatView.classList.remove('active')
+    threadListView.style.display = 'block'
+    document.getElementById('chat-gen-btn')?.classList.remove('active')
+    if (chatChannel) { supabase.removeChannel(chatChannel); chatChannel = null }
+  }
+}
+
+async function loadChatMsgs() {
+  const { data } = await supabase.from('chat_messages')
+    .select('*, author:user_id(id, username, display_name, avatar_url, level)')
+    .order('created_at', { ascending: true })
+    .limit(80)
+  renderChatMsgs(data || [])
+}
+
+function renderChatMsgs(msgs) {
+  const el = document.getElementById('chat-gen-msgs')
+  if (!el) return
+  if (!msgs.length) { el.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);padding:20px;text-align:center">Sois le premier à écrire !</div>'; return }
+  el.innerHTML = msgs.map(m => {
+    const a = m.author || {}
+    const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+    const time = new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+    const isMe = chatUser && m.user_id === chatUser.id
+    return `<div class="chat-gen-msg${isMe?' style="flex-direction:row-reverse"':''}">
+      <div class="chat-gen-av" style="cursor:pointer" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
+      <div class="chat-gen-body">
+        <div class="chat-gen-meta">
+          <span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span>
+          <span class="chat-gen-lvl">Nv${a.level||1}</span>
+          <span class="chat-gen-time">${time}</span>
+        </div>
+        <div class="chat-gen-text">${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+    </div>`
+  }).join('')
+  el.scrollTop = el.scrollHeight
+}
+
+function subscribeChatRealtime() {
+  if (chatChannel) supabase.removeChannel(chatChannel)
+  chatChannel = supabase.channel('chat-general')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages' }, async (payload) => {
+      const { data: msg } = await supabase.from('chat_messages')
+        .select('*, author:user_id(id, username, display_name, avatar_url, level)')
+        .eq('id', payload.new.id).single()
+      if (!msg) return
+      const el = document.getElementById('chat-gen-msgs')
+      if (!el) return
+      const div = document.createElement('div')
+      const a = msg.author || {}
+      const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+      const time = new Date(msg.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+      const isMe = chatUser && msg.user_id === chatUser.id
+      div.className = 'chat-gen-msg'
+      if (isMe) div.style.flexDirection = 'row-reverse'
+      div.innerHTML = `<div class="chat-gen-av" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
+        <div class="chat-gen-body">
+          <div class="chat-gen-meta"><span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span><span class="chat-gen-lvl">Nv${a.level||1}</span><span class="chat-gen-time">${time}</span></div>
+          <div class="chat-gen-text">${msg.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        </div>`
+      el.appendChild(div)
+      el.scrollTop = el.scrollHeight
+    })
+    .subscribe()
+}
+
+window.sendChatMsg = async function() {
+  if (!chatUser) { AN?.openAuth(); return }
+  const input = document.getElementById('chat-gen-input')
+  const content = input.value.trim()
+  if (!content) return
+  // Cooldown 3s
+  const now = Date.now()
+  if (window._lastChatMsg && now - window._lastChatMsg < 3000) { return }
+  window._lastChatMsg = now
+  input.value = ''
+  await supabase.from('chat_messages').insert({ user_id: chatUser.id, content })
+}
+
+// ── SIDEBAR DROITE ──
+async function loadRightSidebar() {
+  // Weekly leaderboard
+  const { data: weekly } = await supabase.from('profiles')
+    .select('id, username, display_name, avatar_url, rank, level, weekly_pts')
+    .order('weekly_pts', { ascending: false }).limit(5)
+  const wEl = document.getElementById('rs-weekly-list')
+  if (wEl && weekly?.length) {
+    wEl.innerHTML = weekly.map((u, i) => lbMiniRow(u, i, u.weekly_pts, 'weekly_pts')).join('')
+  } else if (wEl) { wEl.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Aucun joueur</div>' }
+
+  // All-time
+  const { data: alltime } = await supabase.from('profiles')
+    .select('id, username, display_name, avatar_url, rank, level, points')
+    .order('points', { ascending: false }).limit(5)
+  const aEl = document.getElementById('rs-alltime-list')
+  if (aEl && alltime?.length) {
+    aEl.innerHTML = alltime.map((u, i) => lbMiniRow(u, i, u.points, 'points')).join('')
+  }
+
+  // Week label
+  const now = new Date()
+  const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1))
+  document.getElementById('rs-week-label').textContent = `Sem. ${monday.getDate()}/${monday.getMonth()+1}`
+}
+
+function lbMiniRow(u, i, pts, field) {
+  const avHTML = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
+  const medals = ['🥇','🥈','🥉']
+  const rankDisplay = i < 3 ? medals[i] : `${i+1}`
+  return `<div class="lb-mini-row">
+    <div class="lb-mini-rank">${rankDisplay}</div>
+    <div class="lb-mini-av">${avHTML}</div>
+    <div class="lb-mini-info">
+      <div class="lb-mini-name">${u.display_name||u.username}</div>
+      <div style="display:flex;gap:4px;align-items:center"><span class="level-badge">Nv${u.level||1}</span></div>
+    </div>
+    <div class="lb-mini-pts">${pts}</div>
+  </div>`
+}
+
+// Online users via presence
+supabase.channel('forum-online')
+  .on('presence', { event: 'sync' }, function() {
+    const state = this.presenceState()
+    const users = Object.values(state).flat()
+    const count = users.length
+    const el = document.getElementById('rs-online-list')
+    const countEl = document.getElementById('rs-online-count')
+    if (countEl) countEl.textContent = count
+    const chatCount = document.getElementById('chat-online-count')
+    if (chatCount) chatCount.textContent = count > 0 ? `${count} en ligne` : ''
+    if (!el) return
+    if (!users.length) { el.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Personne en ligne</div>'; return }
+    el.innerHTML = users.slice(0,8).map(u => `
+      <div class="online-user-row">
+        <div style="width:6px;height:6px;border-radius:50%;background:#00c87a;flex-shrink:0"></div>
+        <span class="online-user-name">${u.username||'?'}</span>
+      </div>`).join('')
+  })
+  .subscribe()
+
+loadRightSidebar()
+// Refresh leaderboard toutes les 2 min
+setInterval(loadRightSidebar, 120000)
+</script>
