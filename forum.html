@@ -699,7 +699,7 @@ window.openThread = async function(threadId) {
         <div class="reply-actions">
           ${!r.is_original && !isOwnReply && currentUser ? '<button class="reply-action-btn" onclick="likeReply('+r.id+',\''+ra.id+'\','+likeCount+')" style="color:rgba(231,76,60,0.6);border-color:rgba(231,76,60,0.25)">❤️ '+likeCount+'</button>' : likeCount > 0 ? '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(231,76,60,0.5)">❤️ '+likeCount+'</span>' : ''}
           ${canMarkBest?'<button class="reply-action-btn" onclick="markBest('+r.id+')">✓ Meilleure réponse (+10 pts)</button>':''}
-          ${window.AN?.isAdmin?.() && !r.is_original ? '<button class="reply-action-btn" onclick="AN.adminDeleteReply('+r.id+','+r.thread_id+',' + "''" + ')" style="color:#e74c3c;border-color:rgba(231,76,60,0.3)">✕ Supprimer</button>' : ''}
+          ${window.AN?.isAdmin?.() && !r.is_original ? '<button class="reply-action-btn" onclick="deleteReply('+r.id+','+r.thread_id+')" style="color:#e74c3c;border-color:rgba(231,76,60,0.3)">✕ Supprimer</button>' : ''}
         </div>
       </div>
     </div>`
@@ -767,6 +767,18 @@ window.submitReply = async function() {
     await openThread(currentThread.id)
   } catch(e) { showToast(e.message, 'error') }
   finally { btn.disabled = false; btn.textContent = 'Répondre →' }
+}
+
+window.deleteReply = async function(replyId, threadId) {
+  if (!window.AN?.isAdmin?.() || !confirm('Supprimer cette réponse ?')) return
+  await supabase.from('reply_likes').delete().eq('reply_id', replyId)
+  await supabase.from('forum_replies').delete().eq('id', replyId)
+  // Décrémenter reply_count
+  const { data: t } = await supabase.from('forum_threads').select('reply_count').eq('id', threadId).single()
+  const newCount = Math.max(0, (t?.reply_count || 1) - 1)
+  await supabase.from('forum_threads').update({ reply_count: newCount }).eq('id', threadId)
+  if (currentThread?.id === threadId) currentThread.reply_count = newCount
+  await openThread(threadId)
 }
 
 window.markBest = async function(replyId) {
@@ -1104,13 +1116,16 @@ function renderChatMsgs(msgs) {
     const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
     const time = new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
     const isMe = chatUser && m.user_id === chatUser.id
-    return `<div class="chat-gen-msg${isMe?' style="flex-direction:row-reverse"':''}">
+    const isAdmin = window.AN?.isAdmin?.()
+    const delBtn = (isAdmin || isMe) ? `<button onclick="deleteChatMsg(${m.id},this)" style="background:none;border:none;color:rgba(231,76,60,0.5);cursor:pointer;font-size:10px;padding:0 2px;line-height:1;margin-left:4px;transition:color .15s" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='rgba(231,76,60,0.5)'">✕</button>` : ''
+    return `<div class="chat-gen-msg"${isMe?' data-me="1" style="flex-direction:row-reverse"':''}>
       <div class="chat-gen-av" style="cursor:pointer" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
       <div class="chat-gen-body">
         <div class="chat-gen-meta">
           <span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span>
           <span class="chat-gen-lvl">Nv${a.level||1}</span>
           <span class="chat-gen-time">${time}</span>
+          ${delBtn}
         </div>
         <div class="chat-gen-text">${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
       </div>
@@ -1134,17 +1149,26 @@ function subscribeChatRealtime() {
       const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
       const time = new Date(msg.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
       const isMe = chatUser && msg.user_id === chatUser.id
+      const isAdmin = window.AN?.isAdmin?.()
+      const delBtn = (isAdmin || isMe) ? `<button onclick="deleteChatMsg(${msg.id},this)" style="background:none;border:none;color:rgba(231,76,60,0.5);cursor:pointer;font-size:10px;padding:0 2px;line-height:1;margin-left:4px;transition:color .15s" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='rgba(231,76,60,0.5)'">✕</button>` : ''
       div.className = 'chat-gen-msg'
-      if (isMe) div.style.flexDirection = 'row-reverse'
+      if (isMe) { div.style.flexDirection = 'row-reverse'; div.dataset.me = '1' }
       div.innerHTML = `<div class="chat-gen-av" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
         <div class="chat-gen-body">
-          <div class="chat-gen-meta"><span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span><span class="chat-gen-lvl">Nv${a.level||1}</span><span class="chat-gen-time">${time}</span></div>
+          <div class="chat-gen-meta"><span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span><span class="chat-gen-lvl">Nv${a.level||1}</span><span class="chat-gen-time">${time}</span>${delBtn}</div>
           <div class="chat-gen-text">${msg.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
         </div>`
       el.appendChild(div)
       el.scrollTop = el.scrollHeight
     })
     .subscribe()
+}
+
+window.deleteChatMsg = async function(id, btn) {
+  if (!window.AN?.isAdmin?.() && !btn?.closest('[data-me]')) return
+  if (!confirm('Supprimer ce message ?')) return
+  await supabase.from('chat_messages').delete().eq('id', id)
+  btn?.closest('.chat-gen-msg')?.remove()
 }
 
 window.sendChatMsg = async function() {
