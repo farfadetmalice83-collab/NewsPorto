@@ -1,7 +1,7 @@
 // auth-nav.js — NewsPorto v3
 // <script type="module" src="auth-nav.js"></script> avant </body>
 
-import { supabase, signOut, sendFriendRequest, getFriends, acceptFriendRequest, getConversation, sendMessage, markMessagesRead, startPresence, stopPresence } from './supabase-client.js'
+import { supabase, signOut, sendFriendRequest, getFriends, acceptFriendRequest, getConversation, sendMessage, markMessagesRead, startPresence, stopPresence, addXp, addWeeklyPoints, XP_REWARDS, checkStreak, claimDailyChest } from './supabase-client.js'
 
 const RANKS = [
   { id:'Supporter',  emoji:'⚪', cost:0,      color:'rgba(255,255,255,0.7)', border:'rgba(255,255,255,0.25)' },
@@ -112,9 +112,10 @@ const CSS = `
 .an-tab-dot.on { display:block; }
 
 /* PANEL BODY */
-.an-body { flex:1; overflow-y:auto; padding:0; }
-.an-section { display:none; }
-.an-section.active { display:block; }
+.an-body { flex:1; overflow:hidden; padding:0; display:flex; flex-direction:column; min-height:0; }
+.an-section { display:none; flex:1; flex-direction:column; min-height:0; overflow-y:auto; }
+.an-section.active { display:flex; }
+#an-sec-mp { overflow:hidden; }
 
 /* SHARED COMPONENTS */
 .an-row-label { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); padding:14px 20px 6px; }
@@ -375,6 +376,35 @@ const CSS = `
 .an-crop-zoom { display:flex; align-items:center; gap:10px; }
 .an-crop-zoom input { accent-color:#003DA5; width:120px; }
 .an-crop-zoom span { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.4); }
+
+/* STREAK MODAL */
+#an-streak-modal { position:fixed; inset:0; z-index:2000; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; padding:20px; }
+#an-streak-modal.open { display:flex; }
+.an-streak-box { background:#04070d; border:1px solid rgba(0,61,165,0.4); padding:32px 24px; max-width:340px; width:100%; text-align:center; position:relative; }
+.an-streak-fire { font-size:56px; line-height:1; margin-bottom:8px; }
+.an-streak-title { font-family:'Bebas Neue',sans-serif; font-size:36px; letter-spacing:2px; color:#fff; }
+.an-streak-sub { font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:20px; }
+.an-streak-days { display:flex; gap:6px; justify-content:center; margin-bottom:20px; }
+.an-streak-day { width:36px; height:36px; border-radius:50%; border:1.5px solid rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue',sans-serif; font-size:14px; color:rgba(255,255,255,0.3); transition:.2s; }
+.an-streak-day.done { border-color:#f0a500; color:#f0a500; background:rgba(240,165,0,0.1); }
+.an-streak-day.today { border-color:#00c87a; color:#00c87a; background:rgba(0,200,122,0.1); box-shadow:0 0 8px rgba(0,200,122,0.3); }
+.an-streak-pts { font-family:'Bebas Neue',sans-serif; font-size:48px; letter-spacing:2px; color:#00c87a; }
+.an-streak-pts-label { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:20px; }
+.an-streak-chest { font-size:40px; margin-bottom:4px; }
+
+/* COFFRE QUOTIDIEN */
+.an-chest-btn { display:flex; align-items:center; gap:10px; padding:14px 20px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); transition:background .15s; width:100%; background:none; border-left:none; border-right:none; border-top:none; text-align:left; }
+.an-chest-btn:hover { background:rgba(0,61,165,0.06); }
+.an-chest-btn.claimed { opacity:0.4; cursor:default; }
+.an-chest-icon { font-size:28px; flex-shrink:0; }
+.an-chest-info { flex:1; }
+.an-chest-label { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; }
+.an-chest-sub { font-family:'Barlow Condensed',sans-serif; font-size:10px; letter-spacing:1px; color:rgba(255,255,255,0.3); }
+
+/* RIVALITÉS */
+.an-rival-row { display:flex; align-items:center; gap:10px; padding:12px 20px; border-bottom:1px solid rgba(255,255,255,0.05); }
+.an-rival-score { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; color:#4d82d4; margin-left:auto; white-space:nowrap; }
+.an-rival-vs { font-family:'Bebas Neue',sans-serif; font-size:14px; color:rgba(255,255,255,0.2); }
 `
 
 // ─── HTML ──────────────────────────────────────────────────────────────────
@@ -476,9 +506,19 @@ function html() { return `
         <button class="an-btn" style="flex:1" onclick="AN.saveProfile()">Sauvegarder →</button>
         <button class="an-btn-ghost" onclick="AN.logout()">Déconnexion</button>
       </div>
-      <div style="padding:0 20px 20px">
+      <div style="padding:0 20px 12px">
         <button class="an-btn-ghost" style="width:100%" onclick="AN._generateInviteLink()">📨 Copier mon lien d'invitation</button>
       </div>
+      <!-- COFFRE QUOTIDIEN -->
+      <div class="an-row-label">Coffre quotidien</div>
+      <button class="an-chest-btn" id="an-chest-btn" onclick="AN.claimChest()">
+        <div class="an-chest-icon">📦</div>
+        <div class="an-chest-info">
+          <div class="an-chest-label">Coffre du jour</div>
+          <div class="an-chest-sub" id="an-chest-sub">10 à 200 pts aléatoires · 1x par jour</div>
+        </div>
+        <span id="an-chest-arrow" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#4d82d4">→</span>
+      </button>
     </div>
 
     <!-- NOTIFS -->
@@ -489,10 +529,20 @@ function html() { return `
 
     <!-- AMIS -->
     <div class="an-section" id="an-sec-amis">
-      <div class="an-search-wrap">
-        <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-friends-search" oninput="AN.searchUsers(this.value)">
+      <div class="an-admin-sub-tabs" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+        <button class="an-admin-sub-tab active" onclick="AN.amisSubTab('membres',this)">Membres</button>
+        <button class="an-admin-sub-tab" onclick="AN.amisSubTab('rivalites',this)">Rivalités</button>
       </div>
-      <div id="an-friends-list"><div class="an-empty">Chargement...</div></div>
+      <div class="an-admin-sub-content active" id="an-amis-membres">
+        <div class="an-search-wrap">
+          <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-friends-search" oninput="AN.searchUsers(this.value)">
+        </div>
+        <div id="an-friends-list"><div class="an-empty">Chargement...</div></div>
+      </div>
+      <div class="an-admin-sub-content" id="an-amis-rivalites">
+        <div class="an-row-label">Mes rivalités</div>
+        <div id="an-rivals-list"><div class="an-empty">Chargement...</div></div>
+      </div>
     </div>
 
     <!-- MP -->
@@ -500,16 +550,16 @@ function html() { return `
       <div id="an-conv-view">
         <div class="an-conv-list" id="an-conv-list"><div class="an-empty">Aucune conversation</div></div>
       </div>
-      <div id="an-chat-view" style="display:none;height:calc(100vh - 160px);flex-direction:column">
-        <div class="an-chat-wrap">
+      <div id="an-chat-view" style="display:none;flex-direction:column;height:100%">
+        <div class="an-chat-wrap" style="display:flex;flex-direction:column;height:100%;min-height:0">
           <div class="an-chat-header">
             <button class="an-chat-back" onclick="AN.backToConvList()">←</button>
             <div class="an-chat-name" id="an-chat-name"></div>
           </div>
-          <div class="an-chat-msgs" id="an-chat-msgs"></div>
-          <div class="an-chat-input-row">
-            <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." onkeydown="if(event.key==='Enter')AN.sendMsg()">
-            <button class="an-chat-send" onclick="AN.sendMsg()">Envoyer</button>
+          <div class="an-chat-msgs" id="an-chat-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
+          <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
+            <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendMsg()}">
+            <button class="an-chat-send" onclick="AN.sendMsg()">↑</button>
           </div>
         </div>
       </div>
@@ -667,6 +717,20 @@ function html() { return `
   <div class="an-pcard-badges" id="an-pcard-badges"></div>
   <div class="an-pcard-actions" id="an-pcard-actions"></div>
 </div>
+
+<!-- STREAK MODAL -->
+<div id="an-streak-modal">
+  <div class="an-streak-box">
+    <div class="an-streak-fire" id="an-streak-fire">🔥</div>
+    <div class="an-streak-title" id="an-streak-title">STREAK !</div>
+    <div class="an-streak-sub" id="an-streak-sub">Connexion quotidienne</div>
+    <div class="an-streak-days" id="an-streak-days"></div>
+    <div id="an-streak-chest-icon"></div>
+    <div class="an-streak-pts" id="an-streak-pts">+10</div>
+    <div class="an-streak-pts-label">points gagnés</div>
+    <button class="an-btn" style="width:100%" onclick="AN.closeStreakModal()">Récupérer →</button>
+  </div>
+</div>
 `}
 
 // ─── CONTROLLER ────────────────────────────────────────────────────────────
@@ -818,6 +882,12 @@ class AN {
       if (popup) popup.classList.remove('show')
     }
     startPresence(authUser.id, profile?.username || '')
+    // Streak quotidien
+    checkStreak(authUser.id).then(result => {
+      if (result && !result.alreadyClaimed) {
+        this._showStreakModal(result)
+      }
+    }).catch(() => {})
     // Show admin tab if admin
     if (profile?.role === 'admin') {
       const adminTab = document.getElementById('an-tab-admin')
@@ -866,11 +936,117 @@ class AN {
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
     document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
     if (tab === 'notifs') this._loadNotifs()
-    if (tab === 'amis') this._loadFriends()
+    if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
     if (tab === 'mp') this._loadConvList()
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
+    if (tab === 'profil') this._checkChestStatus()
+  }
+
+  amisSubTab(tab, btn) {
+    document.querySelectorAll('#an-sec-amis .an-admin-sub-tab').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('#an-sec-amis .an-admin-sub-content').forEach(c => c.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById(`an-amis-${tab}`).classList.add('active')
+    if (tab === 'rivalites') this._loadRivals()
+  }
+
+  // ── STREAK ──
+  _showStreakModal({ streak, pts, isChestDay }) {
+    const days = []
+    for (let i = 1; i <= 7; i++) {
+      const cls = i < streak ? 'done' : i === streak ? 'today' : ''
+      const label = i === 7 ? '📦' : `J${i}`
+      days.push(`<div class="an-streak-day ${cls}">${label}</div>`)
+    }
+    document.getElementById('an-streak-days').innerHTML = days.join('')
+    document.getElementById('an-streak-pts').textContent = `+${pts}`
+    document.getElementById('an-streak-title').textContent = streak === 7 ? 'SEMAINE COMPLÈTE !' : `JOUR ${streak} !`
+    document.getElementById('an-streak-sub').textContent = streak >= 3 ? `🔥 ${streak} jours de suite` : 'Connexion quotidienne'
+    document.getElementById('an-streak-chest-icon').innerHTML = isChestDay ? '<div class="an-streak-chest">📦</div><div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#f0a500;margin-bottom:4px">+ COFFRE BONUS</div>' : ''
+    document.getElementById('an-streak-modal').classList.add('open')
+  }
+
+  closeStreakModal() {
+    document.getElementById('an-streak-modal').classList.remove('open')
+  }
+
+  // ── COFFRE ──
+  async _checkChestStatus() {
+    if (!this.u) return
+    const { data: p } = await supabase.from('profiles').select('last_chest_claim').eq('id', this.u.id).single()
+    const today = new Date().toISOString().slice(0, 10)
+    const claimed = p?.last_chest_claim === today
+    const btn = document.getElementById('an-chest-btn')
+    const sub = document.getElementById('an-chest-sub')
+    const arrow = document.getElementById('an-chest-arrow')
+    if (!btn) return
+    if (claimed) {
+      btn.classList.add('claimed')
+      if (sub) sub.textContent = 'Déjà réclamé aujourd\'hui — reviens demain'
+      if (arrow) arrow.textContent = '✓'
+    } else {
+      btn.classList.remove('claimed')
+      if (sub) sub.textContent = '10 à 200 pts aléatoires · 1x par jour'
+      if (arrow) arrow.textContent = '→'
+    }
+  }
+
+  async claimChest() {
+    if (!this.u) return
+    const result = await claimDailyChest(this.u.id)
+    if (!result) return
+    if (result.alreadyClaimed) { this._toast('Coffre déjà ouvert aujourd\'hui !', 'err'); return }
+    this._toast(`📦 +${result.reward} pts dans le coffre !`, 'ok')
+    this._checkChestStatus()
+    // Refresh pts display
+    const { data: p } = await supabase.from('profiles').select('points,xp,level').eq('id', this.u.id).single()
+    if (p && this.p) { this.p.points = p.points; this.p.xp = p.xp; this.p.level = p.level; this._updateNav() }
+  }
+
+  // ── RIVALITÉS ──
+  async _loadRivals() {
+    if (!this.u) return
+    const el = document.getElementById('an-rivals-list'); if (!el) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    const { data } = await supabase.from('rivalries')
+      .select('*, challenger:challenger_id(id,display_name,username,avatar_url), challenged:challenged_id(id,display_name,username,avatar_url)')
+      .or(`challenger_id.eq.${this.u.id},challenged_id.eq.${this.u.id}`)
+      .order('updated_at', { ascending: false })
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune rivalité — défie un ami depuis sa fiche profil</div>'; return }
+    el.innerHTML = data.map(r => {
+      const isChallenger = r.challenger_id === this.u.id
+      const me = isChallenger ? r.challenger : r.challenged
+      const them = isChallenger ? r.challenged : r.challenger
+      const myScore = isChallenger ? r.score_challenger : r.score_challenged
+      const theirScore = isChallenger ? r.score_challenged : r.score_challenger
+      const theirName = them?.display_name || them?.username || '?'
+      const theirAv = them?.avatar_url ? `<img src="${them.avatar_url}" style="width:100%;height:100%;object-fit:cover">` : (theirName[0])
+      return `<div class="an-rival-row">
+        <div class="an-conv-av">${theirAv}</div>
+        <div><div class="an-conv-name">${theirName}</div><div class="an-conv-preview">Paris disputés</div></div>
+        <div class="an-rival-score">${myScore} <span class="an-rival-vs">vs</span> ${theirScore}</div>
+      </div>`
+    }).join('')
+  }
+
+  async challengeFriend(friendId, friendName) {
+    if (!this.u) return
+    // Check if rivalry already exists
+    const { data: existing } = await supabase.from('rivalries')
+      .select('id')
+      .or(`and(challenger_id.eq.${this.u.id},challenged_id.eq.${friendId}),and(challenger_id.eq.${friendId},challenged_id.eq.${this.u.id})`)
+      .maybeSingle()
+    if (existing) { this._toast('Rivalité déjà active avec ce joueur', 'err'); return }
+    await supabase.from('rivalries').insert({
+      challenger_id: this.u.id,
+      challenged_id: friendId,
+      score_challenger: 0,
+      score_challenged: 0,
+    })
+    await supabase.from('notifications').insert({ user_id: friendId, type: 'rival_challenge', from_user_id: this.u.id, ref_label: this.p?.display_name || this.p?.username || '?' })
+    this._toast(`Défi lancé à ${friendName} ! ⚔️`, 'ok')
   }
 
   // AUTH
@@ -1111,7 +1287,7 @@ class AN {
       .eq('user_id', this.u.id).order('created_at', { ascending: false }).limit(30)
     const el = document.getElementById('an-notif-list'); if (!el) return
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune notification</div>'; return }
-    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️', badge_unlocked:'🎖️', rank_available:'⬆️', prono_won:'🏆', prono_lost:'💸', daily_streak:'🔥', level_up:'⬆️' }
+    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️', badge_unlocked:'🎖️', rank_available:'⬆️', prono_won:'🏆', prono_lost:'💸', daily_streak:'🔥', level_up:'⬆️', rival_challenge:'⚔️' }
     const label = (n) => {
       const from = n.from_user?.display_name || n.from_user?.username || '?'
       const map = {
@@ -1127,6 +1303,9 @@ class AN {
         rank_available: `⬆️ Tu peux acheter le rang <strong>${n.ref_label||''}</strong> !`,
         prono_won: `🏆 Pronostic gagné sur <strong>${n.ref_label||'un match'}</strong>`,
         prono_lost: `💸 Pronostic perdu sur <strong>${n.ref_label||'un match'}</strong>`,
+        daily_streak: `🔥 Streak J${n.ref_label?.split(' ')?.[1]||''} : ${n.ref_label||''}`,
+        level_up: `⬆️ Niveau supérieur ! ${n.ref_label||''}`,
+        rival_challenge: `⚔️ <strong>${from}</strong> t'a lancé un défi de rivalité !`,
       }
       return map[n.type] || n.type
     }
@@ -1362,6 +1541,7 @@ class AN {
     const content = input.value.trim(); if (!content || !this.mpFriend || !this.u) return
     input.value = ''
     await sendMessage(this.u.id, this.mpFriend.id, content)
+    addXp(this.u.id, 2, 'mp_sent').catch(() => {})
     // Notif in-app
     await supabase.from('notifications').insert({ user_id: this.mpFriend.id, type:'mp', from_user_id: this.u.id })
     // Email notification (only if recipient not active on site — best effort)
@@ -1630,11 +1810,15 @@ class AN {
         const newPts = (prof?.points || 0) + gain
         await supabase.from('profiles').update({ points: newPts }).eq('id', entry.user_id)
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: gain, reason: 'match_win', ref_id: String(id) })
-        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_won', from_user_id: this.u.id, ref_label: `+${gain} pts` })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team} · +${gain} pts` })
         await supabase.from('bets').update({ status: 'won' }).eq('id', entry.id)
+        addXp(entry.user_id, XP_REWARDS.bet_win, 'bet_win').catch(() => {})
+        addWeeklyPoints(entry.user_id, gain).catch(() => {})
+        // Rivalités : incrémenter le score du gagnant
+        this._updateRivalScore(entry.user_id).catch(() => {})
       } else {
         await supabase.from('bets').update({ status: 'lost' }).eq('id', entry.id)
-        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_lost', from_user_id: this.u.id, ref_label: `${entry.stake} pts perdus` })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team}` })
       }
     }
     this._toast('Match terminé, gains distribués ✅', 'ok')
@@ -1776,16 +1960,18 @@ class AN {
     const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('bet_id', betId).eq('status', 'pending')
     for (const entry of entries || []) {
       if (entry.pick === result) {
-        // Gagné
         const { data: prof } = await supabase.from('profiles').select('points').eq('id', entry.user_id).single()
         const newPts = (prof?.points || 0) + entry.potential_gain
         await supabase.from('profiles').update({ points: newPts }).eq('id', entry.user_id)
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: entry.potential_gain, reason: 'custom_bet_win', ref_id: String(betId) })
-        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_won', from_user_id: this.u.id, ref_label: `+${entry.potential_gain} pts` })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `+${entry.potential_gain} pts` })
         await supabase.from('custom_bet_entries').update({ status: 'won' }).eq('id', entry.id)
+        addXp(entry.user_id, XP_REWARDS.bet_win, 'custom_bet_win').catch(() => {})
+        addWeeklyPoints(entry.user_id, entry.potential_gain).catch(() => {})
+        this._updateRivalScore(entry.user_id).catch(() => {})
       } else {
         await supabase.from('custom_bet_entries').update({ status: 'lost' }).eq('id', entry.id)
-        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_lost', from_user_id: this.u.id, ref_label: entry.potential_gain + ' pts perdus' })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${entry.stake} pts perdus` })
       }
     }
     this._toast('Pari résolu, gains distribués ✅', 'ok')
@@ -1965,6 +2151,7 @@ class AN {
       actEl.innerHTML = `
         <button class="an-pcard-btn primary" onclick="AN._pcardAddFriend('${userId}')">+ Ami</button>
         <button class="an-pcard-btn ghost" onclick="AN._pcardOpenMP('${userId}','${(p.display_name||p.username).replace(/'/g,"\\'")}')">Message</button>
+        <button class="an-pcard-btn ghost" onclick="AN.challengeFriend('${userId}','${(p.display_name||p.username).replace(/'/g,"\\'")}');AN.closeProfileCard()" style="border-color:rgba(240,165,0,0.4);color:#f0a500">⚔️ Défier</button>
       `
     } else {
       actEl.innerHTML = ''
@@ -2013,6 +2200,20 @@ class AN {
     const t = document.getElementById('an-toast'); if (!t) return
     t.textContent = msg; t.className = 'on ' + type
     clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000)
+  }
+
+  async _updateRivalScore(winnerId) {
+    if (!winnerId) return
+    const { data: rivals } = await supabase.from('rivalries')
+      .select('id, challenger_id, challenged_id, score_challenger, score_challenged')
+      .or(`challenger_id.eq.${winnerId},challenged_id.eq.${winnerId}`)
+    for (const r of rivals || []) {
+      if (r.challenger_id === winnerId) {
+        await supabase.from('rivalries').update({ score_challenger: (r.score_challenger||0)+1, updated_at: new Date().toISOString() }).eq('id', r.id)
+      } else {
+        await supabase.from('rivalries').update({ score_challenged: (r.score_challenged||0)+1, updated_at: new Date().toISOString() }).eq('id', r.id)
+      }
+    }
   }
 }
 
