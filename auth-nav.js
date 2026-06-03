@@ -15,22 +15,21 @@ const RANKS = [
 const CSS = `
 /* TRIGGER BUTTON */
 #an-trigger-btn {
-  display:flex; align-items:center; gap:8px; cursor:pointer;
-  background:rgba(0,61,165,0.08); border:1px solid rgba(0,61,165,0.35);
-  padding:5px 12px 5px 5px; transition:border-color .2s, background .2s, box-shadow .2s;
-  position:relative; flex-shrink:0; border-radius:2px;
+  display:flex; align-items:center; gap:9px; cursor:pointer;
+  background:rgba(255,255,255,0.05);
+  border:none; border-radius:24px;
+  padding:4px 12px 4px 4px;
+  transition:background .2s, transform .1s;
+  position:relative; flex-shrink:0;
 }
-#an-trigger-btn:hover { border-color:#003DA5; background:rgba(0,61,165,0.18); box-shadow:0 0 0 1px rgba(0,61,165,0.3); }
-#an-trigger-btn::after {
-  content:'↗'; position:absolute; top:3px; right:3px;
-  font-size:8px; color:rgba(0,61,165,0.6); line-height:1;
-  font-family:'Barlow Condensed',sans-serif;
-}
+#an-trigger-btn:hover { background:rgba(255,255,255,0.1); }
+#an-trigger-btn:active { transform:scale(0.97); }
 #an-avatar-pill {
-  width:30px; height:30px; border-radius:50%;
-  background:rgba(0,61,165,0.4); border:1.5px solid rgba(0,61,165,0.7);
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,#003DA5,#4d82d4);
+  border:2px solid rgba(0,61,165,0.6);
   display:flex; align-items:center; justify-content:center;
-  font-family:'Bebas Neue',sans-serif; font-size:13px; color:#4d82d4;
+  font-family:'Bebas Neue',sans-serif; font-size:14px; color:#fff;
   flex-shrink:0; overflow:hidden;
 }
 #an-avatar-pill img { width:100%; height:100%; object-fit:cover; }
@@ -237,6 +236,45 @@ const CSS = `
 #an-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 #an-toast.ok { border-color:#00c87a; color:#00c87a; }
 #an-toast.err { border-color:#e74c3c; color:#e74c3c; }
+
+/* MINI FICHE PROFIL */
+#an-profile-card {
+  display:none; position:fixed; z-index:2000;
+  background:#05090f; border:1px solid rgba(0,61,165,0.4);
+  width:280px; padding:20px;
+  animation:anFadeUp .2s cubic-bezier(.22,1,.36,1);
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+#an-profile-card.open { display:block; }
+#an-profile-card-close {
+  position:absolute; top:10px; right:12px;
+  background:none; border:none; color:rgba(255,255,255,0.3);
+  font-family:'Bebas Neue',sans-serif; font-size:18px; cursor:pointer; line-height:1;
+}
+#an-profile-card-close:hover { color:#fff; }
+.an-pcard-head { display:flex; align-items:center; gap:12px; margin-bottom:12px; }
+.an-pcard-av {
+  width:44px; height:44px; border-radius:50%;
+  background:linear-gradient(135deg,#003DA5,#4d82d4);
+  border:2px solid rgba(0,61,165,0.5);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Bebas Neue',sans-serif; font-size:19px; color:#fff;
+  overflow:hidden; flex-shrink:0;
+}
+.an-pcard-av img { width:100%; height:100%; object-fit:cover; }
+.an-pcard-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:#fff; }
+.an-pcard-rank { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-top:2px; }
+.an-pcard-bio { font-family:'Barlow',sans-serif; font-size:12px; color:rgba(255,255,255,0.45); margin-bottom:12px; line-height:1.5; min-height:16px; }
+.an-pcard-badges { display:flex; gap:6px; margin-bottom:14px; min-height:44px; align-items:center; }
+.an-pcard-actions { display:flex; gap:6px; }
+.an-pcard-btn { flex:1; font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:9px 8px; cursor:pointer; transition:.15s; border-radius:2px; }
+.an-pcard-btn.primary { background:#003DA5; color:#fff; border:1px solid #003DA5; }
+.an-pcard-btn.primary:hover { background:#0050CC; }
+.an-pcard-btn.ghost { background:transparent; color:rgba(255,255,255,0.5); border:1px solid rgba(255,255,255,0.15); }
+.an-pcard-btn.ghost:hover { color:#fff; border-color:#fff; }
+@media(max-width:768px){
+  #an-profile-card { width:calc(100vw - 32px); left:16px !important; right:16px; }
+}
 
 
 /* ── ADMIN TAB ── */
@@ -540,6 +578,20 @@ function html() { return `
 </div>
 
 <div id="an-toast"></div>
+
+<div id="an-profile-card">
+  <button id="an-profile-card-close" onclick="AN.closeProfileCard()">✕</button>
+  <div class="an-pcard-head">
+    <div class="an-pcard-av" id="an-pcard-av"></div>
+    <div>
+      <div class="an-pcard-name" id="an-pcard-name"></div>
+      <div class="an-pcard-rank" id="an-pcard-rank"></div>
+    </div>
+  </div>
+  <div class="an-pcard-bio" id="an-pcard-bio"></div>
+  <div class="an-pcard-badges" id="an-pcard-badges"></div>
+  <div class="an-pcard-actions" id="an-pcard-actions"></div>
+</div>
 `}
 
 // ─── CONTROLLER ────────────────────────────────────────────────────────────
@@ -1467,7 +1519,93 @@ class AN {
     this._toast('Lien copie ! ' + link, 'ok')
   }
 
-  _toast(msg, type = '') {
+  // ── MINI FICHE PROFIL ──
+  async openProfileCard(userId, anchorEl) {
+    if (userId === this.u?.id) { this.togglePanel(); return } // soi-même → ouvrir le panel
+    const card = document.getElementById('an-profile-card')
+    if (!card) return
+
+    // Charger le profil
+    const { data: p } = await supabase.from('profiles').select('id,username,display_name,avatar_url,bio,rank,points,badges_selected').eq('id', userId).single()
+    if (!p) return
+
+    const rk = RANKS.find(r => r.id === p.rank) || RANKS[0]
+
+    // Avatar
+    const av = document.getElementById('an-pcard-av')
+    av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
+
+    document.getElementById('an-pcard-name').textContent = p.display_name || p.username
+    const rankEl = document.getElementById('an-pcard-rank')
+    rankEl.textContent = `${rk.emoji} ${p.rank} · ${p.points} pts`
+    rankEl.style.color = rk.color
+
+    document.getElementById('an-pcard-bio').textContent = p.bio || ''
+
+    // Badges sélectionnés (max 3)
+    const badgesEl = document.getElementById('an-pcard-badges')
+    const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/'
+    const encodeBadgePath = (path) => path.split('/').map(s => encodeURIComponent(s)).join('/')
+    const sel = (p.badges_selected || []).slice(0, 3)
+    if (sel.length) {
+      const allBadges = this._BADGES || []
+      badgesEl.innerHTML = sel.map(id => {
+        const b = allBadges.find(x => x.id === id)
+        return b ? `<img src="${BASE}${encodeBadgePath(b.img)}" style="width:40px;height:40px;border-radius:50%;border:1.5px solid rgba(0,61,165,0.5);object-fit:cover" title="${b.label}">` : ''
+      }).join('')
+    } else {
+      badgesEl.innerHTML = '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.2)">Aucun badge sélectionné</span>'
+    }
+
+    // Actions (seulement si connecté et pas soi-même)
+    const actEl = document.getElementById('an-pcard-actions')
+    if (this.u && this.u.id !== userId) {
+      actEl.innerHTML = `
+        <button class="an-pcard-btn primary" onclick="AN._pcardAddFriend('${userId}')">+ Ami</button>
+        <button class="an-pcard-btn ghost" onclick="AN._pcardOpenMP('${userId}','${(p.display_name||p.username).replace(/'/g,"\\'")}')">Message</button>
+      `
+    } else {
+      actEl.innerHTML = ''
+    }
+
+    // Positionner la card près du clic
+    card.classList.add('open')
+    const rect = anchorEl ? anchorEl.getBoundingClientRect() : { bottom: 100, left: 100 }
+    const cardW = 280
+    let left = Math.min(rect.left, window.innerWidth - cardW - 16)
+    let top = rect.bottom + 8
+    if (top + 300 > window.innerHeight) top = rect.top - 300
+    card.style.left = Math.max(8, left) + 'px'
+    card.style.top = Math.max(8, top) + 'px'
+
+    // Fermer au clic extérieur
+    setTimeout(() => document.addEventListener('click', this._outsideCardClick = (e) => {
+      if (!card.contains(e.target)) this.closeProfileCard()
+    }), 50)
+  }
+
+  closeProfileCard() {
+    document.getElementById('an-profile-card')?.classList.remove('open')
+    document.removeEventListener('click', this._outsideCardClick)
+  }
+
+  async _pcardAddFriend(userId) {
+    try {
+      await sendFriendRequest(this.u.id, userId)
+      await supabase.from('notifications').insert({ user_id: userId, type:'friend_request', from_user_id: this.u.id })
+      this._toast('Demande envoyée !', 'ok')
+    } catch { this._toast('Déjà envoyée', '') }
+    this.closeProfileCard()
+  }
+
+  async _pcardOpenMP(userId, name) {
+    this.closeProfileCard()
+    this.closePanel()
+    setTimeout(() => {
+      this.togglePanel()
+      setTimeout(() => this.openChat(userId, name), 200)
+    }, 100)
+  }
     const t = document.getElementById('an-toast'); if (!t) return
     t.textContent = msg; t.className = 'on ' + type
     clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000)
