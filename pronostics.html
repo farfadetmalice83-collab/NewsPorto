@@ -475,7 +475,11 @@
 
     <!-- TAB CLASSEMENT -->
     <div class="tab-content" id="tab-classement">
-      <p class="section-label">— Top pronostiqueurs</p>
+      <p class="section-label">— Top de la semaine</p>
+      <div class="leaderboard-list" id="leaderboard-weekly-container" style="margin-bottom:32px">
+        <div class="empty-state">Chargement...</div>
+      </div>
+      <p class="section-label">— Classement général</p>
       <div class="leaderboard-list" id="leaderboard-container">
         <div class="empty-state">Chargement...</div>
       </div>
@@ -1006,6 +1010,44 @@ async function loadHistory() {
 }
 
 // ── LEADERBOARD ──
+async function loadWeeklyLeaderboard() {
+  const container = document.getElementById('leaderboard-weekly-container')
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('id, display_name, username, avatar_url, rank, weekly_pts')
+      .gt('weekly_pts', 0)
+      .order('weekly_pts', { ascending: false })
+      .limit(10)
+    const rankEmoji = { Supporter:'⚪', Dragon:'🔵', Socio:'🟡', Légende:'🔴', Invicta:'💎', Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴' }
+    if (error || !data?.length) { container.innerHTML = '<div class="empty-state">Aucune activité cette semaine</div>'; return }
+    container.innerHTML = data.map((u, i) => {
+      const isMe = currentUser && u.id === currentUser.id
+      const topClass = i===0?'top1':i===1?'top2':i===2?'top3':''
+      const meStyle = isMe ? ' style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"' : ''
+      const meColor = isMe ? ' style="color:var(--blue-light)"' : ''
+      const meAvStyle = isMe ? ' style="border-color:var(--blue-light)"' : ''
+      const avContent = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
+      return `<div class="lb-row ${topClass}"${meStyle}>
+        <div class="lb-rank"${meColor}>${i+1}</div>
+        <div class="lb-user">
+          <div class="lb-avatar"${meAvStyle}>${avContent}</div>
+          <div>
+            <div class="lb-name"${meColor}>${u.display_name||u.username}</div>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3)">${rankEmoji[u.rank]||'⚪'} ${u.rank}</span>
+          </div>
+        </div>
+        <div style="text-align:right">
+          <div class="lb-pts"${meColor}>${u.weekly_pts} pts</div>
+          <div class="lb-pts-label">cette semaine</div>
+        </div>
+      </div>`
+    }).join('')
+  } catch(e) {
+    container.innerHTML = '<div class="empty-state">Erreur de chargement</div>'
+  }
+}
+
 async function loadLeaderboard() {
   const container = document.getElementById('leaderboard-container')
   try {
@@ -1044,7 +1086,7 @@ window.switchTab = function(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab))
   if (tab === 'historique') loadHistory()
-  if (tab === 'classement') loadLeaderboard()
+  if (tab === 'classement') { loadWeeklyLeaderboard(); loadLeaderboard() }
 }
 
 // ── TOAST ──
