@@ -39,6 +39,19 @@ const CSS = `
 #an-notif-dot { position:absolute; top:-3px; right:-3px; width:10px; height:10px; border-radius:50%; background:#e74c3c; border:2px solid #000; display:none; }
 #an-notif-dot.on { display:block; }
 
+/* Pulse sur le bouton profil quand notif non lue */
+@keyframes anPulse { 0%,100%{box-shadow:0 0 0 0 rgba(231,76,60,0.6)} 50%{box-shadow:0 0 0 6px rgba(231,76,60,0)} }
+#an-trigger-btn.has-notif { animation: anPulse 1.8s ease-in-out infinite; }
+
+/* Badge count sur tab notifs */
+.an-tab-notif-count {
+  display:inline-flex; align-items:center; justify-content:center;
+  min-width:16px; height:16px; padding:0 4px;
+  border-radius:8px; background:#e74c3c;
+  font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700;
+  color:#fff; margin-left:4px; vertical-align:middle; line-height:16px;
+}
+
 /* SIGN IN BUTTON */
 #an-signin-btn {
   font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700;
@@ -710,6 +723,13 @@ class AN {
       return
     }
     this.p = profile
+    // Init badge tracking
+    this._loadBadgeStats().then(stats => {
+      const p2 = { ...profile, ...stats }
+      const nonPres = this._BADGES.filter(b => b.id !== 'president')
+      p2._allOtherBadges = nonPres.every(b => b.req(p2))
+      if (this.p) this.p._unlockedBadges = this._BADGES.filter(b => b.req(p2)).map(b => b.id)
+    })
     const signinBtn = document.getElementById('an-signin-btn')
     const triggerBtn = document.getElementById('an-trigger-btn')
     if (signinBtn) signinBtn.style.display = 'none'
@@ -751,6 +771,8 @@ class AN {
     overlay.classList.toggle('on', isOpen)
     document.body.style.overflow = isOpen ? 'hidden' : ''
     if (isOpen) {
+      // Stop pulse
+      document.getElementById('an-trigger-btn')?.classList.remove('has-notif')
       // Re-show admin tab if needed
       if (this.p?.role === 'admin') {
         const adminTab = document.getElementById('an-tab-admin')
@@ -983,7 +1005,25 @@ class AN {
     const { data } = await supabase.from('notifications').select('id').eq('user_id', this.u.id).eq('read', false)
     const n = data?.length || 0
     const dot = document.getElementById('an-notif-dot'); if (dot) dot.classList.toggle('on', n > 0)
-    const tdot = document.getElementById('tab-dot-notifs'); if (tdot) tdot.classList.toggle('on', n > 0)
+    // Pulse sur le bouton profil
+    const triggerBtn = document.getElementById('an-trigger-btn')
+    if (triggerBtn) triggerBtn.classList.toggle('has-notif', n > 0)
+    // Badge count sur l'onglet Notifs
+    const tdot = document.getElementById('tab-dot-notifs')
+    if (tdot) {
+      tdot.classList.toggle('on', n > 0)
+      // Remplace le petit point par un badge avec le nombre
+      const tabNotifs = document.querySelector('.an-tab[data-tab="notifs"]')
+      if (tabNotifs) {
+        let countEl = tabNotifs.querySelector('.an-tab-notif-count')
+        if (n > 0) {
+          if (!countEl) { countEl = document.createElement('span'); countEl.className = 'an-tab-notif-count'; tabNotifs.appendChild(countEl) }
+          countEl.textContent = n > 99 ? '99+' : n
+        } else {
+          countEl?.remove()
+        }
+      }
+    }
     // friend requests
     const { data: fr } = await supabase.from('friendships').select('id').eq('addressee_id', this.u.id).eq('status','pending')
     const frdot = document.getElementById('tab-dot-amis'); if (frdot) frdot.classList.toggle('on', (fr?.length||0) > 0)
@@ -996,7 +1036,7 @@ class AN {
       .eq('user_id', this.u.id).order('created_at', { ascending: false }).limit(30)
     const el = document.getElementById('an-notif-list'); if (!el) return
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune notification</div>'; return }
-    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️' }
+    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️', badge_unlocked:'🎖️', rank_available:'⬆️', prono_won:'🏆', prono_lost:'💸' }
     const label = (n) => {
       const from = n.from_user?.display_name || n.from_user?.username || '?'
       const map = {
@@ -1008,6 +1048,10 @@ class AN {
         bet_won: `🏆 Tu as gagné ton pari sur <strong>${n.ref_label||'un match'}</strong>`,
         bet_lost: `💸 Tu as perdu ton pari sur <strong>${n.ref_label||'un match'}</strong>`,
         mp: `<strong>${from}</strong> t'a envoyé un message`,
+        badge_unlocked: `🎖️ Nouveau badge débloqué : <strong>${n.ref_label||'badge'}</strong>`,
+        rank_available: `⬆️ Tu peux acheter le rang <strong>${n.ref_label||''}</strong> !`,
+        prono_won: `🏆 Pronostic gagné sur <strong>${n.ref_label||'un match'}</strong>`,
+        prono_lost: `💸 Pronostic perdu sur <strong>${n.ref_label||'un match'}</strong>`,
       }
       return map[n.type] || n.type
     }
@@ -1030,6 +1074,9 @@ class AN {
     if (['reply','like','best_answer'].includes(type) && refId) window.location.href = `forum.html#thread-${refId}`
     else if (type === 'friend_request') this.tabTo('amis')
     else if (type === 'mp') this.tabTo('mp')
+    else if (type === 'rank_available') this.tabTo('rangs')
+    else if (type === 'badge_unlocked') this.tabTo('badges')
+    else if (['prono_won','prono_lost','bet_won','bet_lost'].includes(type)) window.location.href = 'pronostics.html'
   }
 
   async markAllRead() {
@@ -1042,21 +1089,62 @@ class AN {
     supabase.channel('notifs-' + this.u.id)
       .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${this.u.id}` }, (payload) => {
         this._checkNotifs()
-        const msgs = { reply:'💬 Quelqu\'un a répondu à ton thread', like:'❤️ Quelqu\'un a liké ta réponse', best_answer:'✅ Meilleure réponse ! +10 pts', friend_request:'👋 Nouvelle demande d\'ami', friend_accepted:'🤝 Demande acceptée !', bet_won:'🏆 Pari gagné !', bet_lost:'💸 Pari perdu', mp:'✉️ Nouveau message' }
-        this._toast(msgs[payload.new.type] || '🔔 Notification', '')
+        const n = payload.new
+        const msgs = {
+          reply: '💬 Quelqu\'un a répondu à ton thread',
+          like: '❤️ Quelqu\'un a liké ta réponse',
+          best_answer: '✅ Meilleure réponse ! +10 pts',
+          friend_request: '👋 Nouvelle demande d\'ami',
+          friend_accepted: '🤝 Demande acceptée !',
+          bet_won: '🏆 Pari gagné !',
+          bet_lost: '💸 Pari perdu',
+          mp: '✉️ Nouveau message',
+          badge_unlocked: `🎖️ Badge débloqué : ${n.ref_label||''}`,
+          rank_available: `⬆️ Rang disponible : ${n.ref_label||''}`,
+          prono_won: `🏆 Pronostic gagné !`,
+          prono_lost: `💸 Pronostic perdu`,
+        }
+        this._toast(msgs[n.type] || '🔔 Notification', n.type?.includes('won')||n.type?.includes('badge')||n.type?.includes('rank') ? 'ok' : '')
         if (document.getElementById('an-sec-notifs')?.classList.contains('active')) this._loadNotifs()
       }).subscribe()
   }
 
   _subscribePoints() {
     supabase.channel('pts-' + this.u.id)
-      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:`id=eq.${this.u.id}` }, payload => {
+      .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:`id=eq.${this.u.id}` }, async payload => {
         const p = payload.new
+        const prevPoints = this.p?.points || 0
         if (this.p) { this.p.points = p.points; this.p.rank = p.rank }
         const pp = document.getElementById('an-pill-pts'); if (pp) pp.textContent = `${p.points} pts`
         const hp = document.getElementById('an-head-pts'); if (hp) hp.textContent = `${p.points} pts`
         window.dispatchEvent(new CustomEvent('points-updated', { detail: { points: p.points, rank: p.rank } }))
+        // Notif si rang devient accessible
+        for (const r of RANKS) {
+          if (r.cost > 0 && prevPoints < r.cost && p.points >= r.cost && p.rank !== r.id) {
+            await supabase.from('notifications').insert({ user_id: this.u.id, type: 'rank_available', ref_label: r.id })
+            break
+          }
+        }
+        // Check badges débloqués
+        await this._checkNewBadges(p)
       }).subscribe()
+  }
+
+  async _checkNewBadges(updatedProfile) {
+    if (!this.u) return
+    const stats = await this._loadBadgeStats()
+    const profile = { ...(updatedProfile || this.p), ...stats }
+    const nonPres = this._BADGES.filter(b => b.id !== 'president')
+    profile._allOtherBadges = nonPres.every(b => b.req(profile))
+    const prevUnlocked = new Set(this.p?._unlockedBadges || [])
+    const nowUnlocked = this._BADGES.filter(b => b.req(profile)).map(b => b.id)
+    for (const id of nowUnlocked) {
+      if (!prevUnlocked.has(id)) {
+        const badge = this._BADGES.find(b => b.id === id)
+        await supabase.from('notifications').insert({ user_id: this.u.id, type: 'badge_unlocked', ref_label: badge?.label || id })
+      }
+    }
+    if (this.p) this.p._unlockedBadges = nowUnlocked
   }
 
   // AMIS
@@ -1149,10 +1237,14 @@ class AN {
 
   async openChat(friendId, friendName) {
     this.mpFriend = { id: friendId, name: friendName }
-    document.getElementById('an-chat-name').textContent = friendName
+    // Switch to MP tab first (without triggering _loadConvList)
+    document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'mp'))
+    document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === 'an-sec-mp'))
+    // Then show chat view
     document.getElementById('an-conv-view').style.display = 'none'
-    const cv = document.getElementById('an-chat-view'); cv.style.display = 'flex'; cv.style.flexDirection = 'column'
-    this.tabTo('mp')
+    const cv = document.getElementById('an-chat-view')
+    cv.style.display = 'flex'; cv.style.flexDirection = 'column'
+    document.getElementById('an-chat-name').textContent = friendName
     await this._loadMsgs()
     await markMessagesRead(friendId, this.u.id)
     if (this.mpCh) supabase.removeChannel(this.mpCh)
@@ -1207,12 +1299,20 @@ class AN {
     if (!this.p) return
     const el = document.getElementById('an-rank-list'); if (!el) return
     const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
+    const RANK_IMGS = {
+      Supporter: 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/Supporter.png',
+      Dragon:    'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/dragon.png',
+      Socio:     'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/socio.png',
+      Légende:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/legende.png',
+      Invicta:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/invicta.png',
+    }
     el.innerHTML = RANKS.map(r => {
       const isCurrent = this.p.rank === r.id
       const canAfford = this.p.points >= r.cost
+      const img = RANK_IMGS[r.id]
       return `<div class="an-rank-row${isCurrent?' current':''}">
         <div class="an-rank-left">
-          <div class="an-rank-emoji">${r.emoji}</div>
+          <img src="${img}" style="width:48px;height:48px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
           <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
         </div>
         ${isCurrent
@@ -1554,9 +1654,9 @@ class AN {
 
     const rk = RANKS.find(r => r.id === p.rank) || RANKS[0]
 
-    // Avatar
+    // Avatar — cliquable
     const av = document.getElementById('an-pcard-av')
-    av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
+    av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}" style="cursor:pointer" onclick="AN.openProfileCard('${userId}',this)">` : (p.display_name||p.username||'?')[0].toUpperCase()
 
     document.getElementById('an-pcard-name').textContent = p.display_name || p.username
     const rankEl = document.getElementById('an-pcard-rank')
