@@ -304,12 +304,12 @@
     <aside class="forum-sidebar">
       <div class="sidebar-section">
         <div class="sidebar-label">Catégories</div>
-        <button class="sidebar-item active" onclick="filterCat('all',this)">Tous les threads <span class="sidebar-count" id="count-all">—</span></button>
-        <button class="sidebar-item" onclick="filterCat('matchs',this)">Matchs <span class="sidebar-count" id="count-matchs">—</span></button>
-        <button class="sidebar-item" onclick="filterCat('transferts',this)">Transferts <span class="sidebar-count" id="count-transferts">—</span></button>
-        <button class="sidebar-item" onclick="filterCat('debats',this)">Débats <span class="sidebar-count" id="count-debats">—</span></button>
-        <button class="sidebar-item" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
-        <button class="sidebar-item" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
+        <button class="sidebar-item active" data-cat="all" onclick="filterCat('all',this)">Tous les threads <span class="sidebar-count" id="count-all">—</span></button>
+        <button class="sidebar-item" data-cat="matchs" onclick="filterCat('matchs',this)">Matchs <span class="sidebar-count" id="count-matchs">—</span></button>
+        <button class="sidebar-item" data-cat="transferts" onclick="filterCat('transferts',this)">Transferts <span class="sidebar-count" id="count-transferts">—</span></button>
+        <button class="sidebar-item" data-cat="debats" onclick="filterCat('debats',this)">Débats <span class="sidebar-count" id="count-debats">—</span></button>
+        <button class="sidebar-item" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
+        <button class="sidebar-item" data-cat="general" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
       </div>
     </aside>
 
@@ -326,12 +326,12 @@
         </div>
         <!-- Mobile category strip (hidden on desktop) -->
         <div class="mobile-cat-strip" id="mobile-cat-strip" style="display:none">
-          <button class="mobile-cat-pill active" onclick="filterCat('all',this)">Tous</button>
-          <button class="mobile-cat-pill" onclick="filterCat('matchs',this)">Matchs</button>
-          <button class="mobile-cat-pill" onclick="filterCat('transferts',this)">Transferts</button>
-          <button class="mobile-cat-pill" onclick="filterCat('debats',this)">Débats</button>
-          <button class="mobile-cat-pill" onclick="filterCat('tactique',this)">Tactique</button>
-          <button class="mobile-cat-pill" onclick="filterCat('general',this)">Général</button>
+          <button class="mobile-cat-pill active" data-cat="all" onclick="filterCat('all',this)">Tous</button>
+          <button class="mobile-cat-pill" data-cat="matchs" onclick="filterCat('matchs',this)">Matchs</button>
+          <button class="mobile-cat-pill" data-cat="transferts" onclick="filterCat('transferts',this)">Transferts</button>
+          <button class="mobile-cat-pill" data-cat="debats" onclick="filterCat('debats',this)">Débats</button>
+          <button class="mobile-cat-pill" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique</button>
+          <button class="mobile-cat-pill" data-cat="general" onclick="filterCat('general',this)">Général</button>
         </div>
         <div class="thread-list" id="thread-list">
           <div class="loading-state">Chargement des threads...</div>
@@ -698,9 +698,8 @@ window.filterCat = function(cat, btn) {
   document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'))
   document.querySelectorAll('.mobile-cat-pill').forEach(b => b.classList.remove('active'))
   btn.classList.add('active')
-  // Also sync the sibling strip
-  const allBtns = [...document.querySelectorAll('.sidebar-item'), ...document.querySelectorAll('.mobile-cat-pill')]
-  allBtns.forEach(b => { if(b.textContent.trim().toLowerCase().startsWith(cat === 'all' ? 'tous' : cat.substring(0,4))) b.classList.add('active') })
+  // Sync l'autre liste via data-cat
+  document.querySelectorAll(`[data-cat="${cat}"]`).forEach(b => b.classList.add('active'))
   renderThreadList()
 }
 window.sortThreads = function(sort, btn) {
