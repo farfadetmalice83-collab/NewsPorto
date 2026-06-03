@@ -465,9 +465,9 @@ function html() { return `
       <!-- USERS -->
       <div class="an-admin-sub-content" id="an-admin-users">
         <div class="an-search-wrap" style="padding:12px 20px">
-          <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-admin-user-search" oninput="AN.adminSearchUsers(this.value)">
+          <input class="an-search" type="text" placeholder="Filtrer par pseudo..." id="an-admin-user-search" oninput="AN.adminSearchUsers(this.value)">
         </div>
-        <div id="an-admin-users-list"><div class="an-empty">Recherche un utilisateur</div></div>
+        <div id="an-admin-users-list"><div class="an-empty">Chargement...</div></div>
       </div>
 
       <!-- PARIS CUSTOM -->
@@ -1168,6 +1168,7 @@ class AN {
     document.getElementById(`an-admin-${tab}`).classList.add('active')
     if (tab === 'forum') this._loadAdminForum()
     if (tab === 'bets') this._loadAdminBets()
+    if (tab === 'users') this.adminSearchUsers('')
   }
 
   async _loadAdminForum() {
@@ -1194,39 +1195,68 @@ class AN {
     await supabase.from('forum_threads').delete().eq('id', id)
     this._toast('Thread supprimé', 'ok')
     this._loadAdminForum()
-    // Reload forum if on forum page
     if (window.loadThreads) window.loadThreads()
   }
 
-  async adminSearchUsers(q) {
-    if (!this.isAdmin() || !q || q.length < 2) {
-      document.getElementById('an-admin-users-list').innerHTML = '<div class="an-empty">Recherche un utilisateur</div>'
-      return
+  async adminDeleteReply(replyId, threadId) {
+    if (!this.isAdmin() || !confirm('Supprimer ce message ?')) return
+    await supabase.from('forum_replies').delete().eq('id', replyId)
+    // Décrémenter reply_count
+    if (threadId) {
+      const { data: t } = await supabase.from('forum_threads').select('reply_count').eq('id', threadId).single()
+      if (t) await supabase.from('forum_threads').update({ reply_count: Math.max(0, (t.reply_count||1) - 1) }).eq('id', threadId)
     }
-    const { data } = await supabase.from('profiles')
-      .select('id, username, display_name, rank, points, role')
-      .ilike('username', `%${q}%`).limit(10)
+    this._toast('Message supprimé', 'ok')
+    if (window.openThread && threadId) window.openThread(threadId)
+  }
+
+  async adminSearchUsers(q) {
+    if (!this.isAdmin()) return
     const el = document.getElementById('an-admin-users-list'); if (!el) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    let query = supabase.from('profiles').select('id, username, display_name, rank, points, role').order('created_at', { ascending: false }).limit(50)
+    if (q && q.length >= 2) query = query.ilike('username', `%${q}%`)
+    const { data } = await query
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun résultat</div>'; return }
-    // Check bans
     const { data: bans } = await supabase.from('bans').select('user_id')
     const bannedIds = new Set((bans||[]).map(b => b.user_id))
     el.innerHTML = data.map(u => {
       const isBanned = bannedIds.has(u.id)
       const isMe = u.id === this.u?.id
+      const isAdmin = u.role === 'admin'
       return `<div class="an-admin-row">
         <div class="an-admin-row-info">
-          <div class="an-admin-row-title">${u.display_name||u.username} ${u.role==='admin'?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
+          <div class="an-admin-row-title">${u.display_name||u.username} ${isAdmin?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
           <div class="an-admin-row-sub">${u.rank} · ${u.points} pts</div>
         </div>
         <div class="an-admin-acts">
-          ${!isMe ? (isBanned
-            ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
-            : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
-          ) : ''}
+          ${!isMe ? `
+            ${isAdmin
+              ? `<button class="an-micro-btn" onclick="AN.adminRemoveAdmin('${u.id}')">-Admin</button>`
+              : `<button class="an-micro-btn blue" onclick="AN.adminMakeAdmin('${u.id}')">+Admin</button>`
+            }
+            ${isBanned
+              ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
+              : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${(u.display_name||u.username).replace(/'/g,"\\'")}')">Bannir</button>`
+            }
+          ` : '<span style="font-size:9px;color:rgba(255,255,255,0.2)">Vous</span>'}
         </div>
       </div>`
     }).join('')
+  }
+
+  async adminMakeAdmin(userId) {
+    if (!this.isAdmin()) return
+    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId)
+    this._toast('Admin accordé ✓', 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminRemoveAdmin(userId) {
+    if (!this.isAdmin() || !confirm('Retirer les droits admin ?')) return
+    await supabase.from('profiles').update({ role: null }).eq('id', userId)
+    this._toast('Admin retiré', 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
   async adminBan(userId, username) {
