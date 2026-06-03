@@ -1341,11 +1341,11 @@ class AN {
     { id:'clan_du_dragon',    cat:'amis',        label:'Clan du Dragon',    desc:'Avoir 25 amis',             img:'amis/Clan du Dragon.png',          req: p => (p._friendCount||0) >= 25 },
     { id:'premier_compagnon', cat:'amis',        label:'Premier Compagnon', desc:'Avoir 1 ami',               img:'amis/Premier Compagnon.png',       req: p => (p._friendCount||0) >= 1 },
     { id:'roi_des_dragons',   cat:'amis',        label:'Roi des Dragons',   desc:'Avoir 100 amis',            img:'amis/Roi des dragons.png',         req: p => (p._friendCount||0) >= 100 },
-    { id:'premier_disciple',  cat:'invitations', label:'Premier Disciple',  desc:'Parrainer 1 membre',        img:'invitations/Premier Disciple.png', req: p => (p.invite_count||0) >= 1 },
-    { id:'mentor',            cat:'invitations', label:'Mentor',            desc:'Parrainer 5 membres',       img:'invitations/Mentor.png',           req: p => (p.invite_count||0) >= 5 },
-    { id:'ultra',             cat:'invitations', label:'Ultra',             desc:'Parrainer 10 membres',      img:'invitations/Ultra.png',            req: p => (p.invite_count||0) >= 10 },
-    { id:'grand_dragon',      cat:'invitations', label:'Grand Dragon',      desc:'Parrainer 25 membres',      img:'invitations/Grand Dragon.png',     req: p => (p.invite_count||0) >= 25 },
-    { id:'empereur',          cat:'invitations', label:'Empereur',          desc:'Parrainer 50 membres',      img:'invitations/Empereur.png',         req: p => (p.invite_count||0) >= 50 },
+    { id:'premier_disciple',  cat:'invitation', label:'Premier Disciple',  desc:'Parrainer 1 membre',        img:'invitation/Premier Disciple.png', req: p => (p.invite_count||0) >= 1 },
+    { id:'mentor',            cat:'invitation', label:'Mentor',            desc:'Parrainer 5 membres',       img:'invitation/Mentor.png',           req: p => (p.invite_count||0) >= 5 },
+    { id:'ultra',             cat:'invitation', label:'Ultra',             desc:'Parrainer 10 membres',      img:'invitation/Ultra.png',            req: p => (p.invite_count||0) >= 10 },
+    { id:'grand_dragon',      cat:'invitation', label:'Grand Dragon',      desc:'Parrainer 25 membres',      img:'invitation/Grand Dragon.png',     req: p => (p.invite_count||0) >= 25 },
+    { id:'empereur',          cat:'invitation', label:'Empereur',          desc:'Parrainer 50 membres',      img:'invitation/Empereur.png',         req: p => (p.invite_count||0) >= 50 },
     { id:'premiere_mise',     cat:'mises',       label:'Premiere Mise',     desc:'Reussir 1 pari',            img:'mises/Premiere Mise.png',          req: p => (p._wonBets||0) >= 1 },
     { id:'flambeur',          cat:'mises',       label:'Flambeur',          desc:'Reussir 10 paris',          img:'mises/Flambeur.png',               req: p => (p._wonBets||0) >= 10 },
     { id:'stratege',          cat:'mises',       label:'Stratege',          desc:'Reussir 50 paris',          img:'mises/Stratege.png',               req: p => (p._wonBets||0) >= 50 },
@@ -1387,8 +1387,8 @@ class AN {
     })
     const encodeBadgePath = (p) => p.split('/').map(s => encodeURIComponent(s)).join('/')
     const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/badges/'
-    const CATS = { amis:'Amis', invitations:'Invitations', mises:'Paris', reponses:'Reponses', richesse:'Richesse', president:'President' }
-    const EMOJIS = { amis:'👥', invitations:'📨', mises:'🎲', reponses:'💬', richesse:'💰', president:'👑' }
+    const CATS = { amis:'Amis', invitation:'Invitations', mises:'Paris', reponses:'Reponses', richesse:'Richesse', president:'President' }
+    const EMOJIS = { amis:'👥', invitation:'📨', mises:'🎲', reponses:'💬', richesse:'💰', president:'👑' }
 
     let html = ''
     // Progress
