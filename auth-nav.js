@@ -1350,7 +1350,7 @@ class AN {
     { id:'flambeur',          cat:'mises',       label:'Flambeur',          desc:'Reussir 10 paris',          img:'mises/Flambeur.png',               req: p => (p._wonBets||0) >= 10 },
     { id:'stratege',          cat:'mises',       label:'Stratege',          desc:'Reussir 50 paris',          img:'mises/Stratege.png',               req: p => (p._wonBets||0) >= 50 },
     { id:'roi_des_mises',     cat:'mises',       label:'Roi des Mises',     desc:'Reussir 500 paris',         img:'mises/Roi des Mises.png',          req: p => (p._wonBets||0) >= 500 },
-    { id:'eveil_du_dragon',   cat:'reponses',    label:'Eveil du Dragon',   desc:'Poster 1 reponse',          img:'reponses/Eveil du dragon.png',     req: p => (p._replyCount||0) >= 1 },
+    { id:'eveil_du_dragon',   cat:'reponses',    label:'Eveil du Dragon',   desc:'Poster 1 reponse',          img:'reponses/Eveuil du dragon.png',     req: p => (p._replyCount||0) >= 1 },
     { id:'souffle_naissant',  cat:'reponses',    label:'Souffle Naissant',  desc:'Poster 10 reponses',        img:'reponses/Souffle Naissant.png',    req: p => (p._replyCount||0) >= 10 },
     { id:'jeune_chasseur',    cat:'reponses',    label:'Jeune Chasseur',    desc:'Poster 20 reponses',        img:'reponses/Jeune Chasseur.png',      req: p => (p._replyCount||0) >= 20 },
     { id:'dragon_erudit',     cat:'reponses',    label:'Dragon Erudit',     desc:'Poster 50 reponses',        img:'reponses/Dragon erudit.png',       req: p => (p._replyCount||0) >= 50 },
