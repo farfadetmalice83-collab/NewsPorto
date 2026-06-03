@@ -1606,6 +1606,8 @@ class AN {
       setTimeout(() => this.openChat(userId, name), 200)
     }, 100)
   }
+
+  _toast(msg, type = '') {
     const t = document.getElementById('an-toast'); if (!t) return
     t.textContent = msg; t.className = 'on ' + type
     clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3000)
