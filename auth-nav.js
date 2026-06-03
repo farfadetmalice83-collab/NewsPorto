@@ -303,6 +303,11 @@ const CSS = `
   .an-save-row { padding-bottom:calc(16px + env(safe-area-inset-bottom)); }
 }
 
+
+/* ── BADGES TAB ── */
+.an-invite-btn { width:calc(100% - 40px); margin:12px 20px 4px; background:rgba(0,61,165,0.15); border:1px solid rgba(0,61,165,0.4); color:#4d82d4; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; padding:10px; cursor:pointer; transition:.2s; display:block; }
+.an-invite-btn:hover { background:rgba(0,61,165,0.3); color:#fff; }
+
 /* ── CROPPER MODAL ── */
 #an-crop-modal { display:none; position:fixed; inset:0; z-index:1000; background:rgba(0,0,0,0.95); align-items:center; justify-content:center; flex-direction:column; gap:16px; }
 #an-crop-modal.open { display:flex; }
@@ -381,6 +386,7 @@ function html() { return `
     <button class="an-tab"        data-tab="amis"    onclick="AN.tabTo('amis')">Amis<span class="an-tab-dot" id="tab-dot-amis"></span></button>
     <button class="an-tab"        data-tab="mp"      onclick="AN.tabTo('mp')">Messages<span class="an-tab-dot" id="tab-dot-mp"></span></button>
     <button class="an-tab"        data-tab="rangs"   onclick="AN.tabTo('rangs')">Rangs</button>
+    <button class="an-tab"        data-tab="badges"  onclick="AN.tabTo('badges')">Badges</button>
     <button class="an-tab" id="an-tab-admin" data-tab="admin" onclick="AN.tabTo('admin')" style="display:none">Admin<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#e74c3c;margin-left:4px;vertical-align:middle"></span></button>
   </div>
 
@@ -490,6 +496,13 @@ function html() { return `
           <button class="an-btn" style="width:100%;margin-top:12px" onclick="AN.createCustomBet()">Lancer le pari →</button>
         </div>
       </div>
+    </div>
+
+
+    <!-- BADGES -->
+    <div class="an-section" id="an-sec-badges">
+      <button class="an-invite-btn" onclick="AN._generateInviteLink()">📨 Copier mon lien d'invitation</button>
+      <div id="an-badges-content"><div class="an-empty">Chargement...</div></div>
     </div>
 
     <!-- RANGS -->
@@ -692,6 +705,7 @@ class AN {
     if (tab === 'amis') this._loadFriends()
     if (tab === 'mp') this._loadConvList()
     if (tab === 'rangs') this._renderRanks()
+    if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
   }
 
@@ -1307,6 +1321,132 @@ class AN {
     window.dispatchEvent(new CustomEvent('custom-bet-updated'))
   }
 
+
+
+  // ── BADGES ──
+  _BADGES = [
+    { id:'cercle_restreint',  cat:'amis',        label:'Cercle Restreint',  desc:'Avoir 5 amis',              img:'amis/Cercle Restreint.png',        req: p => (p._friendCount||0) >= 5 },
+    { id:'clan_du_dragon',    cat:'amis',        label:'Clan du Dragon',    desc:'Avoir 25 amis',             img:'amis/Clan du Dragon.png',          req: p => (p._friendCount||0) >= 25 },
+    { id:'premier_compagnon', cat:'amis',        label:'Premier Compagnon', desc:'Avoir 1 ami',               img:'amis/Premier Compagnon.png',       req: p => (p._friendCount||0) >= 1 },
+    { id:'roi_des_dragons',   cat:'amis',        label:'Roi des Dragons',   desc:'Avoir 100 amis',            img:'amis/Roi des dragons.png',         req: p => (p._friendCount||0) >= 100 },
+    { id:'premier_disciple',  cat:'invitations', label:'Premier Disciple',  desc:'Parrainer 1 membre',        img:'invitations/Premier Disciple.png', req: p => (p.invite_count||0) >= 1 },
+    { id:'mentor',            cat:'invitations', label:'Mentor',            desc:'Parrainer 5 membres',       img:'invitations/Mentor.png',           req: p => (p.invite_count||0) >= 5 },
+    { id:'ultra',             cat:'invitations', label:'Ultra',             desc:'Parrainer 10 membres',      img:'invitations/Ultra.png',            req: p => (p.invite_count||0) >= 10 },
+    { id:'grand_dragon',      cat:'invitations', label:'Grand Dragon',      desc:'Parrainer 25 membres',      img:'invitations/Grand Dragon.png',     req: p => (p.invite_count||0) >= 25 },
+    { id:'empereur',          cat:'invitations', label:'Empereur',          desc:'Parrainer 50 membres',      img:'invitations/Empereur.png',         req: p => (p.invite_count||0) >= 50 },
+    { id:'premiere_mise',     cat:'mises',       label:'Premiere Mise',     desc:'Reussir 1 pari',            img:'mises/Premiere Mise.png',          req: p => (p._wonBets||0) >= 1 },
+    { id:'flambeur',          cat:'mises',       label:'Flambeur',          desc:'Reussir 10 paris',          img:'mises/Flambeur.png',               req: p => (p._wonBets||0) >= 10 },
+    { id:'stratege',          cat:'mises',       label:'Stratege',          desc:'Reussir 50 paris',          img:'mises/Stratege.png',               req: p => (p._wonBets||0) >= 50 },
+    { id:'roi_des_mises',     cat:'mises',       label:'Roi des Mises',     desc:'Reussir 500 paris',         img:'mises/Roi des Mises.png',          req: p => (p._wonBets||0) >= 500 },
+    { id:'eveil_du_dragon',   cat:'reponses',    label:'Eveil du Dragon',   desc:'Poster 1 reponse',          img:'reponses/Eveil du dragon.png',     req: p => (p._replyCount||0) >= 1 },
+    { id:'souffle_naissant',  cat:'reponses',    label:'Souffle Naissant',  desc:'Poster 10 reponses',        img:'reponses/Souffle Naissant.png',    req: p => (p._replyCount||0) >= 10 },
+    { id:'jeune_chasseur',    cat:'reponses',    label:'Jeune Chasseur',    desc:'Poster 20 reponses',        img:'reponses/Jeune Chasseur.png',      req: p => (p._replyCount||0) >= 20 },
+    { id:'dragon_erudit',     cat:'reponses',    label:'Dragon Erudit',     desc:'Poster 50 reponses',        img:'reponses/Dragon erudit.png',       req: p => (p._replyCount||0) >= 50 },
+    { id:'maitre_du_savoir',  cat:'reponses',    label:'Maitre du Savoir',  desc:'Poster 100 reponses',       img:'reponses/Maitre du Savoir.png',    req: p => (p._replyCount||0) >= 100 },
+    { id:'sage_legendaire',   cat:'reponses',    label:'Sage Legendaire',   desc:'Poster 500 reponses',       img:'reponses/Sage legendaire.png',     req: p => (p._replyCount||0) >= 500 },
+    { id:'tresorier',         cat:'richesse',    label:'Tresorier',         desc:'Avoir 1000 points',         img:'richesse/Tresorier.png',           req: p => (p.points||0) >= 1000 },
+    { id:'president',         cat:'president',   label:'President',         desc:'Debloquer tous les badges', img:'president/President.png',          req: p => p._allOtherBadges },
+  ]
+
+  _badgeStats = null
+
+  async _loadBadgeStats() {
+    if (!this.u) return {}
+    const [fc, wb, rc] = await Promise.all([
+      supabase.from('friendships').select('*',{count:'exact',head:true}).or(`requester_id.eq.${this.u.id},addressee_id.eq.${this.u.id}`).eq('status','accepted'),
+      supabase.from('bets').select('*',{count:'exact',head:true}).eq('user_id',this.u.id).eq('status','won'),
+      supabase.from('forum_replies').select('*',{count:'exact',head:true}).eq('author_id',this.u.id),
+    ])
+    return { _friendCount: fc.count||0, _wonBets: wb.count||0, _replyCount: rc.count||0 }
+  }
+
+  async _renderBadges() {
+    if (!this.u || !this.p) return
+    const el = document.getElementById('an-badges-content'); if (!el) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    const stats = await this._loadBadgeStats()
+    const profile = { ...this.p, ...stats }
+    const nonPres = this._BADGES.filter(b => b.id !== 'president')
+    profile._allOtherBadges = nonPres.every(b => b.req(profile))
+    const unlocked = this._BADGES.filter(b => b.req(profile))
+    const total = this._BADGES.length
+    const selected = (this.p.badges_selected || []).filter(id => {
+      const b = this._BADGES.find(x => x.id === id); return b && b.req(profile)
+    })
+    const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/badges/'
+    const CATS = { amis:'Amis', invitations:'Invitations', mises:'Paris', reponses:'Reponses', richesse:'Richesse', president:'President' }
+    const EMOJIS = { amis:'👥', invitations:'📨', mises:'🎲', reponses:'💬', richesse:'💰', president:'👑' }
+
+    let html = ''
+    // Progress
+    html += `<div style="padding:14px 20px 8px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3)">Progression</span>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:#4d82d4">${unlocked.length}/${total}</span>
+      </div>
+      <div style="height:3px;background:rgba(255,255,255,0.08);border-radius:2px">
+        <div style="height:100%;width:${Math.round(unlocked.length/total*100)}%;background:linear-gradient(90deg,#003DA5,#4d82d4);border-radius:2px"></div>
+      </div>
+    </div>`
+
+    // Selected showcase
+    html += `<div style="padding:8px 20px 12px;border-bottom:1px solid rgba(255,255,255,0.06)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:8px">Affiches (max 3) · Clique pour selectionner</div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${
+        selected.length ? selected.map(id => {
+          const b = this._BADGES.find(x => x.id === id)
+          return b ? `<div style="position:relative"><img src="${BASE}${encodeURIComponent(b.img).replace(/%2F/g,'/')}" style="width:44px;height:44px;border-radius:50%;border:2px solid #003DA5;object-fit:cover" title="${b.label}"><button onclick="AN._unselectBadge('${id}')" style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#e74c3c;border:none;color:#fff;font-size:8px;cursor:pointer;line-height:14px;text-align:center;padding:0">✕</button></div>` : ''
+        }).join('') : `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.2)">Aucun badge selectionne</span>`
+      }</div>
+    </div>`
+
+    // Grid by category
+    for (const [catKey, catLabel] of Object.entries(CATS)) {
+      const catBadges = this._BADGES.filter(b => b.cat === catKey)
+      html += `<div style="padding:10px 20px 2px"><span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4)">${EMOJIS[catKey]} ${catLabel}</span></div>`
+      html += `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:4px 20px 10px">`
+      for (const b of catBadges) {
+        const isUnlocked = b.req(profile)
+        const isSel = selected.includes(b.id)
+        const imgUrl = BASE + encodeURIComponent(b.img).replace(/%2F/g,'/')
+        html += `<div onclick="${isUnlocked?`AN._toggleBadge('${b.id}')`:''}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1px solid ${isSel?'#003DA5':isUnlocked?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.04)'};background:${isSel?'rgba(0,61,165,0.12)':'transparent'};cursor:${isUnlocked?'pointer':'default'};position:relative;transition:.15s" title="${b.desc}">
+          <img src="${imgUrl}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;${!isUnlocked?'filter:grayscale(1) brightness(0.25)':''}">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${isUnlocked?'#fff':'rgba(255,255,255,0.2)'};text-align:center;line-height:1.2">${b.label}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:6px;letter-spacing:.5px;color:${isUnlocked?'rgba(255,255,255,0.35)':'rgba(255,255,255,0.12)'};text-align:center;line-height:1.2">${b.desc}</span>
+          ${isSel?'<div style="position:absolute;top:3px;right:3px;width:7px;height:7px;border-radius:50%;background:#003DA5"></div>':''}
+          ${!isUnlocked?'<div style="position:absolute;top:3px;right:3px;font-size:9px">🔒</div>':''}
+        </div>`
+      }
+      html += '</div>'
+    }
+    el.innerHTML = html
+  }
+
+  _toggleBadge(id) {
+    const sel = (this.p.badges_selected||[]).slice()
+    const idx = sel.indexOf(id)
+    if (idx >= 0) { sel.splice(idx,1) }
+    else { if (sel.length >= 3) { this._toast('Max 3 badges', 'err'); return }; sel.push(id) }
+    this._saveBadgeSelection(sel)
+  }
+
+  _unselectBadge(id) { this._saveBadgeSelection((this.p.badges_selected||[]).filter(x=>x!==id)) }
+
+  async _saveBadgeSelection(sel) {
+    await supabase.from('profiles').update({ badges_selected: sel }).eq('id', this.u.id)
+    if (this.p) this.p.badges_selected = sel
+    this._renderBadges()
+  }
+
+  async _generateInviteLink() {
+    if (!this.u || !this.p) return
+    const code = this.p.invite_code || (this.u.id.substring(0,8))
+    await supabase.from('profiles').update({ invite_code: code }).eq('id', this.u.id)
+    if (this.p) this.p.invite_code = code
+    const link = `https://newsporto.fr?ref=${code}`
+    await navigator.clipboard.writeText(link).catch(()=>{})
+    this._toast('Lien copie ! ' + link, 'ok')
+  }
 
   _toast(msg, type = '') {
     const t = document.getElementById('an-toast'); if (!t) return
