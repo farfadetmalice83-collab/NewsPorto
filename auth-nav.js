@@ -1386,7 +1386,7 @@ class AN {
       const b = this._BADGES.find(x => x.id === id); return b && b.req(profile)
     })
     const encodeBadgePath = (p) => p.split('/').map(s => encodeURIComponent(s)).join('/')
-    const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/badges/'
+    const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/'
     const CATS = { amis:'Amis', invitation:'Invitations', mises:'Paris', reponses:'Reponses', richesse:'Richesse', president:'President' }
     const EMOJIS = { amis:'👥', invitation:'📨', mises:'🎲', reponses:'💬', richesse:'💰', president:'👑' }
 
