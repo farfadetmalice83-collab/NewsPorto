@@ -389,6 +389,28 @@
     .reveal.visible{opacity:1;transform:none;}
     .reveal-delay-1{transition-delay:.1s;}.reveal-delay-2{transition-delay:.2s;}.reveal-delay-3{transition-delay:.3s;}
     .empty-state{text-align:center;padding:48px 24px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);border:1px solid var(--border);}
+
+    /* LIVE MATCH BADGE */
+    .live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;}
+    .live-dot{width:6px;height:6px;border-radius:50%;background:#e74c3c;animation:livePulse 1s ease-in-out infinite;}
+    @keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    /* SCORE DISPLAY */
+    .match-score{display:flex;align-items:center;justify-content:center;gap:16px;padding:16px 32px;border-bottom:1px solid var(--border);}
+    .match-score-num{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;color:#fff;}
+    .match-score-sep{font-family:'Bebas Neue',sans-serif;font-size:32px;color:rgba(255,255,255,0.2);}
+    /* EVENTS */
+    .match-events{padding:8px 32px;display:flex;flex-wrap:wrap;gap:6px;}
+    .match-event-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;}
+    /* ADMIN MATCH CONTROLS */
+    .admin-match-controls{padding:10px 32px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.06);background:rgba(231,76,60,0.03);}
+    .admin-match-btn{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);transition:.15s;}
+    .admin-match-btn:hover{border-color:#fff;color:#fff;}
+    .admin-match-btn.green{border-color:rgba(0,200,122,0.4);color:#00c87a;}
+    .admin-match-btn.green:hover{background:rgba(0,200,122,0.1);}
+    .admin-match-btn.red{border-color:rgba(231,76,60,0.4);color:#e74c3c;}
+    .admin-match-btn.red:hover{background:rgba(231,76,60,0.1);}
+    .admin-match-btn.orange{border-color:rgba(240,165,0,0.4);color:#f0a500;}
+    .admin-match-btn.orange:hover{background:rgba(240,165,0,0.1);}
     .login-wall{border:1px solid var(--border);padding:48px;text-align:center;margin-bottom:2px;}
     .login-wall-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;}
     .login-wall-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:24px;}
@@ -459,6 +481,8 @@
 
     <!-- TAB PARIS -->
     <div class="tab-content active" id="tab-paris">
+      <p class="section-label" id="custom-matches-label" style="display:none">— Matchs en cours / à venir</p>
+      <div id="custom-matches-container"></div>
       <p class="section-label">— Matchs ouverts aux mises</p>
       <div id="matches-container">
         <div class="empty-state">Chargement des matchs...</div>
@@ -622,6 +646,208 @@ async function loadMatches() {
   }
 }
 loadMatches()
+
+// ── CUSTOM MATCHES ──
+async function loadCustomMatches() {
+  const container = document.getElementById('custom-matches-container')
+  const label = document.getElementById('custom-matches-label')
+  const { data } = await supabase.from('custom_matches')
+    .select('*')
+    .in('status', ['upcoming','live'])
+    .order('kickoff_at', { ascending: true })
+  if (!data?.length) { container.innerHTML = ''; if(label) label.style.display='none'; return }
+  if(label) label.style.display = ''
+  let userMatchBets = {}
+  if (currentUser) {
+    const ids = data.map(m => String(m.id))
+    const { data: myBets } = await supabase.from('bets').select('*').eq('user_id', currentUser.id).in('match_id', ids)
+    ;(myBets||[]).forEach(b => userMatchBets[b.match_id] = b)
+  }
+  const isAdmin = window.AN?.isAdmin?.()
+  container.innerHTML = data.map((m, i) => renderCustomMatchCard(m, i, userMatchBets, isAdmin)).join('')
+  container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+}
+loadCustomMatches()
+window.addEventListener('custom-match-updated', loadCustomMatches)
+
+function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
+  const now = new Date()
+  const kickoff = new Date(m.kickoff_at)
+  const closes = new Date(m.closes_at)
+  const isLive = m.status === 'live'
+  const isOpen = !isLive && closes > now
+  const existingBet = userMatchBets?.[String(m.id)]
+
+  const homeImg = m.home_crest
+    ? `<img src="${m.home_crest}" class="bet-logo" alt="${m.home_team}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.home_team||'?')[0]}</div>`
+    : `<div class="bet-logo-placeholder">${(m.home_team||'?')[0]}</div>`
+  const awayImg = m.away_crest
+    ? `<img src="${m.away_crest}" class="bet-logo" alt="${m.away_team}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.away_team||'?')[0]}</div>`
+    : `<div class="bet-logo-placeholder">${(m.away_team||'?')[0]}</div>`
+
+  const deadlineBadge = isLive
+    ? `<div class="live-badge"><div class="live-dot"></div>EN COURS</div>`
+    : isOpen
+      ? `<div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">${formatDeadline(closes - now)}</span></div>`
+      : `<div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mises fermées</span></div>`
+
+  const scoreHtml = isLive && m.score_home != null
+    ? `<div class="match-score">
+        <span class="match-score-num">${m.score_home}</span>
+        <span class="match-score-sep">—</span>
+        <span class="match-score-num">${m.score_away}</span>
+      </div>`
+    : ''
+
+  const eventsHtml = m.events?.length
+    ? `<div class="match-events">${m.events.map(e =>
+        `<span class="match-event-tag">${e.type==='yellow'?'🟡':e.type==='red'?'🔴':'⚽'} ${e.player}${e.minute?` ${e.minute}'`:''}</span>`
+      ).join('')}</div>`
+    : ''
+
+  const adminHtml = isAdmin
+    ? `<div class="admin-match-controls">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
+        ${!isLive ? `<button class="admin-match-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+        ${isLive ? `<button class="admin-match-btn orange" onclick="AN.updateMatchScore(${m.id})">Score</button>
+                    <button class="admin-match-btn" onclick="AN.addMatchEvent(${m.id})">+ Carton</button>
+                    <button class="admin-match-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>` : ''}
+        <button class="admin-match-btn red" style="margin-left:auto" onclick="AN.deleteCustomMatch(${m.id})">✕</button>
+      </div>`
+    : ''
+
+  const CUSTOM_ODDS = { win: m.odds_win||1.8, draw: m.odds_draw||3.5, lose: m.odds_lose||4.5 }
+
+  if (existingBet) {
+    const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }[existingBet.pick] || existingBet.pick
+    const statusMap = { pending:'⏳ En attente', won:'✅ Gagné', lost:'❌ Perdu', refunded:'💰 Remboursé' }
+    return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
+      <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
+      <div class="bet-teams">
+        <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
+        <div class="bet-vs">VS</div>
+        <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
+      </div>
+      ${scoreHtml}${eventsHtml}
+      <div class="bet-result-banner ${existingBet.status}">
+        <span class="result-label">${pickLabel} · ${statusMap[existingBet.status]||'En attente'}</span>
+        <span class="result-points">${existingBet.status==='won'?'+'+existingBet.potential_gain+' pts':existingBet.status==='lost'?'-'+existingBet.stake+' pts':'Gain potentiel : +'+existingBet.potential_gain+' pts'}</span>
+      </div>
+      ${adminHtml}
+    </div>`
+  }
+
+  const canBet = isOpen && !isLive
+  const maxS = currentProfile ? (RANK_MAX[currentProfile.rank]||200) : 200
+  const userPts = currentProfile ? currentProfile.points : 0
+
+  return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
+    <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
+    <div class="bet-teams">
+      <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
+      <div class="bet-vs">VS</div>
+      <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
+    </div>
+    ${scoreHtml}${eventsHtml}
+    <div class="bet-infos">
+      <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${kickoff.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</span></div>
+      <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${kickoff.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>
+    </div>
+    ${canBet ? `
+    <div class="bet-options" id="cm-options-${m.id}">
+      <button class="bet-option win-option" onclick="selectCmOpt('${m.id}','win')" id="cm-opt-${m.id}-win">
+        <span class="bet-option-label">Victoire ${m.home_team}</span>
+        <span class="bet-option-result">1</span>
+        <span class="bet-option-mult">×${CUSTOM_ODDS.win}</span>
+      </button>
+      <button class="bet-option draw-option" onclick="selectCmOpt('${m.id}','draw')" id="cm-opt-${m.id}-draw">
+        <span class="bet-option-label">Match nul</span>
+        <span class="bet-option-result">X</span>
+        <span class="bet-option-mult">×${CUSTOM_ODDS.draw}</span>
+      </button>
+      <button class="bet-option lose-option" onclick="selectCmOpt('${m.id}','lose')" id="cm-opt-${m.id}-lose">
+        <span class="bet-option-label">Victoire ${m.away_team}</span>
+        <span class="bet-option-result">2</span>
+        <span class="bet-option-mult">×${CUSTOM_ODDS.lose}</span>
+      </button>
+    </div>
+    <div class="bet-stake">
+      <div class="stake-input-wrap">
+        <span class="stake-label">Mise (pts) · Max ${Math.min(maxS,userPts)} pts</span>
+        <input type="number" class="stake-input" id="cm-stake-${m.id}" placeholder="0" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCmPreview('${m.id}')">
+        <div class="stake-quick">
+          <button class="stake-quick-btn" onclick="setCmStake('${m.id}',50,${Math.min(maxS,userPts)})">50</button>
+          <button class="stake-quick-btn" onclick="setCmStake('${m.id}',100,${Math.min(maxS,userPts)})">100</button>
+          <button class="stake-quick-btn" onclick="setCmStake('${m.id}','all',${Math.min(maxS,userPts)})">TOUT</button>
+        </div>
+      </div>
+      <div class="stake-preview">
+        <span class="stake-preview-label">Gain potentiel</span>
+        <span class="stake-preview-value zero" id="cm-preview-${m.id}">0 pts</span>
+        ${currentUser
+          ? `<button class="btn-bet" id="cm-btn-${m.id}" onclick="submitCustomMatchBet('${m.id}','${(m.home_team+' vs '+m.away_team).replace(/'/g,"\\'")}',${JSON.stringify(CUSTOM_ODDS)})" disabled>Valider →</button>`
+          : `<button class="btn-bet" onclick="window.AN?.openAuth?.()">Connexion requise</button>`
+        }
+      </div>
+    </div>` : !isLive ? `<div style="padding:16px 32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;">Mises fermées pour ce match</div>` : ''}
+    ${adminHtml}
+  </div>`
+}
+
+const cmSelected = {}
+window.selectCmOpt = function(matchId, pick) {
+  if (!currentUser) { window.AN?.openAuth?.(); return }
+  cmSelected[matchId] = pick
+  ;['win','draw','lose'].forEach(p => document.getElementById(`cm-opt-${matchId}-${p}`)?.classList.remove('selected'))
+  document.getElementById(`cm-opt-${matchId}-${pick}`)?.classList.add('selected')
+  updateCmPreview(matchId)
+}
+window.setCmStake = function(matchId, val, max) {
+  const input = document.getElementById(`cm-stake-${matchId}`)
+  if (input) { input.value = val==='all'?max:Math.min(val,max); updateCmPreview(matchId) }
+}
+window.updateCmPreview = function(matchId) {
+  const pick = cmSelected[matchId]
+  const stake = parseInt(document.getElementById(`cm-stake-${matchId}`)?.value) || 0
+  const btnEl = document.getElementById(`cm-btn-${matchId}`)
+  const prevEl = document.getElementById(`cm-preview-${matchId}`)
+  if (!prevEl) return
+  const winBtn = document.getElementById(`cm-opt-${matchId}-win`)
+  if (!winBtn) return
+  const odds = {
+    win: parseFloat(winBtn.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||1.8,
+    draw: parseFloat(document.getElementById(`cm-opt-${matchId}-draw`)?.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||3.5,
+    lose: parseFloat(document.getElementById(`cm-opt-${matchId}-lose`)?.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||4.5,
+  }
+  const mult = pick ? (odds[pick]||1) : 1
+  const gain = pick && stake >= 10 ? Math.floor(stake * mult) : 0
+  if (gain > 0) { prevEl.textContent = '+'+gain+' pts'; prevEl.classList.remove('zero'); if(btnEl) btnEl.disabled = false }
+  else { prevEl.textContent = '0 pts'; prevEl.classList.add('zero'); if(btnEl) btnEl.disabled = true }
+}
+window.submitCustomMatchBet = async function(matchId, label, odds) {
+  if (!currentUser || !currentProfile) return
+  const pick = cmSelected[matchId]
+  const stake = parseInt(document.getElementById(`cm-stake-${matchId}`)?.value) || 0
+  if (!pick || stake < 10) { showToast('Sélectionne une option et mise ≥ 10 pts', 'error'); return }
+  if (stake > currentProfile.points) { showToast('Pas assez de points', 'error'); return }
+  const mult = odds[pick] || 2
+  const potential_gain = Math.floor(stake * mult)
+  const btn = document.getElementById(`cm-btn-${matchId}`)
+  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement...' }
+  try {
+    const newPts = currentProfile.points - stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: -stake, reason: 'custom_match_bet', ref_id: String(matchId) })
+    await supabase.from('bets').insert({ user_id: currentUser.id, match_id: String(matchId), match_label: label, pick, stake, multiplier: mult, potential_gain, status: 'pending' })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(`Mise de ${stake} pts enregistrée ! ✅`, 'ok')
+    loadCustomMatches()
+  } catch(e) {
+    showToast('Erreur lors de la mise', 'error')
+    if (btn) { btn.disabled = false; btn.textContent = 'Valider →' }
+  }
+}
 
 // ── CUSTOM BETS ──
 async function loadCustomBets() {
