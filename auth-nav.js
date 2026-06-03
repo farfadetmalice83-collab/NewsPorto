@@ -408,6 +408,9 @@ function html() { return `
         <button class="an-btn" style="flex:1" onclick="AN.saveProfile()">Sauvegarder →</button>
         <button class="an-btn-ghost" onclick="AN.logout()">Déconnexion</button>
       </div>
+      <div style="padding:0 20px 20px">
+        <button class="an-btn-ghost" style="width:100%" onclick="AN._generateInviteLink()">📨 Copier mon lien d'invitation</button>
+      </div>
     </div>
 
     <!-- NOTIFS -->
@@ -501,7 +504,6 @@ function html() { return `
 
     <!-- BADGES -->
     <div class="an-section" id="an-sec-badges">
-      <button class="an-invite-btn" onclick="AN._generateInviteLink()">📨 Copier mon lien d'invitation</button>
       <div id="an-badges-content"><div class="an-empty">Chargement...</div></div>
     </div>
 
@@ -1383,6 +1385,7 @@ class AN {
     const selected = (this.p.badges_selected || []).filter(id => {
       const b = this._BADGES.find(x => x.id === id); return b && b.req(profile)
     })
+    const encodeBadgePath = (p) => p.split('/').map(s => encodeURIComponent(s)).join('/')
     const BASE = 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/badges/'
     const CATS = { amis:'Amis', invitations:'Invitations', mises:'Paris', reponses:'Reponses', richesse:'Richesse', president:'President' }
     const EMOJIS = { amis:'👥', invitations:'📨', mises:'🎲', reponses:'💬', richesse:'💰', president:'👑' }
@@ -1405,7 +1408,7 @@ class AN {
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">${
         selected.length ? selected.map(id => {
           const b = this._BADGES.find(x => x.id === id)
-          return b ? `<div style="position:relative"><img src="${BASE}${encodeURIComponent(b.img).replace(/%2F/g,'/')}" style="width:44px;height:44px;border-radius:50%;border:2px solid #003DA5;object-fit:cover" title="${b.label}"><button onclick="AN._unselectBadge('${id}')" style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#e74c3c;border:none;color:#fff;font-size:8px;cursor:pointer;line-height:14px;text-align:center;padding:0">✕</button></div>` : ''
+          return b ? `<div style="position:relative"><img src="${BASE}${encodeBadgePath(b.img)}" style="width:44px;height:44px;border-radius:50%;border:2px solid #003DA5;object-fit:cover" title="${b.label}"><button onclick="AN._unselectBadge('${id}')" style="position:absolute;top:-3px;right:-3px;width:14px;height:14px;border-radius:50%;background:#e74c3c;border:none;color:#fff;font-size:8px;cursor:pointer;line-height:14px;text-align:center;padding:0">✕</button></div>` : ''
         }).join('') : `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.2)">Aucun badge selectionne</span>`
       }</div>
     </div>`
@@ -1418,7 +1421,7 @@ class AN {
       for (const b of catBadges) {
         const isUnlocked = b.req(profile)
         const isSel = selected.includes(b.id)
-        const imgUrl = BASE + encodeURIComponent(b.img).replace(/%2F/g,'/')
+        const imgUrl = BASE + encodeBadgePath(b.img)
         html += `<div onclick="${isUnlocked?`AN._toggleBadge('${b.id}')`:''}" style="display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px;border:1px solid ${isSel?'#003DA5':isUnlocked?'rgba(255,255,255,0.1)':'rgba(255,255,255,0.04)'};background:${isSel?'rgba(0,61,165,0.12)':'transparent'};cursor:${isUnlocked?'pointer':'default'};position:relative;transition:.15s" title="${b.desc}">
           <img src="${imgUrl}" style="width:48px;height:48px;border-radius:50%;object-fit:cover;${!isUnlocked?'filter:grayscale(1) brightness(0.25)':''}">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:7px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:${isUnlocked?'#fff':'rgba(255,255,255,0.2)'};text-align:center;line-height:1.2">${b.label}</span>
