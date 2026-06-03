@@ -550,3 +550,73 @@ export async function getUserVotes(userId, threadIds) {
   ;(data || []).forEach(v => { map[v.thread_id] = v.vote })
   return map
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// STREAK QUOTIDIEN
+// ─────────────────────────────────────────────────────────────────────────────
+// Requiert colonnes profiles: last_login date, login_streak int default 1
+
+export async function checkStreak(userId) {
+  const { data: p } = await supabase
+    .from('profiles')
+    .select('last_login, login_streak, points, xp')
+    .eq('id', userId).single()
+  if (!p) return null
+
+  const today = new Date().toISOString().slice(0, 10)
+  const last = p.last_login || null
+
+  if (last === today) return { alreadyClaimed: true, streak: p.login_streak || 1 }
+
+  const yesterday = new Date()
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yStr = yesterday.toISOString().slice(0, 10)
+
+  let newStreak = (last === yStr) ? (p.login_streak || 1) + 1 : 1
+  if (newStreak > 7) newStreak = 1 // repart de 1 après J7
+
+  // Points : J1=10, J2=20...J6=60, J7=100 + coffre
+  const pts = newStreak === 7 ? 100 : newStreak * 10
+  const isChestDay = newStreak === 7
+
+  await supabase.from('profiles').update({
+    last_login: today,
+    login_streak: newStreak,
+    points: (p.points || 0) + pts,
+  }).eq('id', userId)
+  await supabase.from('points_log').insert({ user_id: userId, amount: pts, reason: 'daily_streak', ref_id: String(newStreak) })
+  await supabase.from('notifications').insert({ user_id: userId, type: 'daily_streak', ref_label: `Jour ${newStreak} · +${pts} pts` })
+
+  // XP streak
+  await addXp(userId, 10, 'daily_streak')
+  await addWeeklyPoints(userId, pts)
+
+  return { alreadyClaimed: false, streak: newStreak, pts, isChestDay }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COFFRE QUOTIDIEN
+// ─────────────────────────────────────────────────────────────────────────────
+// Requiert colonne profiles: last_chest_claim date
+
+export async function claimDailyChest(userId) {
+  const { data: p } = await supabase
+    .from('profiles')
+    .select('last_chest_claim, points')
+    .eq('id', userId).single()
+  if (!p) return null
+
+  const today = new Date().toISOString().slice(0, 10)
+  if (p.last_chest_claim === today) return { alreadyClaimed: true }
+
+  const reward = Math.floor(Math.random() * 191) + 10 // 10–200 pts
+  await supabase.from('profiles').update({
+    last_chest_claim: today,
+    points: (p.points || 0) + reward,
+  }).eq('id', userId)
+  await supabase.from('points_log').insert({ user_id: userId, amount: reward, reason: 'daily_chest' })
+  await addXp(userId, 5, 'daily_chest')
+  await addWeeklyPoints(userId, reward)
+
+  return { alreadyClaimed: false, reward }
+}
