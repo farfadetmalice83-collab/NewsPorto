@@ -53,7 +53,7 @@
     @keyframes pulseG{0%,100%{opacity:1}50%{opacity:.4}}
 
     /* MAIN */
-    .forum-main{padding:0;}
+    .forum-main{padding:0;min-width:0;overflow:hidden;}
 
     /* FILTER BAR */
     .filter-bar{padding:16px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;}
@@ -187,13 +187,13 @@
       .forum-sidebar{display:none;}
 
       /* Sticky filter bar */
-      .filter-bar{position:sticky;top:58px;z-index:50;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);padding:0;flex-direction:column;align-items:stretch;gap:0;border-bottom:1px solid var(--border);}
-      .filter-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
+      .filter-bar{position:sticky;top:58px;z-index:50;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);padding:0;flex-direction:column;align-items:stretch;gap:0;border-bottom:1px solid var(--border);width:100%;max-width:100%;overflow:hidden;}
+      .filter-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);width:100%;}
       .filter-tabs::-webkit-scrollbar{display:none;}
       .filter-tab{flex-shrink:0;padding:11px 14px;font-size:10px;}
 
       /* Barre de recherche pleine largeur */
-      .forum-search{margin:8px 16px 10px;width:calc(100% - 32px);font-size:16px;padding:10px 14px;}
+      .forum-search{margin:8px 16px 10px;width:calc(100% - 32px);max-width:calc(100% - 32px);font-size:16px;padding:10px 14px;box-sizing:border-box;}
 
       /* Category strip */
       .mobile-cat-strip{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 16px 10px;gap:8px;border-bottom:1px solid var(--border);}
@@ -779,8 +779,33 @@ window.searchThreads = function(q) { renderThreadList() }
 function subscribeRealtime() {
   if (realtimeChannel) supabase.removeChannel(realtimeChannel)
   realtimeChannel = supabase.channel('forum-realtime')
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, () => loadThreads())
-    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, () => loadThreads())
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, async () => {
+      const { data } = await supabase
+        .from('forum_threads')
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (data) {
+        allThreads = data
+        if (currentUser && allThreads.length) {
+          userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
+        }
+        updateCounts()
+        renderThreadList() // preserves currentSort + currentCat
+      }
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, async () => {
+      const { data } = await supabase
+        .from('forum_threads')
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (data) {
+        allThreads = data
+        updateCounts()
+        renderThreadList() // preserves currentSort + currentCat
+      }
+    })
     .subscribe()
 }
 
