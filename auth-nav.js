@@ -728,7 +728,7 @@ class AN {
     // Show admin tab if admin
     if (profile?.role === 'admin') {
       const adminTab = document.getElementById('an-tab-admin')
-      if (adminTab) adminTab.style.display = ''
+      if (adminTab) { adminTab.style.display = ''; adminTab.style.visibility = 'visible' }
     }
     // Notify other page scripts
     window.dispatchEvent(new CustomEvent('an:login', { detail: { user: authUser, profile } }))
@@ -750,7 +750,14 @@ class AN {
     const isOpen = panel.classList.toggle('open')
     overlay.classList.toggle('on', isOpen)
     document.body.style.overflow = isOpen ? 'hidden' : ''
-    if (isOpen) { this._loadNotifs(); this._loadFriends(); this._loadConvList() }
+    if (isOpen) {
+      // Re-show admin tab if needed
+      if (this.p?.role === 'admin') {
+        const adminTab = document.getElementById('an-tab-admin')
+        if (adminTab) { adminTab.style.display = ''; adminTab.style.visibility = 'visible' }
+      }
+      this._loadNotifs(); this._loadFriends(); this._loadConvList()
+    }
   }
   closePanel() {
     document.getElementById('an-panel').classList.remove('open')
@@ -1060,6 +1067,10 @@ class AN {
     try {
       const friends = await getFriends(this.u.id)
       const { data: pending } = await supabase.from('friendships').select('id, requester:requester_id(id,username,display_name,avatar_url,rank)').eq('addressee_id', this.u.id).eq('status','pending')
+      // Load all users to suggest
+      const friendIds = new Set(friends.map(f => f.id))
+      const { data: allUsers } = await supabase.from('profiles').select('id,username,display_name,avatar_url,rank').neq('id', this.u.id).order('points', { ascending: false }).limit(30)
+      const suggestions = (allUsers || []).filter(u => !friendIds.has(u.id))
       let html = ''
       if (pending?.length) {
         html += `<div class="an-row-label">Demandes reçues (${pending.length})</div>`
@@ -1080,8 +1091,17 @@ class AN {
           <div class="an-friend-info"><div class="an-friend-name">${f.display_name||f.username}</div><div class="an-friend-sub">${f.rank}</div></div>
           <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">MP</button></div>
         </div>`).join('')
+        html += '<div class="an-divider"></div>'
       }
-      list.innerHTML = html || '<div class="an-empty">Aucun ami · Recherche un utilisateur ↑</div>'
+      if (suggestions.length) {
+        html += `<div class="an-row-label">Membres (${suggestions.length})</div>`
+        html += suggestions.map(u => `<div class="an-friend-row">
+          <div class="an-friend-av">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
+          <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.addFriend('${u.id}')">+ Ajouter</button></div>
+        </div>`).join('')
+      }
+      list.innerHTML = html || '<div class="an-empty">Aucun membre</div>'
     } catch { list.innerHTML = '<div class="an-empty">Erreur de chargement</div>' }
   }
 
@@ -1226,6 +1246,7 @@ class AN {
     document.getElementById(`an-admin-${tab}`).classList.add('active')
     if (tab === 'forum') this._loadAdminForum()
     if (tab === 'bets') this._loadAdminBets()
+    if (tab === 'users') this._loadAdminUsers()
   }
 
   async _loadAdminForum() {
@@ -1256,17 +1277,15 @@ class AN {
     if (window.loadThreads) window.loadThreads()
   }
 
-  async adminSearchUsers(q) {
-    if (!this.isAdmin() || !q || q.length < 2) {
-      document.getElementById('an-admin-users-list').innerHTML = '<div class="an-empty">Recherche un utilisateur</div>'
-      return
-    }
-    const { data } = await supabase.from('profiles')
-      .select('id, username, display_name, rank, points, role')
-      .ilike('username', `%${q}%`).limit(10)
+  async _loadAdminUsers(q = '') {
+    if (!this.isAdmin()) return
     const el = document.getElementById('an-admin-users-list'); if (!el) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    let query = supabase.from('profiles').select('id, username, display_name, rank, points, role')
+    if (q && q.length >= 2) query = query.ilike('username', `%${q}%`)
+    else query = query.order('points', { ascending: false })
+    const { data } = await query.limit(30)
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun résultat</div>'; return }
-    // Check bans
     const { data: bans } = await supabase.from('bans').select('user_id')
     const bannedIds = new Set((bans||[]).map(b => b.user_id))
     el.innerHTML = data.map(u => {
@@ -1285,6 +1304,10 @@ class AN {
         </div>
       </div>`
     }).join('')
+  }
+
+  async adminSearchUsers(q) {
+    await this._loadAdminUsers(q)
   }
 
   async adminBan(userId, username) {
