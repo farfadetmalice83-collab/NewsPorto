@@ -138,6 +138,8 @@ const CSS = `
 .an-friend-name { font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .an-friend-sub  { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); }
 .an-friend-acts { display:flex; gap:5px; flex-shrink:0; }
+.an-micro-btn.blue { background:rgba(0,61,165,0.3); border-color:rgba(0,61,165,0.6); color:#4d82d4; }
+.an-micro-btn.blue:hover { background:rgba(0,61,165,0.5); }
 .an-micro-btn { font-family:'Barlow Condensed',sans-serif; font-size:9px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase; border:1px solid rgba(255,255,255,0.15); color:rgba(255,255,255,0.5); padding:4px 9px; cursor:pointer; background:none; transition:.2s; white-space:nowrap; }
 .an-micro-btn:hover { border-color:#fff; color:#fff; }
 .an-micro-btn.blue { border-color:#003DA5; color:#4d82d4; }
@@ -449,8 +451,18 @@ function html() { return `
 
       <!-- FORUM -->
       <div class="an-admin-sub-content active" id="an-admin-forum">
-        <div class="an-row-label">Threads récents</div>
+        <div class="an-row-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px">
+          Threads récents
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3)">Cliquer un thread = voir ses réponses</span>
+        </div>
         <div id="an-admin-threads"><div class="an-empty">Chargement...</div></div>
+        <div id="an-admin-replies-wrap" style="display:none">
+          <div class="an-row-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:20px">
+            <span id="an-admin-replies-title">Réponses</span>
+            <button onclick="AN._closeAdminReplies()" style="background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;font-size:16px;">✕</button>
+          </div>
+          <div id="an-admin-replies"><div class="an-empty">Chargement...</div></div>
+        </div>
       </div>
 
       <!-- USERS -->
@@ -1147,11 +1159,12 @@ class AN {
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun thread</div>'; return }
     el.innerHTML = data.map(t => `
       <div class="an-admin-row">
-        <div class="an-admin-row-info">
+        <div class="an-admin-row-info" style="cursor:pointer" onclick="AN._loadAdminReplies(${t.id},'${(t.title||'').substring(0,30).replace(/'/g,'').replace(/"/g,'')}')">
           <div class="an-admin-row-title">${t.title.substring(0,40)}</div>
           <div class="an-admin-row-sub">${t.author?.display_name||t.author?.username||'?'} · ${t.reply_count} rép. · ${t.category}</div>
         </div>
         <div class="an-admin-acts">
+          <button class="an-micro-btn" onclick="AN._loadAdminReplies(${t.id},'${(t.title||'').substring(0,30).replace(/'/g,'').replace(/"/g,'')}')">Rép.</button>
           <button class="an-micro-btn red" onclick="AN.adminDeleteThread(${t.id})">✕</button>
         </div>
       </div>`).join('')
@@ -1162,7 +1175,44 @@ class AN {
     await supabase.from('forum_threads').delete().eq('id', id)
     this._toast('Thread supprimé', 'ok')
     this._loadAdminForum()
-    // Reload forum if on forum page
+    if (window.loadThreads) window.loadThreads()
+  }
+
+  async _loadAdminReplies(threadId, threadTitle) {
+    if (!this.isAdmin()) return
+    const wrap = document.getElementById('an-admin-replies-wrap')
+    const el = document.getElementById('an-admin-replies')
+    const title = document.getElementById('an-admin-replies-title')
+    if (!wrap || !el) return
+    wrap.style.display = ''
+    title.textContent = `Réponses : ${threadTitle}`
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    const { data } = await supabase.from('forum_replies')
+      .select('id, content, created_at, author:author_id(username, display_name)')
+      .eq('thread_id', threadId).order('created_at', { ascending: true })
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune réponse</div>'; return }
+    el.innerHTML = data.map(r => `
+      <div class="an-admin-row">
+        <div class="an-admin-row-info">
+          <div class="an-admin-row-title" style="font-weight:400;text-transform:none;letter-spacing:0">${(r.content||'').substring(0,60)}${r.content?.length>60?'...':''}</div>
+          <div class="an-admin-row-sub">${r.author?.display_name||r.author?.username||'?'} · ${new Date(r.created_at).toLocaleDateString('fr-FR')}</div>
+        </div>
+        <div class="an-admin-acts">
+          <button class="an-micro-btn red" onclick="AN.adminDeleteReply(${r.id},${threadId},'${threadTitle.replace(/'/g,'')}')">✕</button>
+        </div>
+      </div>`).join('')
+  }
+
+  _closeAdminReplies() {
+    const wrap = document.getElementById('an-admin-replies-wrap')
+    if (wrap) wrap.style.display = 'none'
+  }
+
+  async adminDeleteReply(replyId, threadId, threadTitle) {
+    if (!this.isAdmin() || !confirm('Supprimer cette réponse ?')) return
+    await supabase.from('forum_replies').delete().eq('id', replyId)
+    this._toast('Réponse supprimée', 'ok')
+    this._loadAdminReplies(threadId, threadTitle)
     if (window.loadThreads) window.loadThreads()
   }
 
@@ -1188,6 +1238,7 @@ class AN {
           <div class="an-admin-row-sub">${u.rank} · ${u.points} pts</div>
         </div>
         <div class="an-admin-acts">
+          ${!isMe && u.role !== 'admin' ? `<button class="an-micro-btn blue" onclick="AN.adminMakeAdmin('${u.id}','${u.display_name||u.username}')">Admin</button>` : ''}
           ${!isMe ? (isBanned
             ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
             : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
@@ -1210,6 +1261,15 @@ class AN {
     if (!this.isAdmin()) return
     await supabase.from('bans').delete().eq('user_id', userId)
     this._toast('Utilisateur débanni', 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminMakeAdmin(userId, username) {
+    if (!this.isAdmin()) return
+    if (!confirm(`Rendre ${username} administrateur ? Cette action est irréversible depuis l'interface.`)) return
+    const { error } = await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId)
+    if (error) { this._toast(error.message, 'err'); return }
+    this._toast(`${username} est maintenant admin ✓`, 'ok')
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
