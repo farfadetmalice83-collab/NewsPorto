@@ -756,6 +756,8 @@ class AN {
 
   _onLogout() {
     this.u = null; this.p = null
+    if (this._notifPollInterval) { clearInterval(this._notifPollInterval); this._notifPollInterval = null }
+    if (this._notifChannel) { try { supabase.removeChannel(this._notifChannel) } catch {} this._notifChannel = null }
     document.getElementById('an-signin-btn').style.display = ''
     document.getElementById('an-trigger-btn').style.display = 'none'
     stopPresence()
@@ -1086,7 +1088,10 @@ class AN {
   }
 
   _subscribeNotifs() {
-    supabase.channel('notifs-' + this.u.id)
+    // Remove existing channel if any
+    if (this._notifChannel) { try { supabase.removeChannel(this._notifChannel) } catch {} }
+
+    this._notifChannel = supabase.channel('notifs-' + this.u.id)
       .on('postgres_changes', { event:'INSERT', schema:'public', table:'notifications', filter:`user_id=eq.${this.u.id}` }, (payload) => {
         this._checkNotifs()
         const n = payload.new
@@ -1106,7 +1111,19 @@ class AN {
         }
         this._toast(msgs[n.type] || '🔔 Notification', n.type?.includes('won')||n.type?.includes('badge')||n.type?.includes('rank') ? 'ok' : '')
         if (document.getElementById('an-sec-notifs')?.classList.contains('active')) this._loadNotifs()
-      }).subscribe()
+      })
+      .subscribe((status, err) => {
+        // Auto-reconnect si le channel tombe
+        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+          setTimeout(() => { if (this.u) this._subscribeNotifs() }, 3000)
+        }
+      })
+
+    // Polling fallback toutes les 30s pour ne rien rater
+    if (this._notifPollInterval) clearInterval(this._notifPollInterval)
+    this._notifPollInterval = setInterval(() => {
+      if (this.u) this._checkNotifs()
+    }, 30000)
   }
 
   _subscribePoints() {
