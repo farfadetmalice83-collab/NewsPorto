@@ -157,6 +157,9 @@ export async function addPoints(userId, amount, reason, refId = null) {
   return { newPoints, newRank }
 }
 
+// Expose on window so non-module scripts can share the same instance
+window._supabase = supabase
+
 /** Récupère l'historique des points d'un user */
 export async function getPointsLog(userId, limit = 20) {
   const { data, error } = await supabase
@@ -410,8 +413,97 @@ export async function getBetsLeaderboard(limit = 10) {
   return data
 }
 
-// Expose on window so non-module scripts can share the same instance
-window._supabase = supabase
+// ─────────────────────────────────────────────────────────────────────────────
+// XP & NIVEAUX
+// ─────────────────────────────────────────────────────────────────────────────
+
+// XP requis pour passer au niveau N : 100 * 1.4^(N-1) arrondi
+// Nv1→2: 100xp, Nv2→3: 140, Nv3→4: 196, Nv4→5: 274, Nv5→6: 384...
+export function xpForLevel(level) {
+  return Math.round(100 * Math.pow(1.4, level - 1))
+}
+
+// XP total cumulé pour atteindre un niveau
+export function totalXpForLevel(level) {
+  let total = 0
+  for (let i = 1; i < level; i++) total += xpForLevel(i)
+  return total
+}
+
+// Calcule le niveau depuis le XP total
+export function computeLevel(totalXp) {
+  let level = 1
+  let needed = 0
+  while (needed + xpForLevel(level) <= totalXp) {
+    needed += xpForLevel(level)
+    level++
+  }
+  return { level, currentXp: totalXp - needed, neededXp: xpForLevel(level) }
+}
+
+// XP gagné par action
+export const XP_REWARDS = {
+  forum_thread:  15,
+  forum_reply:   8,
+  best_answer:   25,
+  bet_win:       20,
+  daily_streak:  10,
+  like_received: 3,
+  welcome:       50,
+}
+
+export async function addXp(userId, amount, reason) {
+  const { data: profile } = await supabase.from('profiles').select('xp, level, points').eq('id', userId).single()
+  if (!profile) return
+  const newXp = (profile.xp || 0) + amount
+  const { level: newLevel, currentXp, neededXp } = computeLevel(newXp)
+  const prevLevel = profile.level || 1
+  const leveledUp = newLevel > prevLevel
+  // Bonus pts au level up
+  const bonusPts = leveledUp ? newLevel * 10 : 0
+  await supabase.from('profiles').update({
+    xp: newXp,
+    level: newLevel,
+    ...(bonusPts ? { points: (profile.points || 0) + bonusPts } : {})
+  }).eq('id', userId)
+  if (leveledUp) {
+    await supabase.from('notifications').insert({ user_id: userId, type: 'level_up', ref_label: `Niveau ${newLevel} · +${bonusPts} pts` })
+    await supabase.from('points_log').insert({ user_id: userId, amount: bonusPts, reason: 'level_up', ref_id: String(newLevel) })
+  }
+  return { newXp, newLevel, currentXp, neededXp, leveledUp, bonusPts }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WEEKLY POINTS
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function addWeeklyPoints(userId, amount) {
+  const { data: profile } = await supabase.from('profiles').select('weekly_pts, weekly_reset_at').eq('id', userId).single()
+  if (!profile) return
+  // Reset si nouveau lundi
+  const now = new Date()
+  const dayOfWeek = now.getDay() // 0=dim, 1=lun...
+  const lastMonday = new Date(now)
+  lastMonday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1))
+  lastMonday.setHours(0,0,0,0)
+  const lastReset = profile.weekly_reset_at ? new Date(profile.weekly_reset_at) : null
+  const needsReset = !lastReset || lastReset < lastMonday
+  const newWeeklyPts = (needsReset ? 0 : (profile.weekly_pts || 0)) + amount
+  await supabase.from('profiles').update({
+    weekly_pts: newWeeklyPts,
+    ...(needsReset ? { weekly_reset_at: lastMonday.toISOString().slice(0,10) } : {})
+  }).eq('id', userId)
+}
+
+export async function getWeeklyLeaderboard(limit = 10) {
+  const { data } = await supabase.from('profiles')
+    .select('id, username, display_name, avatar_url, rank, level, weekly_pts, points')
+    .order('weekly_pts', { ascending: false })
+    .limit(limit)
+  return data || []
+}
+
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // VOTES THREADS (Reddit-style)
