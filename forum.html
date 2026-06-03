@@ -1202,9 +1202,9 @@ function lbMiniRow(u, i, pts, field) {
 }
 
 // Online users via presence
-supabase.channel('forum-online')
+const _forumPresenceCh = supabase.channel('forum-online')
   .on('presence', { event: 'sync' }, function() {
-    const state = this.presenceState()
+    const state = _forumPresenceCh.presenceState()
     const users = Object.values(state).flat()
     const count = users.length
     const el = document.getElementById('rs-online-list')
@@ -1220,7 +1220,18 @@ supabase.channel('forum-online')
         <span class="online-user-name">${u.username||'?'}</span>
       </div>`).join('')
   })
-  .subscribe()
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      const sess = await supabase.auth.getSession()
+      const uid = sess?.data?.session?.user?.id
+      if (!uid) return
+      const { data: prof } = await supabase.from('profiles').select('username,display_name').eq('id', uid).single()
+      await _forumPresenceCh.track({
+        username: prof?.display_name || prof?.username || 'Anonyme',
+        user_id: uid
+      })
+    }
+  })
 
 loadRightSidebar()
 // Refresh leaderboard toutes les 2 min
