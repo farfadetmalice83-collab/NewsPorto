@@ -760,9 +760,19 @@ class AN {
     try {
       const { data, error } = await supabase.auth.signUp({ email, password: pwd })
       if (error) throw error
+      // Check invite code in URL (?ref=CODE)
+      const refCode = new URLSearchParams(window.location.search).get('ref')
       // Insert profile
       await supabase.from('profiles').insert({ id: data.user.id, username, display_name: username, newsletter: nl, points: 500, rank: 'Dragão' })
       await supabase.from('points_log').insert({ user_id: data.user.id, amount: 500, reason: 'welcome' })
+      // Credit inviter
+      if (refCode) {
+        const { data: inviter } = await supabase.from('profiles').select('id, invite_count').eq('invite_code', refCode).single()
+        if (inviter) {
+          await supabase.from('profiles').update({ invite_count: (inviter.invite_count||0) + 1 }).eq('id', inviter.id)
+          await supabase.from('notifications').insert({ user_id: inviter.id, type:'friend_request', from_user_id: data.user.id, ref_label: username + ' a rejoint via ton lien !' })
+        }
+      }
       if (nl) {
         try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email }) }) } catch {}
         localStorage.setItem('np_email_subscribed', '1')
