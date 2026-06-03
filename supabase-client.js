@@ -412,3 +412,49 @@ export async function getBetsLeaderboard(limit = 10) {
 
 // Expose on window so non-module scripts can share the same instance
 window._supabase = supabase
+
+// ─────────────────────────────────────────────────────────────────────────────
+// VOTES THREADS (Reddit-style)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function voteThread(threadId, userId, vote) {
+  const { data: existing } = await supabase
+    .from('thread_votes')
+    .select('id, vote')
+    .eq('thread_id', threadId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  let delta = 0
+
+  if (existing) {
+    if (existing.vote === vote) {
+      await supabase.from('thread_votes').delete().eq('id', existing.id)
+      delta = -vote
+      vote = 0
+    } else {
+      await supabase.from('thread_votes').update({ vote }).eq('id', existing.id)
+      delta = vote * 2
+    }
+  } else {
+    await supabase.from('thread_votes').insert({ thread_id: threadId, user_id: userId, vote })
+    delta = vote
+  }
+
+  const { data: thread } = await supabase.from('forum_threads').select('votes').eq('id', threadId).single()
+  const newVotes = (thread?.votes || 0) + delta
+  await supabase.from('forum_threads').update({ votes: newVotes }).eq('id', threadId)
+  return { newVotes, userVote: vote }
+}
+
+export async function getUserVotes(userId, threadIds) {
+  if (!threadIds.length) return {}
+  const { data } = await supabase
+    .from('thread_votes')
+    .select('thread_id, vote')
+    .eq('user_id', userId)
+    .in('thread_id', threadIds)
+  const map = {}
+  ;(data || []).forEach(v => { map[v.thread_id] = v.vote })
+  return map
+}
