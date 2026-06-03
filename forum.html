@@ -66,7 +66,7 @@
 
     /* THREAD LIST */
     .thread-list{border-bottom:1px solid var(--border);}
-    .thread-row{display:grid;grid-template-columns:1fr auto;gap:16px;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;}
+    .thread-row{display:flex;align-items:flex-start;gap:12px;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;}
     .thread-row:last-child{border-bottom:none;}
     .thread-row:hover{background:rgba(0,61,165,0.04);}
     .thread-row.pinned{background:rgba(0,61,165,0.03);border-left:2px solid rgba(0,61,165,0.4);}
@@ -167,180 +167,117 @@
     /* RESPONSIVE */
     @media(max-width:1024px){.forum-layout{grid-template-columns:180px 1fr;}nav{padding:0 24px;}.page-header{padding:40px 24px 28px;}}
 
-    /* ── MOBILE FIRST ── */
+    /* ── MOBILE ── */
     @media(max-width:768px){
-
-      /* ─ Nav ─ */
-      nav{padding:0 16px;height:56px;}
+      /* Nav */
+      nav{padding:0 16px;height:58px;}
       .nav-links,.nav-cta{display:none;}
       .nav-hamburger{display:flex;}
-      .nav-logo img{height:34px;}
-      .nav-logo-text{font-size:17px;}
+      .nav-logo img{height:36px;}
+      .nav-logo-text{font-size:18px;}
 
-      /* ─ Header ultra compact ─ */
-      .page-header{
-        padding:12px 16px 12px;
-        flex-direction:row;align-items:center;justify-content:space-between;gap:10px;
-        border-bottom:1px solid var(--border);
-      }
+      /* Page header — compact avec FAB */
+      .page-header{flex-direction:row;align-items:center;justify-content:space-between;padding:16px 16px 14px;gap:12px;}
+      .page-title{font-size:clamp(36px,10vw,56px);}
       .page-eyebrow{display:none;}
-      .page-title{font-size:28px;letter-spacing:1px;line-height:1;}
-      .page-title .outline{-webkit-text-stroke:1px #fff;}
-      .btn-new-thread{
-        display:flex;align-items:center;gap:6px;
-        padding:10px 14px;font-size:11px;letter-spacing:1px;
-        border-radius:4px;flex-shrink:0;
-      }
+      .btn-new-thread{padding:10px 16px;font-size:11px;letter-spacing:1.5px;white-space:nowrap;flex-shrink:0;}
 
-      /* ─ Layout ─ */
-      .forum-layout{grid-template-columns:1fr;border-top:none;}
+      /* Layout: sidebar cachée */
+      .forum-layout{grid-template-columns:1fr;}
       .forum-sidebar{display:none;}
 
-      /* ─ Barre filtre sticky tout-en-un ─ */
-      .filter-bar{
-        position:sticky;top:56px;z-index:50;
-        background:rgba(0,0,0,0.97);backdrop-filter:blur(16px);
-        padding:0;flex-direction:column;align-items:stretch;gap:0;
-        border-bottom:1px solid rgba(255,255,255,0.08);
-      }
-      /* Recherche en premier, pleine largeur */
-      .filter-bar .forum-search{
-        order:-1;margin:10px 16px 0;width:calc(100% - 32px);
-        font-size:16px;padding:10px 14px;border-radius:2px;
-      }
-      .filter-tabs{
-        order:0;overflow-x:auto;-webkit-overflow-scrolling:touch;
-        scrollbar-width:none;padding:0 12px;gap:0;
-        border-top:1px solid rgba(255,255,255,0.05);
-      }
+      /* Sticky filter bar */
+      .filter-bar{position:sticky;top:58px;z-index:50;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);padding:0;flex-direction:column;align-items:stretch;gap:0;border-bottom:1px solid var(--border);}
+      .filter-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);}
       .filter-tabs::-webkit-scrollbar{display:none;}
-      .filter-tab{flex-shrink:0;padding:9px 12px;font-size:9px;letter-spacing:1.5px;}
+      .filter-tab{flex-shrink:0;padding:11px 14px;font-size:10px;}
 
-      /* ─ Catégories pills scrollables ─ */
-      .mobile-cat-strip{
-        display:flex !important;overflow-x:auto;-webkit-overflow-scrolling:touch;
-        scrollbar-width:none;padding:8px 16px 10px;gap:6px;
-        border-bottom:1px solid rgba(255,255,255,0.07);
-        background:rgba(0,0,0,0.97);
-      }
+      /* Barre de recherche pleine largeur */
+      .forum-search{margin:8px 16px 10px;width:calc(100% - 32px);font-size:16px;padding:10px 14px;}
+
+      /* Category strip */
+      .mobile-cat-strip{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 16px 10px;gap:8px;border-bottom:1px solid var(--border);}
       .mobile-cat-strip::-webkit-scrollbar{display:none;}
-      .mobile-cat-pill{
-        flex-shrink:0;font-family:'Barlow Condensed',sans-serif;
-        font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-        padding:7px 14px;border:1px solid rgba(255,255,255,0.12);
-        color:rgba(255,255,255,0.45);cursor:pointer;background:rgba(255,255,255,0.03);
-        transition:all .15s;white-space:nowrap;border-radius:20px;
-      }
-      .mobile-cat-pill.active{
-        border-color:var(--blue);color:#fff;
-        background:rgba(0,61,165,0.2);
-      }
+      .mobile-cat-pill{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);cursor:pointer;background:none;transition:.2s;white-space:nowrap;border-radius:2px;}
+      .mobile-cat-pill.active{border-color:var(--blue);color:#fff;background:rgba(0,61,165,0.15);}
 
-      /* ─ Thread list — vraies cartes touch ─ */
-      .thread-list{border:none;}
-      .thread-row{
-        display:flex;flex-direction:column;gap:8px;
-        padding:14px 16px;
-        border-bottom:1px solid rgba(255,255,255,0.06);
-        border-left:none;border-right:none;
-        -webkit-tap-highlight-color:rgba(0,61,165,0.1);
-      }
-      .thread-row:active{background:rgba(0,61,165,0.07);}
-      /* Stats en ligne sous le titre */
-      .thread-stats{
-        flex-direction:row;align-items:center;gap:12px;
-        justify-content:flex-start;margin-top:2px;
-      }
-      .thread-replies{font-size:14px;color:rgba(255,255,255,0.35);}
-      .thread-replies-label{font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.25);}
-      .thread-title{font-size:15px;line-height:1.35;margin-bottom:4px;}
-      .thread-top{margin-bottom:4px;gap:6px;}
-      .thread-meta{font-size:10px;gap:5px;flex-wrap:wrap;}
+      /* Thread list — cards plus aérées */
+      .thread-row{padding:14px 16px;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+      .thread-row:active{background:rgba(0,61,165,0.06);}
+      .thread-title{font-size:14px;line-height:1.4;}
+      .thread-meta{font-size:9px;flex-wrap:wrap;gap:5px;}
+      .thread-replies{font-size:20px;}
+      .thread-replies-label{font-size:8px;}
 
-      /* ─ Thread view — plein écran natif ─ */
-      .thread-view-header{padding:14px 16px 12px;}
-      .thread-view-title{font-size:22px;line-height:1.15;}
-      .thread-view-meta{font-size:11px;}
-      .back-btn{
-        font-size:11px;padding:6px 0;margin-bottom:10px;
-        gap:6px;color:var(--blue-light);
-      }
-      .back-btn:hover{color:#fff;}
-      .replies-list{padding:0 16px 80px;/* espace pour la reply form sticky */}
-      .reply-item{
-        padding:14px 0;
-        grid-template-columns:34px 1fr;gap:10px;
-        border-bottom:1px solid rgba(255,255,255,0.05);
-      }
-      .reply-av{width:34px;height:34px;font-size:14px;border-width:1px;}
+      /* Thread view — full screen natif */
+      .thread-view-header{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+      .thread-view-title{font-size:20px;line-height:1.2;}
+      .back-btn{font-size:10px;padding:6px 0;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+      .replies-list{padding:0 16px;}
+      .reply-item{padding:14px 0;grid-template-columns:32px 1fr;gap:10px;}
+      .reply-av{width:32px;height:32px;font-size:13px;}
       .reply-body{font-size:14px;line-height:1.65;}
-      .reply-header{gap:6px;margin-bottom:5px;flex-wrap:wrap;}
+      .reply-header{gap:6px;margin-bottom:6px;}
       .reply-author{font-size:12px;}
-      .reply-date{font-size:9px;}
       .reply-actions{flex-wrap:wrap;gap:6px;margin-top:8px;}
-      .reply-action-btn{padding:6px 12px;font-size:10px;border-radius:2px;min-height:32px;}
+      .reply-action-btn{padding:5px 10px;font-size:9px;}
 
-      /* ─ Reply form sticky bottom ─ */
-      .reply-form{
-        position:fixed;bottom:0;left:0;right:0;z-index:60;
-        background:rgba(3,6,12,0.98);backdrop-filter:blur(20px);
-        border-top:1px solid rgba(0,61,165,0.25);
-        padding:10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-      }
-      .reply-form-label{display:none;}
-      .reply-textarea{
-        min-height:44px;max-height:120px;font-size:16px;
-        padding:10px 12px;resize:none;border-radius:22px;
-        background:rgba(255,255,255,0.06);
-      }
-      .reply-form-footer{
-        flex-direction:row;gap:8px;align-items:center;
-        justify-content:space-between;margin-top:8px;
-      }
-      .reply-pts-hint{font-size:9px;letter-spacing:1px;}
-      .btn-reply{
-        padding:10px 18px;font-size:11px;letter-spacing:1.5px;
-        white-space:nowrap;border-radius:4px;min-height:38px;
-      }
+      /* Reply form — collante en bas */
+      .reply-form{position:sticky;bottom:0;z-index:40;background:rgba(4,7,13,0.97);backdrop-filter:blur(12px);border-top:1px solid rgba(0,61,165,0.3);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));}
+      .reply-textarea{min-height:72px;font-size:16px;padding:10px 12px;}
+      .reply-form-footer{flex-direction:row;gap:10px;align-items:center;justify-content:space-between;margin-top:8px;}
+      .reply-pts-hint{font-size:9px;}
+      .btn-reply{padding:10px 20px;font-size:11px;white-space:nowrap;}
 
-      /* ─ Modal nouveau thread — drawer bottom ─ */
+      /* New thread modal — slide from bottom */
       #new-thread-modal{align-items:flex-end;padding:0;}
-      .new-thread-box{
-        border-radius:16px 16px 0 0;max-height:94vh;overflow-y:auto;
-        padding:20px 20px calc(20px + env(safe-area-inset-bottom,0px));
-        width:100%;border-left:none;border-right:none;border-bottom:none;
-      }
-      .new-thread-box::before{
-        content:'';display:block;width:36px;height:4px;
-        background:rgba(255,255,255,0.15);border-radius:2px;
-        margin:0 auto 20px;
-      }
-      .nt-title{font-size:26px;margin-bottom:18px;}
-      .nt-input,.nt-textarea,.nt-select{font-size:16px;padding:12px 14px;border-radius:2px;}
+      .new-thread-box{border-radius:0;max-height:94vh;overflow-y:auto;padding:20px 16px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));width:100%;}
+      .nt-title{font-size:28px;margin-bottom:18px;}
+      .nt-input,.nt-textarea,.nt-select{font-size:16px;padding:12px 14px;}
       .nt-textarea{min-height:100px;}
-      .nt-submit{padding:16px;font-size:13px;border-radius:4px;min-height:50px;}
+      .nt-submit{padding:16px;font-size:13px;}
 
-      /* ─ Map ─ */
-      #leaflet-map{height:240px;}
+      /* Carte communauté mondiale */
+      #leaflet-map{height:260px;}
 
-      /* ─ Footer ─ */
-      footer{flex-direction:column;gap:12px;padding:20px 16px;align-items:flex-start;}
-      .footer-links{flex-wrap:wrap;gap:10px;}
+      /* Footer */
+      footer{flex-direction:column;gap:14px;padding:24px 16px;align-items:flex-start;}
+      .footer-links{flex-wrap:wrap;gap:12px;}
     }
 
-    @supports(padding-bottom:env(safe-area-inset-bottom)){
-      .reply-form{padding-bottom:calc(10px + env(safe-area-inset-bottom));}
+    /* ── BOTTOM SAFE AREA (iPhone notch) ── */
+    @supports(padding-bottom: env(safe-area-inset-bottom)){
+      .reply-form{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
     }
 
     @media(max-width:380px){
-      .thread-title{font-size:14px;}
-      .mobile-cat-pill{font-size:10px;padding:6px 11px;}
-      .page-title{font-size:24px;}
+      .thread-row{padding:12px 14px;}
+      .page-title{font-size:36px;}
+      .mobile-cat-pill{font-size:9px;padding:6px 10px;}
     }
 
     .empty-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
     .loading-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.15);animation:blink 1.5s ease-in-out infinite;}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* ── VOTES ── */
+    .vote-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;padding:2px 0;}
+    .vote-btn{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:3px;transition:background .15s;line-height:1;display:flex;align-items:center;justify-content:center;}
+    .vote-btn:hover{background:rgba(255,255,255,0.08);}
+    .vote-btn svg{width:14px;height:14px;stroke:rgba(255,255,255,0.3);fill:none;stroke-width:2;transition:stroke .15s;}
+    .vote-btn.up.active svg{stroke:#00c87a;}
+    .vote-btn.down.active svg{stroke:#e74c3c;}
+    .vote-btn.up:hover svg{stroke:#00c87a;}
+    .vote-btn.down:hover svg{stroke:#e74c3c;}
+    .vote-score{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:rgba(255,255,255,0.4);min-width:24px;text-align:center;transition:color .15s;}
+    .vote-score.positive{color:#00c87a;}
+    .vote-score.negative{color:#e74c3c;}
+
+    @media(max-width:768px){
+      .vote-btn{padding:6px 8px;min-height:32px;min-width:32px;}
+      .vote-btn svg{width:16px;height:16px;}
+      .vote-score{font-size:14px;}
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
@@ -401,8 +338,9 @@
       <div id="thread-list-view">
         <div class="filter-bar">
           <div class="filter-tabs">
-            <button class="filter-tab active" onclick="sortThreads('recent',this)">Récents</button>
-            <button class="filter-tab" onclick="sortThreads('popular',this)">Populaires</button>
+            <button class="filter-tab active" data-sort="recent" onclick="sortThreads('recent',this)">Récents</button>
+            <button class="filter-tab" data-sort="popular" onclick="sortThreads('popular',this)">Populaires</button>
+            <button class="filter-tab" data-sort="top" onclick="sortThreads('top',this)">Top votes</button>
           </div>
           <input class="forum-search" type="text" placeholder="Rechercher un thread..." id="forum-search" oninput="searchThreads(this.value)">
         </div>
@@ -492,6 +430,7 @@
 <script type="module" src="auth-nav.js"></script>
 <script type="module">
 import { supabase } from './supabase-client.js'
+import { voteThread, getUserVotes } from './supabase-client.js'
 
 // ── STATE ──
 let currentUser = null
@@ -501,6 +440,7 @@ let currentThread = null
 let currentCat = 'all'
 let currentSort = 'recent'
 let realtimeChannel = null
+let userVotesMap = {} // threadId → 1 | -1 | 0
 
 const RANK_COLORS = { Adepto:'rgba(255,255,255,0.5)', Dragão:'#4d82d4', Ultras:'#f0a500', Lenda:'#e74c3c', Invicta:'#c9a84c' }
 const RANK_EMOJI = { Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴', Invicta:'💎' }
@@ -521,6 +461,10 @@ window.addEventListener('an:login', (e) => {
   currentUser = e.detail.user
   currentProfile = e.detail.profile
   updateReplyForm()
+  // Charger les votes de l'user
+  if (allThreads.length) {
+    getUserVotes(currentUser.id, allThreads.map(t => t.id)).then(v => { userVotesMap = v; renderThreadList() })
+  }
 })
 window.addEventListener('an:logout', () => {
   currentUser = null; currentProfile = null; updateReplyForm()
@@ -542,11 +486,15 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 async function loadThreads() {
   const { data, error } = await supabase
     .from('forum_threads')
-    .select(`id, title, content, category, reply_count, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
+    .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank)`)
     .order('created_at', { ascending: false })
     .limit(50)
   if (error) { document.getElementById('thread-list').innerHTML = '<div class="empty-state">Erreur de chargement</div>'; return }
   allThreads = data || []
+  // Charger les votes de l'user connecté
+  if (currentUser && allThreads.length) {
+    userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
+  }
   renderThreadList()
   updateCounts()
   subscribeRealtime()
@@ -559,9 +507,13 @@ function renderThreadList() {
   const q = document.getElementById('forum-search')?.value?.toLowerCase() || ''
   if (q) filtered = filtered.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
   if (currentSort === 'popular') filtered = [...filtered].sort((a,b) => b.reply_count - a.reply_count)
+  if (currentSort === 'top') filtered = [...filtered].sort((a,b) => (b.votes||0) - (a.votes||0))
 
   const list = document.getElementById('thread-list')
   if (!filtered.length) { list.innerHTML = '<div class="empty-state">Aucun thread · Sois le premier !</div>'; return }
+
+  const upSVG = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>`
+  const downSVG = `<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`
 
   list.innerHTML = filtered.map(t => {
     const a = t.author || {}
@@ -570,9 +522,17 @@ function renderThreadList() {
     const emoji = RANK_EMOJI[rank] || '⚪'
     const date = new Date(t.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'})
     const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+    const score = t.votes || 0
+    const uv = userVotesMap[t.id] || 0
+    const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : ''
     return `
     <div class="thread-row" onclick="openThread(${t.id})">
-      <div>
+      <div class="vote-col" onclick="event.stopPropagation()">
+        <button class="vote-btn up${uv===1?' active':''}" onclick="castVote(${t.id},1,this)" title="Upvote">${upSVG}</button>
+        <span class="vote-score ${scoreClass}" id="vs-${t.id}">${score}</span>
+        <button class="vote-btn down${uv===-1?' active':''}" onclick="castVote(${t.id},-1,this)" title="Downvote">${downSVG}</button>
+      </div>
+      <div style="flex:1;min-width:0">
         <div class="thread-top">
           <span class="thread-cat cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
         </div>
@@ -587,7 +547,7 @@ function renderThreadList() {
       <div class="thread-stats" style="display:flex;flex-direction:column;align-items:center;gap:6px">
         <div class="thread-replies">${t.reply_count}</div>
         <div class="thread-replies-label">réponses</div>
-        ${window.AN?.isAdmin?.() ? `<button onclick="event.stopPropagation();AN.adminDeleteThread(${t.id})" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #e74c3c;color:#e74c3c;padding:3px 7px;cursor:pointer;background:none;transition:.2s;" onmouseover="this.style.background='#e74c3c';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#e74c3c'">✕ Suppr.</button>` : ''}
+        ${window.AN?.isAdmin?.() ? `<button onclick="event.stopPropagation();AN.adminDeleteThread(${t.id})" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #e74c3c;color:#e74c3c;padding:3px 7px;cursor:pointer;background:none;transition:.2s;" onmouseover="this.style.background='#e74c3c';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#e74c3c'">✕</button>` : ''}
       </div>
     </div>`
   }).join('')
@@ -784,6 +744,29 @@ window.filterCat = function(cat, btn) {
   document.querySelectorAll(`[data-cat="${cat}"]`).forEach(b => b.classList.add('active'))
   renderThreadList()
 }
+window.castVote = async function(threadId, vote, btn) {
+  if (!currentUser) { AN?.openAuth(); return }
+  try {
+    const { newVotes, userVote } = await voteThread(threadId, currentUser.id, vote)
+    // Mettre à jour le score localement
+    const scoreEl = document.getElementById(`vs-${threadId}`)
+    if (scoreEl) {
+      scoreEl.textContent = newVotes
+      scoreEl.className = 'vote-score' + (newVotes > 0 ? ' positive' : newVotes < 0 ? ' negative' : '')
+    }
+    // Mettre à jour les boutons up/down
+    const row = btn.closest('.thread-row')
+    if (row) {
+      row.querySelector('.vote-btn.up')?.classList.toggle('active', userVote === 1)
+      row.querySelector('.vote-btn.down')?.classList.toggle('active', userVote === -1)
+    }
+    // Mettre à jour le cache local
+    userVotesMap[threadId] = userVote
+    const t = allThreads.find(x => x.id === threadId)
+    if (t) t.votes = newVotes
+  } catch(e) { showToast(e.message, 'error') }
+}
+
 window.sortThreads = function(sort, btn) {
   currentSort = sort
   document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
