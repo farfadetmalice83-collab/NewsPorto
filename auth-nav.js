@@ -431,7 +431,18 @@ function html() { return `
     <div class="an-head-info">
       <div class="an-head-name" id="an-head-name">—</div>
       <div class="an-head-rank" id="an-head-rank"></div>
-      <div class="an-head-pts"  id="an-head-pts">0 pts</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <div class="an-head-pts" id="an-head-pts">0 pts</div>
+        <div id="an-head-level" style="font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4d82d4;background:rgba(0,61,165,0.2);border:1px solid rgba(0,61,165,0.4);padding:1px 6px;letter-spacing:1px">Nv1</div>
+      </div>
+      <div style="margin-top:5px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:2px">
+          <span id="an-xp-label" style="font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3)">0 / 100 XP</span>
+        </div>
+        <div style="height:3px;background:rgba(255,255,255,0.08);border-radius:2px;width:140px">
+          <div id="an-xp-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#003DA5,#4d82d4);border-radius:2px;transition:width .5s ease"></div>
+        </div>
+      </div>
     </div>
     <button class="an-head-close" onclick="AN.closePanel()">✕</button>
   </div>
@@ -667,13 +678,24 @@ class AN {
     const av = document.getElementById('an-avatar-pill')
     if (av) av.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
     const pn = document.getElementById('an-pill-name'); if (pn) pn.textContent = p.display_name || p.username
-    const pp = document.getElementById('an-pill-pts');  if (pp) pp.textContent = p.role === 'admin' ? 'Admin' : `${p.points} pts`
+    const pp = document.getElementById('an-pill-pts');  if (pp) pp.textContent = p.role === 'admin' ? 'Admin' : `${p.points} pts · Nv${p.level||1}`
     // panel header
     const ha = document.getElementById('an-head-av')
     if (ha) ha.innerHTML = p.avatar_url ? `<img src="${p.avatar_url}">` : (p.display_name||p.username||'?')[0].toUpperCase()
     const hn = document.getElementById('an-head-name'); if (hn) hn.textContent = p.display_name || p.username
     const hr = document.getElementById('an-head-rank')
     const hpts = document.getElementById('an-head-pts'); if (hpts) hpts.textContent = `${p.points} pts`
+    // Level + XP bar
+    const lvl = p.level || 1
+    const xp = p.xp || 0
+    const hlvl = document.getElementById('an-head-level'); if (hlvl) hlvl.textContent = `Nv${lvl}`
+    // Compute XP for current level
+    let needed = Math.round(100 * Math.pow(1.4, lvl - 1))
+    let accumulated = 0; for (let i = 1; i < lvl; i++) accumulated += Math.round(100 * Math.pow(1.4, i - 1))
+    const currentXp = xp - accumulated
+    const pct = Math.min(100, Math.round(currentXp / needed * 100))
+    const xpLabel = document.getElementById('an-xp-label'); if (xpLabel) xpLabel.textContent = `${currentXp} / ${needed} XP`
+    const xpBar = document.getElementById('an-xp-bar'); if (xpBar) xpBar.style.width = pct + '%'
     const rk = RANKS.find(r => r.id === p.rank) || RANKS[0]
     if (hr) {
       if (p.role === 'admin') {
@@ -1038,7 +1060,7 @@ class AN {
       .eq('user_id', this.u.id).order('created_at', { ascending: false }).limit(30)
     const el = document.getElementById('an-notif-list'); if (!el) return
     if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucune notification</div>'; return }
-    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️', badge_unlocked:'🎖️', rank_available:'⬆️', prono_won:'🏆', prono_lost:'💸' }
+    const icons = { reply:'💬', like:'❤️', best_answer:'✅', friend_request:'👋', friend_accepted:'🤝', bet_won:'🏆', bet_lost:'💸', mp:'✉️', badge_unlocked:'🎖️', rank_available:'⬆️', prono_won:'🏆', prono_lost:'💸', daily_streak:'🔥', level_up:'⬆️' }
     const label = (n) => {
       const from = n.from_user?.display_name || n.from_user?.username || '?'
       const map = {
@@ -1078,6 +1100,7 @@ class AN {
     else if (type === 'mp') this.tabTo('mp')
     else if (type === 'rank_available') this.tabTo('rangs')
     else if (type === 'badge_unlocked') this.tabTo('badges')
+    else if (type === 'level_up') this.tabTo('profil')
     else if (['prono_won','prono_lost','bet_won','bet_lost'].includes(type)) window.location.href = 'pronostics.html'
   }
 
@@ -1108,6 +1131,8 @@ class AN {
           rank_available: `⬆️ Rang disponible : ${n.ref_label||''}`,
           prono_won: `🏆 Pronostic gagné !`,
           prono_lost: `💸 Pronostic perdu`,
+          daily_streak: `🔥 Streak connexion : ${n.ref_label||''}`,
+          level_up: `⬆️ Niveau supérieur : ${n.ref_label||''}`,
         }
         this._toast(msgs[n.type] || '🔔 Notification', n.type?.includes('won')||n.type?.includes('badge')||n.type?.includes('rank') ? 'ok' : '')
         if (document.getElementById('an-sec-notifs')?.classList.contains('active')) this._loadNotifs()
@@ -1131,7 +1156,8 @@ class AN {
       .on('postgres_changes', { event:'UPDATE', schema:'public', table:'profiles', filter:`id=eq.${this.u.id}` }, async payload => {
         const p = payload.new
         const prevPoints = this.p?.points || 0
-        if (this.p) { this.p.points = p.points; this.p.rank = p.rank }
+        if (this.p) { this.p.points = p.points; this.p.rank = p.rank; this.p.xp = p.xp; this.p.level = p.level }
+        this._updateNav()
         const pp = document.getElementById('an-pill-pts'); if (pp) pp.textContent = `${p.points} pts`
         const hp = document.getElementById('an-head-pts'); if (hp) hp.textContent = `${p.points} pts`
         window.dispatchEvent(new CustomEvent('points-updated', { detail: { points: p.points, rank: p.rank } }))
