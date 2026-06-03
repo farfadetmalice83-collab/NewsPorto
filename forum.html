@@ -145,7 +145,7 @@
     .nt-submit:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;}
 
     /* MOBILE NAV */
-    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.97);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:translateY(-8px);transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
+    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.97);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:translateY(-8px);transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
     .mobile-nav-overlay.open{opacity:1;transform:translateY(0);pointer-events:all;display:flex;}
     .mobile-nav-item{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,12vw,64px);letter-spacing:4px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color .2s,letter-spacing .2s;line-height:1.15;padding:6px 0;}
     .mobile-nav-item:hover,.mobile-nav-item.active{color:#fff;letter-spacing:6px;}
@@ -539,7 +539,7 @@ function renderThreadList() {
         <div class="thread-title">${t.title}</div>
         <div class="thread-meta">
           <span class="thread-author-av">${avHTML}</span>
-          <span>${a.display_name||a.username||'Anonyme'}</span>
+          <span class="an-clickable-user" onclick="event.stopPropagation();AN?.openProfileCard('${a.id}',this)" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='#4d82d4'" onmouseout="this.style.color=''">${a.display_name||a.username||'Anonyme'}</span>
           <span class="thread-rank-badge" style="color:${color};border-color:${color}">${emoji} ${rank}</span>
           <span>·</span><span>${date}</span>
         </div>
@@ -606,7 +606,7 @@ window.openThread = async function(threadId) {
       <div>
         ${isBest?'<div class="best-label">✅ Meilleure réponse</div>':''}
         <div class="reply-header">
-          <span class="reply-author">${ra.display_name||ra.username||'?'}</span>
+          <span class="reply-author" style="cursor:pointer" onclick="AN?.openProfileCard('${ra.id}',this)">${ra.display_name||ra.username||'?'}</span>
           <span class="thread-rank-badge" style="color:${rcolor};border-color:${rcolor}">${remoji} ${rrank}</span>
           <span class="reply-date">${rdate}</span>
           ${r.is_original?'<span class="thread-new-badge">OP</span>':''}
