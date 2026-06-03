@@ -510,7 +510,7 @@
 <script type="module" src="supabase-client.js"></script>
 <script type="module" src="auth-nav.js"></script>
 <script type="module">
-import { supabase } from './supabase-client.js'
+import { supabase, addXp, addWeeklyPoints, XP_REWARDS } from './supabase-client.js'
 import { voteThread, getUserVotes } from './supabase-client.js'
 
 // ── STATE ──
@@ -751,6 +751,8 @@ window.submitReply = async function() {
       const newPts = (currentProfile.points || 0) + 3
       await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
       await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 3, reason: 'forum_reply', ref_id: String(currentThread.id) })
+      addXp(currentUser.id, XP_REWARDS.forum_reply, 'forum_reply')
+      addWeeklyPoints(currentUser.id, 3)
       // Notif au créateur du thread
       if (currentThread.author_id !== currentUser.id) {
         const title = currentThread.title.substring(0,60)
@@ -790,6 +792,8 @@ window.markBest = async function(replyId) {
     const { data: rp } = await supabase.from('profiles').select('points').eq('id', reply.author_id).single()
     await supabase.from('profiles').update({ points: (rp.points||0) + 10 }).eq('id', reply.author_id)
     await supabase.from('points_log').insert({ user_id: reply.author_id, amount: 10, reason: 'best_answer', ref_id: String(currentThread.id) })
+    addXp(reply.author_id, XP_REWARDS.best_answer, 'best_answer')
+    addWeeklyPoints(reply.author_id, 10)
     showToast('Meilleure réponse marquée ! +10 pts offerts', 'success')
     await openThread(currentThread.id)
   } catch(e) { showToast(e.message, 'error') }
@@ -821,6 +825,8 @@ window.submitThread = async function() {
     const newPts = (currentProfile.points || 0) + 5
     await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
     await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 5, reason: 'forum_thread', ref_id: null })
+    addXp(currentUser.id, XP_REWARDS.forum_thread, 'forum_thread')
+    addWeeklyPoints(currentUser.id, 5)
     document.getElementById('nt-title').value = ''
     document.getElementById('nt-content').value = ''
     closeNewThread()
