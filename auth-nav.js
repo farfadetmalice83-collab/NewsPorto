@@ -522,6 +522,7 @@ function html() { return `
         <button class="an-admin-sub-tab active" onclick="AN.adminSubTab('forum',this)">Forum</button>
         <button class="an-admin-sub-tab" onclick="AN.adminSubTab('users',this)">Users</button>
         <button class="an-admin-sub-tab" onclick="AN.adminSubTab('bets',this)">Paris</button>
+        <button class="an-admin-sub-tab" onclick="AN.adminSubTab('matches',this)">Matchs</button>
       </div>
 
       <!-- FORUM -->
@@ -565,6 +566,56 @@ function html() { return `
           <label class="an-label">Ferme le (optionnel)</label>
           <input class="an-input" type="datetime-local" id="an-cb-closes">
           <button class="an-btn" style="width:100%;margin-top:12px" onclick="AN.createCustomBet()">Lancer le pari →</button>
+        </div>
+      </div>
+
+      <!-- MATCHS CUSTOM -->
+      <div class="an-admin-sub-content" id="an-admin-matches">
+        <div class="an-row-label">Matchs actifs</div>
+        <div id="an-admin-matches-list"><div class="an-empty">Chargement...</div></div>
+        <div class="an-row-label" style="margin-top:8px">Créer un match</div>
+        <div class="an-admin-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <label class="an-label">Équipe domicile</label>
+              <input class="an-input" type="text" id="an-m-home" placeholder="FC Porto">
+            </div>
+            <div>
+              <label class="an-label">Équipe extérieur</label>
+              <input class="an-input" type="text" id="an-m-away" placeholder="Benfica">
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+            <div>
+              <label class="an-label">Logo domicile</label>
+              <input class="an-input" type="file" accept="image/*" id="an-m-home-img" style="padding:5px">
+            </div>
+            <div>
+              <label class="an-label">Logo extérieur</label>
+              <input class="an-input" type="file" accept="image/*" id="an-m-away-img" style="padding:5px">
+            </div>
+          </div>
+          <label class="an-label" style="margin-top:8px">Compétition</label>
+          <input class="an-input" type="text" id="an-m-competition" placeholder="Liga Portugal" value="Liga Portugal">
+          <label class="an-label">Kick-off (date/heure)</label>
+          <input class="an-input" type="datetime-local" id="an-m-kickoff">
+          <label class="an-label">Fermeture des mises</label>
+          <input class="an-input" type="datetime-local" id="an-m-closes">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:8px">
+            <div>
+              <label class="an-label">Cote Victoire</label>
+              <input class="an-input" type="number" id="an-m-odds-win" value="1.8" step="0.1" min="1.1">
+            </div>
+            <div>
+              <label class="an-label">Cote Nul</label>
+              <input class="an-input" type="number" id="an-m-odds-draw" value="3.5" step="0.1" min="1.1">
+            </div>
+            <div>
+              <label class="an-label">Cote Défaite</label>
+              <input class="an-input" type="number" id="an-m-odds-lose" value="4.5" step="0.1" min="1.1">
+            </div>
+          </div>
+          <button class="an-btn" style="width:100%;margin-top:12px" onclick="AN.createCustomMatch()">Créer le match →</button>
         </div>
       </div>
     </div>
@@ -1390,6 +1441,7 @@ class AN {
     if (tab === 'forum') this._loadAdminForum()
     if (tab === 'bets') this._loadAdminBets()
     if (tab === 'users') this._loadAdminUsers()
+    if (tab === 'matches') this._loadAdminMatches()
   }
 
   async _loadAdminForum() {
@@ -1413,11 +1465,195 @@ class AN {
 
   async adminDeleteThread(id) {
     if (!this.isAdmin() || !confirm('Supprimer ce thread ?')) return
+    await supabase.from('forum_replies').delete().eq('thread_id', id)
     await supabase.from('forum_threads').delete().eq('id', id)
     this._toast('Thread supprimé', 'ok')
     this._loadAdminForum()
-    // Reload forum if on forum page
     if (window.loadThreads) window.loadThreads()
+  }
+
+  async adminDeleteReply(id) {
+    if (!this.isAdmin() || !confirm('Supprimer cette réponse ?')) return
+    await supabase.from('reply_likes').delete().eq('reply_id', id)
+    await supabase.from('forum_replies').delete().eq('id', id)
+    this._toast('Réponse supprimée', 'ok')
+    if (window.loadThread) window.loadThread(window._currentThreadId)
+    else if (window.loadThreads) window.loadThreads()
+  }
+
+  async adminDeleteMsg(id) {
+    if (!this.isAdmin() || !confirm('Supprimer ce message ?')) return
+    await supabase.from('chat_messages').delete().eq('id', id)
+    this._toast('Message supprimé', 'ok')
+  }
+
+  // ── CUSTOM MATCHES ──
+  async _loadAdminMatches() {
+    if (!this.isAdmin()) return
+    const el = document.getElementById('an-admin-matches-list'); if (!el) return
+    const { data } = await supabase.from('custom_matches')
+      .select('*').order('kickoff_at', { ascending: false }).limit(10)
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun match</div>'; return }
+    el.innerHTML = data.map(m => {
+      const isLive = m.status === 'live'
+      const isDone = m.status === 'finished'
+      const scoreStr = (m.score_home != null && m.score_away != null) ? `${m.score_home}-${m.score_away}` : '—'
+      return `<div class="an-admin-row" style="flex-direction:column;align-items:stretch;gap:6px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="an-admin-row-info">
+            <div class="an-admin-row-title">${m.home_team} vs ${m.away_team}</div>
+            <div class="an-admin-row-sub">
+              ${new Date(m.kickoff_at).toLocaleString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})} ·
+              <span style="color:${isLive?'#00c87a':isDone?'rgba(255,255,255,0.3)':'#f0a500'}">${isLive?'🔴 EN COURS':isDone?'Terminé':'À venir'}</span>
+              · Score: <b>${scoreStr}</b>
+            </div>
+          </div>
+          <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px">
+            ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+            ${isLive ? `<button class="an-micro-btn orange" onclick="AN.updateMatchScore(${m.id})">Score</button>
+                        <button class="an-micro-btn" onclick="AN.addMatchEvent(${m.id})">Carton</button>
+                        <button class="an-micro-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>` : ''}
+            ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.5" onclick="AN.deleteCustomMatch(${m.id})">✕</button>` : ''}
+          </div>
+        </div>
+        ${m.events?.length ? `<div style="padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.05)">
+          ${m.events.map(e => `${e.type==='yellow'?'🟡':e.type==='red'?'🔴':'⚽'} ${e.player} ${e.minute ? e.minute+"'" : ''}`).join(' · ')}
+        </div>` : ''}
+      </div>`
+    }).join('')
+  }
+
+  async createCustomMatch() {
+    if (!this.isAdmin()) return
+    const home = document.getElementById('an-m-home')?.value.trim()
+    const away = document.getElementById('an-m-away')?.value.trim()
+    const competition = document.getElementById('an-m-competition')?.value.trim() || 'Liga Portugal'
+    const kickoff = document.getElementById('an-m-kickoff')?.value
+    const closes = document.getElementById('an-m-closes')?.value
+    const oddsWin = parseFloat(document.getElementById('an-m-odds-win')?.value) || 1.8
+    const oddsDraw = parseFloat(document.getElementById('an-m-odds-draw')?.value) || 3.5
+    const oddsLose = parseFloat(document.getElementById('an-m-odds-lose')?.value) || 4.5
+    if (!home || !away) { this._toast('Noms des équipes requis', 'err'); return }
+    if (!kickoff) { this._toast('Date de kick-off requise', 'err'); return }
+
+    let homeUrl = null, awayUrl = null
+    const homeFile = document.getElementById('an-m-home-img')?.files?.[0]
+    const awayFile = document.getElementById('an-m-away-img')?.files?.[0]
+    try {
+      if (homeFile) {
+        const ext = homeFile.name.split('.').pop()
+        const { data: up } = await supabase.storage.from('match-logos').upload(`home_${Date.now()}.${ext}`, homeFile, { upsert: true })
+        if (up) homeUrl = supabase.storage.from('match-logos').getPublicUrl(up.path).data.publicUrl
+      }
+      if (awayFile) {
+        const ext = awayFile.name.split('.').pop()
+        const { data: up } = await supabase.storage.from('match-logos').upload(`away_${Date.now()}.${ext}`, awayFile, { upsert: true })
+        if (up) awayUrl = supabase.storage.from('match-logos').getPublicUrl(up.path).data.publicUrl
+      }
+    } catch(e) { console.warn('Logo upload error:', e) }
+
+    const { error } = await supabase.from('custom_matches').insert({
+      home_team: home, away_team: away, competition,
+      kickoff_at: kickoff, closes_at: closes || kickoff,
+      odds_win: oddsWin, odds_draw: oddsDraw, odds_lose: oddsLose,
+      home_crest: homeUrl, away_crest: awayUrl,
+      status: 'upcoming', score_home: null, score_away: null, events: []
+    })
+    if (error) { this._toast(error.message, 'err'); return }
+    ;['an-m-home','an-m-away','an-m-kickoff','an-m-closes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = '' })
+    document.getElementById('an-m-home-img').value = ''
+    document.getElementById('an-m-away-img').value = ''
+    this._toast('Match créé ✅', 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
+  }
+
+  async startCustomMatch(id) {
+    if (!this.isAdmin()) return
+    await supabase.from('custom_matches').update({ status: 'live', score_home: 0, score_away: 0 }).eq('id', id)
+    this._toast('Match lancé 🔴', 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
+  }
+
+  async updateMatchScore(id) {
+    if (!this.isAdmin()) return
+    const input = prompt('Score (format: 1-0) :')
+    if (!input) return
+    const parts = input.split('-')
+    if (parts.length !== 2) { this._toast('Format invalide, ex: 2-1', 'err'); return }
+    const sh = parseInt(parts[0]), sa = parseInt(parts[1])
+    if (isNaN(sh) || isNaN(sa)) { this._toast('Chiffres invalides', 'err'); return }
+    await supabase.from('custom_matches').update({ score_home: sh, score_away: sa }).eq('id', id)
+    this._toast(`Score mis à jour : ${sh}-${sa}`, 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
+  }
+
+  async addMatchEvent(id) {
+    if (!this.isAdmin()) return
+    const type = prompt('Type d\'événement (yellow / red / goal) :')?.toLowerCase()
+    if (!['yellow','red','goal'].includes(type)) { this._toast('Type invalide', 'err'); return }
+    const player = prompt('Nom du joueur :')?.trim()
+    if (!player) return
+    const minute = prompt('Minute (optionnel) :') || ''
+    const { data: m } = await supabase.from('custom_matches').select('events').eq('id', id).single()
+    const events = [...(m?.events || []), { type, player, minute }]
+    await supabase.from('custom_matches').update({ events }).eq('id', id)
+    this._toast(`${type === 'yellow' ? '🟡' : type === 'red' ? '🔴' : '⚽'} ${player} ajouté`, 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
+  }
+
+  async finishCustomMatch(id) {
+    if (!this.isAdmin() || !confirm('Terminer ce match et distribuer les gains ?')) return
+    const { data: m } = await supabase.from('custom_matches').select('*').eq('id', id).single()
+    if (!m) return
+    // Déterminer résultat
+    let result = null
+    if (m.score_home != null && m.score_away != null) {
+      if (m.score_home > m.score_away) result = 'win'
+      else if (m.score_home < m.score_away) result = 'lose'
+      else result = 'draw'
+    } else {
+      result = prompt('Résultat (win / draw / lose depuis la perspective domicile) :')?.toLowerCase()
+      if (!['win','draw','lose'].includes(result)) { this._toast('Résultat invalide', 'err'); return }
+    }
+    await supabase.from('custom_matches').update({ status: 'finished' }).eq('id', id)
+    // Payer les gagnants
+    const oddsMap = { win: m.odds_win, draw: m.odds_draw, lose: m.odds_lose }
+    const { data: entries } = await supabase.from('bets').select('*').eq('match_id', String(id)).eq('status', 'pending')
+    for (const entry of entries || []) {
+      if (entry.pick === result) {
+        const gain = Math.floor(entry.stake * (oddsMap[result] || entry.multiplier || 2))
+        const { data: prof } = await supabase.from('profiles').select('points').eq('id', entry.user_id).single()
+        const newPts = (prof?.points || 0) + gain
+        await supabase.from('profiles').update({ points: newPts }).eq('id', entry.user_id)
+        await supabase.from('points_log').insert({ user_id: entry.user_id, amount: gain, reason: 'match_win', ref_id: String(id) })
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_won', from_user_id: this.u.id, ref_label: `+${gain} pts` })
+        await supabase.from('bets').update({ status: 'won' }).eq('id', entry.id)
+      } else {
+        await supabase.from('bets').update({ status: 'lost' }).eq('id', entry.id)
+        await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'bet_lost', from_user_id: this.u.id, ref_label: `${entry.stake} pts perdus` })
+      }
+    }
+    this._toast('Match terminé, gains distribués ✅', 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
+  }
+
+  async deleteCustomMatch(id) {
+    if (!this.isAdmin() || !confirm('Supprimer ce match ? (les mises seront remboursées)')) return
+    const { data: entries } = await supabase.from('bets').select('*').eq('match_id', String(id)).eq('status', 'pending')
+    for (const entry of entries || []) {
+      const { data: prof } = await supabase.from('profiles').select('points').eq('id', entry.user_id).single()
+      await supabase.from('profiles').update({ points: (prof?.points||0) + entry.stake }).eq('id', entry.user_id)
+      await supabase.from('bets').update({ status: 'refunded' }).eq('id', entry.id)
+    }
+    await supabase.from('custom_matches').delete().eq('id', id)
+    this._toast('Match supprimé, mises remboursées', 'ok')
+    this._loadAdminMatches()
+    window.dispatchEvent(new CustomEvent('custom-match-updated'))
   }
 
   async _loadAdminUsers(q = '') {
