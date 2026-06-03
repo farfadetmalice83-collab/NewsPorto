@@ -246,6 +246,7 @@
     .loading-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.15);animation:blink 1.5s ease-in-out infinite;}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
 <div class="grid-bg"></div>
@@ -343,6 +344,24 @@
       </div>
     </main>
   </div>
+
+  <!-- COMMUNAUTÉ MONDIALE -->
+  <section style="border-top:1px solid rgba(255,255,255,0.08);padding:48px 48px 64px;max-width:1100px;margin:0 auto;" class="reveal">
+    <p class="section-label" style="margin-bottom:8px;">Communauté mondiale</p>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;" id="pin-count">0</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">Portistas dans le monde</span>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:16px;">Clique sur la carte pour marquer ta position · 1 pin par visiteur</p>
+    <div id="leaflet-map" style="width:100%;height:380px;border:1px solid rgba(255,255,255,0.1);"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#003DA5;"></div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Position d'un lecteur</span>
+      </div>
+      <button onclick="resetMyPin()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.3);padding:6px 14px;cursor:pointer;transition:color .2s,border-color .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.3)';this.style.borderColor='rgba(255,255,255,0.15)'">Effacer mon pin</button>
+    </div>
+  </section>
 
   <footer>
     <div class="footer-logo"><img src="Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
@@ -721,6 +740,103 @@ window.likeReply = async function(replyId, authorId, currentCount) {
     if (currentThread) await openThread(currentThread.id)
   } catch(e) { showToast(e.message, 'error') }
 }
+  // ── MAP LEAFLET + KV ──
+// ── MAP LEAFLET + KV ──
+  const VISITOR_KEY = 'newsporto_visitor_id';
+
+  // Génère un ID unique par visiteur
+  function getVisitorId() {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) {
+      id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+      localStorage.setItem(VISITOR_KEY, id);
+    }
+    return id;
+  }
+
+  let leafletMap = null;
+  let myMarker = null;
+
+  const pinIcon = (isMe = false) => L.divIcon({
+    className: '',
+    html: `<div style="width:${isMe?14:10}px;height:${isMe?14:10}px;border-radius:50%;background:${isMe?'#fff':'rgba(0,61,165,0.9)'};border:2px solid ${isMe?'#003DA5':'rgba(0,100,255,0.5)'};box-shadow:0 0 ${isMe?8:4}px rgba(0,61,165,0.6);"></div>`,
+    iconSize: [isMe?14:10, isMe?14:10], iconAnchor: [isMe?7:5, isMe?7:5]
+  });
+
+  async function loadAndRenderPins() {
+    try {
+      const r = await fetch('/api/pins');
+      const data = await r.json();
+      const pins = data.pins || [];
+      document.getElementById('pin-count').textContent = pins.length;
+
+      const visitorId = getVisitorId();
+      leafletMap.eachLayer(l => { if (l._isPin) leafletMap.removeLayer(l); });
+
+      pins.forEach(pin => {
+        const isMe = pin.visitorId === visitorId;
+        const m = L.marker([pin.lat, pin.lng], { icon: pinIcon(isMe) }).addTo(leafletMap);
+        m._isPin = true;
+        if (isMe) myMarker = m;
+      });
+    } catch(e) { console.error('loadPins error', e); }
+  }
+
+  async function resetMyPin() {
+    const visitorId = getVisitorId();
+    try {
+      await fetch('/api/pins', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorId })
+      });
+      if (myMarker) { leafletMap.removeLayer(myMarker); myMarker = null; }
+      await loadAndRenderPins();
+    } catch(e) {}
+  }
+  window.resetMyPin = resetMyPin;
+
+  function initMap() {
+    leafletMap = L.map('leaflet-map', {
+      center: [20, 0], zoom: 2, minZoom: 1, maxZoom: 6,
+      zoomControl: true, attributionControl: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19
+    }).addTo(leafletMap);
+
+    loadAndRenderPins();
+
+    leafletMap.on('click', async function(e) {
+      const visitorId = getVisitorId();
+      if (myMarker) return; // déjà un pin
+      try {
+        const r = await fetch('/api/pins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            visitorId
+          })
+        });
+        const data = await r.json();
+        if (r.status === 409) return; // déjà existant
+        if (data.ok) {
+          myMarker = L.marker([e.latlng.lat, e.latlng.lng], { icon: pinIcon(true) }).addTo(leafletMap);
+          myMarker._isPin = true;
+          document.getElementById('pin-count').textContent = data.count;
+        }
+      } catch(err) {}
+    });
+  }
+
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  s.onload = initMap;
+  document.head.appendChild(s);
+
 </script>
 
 </body>
