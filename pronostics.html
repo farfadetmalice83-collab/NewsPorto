@@ -443,6 +443,17 @@
       .match-live-chat-header{padding:10px 14px;}
     }
 
+
+    /* BET COUNT BAR */
+    .bet-count-bar{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);}
+    .bet-count-col{flex:1;padding:8px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.05);}
+    .bet-count-col:last-child{border-right:none;}
+    .bet-count-num{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;display:block;}
+    .bet-count-num.win{color:rgba(0,200,122,0.7);}
+    .bet-count-num.draw{color:rgba(240,165,0,0.7);}
+    .bet-count-num.lose{color:rgba(231,76,60,0.7);}
+    .bet-count-lbl{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);display:block;}
+
     .login-wall{border:1px solid var(--border);padding:48px;text-align:center;margin-bottom:2px;}
     .login-wall-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;}
     .login-wall-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:24px;}
@@ -830,6 +841,11 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
         <span class="bet-option-result">2</span>
         <span class="bet-option-mult">×${CUSTOM_ODDS.lose}</span>
       </button>
+    </div>
+    <div class="bet-count-bar" id="bc-${m.id}">
+      <div class="bet-count-col"><span class="bet-count-num win" id="bc-win-${m.id}">—</span><span class="bet-count-lbl">sur 1</span></div>
+      <div class="bet-count-col"><span class="bet-count-num draw" id="bc-draw-${m.id}">—</span><span class="bet-count-lbl">sur X</span></div>
+      <div class="bet-count-col"><span class="bet-count-num lose" id="bc-lose-${m.id}">—</span><span class="bet-count-lbl">sur 2</span></div>
     </div>
     <div class="bet-stake">
       <div class="stake-input-wrap">
@@ -1414,6 +1430,27 @@ document.getElementById('confirm-modal').addEventListener('click', e => { if(e.t
 const _mlcChannels = {}
 const _mlcOpen = {}
 let _mlcLastMsg = 0
+
+
+// ── BET COUNTS ──
+async function loadBetCounts(matchIds) {
+  if (!matchIds.length) return
+  for (const id of matchIds) {
+    const { data } = await supabase
+      .from('bets')
+      .select('pick')
+      .eq('match_id', String(id))
+      .eq('status', 'pending')
+    if (!data) continue
+    const counts = { win: 0, draw: 0, lose: 0 }
+    data.forEach(b => { if (counts[b.pick] !== undefined) counts[b.pick]++ })
+    const total = counts.win + counts.draw + counts.lose
+    ;['win','draw','lose'].forEach(pick => {
+      const el = document.getElementById('bc-' + pick + '-' + id)
+      if (el) el.textContent = total > 0 ? counts[pick] : '0'
+    })
+  }
+}
 
 window.toggleLiveChat = function(matchId) {
   const body = document.getElementById('mlc-body-' + matchId)
