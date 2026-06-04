@@ -399,7 +399,7 @@ const CSS = `
   }
   .an-chat-input-row {
     flex-shrink:0; padding:8px 12px;
-    padding-bottom:max(8px, env(safe-area-inset-bottom));
+    padding-bottom:calc(max(8px, env(safe-area-inset-bottom)) + 56px);
     background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
   }
 
@@ -618,6 +618,9 @@ function html() { return `
         </div>
         <span id="an-chest-arrow" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#4d82d4">→</span>
       </button>
+      <!-- RANGS intégrés dans le profil -->
+      <div class="an-row-label">Progression des rangs</div>
+      <div id="an-ranks-in-profil"></div>
     </div>
 
     <!-- NOTIFS -->
@@ -1162,7 +1165,7 @@ class AN {
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
-    if (tab === 'profil') this._checkChestStatus()
+    if (tab === 'profil') { this._checkChestStatus(); this._renderRanks() }
   }
 
   amisSubTab(tab, btn) {
@@ -1929,27 +1932,31 @@ class AN {
   // RANGS
   _renderRanks() {
     if (!this.p) return
-    const el = document.getElementById('an-rank-list'); if (!el) return
-    const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
-    const RANK_IMGS = {
-      Supporter: 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/Supporter.png',
-      Dragon:    'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/dragon.png',
-      Socio:     'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/socio.png',
-      Légende:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/legende.png',
-      Invicta:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/invicta.png',
+    const render = (el) => {
+      if (!el) return
+      const RANK_IMGS = {
+        Supporter: 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/Supporter.png',
+        Dragon:    'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/dragon.png',
+        Socio:     'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/socio.png',
+        Légende:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/legende.png',
+        Invicta:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/invicta.png',
+      }
+      el.innerHTML = RANKS.map(r => {
+        const isCurrent = this.p.rank === r.id
+        const img = RANK_IMGS[r.id]
+        return `<div class="an-rank-row${isCurrent?' current':''}">
+          <div class="an-rank-left">
+            <img src="${img}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
+            <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
+          </div>
+          ${isCurrent ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:${r.color};border:1px solid ${r.color};padding:2px 6px">ACTUEL</span>` : ''}
+        </div>`
+      }).join('')
     }
-    el.innerHTML = RANKS.map(r => {
-      const isCurrent = this.p.rank === r.id
-      const canAfford = this.p.points >= r.cost
-      const img = RANK_IMGS[r.id]
-      return `<div class="an-rank-row${isCurrent?' current':''}">
-        <div class="an-rank-left">
-          <img src="${img}" style="width:48px;height:48px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
-          <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
-        </div>
-        ${isCurrent
-          ? `<button class="an-micro-btn" style="color:${r.color};border-color:${r.border}" disabled>Actuel</button>`
-          : r.cost===0 ? ''
+    const el = document.getElementById('an-rank-list')
+    const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
+    render(el)
+    render(document.getElementById('an-ranks-in-profil'))
           : `<button class="an-micro-btn${canAfford?' blue':''}" ${!canAfford?'disabled':''} style="${canAfford?'':'opacity:.4'}" onclick="AN.buyRank('${r.id}',${r.cost})">${canAfford?'Acheter':'Insuffisant'}</button>`
         }
       </div>`
