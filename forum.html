@@ -1091,6 +1091,9 @@ supabase.auth.getSession().then(async ({ data: { session } }) => {
   }
 })
 
+// Écouter l'ouverture depuis auth-nav (lien direct)
+window.addEventListener('open-chat-general', () => { if (!chatActive) toggleChatGeneral() })
+
 window.toggleChatGeneral = function(btn) {
   chatActive = !chatActive
   const chatView = document.getElementById('chat-general-view')
