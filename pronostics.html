@@ -693,6 +693,7 @@ window.addEventListener('an:login', async (e) => {
   updatePointsBanner()
   await loadExistingBets()
   renderMatches()
+  loadActiveBets()
   loadHistory()
 })
 window.addEventListener('an:logout', () => {
