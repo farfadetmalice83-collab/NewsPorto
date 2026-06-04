@@ -359,29 +359,28 @@ const CSS = `
   #an-trigger-btn { padding:4px 8px 4px 4px; gap:6px; }
   #an-avatar-pill { width:28px; height:28px; font-size:12px; }
 
-  /* Body : prend tout l'espace, bottom nav réserve 56px */
+  /* Body : position relative + padding bottom nav */
   .an-body {
+    position:relative; overflow:hidden;
     padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));
   }
 
-  /* Sections : scroll interne correct, pas de débordement */
+  /* Sections isolées — scroll sans débordement */
   .an-section {
-    position:absolute; top:0; left:0; right:0; bottom:0;
+    position:absolute; top:0; left:0; right:0;
+    bottom:calc(56px + env(safe-area-inset-bottom,0px));
     overflow-y:auto; -webkit-overflow-scrolling:touch;
     display:none; flex-direction:column;
   }
   .an-section.active { display:flex; }
 
-  /* Body wrapper doit être relative pour que position:absolute fonctionne */
-  .an-body { position:relative; overflow:hidden; }
-
   /* MP : layout correct sur mobile */
   #an-sec-mp { overflow:hidden; display:flex; flex-direction:column; }
   #an-mp-convs {
-    flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;
+    position:relative; flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;
   }
   #an-mp-groupes {
-    flex:1; min-height:0; display:none; flex-direction:column; overflow:hidden;
+    position:relative; flex:1; min-height:0; display:none; flex-direction:column; overflow:hidden;
   }
   #an-conv-view {
     flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
@@ -389,7 +388,7 @@ const CSS = `
   }
   #an-chat-view {
     position:absolute; top:0; left:0; right:0; bottom:0;
-    display:none; flex-direction:column; background:#04070d; z-index:1;
+    display:none; flex-direction:column; background:#04070d; z-index:2;
   }
   #an-chat-view.visible { display:flex; }
   .an-chat-wrap { flex:1; min-height:0; display:flex; flex-direction:column; }
@@ -399,7 +398,7 @@ const CSS = `
   }
   .an-chat-input-row {
     flex-shrink:0; padding:8px 12px;
-    padding-bottom:calc(max(8px, env(safe-area-inset-bottom)) + 56px);
+    padding-bottom:max(8px, env(safe-area-inset-bottom, 0px));
     background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
   }
 
@@ -1940,13 +1939,18 @@ class AN {
       }
       el.innerHTML = RANKS.map(r => {
         const isCurrent = this.p.rank === r.id
+        const canAfford = this.p.points >= r.cost
         const img = RANK_IMGS[r.id]
         return `<div class="an-rank-row${isCurrent?' current':''}">
           <div class="an-rank-left">
             <img src="${img}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
             <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
           </div>
-          ${isCurrent ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:${r.color};border:1px solid ${r.color};padding:2px 6px">ACTUEL</span>` : ''}
+          ${isCurrent
+            ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:${r.color};border:1px solid ${r.color};padding:2px 6px">ACTUEL</span>`
+            : r.cost===0 ? ''
+            : `<button class="an-micro-btn${canAfford?' blue':''}" ${!canAfford?'disabled':''} style="${canAfford?'':'opacity:.4'}" onclick="AN.buyRank('${r.id}',${r.cost})">${canAfford?'Acheter':'Insuffisant'}</button>`
+          }
         </div>`
       }).join('')
     }
