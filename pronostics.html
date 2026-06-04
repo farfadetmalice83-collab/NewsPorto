@@ -1365,6 +1365,7 @@ window.submitBet = async function() {
     const { data } = await supabase.from('profiles').select('points,rank').eq('id', currentUser.id).single()
     if (data) { currentProfile.points = data.points; currentProfile.rank = data.rank; updatePointsBanner() }
     renderMatches()
+    loadActiveBets()
     showToast(`Mise de ${pendingBet.stake} pts enregistrée ! Gain potentiel : +${pendingBet.gain} pts`, 'success')
   } catch(e) {
     showToast(e.message, 'error')
