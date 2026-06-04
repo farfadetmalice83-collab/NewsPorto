@@ -329,9 +329,14 @@ const CSS = `
   .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; } /* 16px prevents iOS zoom */
   .an-auth-input { font-size:16px; } /* prevents iOS zoom */
   .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
-  /* Chat full height */
-  .an-chat-wrap { height:calc(100vh - 120px); }
-  .an-chat-msgs { flex:1; }
+  /* Chat full height mobile */
+  #an-sec-mp { overflow:hidden; display:flex; flex-direction:column; }
+  .an-admin-sub-content.active { display:flex; flex-direction:column; flex:1; min-height:0; }
+  #an-mp-convs { flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column; }
+  #an-chat-view { flex:1; min-height:0; }
+  .an-chat-wrap { height:100%; display:flex; flex-direction:column; }
+  .an-chat-msgs { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+  .an-chat-input-row { flex-shrink:0; padding-bottom:max(12px, env(safe-area-inset-bottom)); }
   /* Auth modal */
   #an-auth-modal { align-items:flex-end; }
   .an-auth-box { border-radius:0; border-bottom:none; padding:28px 20px; padding-bottom:calc(28px + env(safe-area-inset-bottom,0px)); max-width:100%; }
@@ -547,6 +552,14 @@ function html() { return `
 
     <!-- MP -->
     <div class="an-section" id="an-sec-mp">
+      <a href="forum.html#chat-general" style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(0,200,122,0.04);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(0,200,122,0.08)'" onmouseout="this.style.background='rgba(0,200,122,0.04)'">
+        <span style="font-size:16px">💬</span>
+        <div style="flex:1">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff">Discussion Générale</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.35)">Chat en direct · Forum</div>
+        </div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#00c87a;border:1px solid #00c87a;padding:2px 6px">LIVE</span>
+      </a>
       <div class="an-admin-sub-tabs" style="border-bottom:1px solid rgba(255,255,255,0.06)">
         <button class="an-admin-sub-tab active" onclick="AN.mpSubTab('convs',this)">Messages</button>
         <button class="an-admin-sub-tab" onclick="AN.mpSubTab('groupes',this)">Groupes</button>
@@ -796,6 +809,14 @@ class AN {
         await this._onLogin(session.user)
       }
     })
+
+    // Auto-ouvrir le chat général si #chat-general dans l'URL
+    if (window.location.hash === '#chat-general') {
+      setTimeout(() => {
+        if (typeof toggleChatGeneral === 'function') toggleChatGeneral()
+        else window.dispatchEvent(new CustomEvent('open-chat-general'))
+      }, 600)
+    }
   }
 
   _mountNav() {
@@ -2027,15 +2048,21 @@ class AN {
     el.innerHTML = data.map(u => {
       const isBanned = bannedIds.has(u.id)
       const isMe = u.id === this.u?.id
+      const isAdmin = u.role === 'admin'
       return `<div class="an-admin-row">
         <div class="an-admin-row-info">
-          <div class="an-admin-row-title">${u.display_name||u.username} ${u.role==='admin'?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
+          <div class="an-admin-row-title">${u.display_name||u.username} ${isAdmin?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
           <div class="an-admin-row-sub">${u.rank} · ${u.points} pts</div>
         </div>
-        <div class="an-admin-acts">
+        <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px;justify-content:flex-end">
+          <button class="an-micro-btn blue" onclick="AN.adminEditPoints('${u.id}','${u.display_name||u.username}',${u.points})">± Pts</button>
+          ${!isMe ? (isAdmin
+            ? `<button class="an-micro-btn orange" onclick="AN.adminDemote('${u.id}','${u.display_name||u.username}')">↓ Admin</button>`
+            : `<button class="an-micro-btn green" onclick="AN.adminPromote('${u.id}','${u.display_name||u.username}')">↑ Admin</button>`
+          ) : ''}
           ${!isMe ? (isBanned
             ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
-            : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
+            : `<button class="an-micro-btn red" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
           ) : ''}
         </div>
       </div>`
@@ -2059,6 +2086,35 @@ class AN {
     if (!this.isAdmin()) return
     await supabase.from('bans').delete().eq('user_id', userId)
     this._toast('Utilisateur débanni', 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminPromote(userId, username) {
+    if (!this.isAdmin()) return
+    if (!confirm(`Promouvoir ${username} en admin ?`)) return
+    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId)
+    this._toast(`${username} est maintenant admin ✅`, 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminDemote(userId, username) {
+    if (!this.isAdmin()) return
+    if (!confirm(`Rétrograder ${username} (retirer les droits admin) ?`)) return
+    await supabase.from('profiles').update({ role: 'user' }).eq('id', userId)
+    this._toast(`${username} rétrogradé`, 'ok')
+    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
+  }
+
+  async adminEditPoints(userId, username, currentPts) {
+    if (!this.isAdmin()) return
+    const input = prompt(`Points actuels de ${username} : ${currentPts}\nEntrer le montant à ajouter (négatif pour enlever) :`)
+    if (input === null) return
+    const delta = parseInt(input)
+    if (isNaN(delta)) { this._toast('Valeur invalide', 'err'); return }
+    const newPts = Math.max(0, currentPts + delta)
+    await supabase.from('profiles').update({ points: newPts }).eq('id', userId)
+    await supabase.from('points_log').insert({ user_id: userId, amount: delta, reason: 'admin_edit', ref_id: null })
+    this._toast(`${username} : ${delta > 0 ? '+' : ''}${delta} pts (total: ${newPts})`, 'ok')
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
