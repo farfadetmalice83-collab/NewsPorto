@@ -190,7 +190,8 @@ export async function placeBet({ userId, matchId, matchLabel, pick, stake, multi
     .select('id')
     .eq('user_id', userId)
     .eq('match_id', String(matchId))
-    .single()
+    .eq('status', 'pending')
+    .maybeSingle()
 
   if (existing) throw new Error('Tu as déjà misé sur ce match')
 
