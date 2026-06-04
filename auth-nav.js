@@ -2179,6 +2179,7 @@ class AN {
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: gain, reason: 'match_win', ref_id: String(id) })
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team} · +${gain} pts` })
         await supabase.from('bets').update({ status: 'won' }).eq('id', entry.id)
+        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'won', matchLabel:`${m.home_team} vs ${m.away_team}`, gain }) }).catch(()=>{})
         addXp(entry.user_id, XP_REWARDS.bet_win, 'bet_win').catch(() => {})
         addWeeklyPoints(entry.user_id, gain).catch(() => {})
         // Rivalités : incrémenter le score du gagnant
@@ -2186,6 +2187,7 @@ class AN {
       } else {
         await supabase.from('bets').update({ status: 'lost' }).eq('id', entry.id)
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team}` })
+        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'lost', matchLabel:`${m.home_team} vs ${m.away_team}`, stake: entry.stake }) }).catch(()=>{})
       }
     }
     this._toast('Match terminé, gains distribués ✅', 'ok')
@@ -2368,12 +2370,14 @@ class AN {
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: entry.potential_gain, reason: 'custom_bet_win', ref_id: String(betId) })
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `+${entry.potential_gain} pts` })
         await supabase.from('custom_bet_entries').update({ status: 'won' }).eq('id', entry.id)
+        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'won', matchLabel: entry.match_label||'Pari spécial', gain: entry.potential_gain }) }).catch(()=>{})
         addXp(entry.user_id, XP_REWARDS.bet_win, 'custom_bet_win').catch(() => {})
         addWeeklyPoints(entry.user_id, entry.potential_gain).catch(() => {})
         this._updateRivalScore(entry.user_id).catch(() => {})
       } else {
         await supabase.from('custom_bet_entries').update({ status: 'lost' }).eq('id', entry.id)
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${entry.stake} pts perdus` })
+        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'lost', matchLabel: entry.match_label||'Pari spécial', stake: entry.stake }) }).catch(()=>{})
       }
     }
     this._toast('Pari résolu, gains distribués ✅', 'ok')
