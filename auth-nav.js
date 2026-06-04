@@ -386,9 +386,10 @@ const CSS = `
     flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
     display:flex; flex-direction:column;
   }
+  #an-sec-mp { position:relative; }
   #an-chat-view {
     position:absolute; top:0; left:0; right:0; bottom:0;
-    display:none; flex-direction:column; background:#04070d; z-index:2;
+    display:none; flex-direction:column; background:#04070d; z-index:10;
   }
   #an-chat-view.visible { display:flex; }
   .an-chat-wrap { flex:1; min-height:0; display:flex; flex-direction:column; }
@@ -397,9 +398,10 @@ const CSS = `
     padding:10px 12px; display:flex; flex-direction:column; gap:8px;
   }
   .an-chat-input-row {
-    flex-shrink:0; padding:8px 12px;
-    padding-bottom:max(8px, env(safe-area-inset-bottom, 0px));
+    flex-shrink:0; padding:10px 12px;
+    padding-bottom:max(10px, env(safe-area-inset-bottom, 0px));
     background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
+    display:flex; gap:6px;
   }
 
   /* Bottom nav visible sur mobile */
@@ -664,14 +666,14 @@ function html() { return `
         <div id="an-conv-view">
           <div class="an-conv-list" id="an-conv-list"><div class="an-empty">Aucune conversation</div></div>
         </div>
-        <div id="an-chat-view" style="display:none;flex-direction:column;flex:1;min-height:0">
-          <div class="an-chat-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div id="an-chat-view">
+          <div class="an-chat-wrap">
             <div class="an-chat-header">
               <button class="an-chat-back" onclick="AN.backToConvList()">←</button>
               <div class="an-chat-name" id="an-chat-name"></div>
             </div>
             <div class="an-chat-msgs" id="an-chat-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
-            <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
+            <div class="an-chat-input-row">
               <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendMsg()}">
               <button class="an-chat-send" onclick="AN.sendMsg()">↑</button>
             </div>
@@ -698,14 +700,14 @@ function html() { return `
           <button class="an-btn" style="width:100%;margin-top:14px" onclick="AN.createGroup()">Créer le groupe →</button>
         </div>
         <div id="an-group-chat-view" style="display:none;flex-direction:column;flex:1;min-height:0">
-          <div class="an-chat-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0">
+          <div class="an-chat-wrap">
             <div class="an-chat-header">
               <button class="an-chat-back" onclick="AN.backToGroupList()">←</button>
               <div class="an-chat-name" id="an-group-chat-name"></div>
               <span id="an-group-members-count" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);margin-left:auto"></span>
             </div>
             <div class="an-chat-msgs" id="an-group-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
-            <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
+            <div class="an-chat-input-row">
               <input class="an-chat-input" type="text" id="an-group-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendGroupMsg()}">
               <button class="an-chat-send" onclick="AN.sendGroupMsg()">↑</button>
             </div>
@@ -1144,10 +1146,10 @@ class AN {
     document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
     document.querySelectorAll('#an-panel .an-section').forEach(s => {
       s.classList.remove('active')
-      s.style.display = ''
+      s.style.display = 'none'
     })
     const sec = document.getElementById('an-sec-' + tab)
-    if (sec) { sec.classList.add('active') }
+    if (sec) { sec.classList.add('active'); sec.style.display = '' }
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
     if (tab === 'mp') {
