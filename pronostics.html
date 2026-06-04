@@ -411,6 +411,38 @@
     .admin-match-btn.red:hover{background:rgba(231,76,60,0.1);}
     .admin-match-btn.orange{border-color:rgba(240,165,0,0.4);color:#f0a500;}
     .admin-match-btn.orange:hover{background:rgba(240,165,0,0.1);}
+
+    /* LIVE MATCH CHAT */
+    .match-live-chat{border-top:1px solid rgba(231,76,60,0.2);background:rgba(231,76,60,0.02);}
+    .match-live-chat-header{padding:10px 20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,0.05);}
+    .match-live-chat-header:hover{background:rgba(255,255,255,0.02);}
+    .match-live-chat-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);flex:1;}
+    .match-live-chat-toggle{font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,0.3);transition:transform .2s;}
+    .match-live-chat-body{overflow:hidden;max-height:0;transition:max-height .3s ease;}
+    .match-live-chat-body.open{max-height:320px;}
+    .match-live-chat-msgs{height:220px;overflow-y:auto;padding:10px 20px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:rgba(231,76,60,0.2) transparent;}
+    .match-live-chat-msgs::-webkit-scrollbar{width:3px;}
+    .match-live-chat-msgs::-webkit-scrollbar-thumb{background:rgba(231,76,60,0.3);}
+    .mlc-msg{display:flex;gap:7px;align-items:flex-start;}
+    .mlc-av{width:22px;height:22px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .mlc-av img{width:100%;height:100%;object-fit:cover;}
+    .mlc-body{flex:1;min-width:0;}
+    .mlc-meta{display:flex;align-items:baseline;gap:5px;margin-bottom:2px;}
+    .mlc-author{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:#fff;}
+    .mlc-time{font-family:'Barlow Condensed',sans-serif;font-size:8px;color:rgba(255,255,255,0.2);}
+    .mlc-text{font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);line-height:1.4;word-break:break-word;}
+    .match-live-chat-input-row{padding:8px 20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:6px;background:rgba(0,0,0,0.3);}
+    .mlc-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+    .mlc-input:focus{border-color:#e74c3c;}
+    .mlc-input::placeholder{color:rgba(255,255,255,0.2);}
+    .mlc-send{background:#e74c3c;border:none;color:#fff;padding:7px 12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.2s;}
+    .mlc-send:hover{background:#c0392b;}
+    @media(max-width:768px){
+      .match-live-chat-msgs{height:180px;padding:8px 14px;}
+      .match-live-chat-input-row{padding:8px 14px;}
+      .match-live-chat-header{padding:10px 14px;}
+    }
+
     .login-wall{border:1px solid var(--border);padding:48px;text-align:center;margin-bottom:2px;}
     .login-wall-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;}
     .login-wall-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:24px;}
@@ -693,6 +725,26 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
       ? `<div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">${formatDeadline(closes - now)}</span></div>`
       : `<div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mises fermées</span></div>`
 
+  const liveChatHtml = isLive
+    ? `<div class="match-live-chat" id="mlc-wrap-${m.id}">
+        <div class="match-live-chat-header" onclick="toggleLiveChat('${m.id}')">
+          <div class="live-dot" style="background:#e74c3c;flex-shrink:0"></div>
+          <span class="match-live-chat-title">💬 Chat Live · <span id="mlc-count-${m.id}">0</span> en ligne</span>
+          <span class="match-live-chat-toggle" id="mlc-toggle-${m.id}">▼</span>
+        </div>
+        <div class="match-live-chat-body" id="mlc-body-${m.id}">
+          <div class="match-live-chat-msgs" id="mlc-msgs-${m.id}"></div>
+          <div class="match-live-chat-input-row">
+            ${currentUser
+              ? `<input class="mlc-input" id="mlc-input-${m.id}" placeholder="Réagis en direct..." maxlength="300" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatMsg('${m.id}')}">`
+              : `<input class="mlc-input" placeholder="Connecte-toi pour chatter..." disabled style="cursor:pointer" onclick="window.AN?.openAuth?.()">`
+            }
+            ${currentUser ? `<button class="mlc-send" onclick="sendLiveChatMsg('${m.id}')">↑</button>` : ''}
+          </div>
+        </div>
+      </div>`
+    : ''
+
   const scoreHtml = isLive && m.score_home != null
     ? `<div class="match-score">
         <span class="match-score-num">${m.score_home}</span>
@@ -724,18 +776,23 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
   if (existingBet) {
     const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }[existingBet.pick] || existingBet.pick
     const statusMap = { pending:'⏳ En attente', won:'✅ Gagné', lost:'❌ Perdu', refunded:'💰 Remboursé' }
-    return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
+    const canCancel = existingBet.status === 'pending' && isOpen && !isLive
+    return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}" id="bet-card-${m.id}">
       <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
       <div class="bet-teams">
         <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
         <div class="bet-vs">VS</div>
         <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
       </div>
-      ${scoreHtml}${eventsHtml}
+      ${scoreHtml}${eventsHtml}${liveChatHtml}
       <div class="bet-result-banner ${existingBet.status}">
         <span class="result-label">${pickLabel} · ${statusMap[existingBet.status]||'En attente'}</span>
         <span class="result-points">${existingBet.status==='won'?'+'+existingBet.potential_gain+' pts':existingBet.status==='lost'?'-'+existingBet.stake+' pts':'Gain potentiel : +'+existingBet.potential_gain+' pts'}</span>
       </div>
+      ${canCancel ? `<div style="padding:10px 32px;display:flex;gap:8px;border-top:1px solid rgba(255,255,255,0.06)">
+        <button class="admin-match-btn" onclick="cancelCustomBet('${existingBet.id}','${m.id}',${existingBet.stake})" style="border-color:rgba(231,76,60,0.4);color:#e74c3c">✕ Annuler ma mise</button>
+        <button class="admin-match-btn" onclick="changeBet('${existingBet.id}','${m.id}',${existingBet.stake},'${m.home_team} vs ${m.away_team}')">✎ Modifier</button>
+      </div>` : ''}
       ${adminHtml}
     </div>`
   }
@@ -751,7 +808,7 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
       <div class="bet-vs">VS</div>
       <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
     </div>
-    ${scoreHtml}${eventsHtml}
+    ${scoreHtml}${eventsHtml}${liveChatHtml}
     <div class="bet-infos">
       <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${kickoff.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</span></div>
       <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${kickoff.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>
@@ -846,6 +903,37 @@ window.submitCustomMatchBet = async function(matchId, label, odds) {
     showToast('Erreur lors de la mise', 'error')
     if (btn) { btn.disabled = false; btn.textContent = 'Valider →' }
   }
+}
+
+// ── CANCEL / CHANGE BET ──
+window.cancelCustomBet = async function(betId, matchId, stake) {
+  if (!currentUser) return
+  if (!confirm(`Annuler ta mise de ${stake} pts ? Tu seras remboursé.`)) return
+  try {
+    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
+    const newPts = (currentProfile.points || 0) + stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_cancelled', ref_id: String(matchId) })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(`Mise annulée · ${stake} pts remboursés`, 'ok')
+    loadCustomMatches()
+  } catch(e) { showToast('Erreur lors de l\'annulation', 'error') }
+}
+
+window.changeBet = async function(betId, matchId, stake, label) {
+  if (!currentUser) return
+  if (!confirm(`Modifier ta mise ? Elle sera annulée (${stake} pts remboursés) et tu pourras en passer une nouvelle.`)) return
+  try {
+    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
+    const newPts = (currentProfile.points || 0) + stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_changed', ref_id: String(matchId) })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(`Mise annulée · ${stake} pts remboursés · Passe une nouvelle mise`, 'ok')
+    loadCustomMatches()
+  } catch(e) { showToast('Erreur lors de la modification', 'error') }
 }
 
 // ── CUSTOM BETS ──
@@ -1321,6 +1409,99 @@ window.showToast = function(msg, type='') {
 }
 
 document.getElementById('confirm-modal').addEventListener('click', e => { if(e.target.id==='confirm-modal') closeConfirm() })
+
+// ── LIVE MATCH CHAT ──
+const _mlcChannels = {}
+const _mlcOpen = {}
+let _mlcLastMsg = 0
+
+window.toggleLiveChat = function(matchId) {
+  const body = document.getElementById('mlc-body-' + matchId)
+  const toggle = document.getElementById('mlc-toggle-' + matchId)
+  if (!body) return
+  const opening = !_mlcOpen[matchId]
+  _mlcOpen[matchId] = opening
+  body.classList.toggle('open', opening)
+  if (toggle) toggle.textContent = opening ? '▲' : '▼'
+  if (opening && !_mlcChannels[matchId]) {
+    loadLiveChatMsgs(matchId)
+    subscribeLiveChat(matchId)
+  }
+}
+
+async function loadLiveChatMsgs(matchId) {
+  const el = document.getElementById('mlc-msgs-' + matchId)
+  if (!el) return
+  const { data } = await supabase
+    .from('match_chat_messages')
+    .select('*, author:user_id(id, username, display_name, avatar_url)')
+    .eq('match_id', String(matchId))
+    .order('created_at', { ascending: true })
+    .limit(60)
+  if (!data?.length) { el.innerHTML = '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);padding:20px">Sois le premier à réagir !</div>'; return }
+  el.innerHTML = data.map(m => renderLiveChatMsg(m)).join('')
+  el.scrollTop = el.scrollHeight
+}
+
+function renderLiveChatMsg(m) {
+  const a = m.author || {}
+  const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+  const time = new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+  return `<div class="mlc-msg">
+    <div class="mlc-av">${avHTML}</div>
+    <div class="mlc-body">
+      <div class="mlc-meta"><span class="mlc-author">${a.display_name||a.username||'?'}</span><span class="mlc-time">${time}</span></div>
+      <div class="mlc-text">${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>
+  </div>`
+}
+
+function subscribeLiveChat(matchId) {
+  if (_mlcChannels[matchId]) return
+  _mlcChannels[matchId] = supabase
+    .channel('match-chat-' + matchId)
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'match_chat_messages', filter:`match_id=eq.${matchId}` }, async (payload) => {
+      const el = document.getElementById('mlc-msgs-' + matchId)
+      if (!el) return
+      const { data: msg } = await supabase
+        .from('match_chat_messages')
+        .select('*, author:user_id(id, username, display_name, avatar_url)')
+        .eq('id', payload.new.id).single()
+      if (!msg) return
+      // Remove placeholder
+      const placeholder = el.querySelector('div[style*="Sois le premier"]')
+      if (placeholder) placeholder.remove()
+      const div = document.createElement('div')
+      div.innerHTML = renderLiveChatMsg(msg)
+      el.appendChild(div.firstElementChild)
+      el.scrollTop = el.scrollHeight
+    })
+    .subscribe()
+}
+
+window.sendLiveChatMsg = async function(matchId) {
+  if (!currentUser) { window.AN?.openAuth?.(); return }
+  const input = document.getElementById('mlc-input-' + matchId)
+  const content = input?.value?.trim()
+  if (!content) return
+  // Cooldown 3s
+  const now = Date.now()
+  if (now - _mlcLastMsg < 3000) { showToast('Attends 3s entre chaque message', ''); return }
+  _mlcLastMsg = now
+  input.value = ''
+  await supabase.from('match_chat_messages').insert({ match_id: String(matchId), user_id: currentUser.id, content })
+}
+
+// Nettoyage des channels quand le match se termine
+window.addEventListener('custom-match-updated', () => {
+  // Les channels actifs seront recréés au prochain render si le match est encore live
+  Object.keys(_mlcChannels).forEach(id => {
+    supabase.removeChannel(_mlcChannels[id])
+    delete _mlcChannels[id]
+    delete _mlcOpen[id]
+  })
+})
+
 </script>
 
 <script>
