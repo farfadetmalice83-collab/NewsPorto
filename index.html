@@ -2312,8 +2312,8 @@ img[loading="lazy"].loaded { opacity: 1; }
   /* ══ MOBILE UX OVERHAUL ══════════════════════════════════════════ */
   @media (max-width: 768px) {
 
-    /* 1. RÉORDONNANCEMENT */
-    .page { display: flex !important; flex-direction: column !important; position: relative; z-index: 1; }
+    /* 1. RÉORDONNANCEMENT — match en premier */
+    .page { display: flex; flex-direction: column; }
     nav { order: 0; }
     .ticker { order: 1; }
     .hero { order: 2; }
@@ -2331,18 +2331,16 @@ img[loading="lazy"].loaded { opacity: 1; }
     .hero-content { padding: 24px 20px 20px !important; }
     .hero-btn { margin-top: 16px !important; padding: 10px 20px !important; font-size: 11px !important; }
 
-    /* 3. VITRINE — cards simples */
-    .vitrine-section { padding: 28px 16px !important; box-sizing: border-box !important; width: 100% !important; overflow: hidden !important; }
-    .vitrine-title { font-size: clamp(22px, 6vw, 32px) !important; }
-    .vitrine-sub { font-size: 10px !important; }
-    .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; }
-    .vitrine-card { display: flex !important; flex-direction: column !important; padding: 16px !important; width: 100% !important; box-sizing: border-box !important; gap: 6px !important; }
-    .vitrine-card-eyebrow { font-size: 9px !important; margin-bottom: 0 !important; }
-    .vitrine-card-title { font-size: 18px !important; line-height: 1.1 !important; }
+    /* 3. VITRINE — 2 gros boutons horizontaux */
+    .vitrine-section { padding: 32px 20px !important; }
+    .vitrine-title { font-size: clamp(26px, 8vw, 40px) !important; }
+    .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; width: 100% !important; }
+    .vitrine-card { padding: 16px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; box-sizing: border-box !important; overflow: hidden !important; }
+    .vitrine-card-title { font-size: 18px !important; line-height: 1.1 !important; flex-shrink: 1 !important; min-width: 0 !important; }
     .vitrine-card-title br { display: none !important; }
-    .vitrine-cta { font-size: 10px !important; white-space: normal !important; padding: 8px 0 !important; border: none !important; border-top: 1px solid rgba(255,255,255,0.1) !important; margin-top: 4px !important; }
-    .vitrine-cta-arrow { margin-left: 4px; }
-    .vitrine-card-desc, .vitrine-features, .vitrine-stats, .vitrine-live-badge { display: none !important; }
+    .vitrine-card-desc, .vitrine-features, .vitrine-stats { display: none !important; }
+    .vitrine-card-eyebrow { font-size: 9px !important; margin-bottom: 4px !important; }
+    .vitrine-cta { flex-shrink: 0 !important; font-size: 10px !important; white-space: nowrap !important; padding: 8px 12px !important; border: 1px solid rgba(255,255,255,0.2) !important; }
 
     /* 4. ARTICLES — 2 seulement */
     .articles-section { padding: 24px 20px !important; }
@@ -2350,13 +2348,15 @@ img[loading="lazy"].loaded { opacity: 1; }
     .article-card { min-height: 140px !important; }
     .article-card.featured .article-title { font-size: 18px !important; }
 
-    /* 5. SHOP — scroll horizontal snappé */
+    /* 5. STATS LIGA — visibles à l'ordre 4 */
+
+    /* 6. SHOP — scroll horizontal snappé */
     .shop-section { padding: 28px 0 28px 20px !important; }
     .shop-header { padding: 0 20px 16px 0 !important; }
     .shop-grid { display: flex !important; flex-direction: row !important; gap: 12px !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-right: 20px !important; scroll-snap-type: x mandatory !important; }
     .shop-card { flex: 0 0 72vw !important; scroll-snap-align: start !important; }
 
-    /* 6. TOAST au-dessus bottom nav */
+    /* 7. TOAST au-dessus bottom nav */
     #toast-container { bottom: calc(56px + env(safe-area-inset-bottom,0px) + 12px) !important; left: 16px !important; right: 16px !important; }
   }
   @media (max-width: 480px) {
@@ -2465,35 +2465,6 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   </section>
 
-
-  <!-- ARTICLES -->
-  <section class="articles-section reveal">
-    <div class="section-header">
-      <span class="section-label">— Derniers articles</span>
-      <a href="actu.html" class="section-link">Tout voir →</a>
-    </div>
-    <div class="articles-grid" id="articles-grid">
-      <a class="article-card featured reveal" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-      <a class="article-card reveal reveal-d1" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-      <a class="article-card reveal reveal-d2" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-    </div>
-  </section>
-
   <!-- ── VITRINE FORUM + PRONOSTICS ── -->
   <section class="vitrine-section">
     <div class="vitrine-header">
@@ -2567,6 +2538,34 @@ img[loading="lazy"].loaded { opacity: 1; }
     </div>
   </section>
 
+  <!-- ARTICLES -->
+  <section class="articles-section reveal">
+    <div class="section-header">
+      <span class="section-label">— Derniers articles</span>
+      <a href="actu.html" class="section-link">Tout voir →</a>
+    </div>
+    <div class="articles-grid" id="articles-grid">
+      <a class="article-card featured reveal" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
+      <a class="article-card reveal reveal-d1" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
+      <a class="article-card reveal reveal-d2" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
+    </div>
+  </section>
+
   <!-- ── MATCH SECTION ── -->
   <section class="match-section reveal">
     <div class="section-header">
@@ -2631,7 +2630,6 @@ img[loading="lazy"].loaded { opacity: 1; }
       </div>
     </div>
   </section>
-
 
 
 
