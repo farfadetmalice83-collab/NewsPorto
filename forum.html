@@ -784,8 +784,8 @@ window.deleteReply = async function(replyId, threadId) {
   await supabase.from('forum_threads').update({ reply_count: newCount }).eq('id', threadId)
   if (currentThread?.id === threadId) currentThread.reply_count = newCount
   // Sync allThreads en mémoire
-  const t = allThreads.find(x => x.id === threadId)
-  if (t) t.reply_count = newCount
+  const threadInMemory = allThreads.find(x => x.id === threadId)
+  if (threadInMemory) threadInMemory.reply_count = newCount
   await openThread(threadId)
 }
 
