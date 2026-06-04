@@ -246,10 +246,13 @@ const CSS = `
 .an-auth-bonus { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#4d82d4; text-align:center; }
 
 /* TOAST */
-#an-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(10px); background:#05090f; border:1px solid rgba(0,61,165,0.4); padding:9px 22px; z-index:1000; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; opacity:0; transition:opacity .25s,transform .25s; pointer-events:none; white-space:nowrap; }
+#an-toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(10px); background:#05090f; border:1px solid rgba(0,61,165,0.4); padding:9px 22px; z-index:1000; font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fff; opacity:0; transition:opacity .25s,transform .25s; pointer-events:none; white-space:nowrap; max-width:calc(100vw - 32px); text-align:center; }
 #an-toast.on { opacity:1; transform:translateX(-50%) translateY(0); }
 #an-toast.ok { border-color:#00c87a; color:#00c87a; }
 #an-toast.err { border-color:#e74c3c; color:#e74c3c; }
+@media(max-width:768px){
+  #an-toast { bottom:calc(56px + env(safe-area-inset-bottom,0px) + 12px); }
+}
 
 /* MINI FICHE PROFIL */
 #an-profile-card {
@@ -403,6 +406,8 @@ const CSS = `
     padding-bottom:max(10px, env(safe-area-inset-bottom, 0px));
     background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
     display:flex; gap:6px;
+    position:sticky; bottom:0; left:0; right:0;
+    box-sizing:border-box; width:100%;
   }
 
   /* Bottom nav visible sur mobile */
@@ -1929,10 +1934,11 @@ class AN {
       const fromName = this.p?.display_name || this.p?.username || 'Un membre'
       const preview = content.length > 80 ? content.substring(0, 80) + '…' : content
       // Call our notify-mp API — it handles email lookup server-side
-      fetch('/api/notify-mp', {
+      fetch('/api/notify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          type: 'mp',
           toUserId: this.mpFriend.id,
           fromName,
           messagePreview: preview,
@@ -2195,7 +2201,7 @@ class AN {
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: gain, reason: 'match_win', ref_id: String(id) })
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team} · +${gain} pts` })
         await supabase.from('bets').update({ status: 'won' }).eq('id', entry.id)
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'won', matchLabel: m.home_team + ' vs ' + m.away_team, gain }) }).catch(()=>{})
+        fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'bet', toUserId: entry.user_id, result:'won', matchLabel: m.home_team + ' vs ' + m.away_team, gain }) }).catch(()=>{})
         addXp(entry.user_id, XP_REWARDS.bet_win, 'bet_win').catch(() => {})
         addWeeklyPoints(entry.user_id, gain).catch(() => {})
         // Rivalités : incrémenter le score du gagnant
@@ -2203,7 +2209,7 @@ class AN {
       } else {
         await supabase.from('bets').update({ status: 'lost' }).eq('id', entry.id)
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team}` })
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'lost', matchLabel: m.home_team + ' vs ' + m.away_team, stake: entry.stake }) }).catch(()=>{})
+        fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ type:'bet', toUserId: entry.user_id, result:'lost', matchLabel: m.home_team + ' vs ' + m.away_team, stake: entry.stake }) }).catch(()=>{})
       }
     }
     this._toast('Match terminé, gains distribués ✅', 'ok')
