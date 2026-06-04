@@ -717,6 +717,7 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
     : ''
 
   const CUSTOM_ODDS = { win: m.odds_win||1.8, draw: m.odds_draw||3.5, lose: m.odds_lose||4.5 }
+  cmOdds[String(m.id)] = CUSTOM_ODDS
 
   if (existingBet) {
     const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }[existingBet.pick] || existingBet.pick
@@ -785,7 +786,7 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
         <span class="stake-preview-label">Gain potentiel</span>
         <span class="stake-preview-value zero" id="cm-preview-${m.id}">0 pts</span>
         ${currentUser
-          ? `<button class="btn-bet" id="cm-btn-${m.id}" onclick="submitCustomMatchBet('${m.id}','${(m.home_team+' vs '+m.away_team).replace(/'/g,"\\'")}',${JSON.stringify(CUSTOM_ODDS)})" disabled>Valider →</button>`
+          ? `<button class="btn-bet" id="cm-btn-${m.id}" onclick="submitCustomMatchBet('${m.id}','${(m.home_team+' vs '+m.away_team).replace(/'/g,"\\'")}',cmOdds['${m.id}'])" disabled>Valider →</button>`
           : `<button class="btn-bet" onclick="window.AN?.openAuth?.()">Connexion requise</button>`
         }
       </div>
@@ -795,6 +796,8 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
 }
 
 const cmSelected = {}
+const cmOdds = {}
+window.cmOdds = cmOdds
 window.selectCmOpt = function(matchId, pick) {
   if (!currentUser) { window.AN?.openAuth?.(); return }
   cmSelected[matchId] = pick
@@ -812,13 +815,7 @@ window.updateCmPreview = function(matchId) {
   const btnEl = document.getElementById(`cm-btn-${matchId}`)
   const prevEl = document.getElementById(`cm-preview-${matchId}`)
   if (!prevEl) return
-  const winBtn = document.getElementById(`cm-opt-${matchId}-win`)
-  if (!winBtn) return
-  const odds = {
-    win: parseFloat(winBtn.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||1.8,
-    draw: parseFloat(document.getElementById(`cm-opt-${matchId}-draw`)?.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||3.5,
-    lose: parseFloat(document.getElementById(`cm-opt-${matchId}-lose`)?.querySelector('.bet-option-mult')?.textContent?.replace('×',''))||4.5,
-  }
+  const odds = cmOdds[matchId] || { win:1.8, draw:3.5, lose:4.5 }
   const mult = pick ? (odds[pick]||1) : 1
   const gain = pick && stake >= 10 ? Math.floor(stake * mult) : 0
   if (gain > 0) { prevEl.textContent = '+'+gain+' pts'; prevEl.classList.remove('zero'); if(btnEl) btnEl.disabled = false }
