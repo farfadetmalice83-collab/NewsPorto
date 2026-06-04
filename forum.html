@@ -858,28 +858,24 @@ window.filterCat = function(cat, btn) {
 window.castVote = async function(threadId, vote, btn) {
   if (!currentUser) { AN?.openAuth(); return }
   try {
-    const prevVote = userVotesMap[threadId] || 0
-    const thread = allThreads.find(x => x.id === threadId)
-    const currentScore = thread?.votes || 0
+    const tid = String(threadId)
+    const prevVote = parseInt(userVotesMap[tid] ?? userVotesMap[threadId] ?? 0)
+    const thread = allThreads.find(x => String(x.id) === tid)
+    // Récupérer le score réel depuis la DB pour éviter les états stale
+    const { data: freshThread } = await supabase.from('forum_threads').select('votes').eq('id', threadId).single()
+    const currentScore = parseInt(freshThread?.votes ?? thread?.votes ?? 0)
 
-    // Toggle logic: same vote = remove, different = switch
     const newUserVote = prevVote === vote ? 0 : vote
-
-    // Calculate new score delta
-    // prevVote contributed prevVote to the score, newUserVote will contribute newUserVote
     const delta = newUserVote - prevVote
     const newScore = currentScore + delta
 
-    // Upsert vote in DB
     if (newUserVote === 0) {
       await supabase.from('thread_votes').delete().eq('thread_id', threadId).eq('user_id', currentUser.id)
     } else {
       await supabase.from('thread_votes').upsert({ thread_id: threadId, user_id: currentUser.id, vote: newUserVote }, { onConflict: 'thread_id,user_id' })
     }
-    // Update thread votes count
     await supabase.from('forum_threads').update({ votes: newScore }).eq('id', threadId)
 
-    // Update UI via ids directs
     const scoreEl = document.getElementById('vs-' + threadId)
     if (scoreEl) {
       scoreEl.textContent = newScore
@@ -889,6 +885,7 @@ window.castVote = async function(threadId, vote, btn) {
     const dnBtn = document.getElementById('vdn-' + threadId)
     if (upBtn) upBtn.classList.toggle('active', newUserVote === 1)
     if (dnBtn) dnBtn.classList.toggle('active', newUserVote === -1)
+    userVotesMap[tid] = newUserVote
     userVotesMap[threadId] = newUserVote
     if (thread) thread.votes = newScore
   } catch(e) { showToast(e.message, 'error') }
