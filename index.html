@@ -244,20 +244,7 @@
       transition: transform .2s;
     }
     .vitrine-card:hover .vitrine-cta-arrow { transform: translateX(4px); }
-    .vitrine-mock {
-      position: absolute;
-      bottom: -20px;
-      right: -10px;
-      width: 200px;
-      opacity: 0.06;
-      pointer-events: none;
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 120px;
-      letter-spacing: -5px;
-      line-height: 1;
-      color: #fff;
-      user-select: none;
-    }
+
     .vitrine-live-badge {
       display: inline-flex;
       align-items: center;
@@ -2447,6 +2434,64 @@ img[loading="lazy"].loaded { opacity: 1; }
       </a>
     </div>
   </section>
+  <!-- ── VITRINE FORUM + PRONOSTICS ── -->
+  <section class="vitrine-section">
+    <div class="vitrine-header">
+      <div>
+        <p class="section-label">— Fonctionnalités</p>
+        <h2 class="vitrine-title">La communauté<br><span>Porto</span> vous attend</h2>
+        <p class="vitrine-sub">Forum · Pronostics · Messages · Classements</p>
+      </div>
+    </div>
+
+    <div class="vitrine-grid">
+
+      <!-- FORUM -->
+      <a href="forum.html" class="vitrine-card">
+        <div class="vitrine-card-eyebrow">
+          Forum
+          <span class="vitrine-live-badge"><span class="vitrine-live-dot"></span>Live</span>
+        </div>
+        <div class="vitrine-card-title">Débats,<br>Analyses,<br>Réactions</div>
+        <div class="vitrine-card-desc">Rejoins des centaines de Portistas pour discuter de chaque match, chaque transfert, chaque décision tactique.</div>
+        <div class="vitrine-features">
+          <div class="vitrine-feature">Threads en temps réel</div>
+          <div class="vitrine-feature">Votes up/down & meilleure réponse</div>
+          <div class="vitrine-feature">Chat général en direct</div>
+          <div class="vitrine-feature">Messages privés entre membres</div>
+        </div>
+        <div class="vitrine-cta">Accéder au forum <span class="vitrine-cta-arrow">→</span></div>
+      </a>
+
+      <!-- PRONOSTICS -->
+      <a href="pronostics.html" class="vitrine-card">
+        <div class="vitrine-card-eyebrow">Pronostics</div>
+        <div class="vitrine-card-title">Mise sur<br>chaque<br>victoire</div>
+        <div class="vitrine-card-desc">Parie tes points sur les matchs du FC Porto et grimpe dans le classement. Plus tu gagnes, plus tu deviens légende.</div>
+        <div class="vitrine-stats">
+          <div>
+            <span class="vitrine-stat-num">×4.5</span>
+            <span class="vitrine-stat-lbl">Cote max</span>
+          </div>
+          <div>
+            <span class="vitrine-stat-num">500</span>
+            <span class="vitrine-stat-lbl">Pts offerts</span>
+          </div>
+          <div>
+            <span class="vitrine-stat-num">5</span>
+            <span class="vitrine-stat-lbl">Rangs</span>
+          </div>
+        </div>
+        <div class="vitrine-features">
+          <div class="vitrine-feature">Matchs officiels & paris spéciaux</div>
+          <div class="vitrine-feature">Classement hebdomadaire</div>
+          <div class="vitrine-feature">Gains en temps réel</div>
+        </div>
+        <div class="vitrine-cta">Parier maintenant <span class="vitrine-cta-arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
 
   <!-- STATS + PROCHAIN MATCH -->
   <section class="match-section reveal">
@@ -2757,66 +2802,6 @@ img[loading="lazy"].loaded { opacity: 1; }
   }
   </script>
 
-  <!-- ── VITRINE FORUM + PRONOSTICS ── -->
-  <section class="vitrine-section">
-    <div class="vitrine-header">
-      <div>
-        <p class="section-label">— Fonctionnalités</p>
-        <h2 class="vitrine-title">La communauté<br><span>Porto</span> vous attend</h2>
-        <p class="vitrine-sub">Forum · Pronostics · Messages · Classements</p>
-      </div>
-    </div>
-
-    <div class="vitrine-grid">
-
-      <!-- FORUM -->
-      <a href="forum.html" class="vitrine-card">
-        <div class="vitrine-mock">F</div>
-        <div class="vitrine-card-eyebrow">
-          Forum
-          <span class="vitrine-live-badge"><span class="vitrine-live-dot"></span>Live</span>
-        </div>
-        <div class="vitrine-card-title">Débats,<br>Analyses,<br>Réactions</div>
-        <div class="vitrine-card-desc">Rejoins des centaines de Portistas pour discuter de chaque match, chaque transfert, chaque décision tactique.</div>
-        <div class="vitrine-features">
-          <div class="vitrine-feature">Threads en temps réel</div>
-          <div class="vitrine-feature">Votes up/down & meilleure réponse</div>
-          <div class="vitrine-feature">Chat général en direct</div>
-          <div class="vitrine-feature">Messages privés entre membres</div>
-        </div>
-        <div class="vitrine-cta">Accéder au forum <span class="vitrine-cta-arrow">→</span></div>
-      </a>
-
-      <!-- PRONOSTICS -->
-      <a href="pronostics.html" class="vitrine-card">
-        <div class="vitrine-mock">P</div>
-        <div class="vitrine-card-eyebrow">Pronostics</div>
-        <div class="vitrine-card-title">Mise sur<br>chaque<br>victoire</div>
-        <div class="vitrine-card-desc">Parie tes points sur les matchs du FC Porto et grimpe dans le classement. Plus tu gagnes, plus tu deviens légende.</div>
-        <div class="vitrine-stats">
-          <div>
-            <span class="vitrine-stat-num">×4.5</span>
-            <span class="vitrine-stat-lbl">Cote max</span>
-          </div>
-          <div>
-            <span class="vitrine-stat-num">500</span>
-            <span class="vitrine-stat-lbl">Pts offerts</span>
-          </div>
-          <div>
-            <span class="vitrine-stat-num">5</span>
-            <span class="vitrine-stat-lbl">Rangs</span>
-          </div>
-        </div>
-        <div class="vitrine-features">
-          <div class="vitrine-feature">Matchs officiels & paris spéciaux</div>
-          <div class="vitrine-feature">Classement hebdomadaire</div>
-          <div class="vitrine-feature">Gains en temps réel</div>
-        </div>
-        <div class="vitrine-cta">Parier maintenant <span class="vitrine-cta-arrow">→</span></div>
-      </a>
-
-    </div>
-  </section>
 
   <!-- SHOP TEASER -->
   <section class="shop-section reveal">
