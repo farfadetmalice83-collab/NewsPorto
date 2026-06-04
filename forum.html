@@ -693,7 +693,6 @@ window.addEventListener('an:login', async (e) => {
   updatePointsBanner()
   await loadExistingBets()
   renderMatches()
-  loadActiveBets()
   loadHistory()
 })
 window.addEventListener('an:logout', () => {
@@ -1589,7 +1588,7 @@ async function loadLeaderboard() {
 window.switchTab = function(tab) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
   document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab))
-  if (tab === 'historique') loadHistory()
+  if (tab === 'historique') { loadActiveBets(); loadHistory() }
   if (tab === 'classement') { loadWeeklyLeaderboard(); loadLeaderboard() }
 }
 
