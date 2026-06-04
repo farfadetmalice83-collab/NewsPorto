@@ -333,6 +333,7 @@ const CSS = `
   position:relative; padding:0;
 }
 .an-bnav-btn.active { color:#4d82d4; }
+.an-bnav-btn.has-notif svg { animation: anPulse 1.8s ease-in-out infinite; }
 .an-bnav-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; }
 .an-bnav-label { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
 .an-bnav-dot { position:absolute; top:8px; right:calc(50% - 14px); width:6px; height:6px; border-radius:50%; background:#e74c3c; display:none; border:1.5px solid #04070d; }
@@ -352,7 +353,7 @@ const CSS = `
 
   /* Panel head compact */
   .an-panel-head { padding:10px 14px; min-height:54px; }
-  .an-head-avatar { width:36px; height:36px; font-size:16px; }
+  .an-head-avatar { width:36px; height:36px; font-size:16px; cursor:pointer; }
   .an-head-name { font-size:13px; }
   .an-head-pts { font-size:16px; }
   #an-pill-info { display:none; }
@@ -1497,6 +1498,20 @@ class AN {
         }
       }
     }
+    // Bottom nav notifs dot + pulse
+    const bnavDotNotifs = document.getElementById('bnav-dot-notifs')
+    if (bnavDotNotifs) bnavDotNotifs.classList.toggle('on', n > 0)
+    // Pulse sur icône notifs bottom nav
+    const bnavNotifBtn = document.getElementById('bnav-notifs')
+    if (bnavNotifBtn) bnavNotifBtn.classList.toggle('has-notif', n > 0)
+
+    // MP unread
+    const { data: unreadMp } = await supabase.from('notifications').select('id').eq('user_id', this.u.id).eq('read', false).eq('type', 'mp')
+    const hasMp = (unreadMp?.length || 0) > 0
+    const mpDot = document.getElementById('tab-dot-mp'); if (mpDot) mpDot.classList.toggle('on', hasMp)
+    const bnavDotMp = document.getElementById('bnav-dot-mp'); if (bnavDotMp) bnavDotMp.classList.toggle('on', hasMp)
+    const bnavMpBtn = document.getElementById('bnav-mp'); if (bnavMpBtn) bnavMpBtn.classList.toggle('has-notif', hasMp)
+
     // friend requests
     const { data: fr } = await supabase.from('friendships').select('id').eq('addressee_id', this.u.id).eq('status','pending')
     const frdot = document.getElementById('tab-dot-amis'); if (frdot) frdot.classList.toggle('on', (fr?.length||0) > 0)
