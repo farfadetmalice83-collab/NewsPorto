@@ -1141,17 +1141,15 @@ class AN {
 
   tabTo(tab) {
     this._currentTab = tab
-    // Tabs desktop
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    // Bottom nav mobile
     document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    // Sections — toutes cachées puis active affichée
-    document.querySelectorAll('.an-section').forEach(s => {
+    // Classes uniquement — pas de style inline qui override le CSS
+    document.querySelectorAll('#an-panel .an-section').forEach(s => {
       s.classList.remove('active')
-      s.style.display = 'none'
+      s.style.display = ''
     })
     const sec = document.getElementById('an-sec-' + tab)
-    if (sec) { sec.classList.add('active'); sec.style.display = 'flex' }
+    if (sec) { sec.classList.add('active'); sec.style.display = '' }
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
     if (tab === 'mp') {
@@ -1159,8 +1157,8 @@ class AN {
       // Réinitialiser les sub-tabs MP
       const convs = document.getElementById('an-mp-convs')
       const grps = document.getElementById('an-mp-groupes')
-      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
-      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
+      if (convs) { convs.classList.add('active'); convs.style.display = '' }
+      if (grps) { grps.classList.remove('active'); grps.style.display = '' }
     }
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
@@ -1757,8 +1755,8 @@ class AN {
     btn.classList.add('active')
     const convs = document.getElementById('an-mp-convs')
     const grps = document.getElementById('an-mp-groupes')
-    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = tab==='convs' ? 'flex' : 'none' }
-    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display  = tab!=='convs'  ? 'flex' : 'none' }
+    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = '' }
+    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display = '' }
     if (tab !== 'convs') this._loadGroups?.()
   }
 
