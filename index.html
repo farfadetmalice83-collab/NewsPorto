@@ -2336,7 +2336,8 @@ img[loading="lazy"].loaded { opacity: 1; }
     .vitrine-title { font-size: clamp(26px, 8vw, 40px) !important; }
     .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; width: 100% !important; }
     .vitrine-card { padding: 16px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; box-sizing: border-box !important; overflow: hidden !important; }
-    .vitrine-card-title { font-size: 20px !important; line-height: 1 !important; flex-shrink: 1 !important; min-width: 0 !important; }
+    .vitrine-card-title { font-size: 18px !important; line-height: 1.1 !important; flex-shrink: 1 !important; min-width: 0 !important; }
+    .vitrine-card-title br { display: none !important; }
     .vitrine-card-desc, .vitrine-features, .vitrine-stats { display: none !important; }
     .vitrine-card-eyebrow { font-size: 9px !important; margin-bottom: 4px !important; }
     .vitrine-cta { flex-shrink: 0 !important; font-size: 10px !important; white-space: nowrap !important; padding: 8px 12px !important; border: 1px solid rgba(255,255,255,0.2) !important; }
@@ -2462,33 +2463,8 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   </section>
 
-  <!-- ARTICLES -->
-  <section class="articles-section reveal">
-    <div class="section-header">
-      <span class="section-label">— Derniers articles</span>
-      <a href="actu.html" class="section-link">Tout voir →</a>
-    </div>
-    <div class="articles-grid" id="articles-grid">
-      <a class="article-card featured reveal" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-      <a class="article-card reveal reveal-d1" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-      <a class="article-card reveal reveal-d2" href="#">
-        <div class="article-card-bg"></div>
-        <p class="article-cat">—</p>
-        <h2 class="article-title">Chargement...</h2>
-        <p class="article-date">—</p>
-      </a>
-    </div>
   </section>
+
   <!-- ── VITRINE FORUM + PRONOSTICS ── -->
   <section class="vitrine-section">
     <div class="vitrine-header">
@@ -2559,6 +2535,34 @@ img[loading="lazy"].loaded { opacity: 1; }
       <div class="stat-cell reveal reveal-d2"><div class="stat-num">—</div><div class="stat-label">Victoires</div></div>
       <div class="stat-cell reveal reveal-d3"><div class="stat-num">—</div><div class="stat-label">Buts marqués</div></div>
       <div class="stat-cell reveal reveal-d4"><div class="stat-num">—</div><div class="stat-label">Points</div></div>
+    </div>
+  </section>
+
+  <!-- ARTICLES -->
+  <section class="articles-section reveal">
+    <div class="section-header">
+      <span class="section-label">— Derniers articles</span>
+      <a href="actu.html" class="section-link">Tout voir →</a>
+    </div>
+    <div class="articles-grid" id="articles-grid">
+      <a class="article-card featured reveal" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
+      <a class="article-card reveal reveal-d1" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
+      <a class="article-card reveal reveal-d2" href="#">
+        <div class="article-card-bg"></div>
+        <p class="article-cat">—</p>
+        <h2 class="article-title">Chargement...</h2>
+        <p class="article-date">—</p>
+      </a>
     </div>
   </section>
 
