@@ -314,145 +314,46 @@ const CSS = `
 .an-admin-form .an-label { margin-top:10px; }
 .an-odds-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
-/* ── BOTTOM NAV MOBILE ── */
-.an-bottom-nav {
-  display:none;
-  position:fixed; bottom:0; left:0; right:0;
-  background:#04070d;
-  border-top:1px solid rgba(0,61,165,0.25);
-  z-index:803; /* au-dessus du panel et overlay */
-  padding-bottom:env(safe-area-inset-bottom,0px);
-}
-.an-bottom-nav-inner {
-  display:flex; height:56px; align-items:stretch;
-}
-.an-bnav-btn {
-  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
-  gap:3px; background:none; border:none; cursor:pointer;
-  color:rgba(255,255,255,0.35); transition:color .15s;
-  position:relative; padding:0;
-}
-.an-bnav-btn.active { color:#4d82d4; }
-.an-bnav-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; }
-.an-bnav-label { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
-.an-bnav-dot { position:absolute; top:8px; right:calc(50% - 14px); width:6px; height:6px; border-radius:50%; background:#e74c3c; display:none; border:1.5px solid #04070d; }
-.an-bnav-dot.on { display:block; }
-
 @media(max-width:768px) {
-  /* Panel : full screen, pas de header, navigation par bottom nav */
-  #an-panel {
-    width:100%; border-left:none;
-    top:0; right:0; bottom:0;
-    transform:translateX(100%);
-  }
-  #an-panel.open { transform:translateX(0); }
-
-  /* Cacher les tabs horizontales sur mobile, remplacées par bottom nav */
-  .an-tabs { display:none; }
-
-  /* Panel head compact */
-  .an-panel-head { padding:10px 14px; min-height:54px; }
-  .an-head-avatar { width:36px; height:36px; font-size:16px; }
-  .an-head-name { font-size:13px; }
-  .an-head-pts { font-size:16px; }
+  /* Panel takes full screen */
+  #an-panel { width:100%; border-left:none; }
   #an-pill-info { display:none; }
+  /* Bigger touch targets */
+  .an-tab { padding:12px 2px; font-size:8px; letter-spacing:1.5px; }
+  .an-friend-row { padding:12px 16px; }
+  .an-notif-item { padding:12px 16px; }
+  .an-admin-row { padding:12px 16px; }
+  .an-conv-row { padding:14px 16px; }
+  .an-rank-row { padding:14px 16px; }
+  /* Input fields bigger for mobile */
+  .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; } /* 16px prevents iOS zoom */
+  .an-auth-input { font-size:16px; } /* prevents iOS zoom */
+  .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
+  /* Chat full height */
+  .an-chat-wrap { height:calc(100vh - 120px); }
+  .an-chat-msgs { flex:1; }
+  /* Auth modal */
+  #an-auth-modal { align-items:flex-end; }
+  .an-auth-box { border-radius:0; border-bottom:none; padding:28px 20px; padding-bottom:calc(28px + env(safe-area-inset-bottom,0px)); max-width:100%; }
+  /* Panel head smaller */
+  .an-panel-head { padding:12px 16px; }
+  .an-head-avatar { width:38px; height:38px; font-size:17px; }
+  .an-head-name { font-size:13px; }
+  .an-head-pts { font-size:18px; }
+  /* Row labels */
+  .an-row-label { padding:12px 16px 4px; }
+  .an-field { padding:0 16px 10px; }
+  .an-save-row { padding:10px 16px 16px; }
+  .an-search-wrap { padding:10px 16px; }
+  /* Admin sub tabs */
+  .an-admin-sub-tab { font-size:8px; padding:10px 4px; letter-spacing:1.5px; }
+  .an-admin-form { padding:10px 16px; }
+  /* Rank rows */
+  .an-rank-emoji { font-size:20px; }
+  .an-rank-name { font-size:17px; }
+  /* Trigger button */
   #an-trigger-btn { padding:4px 8px 4px 4px; gap:6px; }
   #an-avatar-pill { width:28px; height:28px; font-size:12px; }
-
-  /* Body : prend tout l'espace, bottom nav réserve 56px */
-  .an-body {
-    padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));
-  }
-
-  /* Sections : scroll interne correct, pas de débordement */
-  .an-section {
-    position:absolute; top:0; left:0; right:0; bottom:0;
-    overflow-y:auto; -webkit-overflow-scrolling:touch;
-    display:none; flex-direction:column;
-  }
-  .an-section.active { display:flex; }
-
-  /* Body wrapper doit être relative pour que position:absolute fonctionne */
-  .an-body { position:relative; overflow:hidden; }
-
-  /* MP : layout correct sur mobile */
-  #an-sec-mp { overflow:hidden; display:flex; flex-direction:column; }
-  #an-mp-convs {
-    flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;
-  }
-  #an-mp-groupes {
-    flex:1; min-height:0; display:none; flex-direction:column; overflow:hidden;
-  }
-  #an-conv-view {
-    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-    display:flex; flex-direction:column;
-  }
-  #an-chat-view {
-    position:absolute; top:0; left:0; right:0; bottom:0;
-    display:none; flex-direction:column; background:#04070d; z-index:1;
-  }
-  #an-chat-view.visible { display:flex; }
-  .an-chat-wrap { flex:1; min-height:0; display:flex; flex-direction:column; }
-  .an-chat-msgs {
-    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-    padding:10px 12px; display:flex; flex-direction:column; gap:8px;
-  }
-  .an-chat-input-row {
-    flex-shrink:0; padding:8px 12px;
-    padding-bottom:calc(max(8px, env(safe-area-inset-bottom)) + 56px);
-    background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
-  }
-
-  /* Bottom nav visible sur mobile */
-  .an-bottom-nav { display:block; z-index:802; }
-
-  /* Inputs 16px pour éviter zoom iOS */
-  .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; }
-  .an-auth-input { font-size:16px; }
-  .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
-
-  /* Touch targets */
-  .an-friend-row { padding:14px 14px; min-height:56px; }
-  .an-notif-item { padding:12px 14px; }
-  .an-admin-row { padding:12px 14px; }
-  .an-conv-row { padding:14px 14px; min-height:56px; }
-  .an-rank-row { padding:16px 14px; min-height:56px; }
-
-  /* Labels & champs */
-  .an-row-label { padding:12px 14px 4px; }
-  .an-field { padding:0 14px 10px; }
-  .an-save-row { padding:10px 14px 14px; }
-  .an-search-wrap { padding:10px 14px; }
-  .an-admin-sub-tab { font-size:9px; padding:10px 6px; letter-spacing:1px; }
-  .an-admin-form { padding:10px 14px; }
-  .an-rank-emoji { font-size:22px; }
-  .an-rank-name { font-size:19px; }
-
-  /* Auth modal slide from bottom */
-  #an-auth-modal { align-items:flex-end; }
-  .an-auth-box {
-    border-radius:16px 16px 0 0; border-bottom:none;
-    padding:24px 18px calc(24px + env(safe-area-inset-bottom,0px));
-    max-width:100%;
-  }
-  .an-auth-box::before {
-    content:''; display:block; width:36px; height:4px;
-    background:rgba(255,255,255,0.15); border-radius:2px;
-    margin:0 auto 20px;
-  }
-
-  /* Profile card pleine largeur */
-  #an-profile-card {
-    width:calc(100vw - 24px) !important;
-    left:12px !important; right:12px;
-    top:50% !important; transform:translateY(-50%) !important;
-    max-height:90vh; overflow-y:auto;
-  }
-  #an-profile-card.open { display:block; }
-
-  /* Admin acts wrap */
-  .an-admin-acts { flex-wrap:wrap; gap:4px; max-width:160px; justify-content:flex-end; }
-  .an-micro-btn { padding:6px 8px; font-size:9px; min-height:32px; }
 }
 /* Safe area for panel */
 @supports(padding-bottom: env(safe-area-inset-bottom)){
@@ -618,7 +519,7 @@ function html() { return `
         </div>
         <span id="an-chest-arrow" style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:#4d82d4">→</span>
       </button>
-      <!-- RANGS intégrés dans le profil -->
+      <!-- RANGS dans profil -->
       <div class="an-row-label">Progression des rangs</div>
       <div id="an-ranks-in-profil"></div>
     </div>
@@ -649,14 +550,6 @@ function html() { return `
 
     <!-- MP -->
     <div class="an-section" id="an-sec-mp">
-      <a href="forum.html#chat-general" style="display:flex;align-items:center;gap:10px;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06);background:rgba(0,200,122,0.04);text-decoration:none;transition:background .15s" onmouseover="this.style.background='rgba(0,200,122,0.08)'" onmouseout="this.style.background='rgba(0,200,122,0.04)'">
-        <span style="font-size:16px">💬</span>
-        <div style="flex:1">
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff">Discussion Générale</div>
-          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.35)">Chat en direct · Forum</div>
-        </div>
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:#00c87a;border:1px solid #00c87a;padding:2px 6px">LIVE</span>
-      </a>
       <div class="an-admin-sub-tabs" style="border-bottom:1px solid rgba(255,255,255,0.06)">
         <button class="an-admin-sub-tab active" onclick="AN.mpSubTab('convs',this)">Messages</button>
         <button class="an-admin-sub-tab" onclick="AN.mpSubTab('groupes',this)">Groupes</button>
@@ -852,34 +745,6 @@ function html() { return `
   </div>
 </div>
 
-<!-- BOTTOM NAV MOBILE — toujours visible, ouvre le panel sur l'onglet voulu -->
-<div class="an-bottom-nav" id="an-bottom-nav">
-  <div class="an-bottom-nav-inner">
-    <button class="an-bnav-btn" id="bnav-profil" data-tab="profil" onclick="AN.bnavTap('profil')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-      <span class="an-bnav-label">Profil</span>
-    </button>
-    <button class="an-bnav-btn" id="bnav-notifs" data-tab="notifs" onclick="AN.bnavTap('notifs')">
-      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-      <span class="an-bnav-label">Notifs</span>
-      <span class="an-bnav-dot" id="bnav-dot-notifs"></span>
-    </button>
-    <button class="an-bnav-btn" id="bnav-mp" data-tab="mp" onclick="AN.bnavTap('mp')">
-      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span class="an-bnav-label">Messages</span>
-      <span class="an-bnav-dot" id="bnav-dot-mp"></span>
-    </button>
-    <button class="an-bnav-btn" id="bnav-badges" data-tab="badges" onclick="AN.bnavTap('badges')">
-      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-      <span class="an-bnav-label">Badges</span>
-    </button>
-    <button class="an-bnav-btn" id="bnav-amis" data-tab="amis" onclick="AN.bnavTap('amis')">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span class="an-bnav-label">Amis</span>
-    </button>
-  </div>
-</div>
-
 <div id="an-toast"></div>
 
 <div id="an-profile-card">
@@ -934,14 +799,6 @@ class AN {
         await this._onLogin(session.user)
       }
     })
-
-    // Auto-ouvrir le chat général si #chat-general dans l'URL
-    if (window.location.hash === '#chat-general') {
-      setTimeout(() => {
-        if (typeof toggleChatGeneral === 'function') toggleChatGeneral()
-        else window.dispatchEvent(new CustomEvent('open-chat-general'))
-      }, 600)
-    }
   }
 
   _mountNav() {
@@ -1118,47 +975,12 @@ class AN {
     document.body.style.overflow = ''
   }
 
-  bnavTap(tab) {
-    const panel = document.getElementById('an-panel')
-    const isOpen = panel.classList.contains('open')
-    const isSameTab = this._currentTab === tab
-    // Mettre à jour l'état actif de la bottom nav
-    document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    if (isOpen && isSameTab) {
-      // Re-clic sur le même onglet = fermer le panel
-      this.closePanel()
-      document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.remove('active'))
-    } else {
-      if (!isOpen) {
-        // Ouvrir le panel
-        panel.classList.add('open')
-        document.getElementById('an-overlay')?.classList.add('on')
-        document.body.style.overflow = 'hidden'
-      }
-      this.tabTo(tab)
-    }
-  }
-
   tabTo(tab) {
-    this._currentTab = tab
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    document.querySelectorAll('#an-panel .an-section').forEach(s => {
-      s.classList.remove('active')
-      s.style.display = ''
-    })
-    const sec = document.getElementById('an-sec-' + tab)
-    if (sec) { sec.classList.add('active') }
+    document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
-    if (tab === 'mp') {
-      this._loadConvList()
-      // Réinitialiser les sub-tabs MP
-      const convs = document.getElementById('an-mp-convs')
-      const grps = document.getElementById('an-mp-groupes')
-      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
-      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
-    }
+    if (tab === 'mp') this._loadConvList()
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
@@ -1721,9 +1543,9 @@ class AN {
     const convView = document.getElementById('an-conv-view')
     const convList = document.getElementById('an-conv-list')
     if (!convList) return
-    if (convView) convView.style.display = ''
+    if (convView) { convView.style.display = ''; }
     const chatView = document.getElementById('an-chat-view')
-    if (chatView) { chatView.classList.remove('visible'); chatView.style.display = '' }
+    if (chatView) chatView.style.display = 'none'
     if (!friends.length) { convList.innerHTML = '<div class="an-empty">Ajoute des amis pour écrire</div>'; return }
     convList.innerHTML = '<div class="an-row-label">Conversations</div>' + friends.map(f => `<div class="an-conv-row" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">
       <div class="an-conv-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
@@ -1733,13 +1555,14 @@ class AN {
 
   async openChat(friendId, friendName) {
     this.mpFriend = { id: friendId, name: friendName }
+    // Switch to MP tab first (without triggering _loadConvList)
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'mp'))
     document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === 'an-sec-mp'))
-    // Afficher chat, cacher liste
+    // Then show chat view
     const convView = document.getElementById('an-conv-view')
     if (convView) convView.style.display = 'none'
     const cv = document.getElementById('an-chat-view')
-    if (cv) { cv.classList.add('visible'); cv.style.display = '' }
+    if (cv) { cv.style.display = 'flex'; cv.style.flexDirection = 'column' }
     document.getElementById('an-chat-name').textContent = friendName
     await this._loadMsgs()
     await markMessagesRead(friendId, this.u.id)
@@ -1751,12 +1574,11 @@ class AN {
 
   mpSubTab(tab, btn) {
     document.querySelectorAll('#an-sec-mp .an-admin-sub-tab').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('#an-sec-mp .an-admin-sub-content').forEach(c => c.classList.remove('active'))
     btn.classList.add('active')
-    const convs = document.getElementById('an-mp-convs')
-    const grps = document.getElementById('an-mp-groupes')
-    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = tab==='convs' ? 'flex' : 'none' }
-    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display  = tab!=='convs'  ? 'flex' : 'none' }
-    if (tab !== 'convs') this._loadGroups?.()
+    document.getElementById(`an-mp-${tab}`).classList.add('active')
+    if (tab === 'groupes') this._loadGroups()
+    if (tab === 'convs') this._loadConvList()
   }
 
   // ── GROUPES ──
@@ -1879,7 +1701,7 @@ class AN {
 
   backToConvList() {
     const cv = document.getElementById('an-chat-view')
-    if (cv) { cv.classList.remove('visible'); cv.style.display = '' }
+    if (cv) cv.style.display = 'none'
     const convView = document.getElementById('an-conv-view')
     if (convView) convView.style.display = ''
     this.mpFriend = null
@@ -1929,35 +1751,34 @@ class AN {
   // RANGS
   _renderRanks() {
     if (!this.p) return
-    const render = (el) => {
-      if (!el) return
-      const RANK_IMGS = {
-        Supporter: 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/Supporter.png',
-        Dragon:    'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/dragon.png',
-        Socio:     'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/socio.png',
-        Légende:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/legende.png',
-        Invicta:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/invicta.png',
-      }
-      el.innerHTML = RANKS.map(r => {
-        const isCurrent = this.p.rank === r.id
-        const img = RANK_IMGS[r.id]
-        return `<div class="an-rank-row${isCurrent?' current':''}">
-          <div class="an-rank-left">
-            <img src="${img}" style="width:40px;height:40px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
-            <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
-          </div>
-          ${isCurrent ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;color:${r.color};border:1px solid ${r.color};padding:2px 6px">ACTUEL</span>` : ''}
-        </div>`
-      }).join('')
+    const RANK_IMGS = {
+      Supporter: 'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/Supporter.png',
+      Dragon:    'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/dragon.png',
+      Socio:     'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/socio.png',
+      Légende:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/legende.png',
+      Invicta:   'https://eaiiesiouwqpwtxrebax.supabase.co/storage/v1/object/public/Badges/Rang/invicta.png',
     }
-    const el = document.getElementById('an-rank-list')
-    const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
-    render(el)
-    render(document.getElementById('an-ranks-in-profil'))
+    const html = RANKS.map(r => {
+      const isCurrent = this.p.rank === r.id
+      const canAfford = this.p.points >= r.cost
+      const img = RANK_IMGS[r.id]
+      return `<div class="an-rank-row${isCurrent?' current':''}">
+        <div class="an-rank-left">
+          <img src="${img}" style="width:48px;height:48px;object-fit:contain;flex-shrink:0" onerror="this.style.display='none'">
+          <div><div class="an-rank-name" style="color:${r.color}">${r.id}</div><div class="an-rank-price">${r.cost===0?'Rang de départ':r.cost.toLocaleString('fr-FR')+' pts'}</div></div>
+        </div>
+        ${isCurrent
+          ? `<button class="an-micro-btn" style="color:${r.color};border-color:${r.border}" disabled>Actuel</button>`
+          : r.cost===0 ? ''
           : `<button class="an-micro-btn${canAfford?' blue':''}" ${!canAfford?'disabled':''} style="${canAfford?'':'opacity:.4'}" onclick="AN.buyRank('${r.id}',${r.cost})">${canAfford?'Acheter':'Insuffisant'}</button>`
         }
       </div>`
     }).join('')
+    const el = document.getElementById('an-rank-list')
+    const pts = document.getElementById('an-rangs-pts'); if (pts) pts.textContent = this.p.points
+    if (el) el.innerHTML = html
+    const elProfil = document.getElementById('an-ranks-in-profil')
+    if (elProfil) elProfil.innerHTML = html
   }
 
   async buyRank(rankId, cost) {
@@ -2178,7 +1999,6 @@ class AN {
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: gain, reason: 'match_win', ref_id: String(id) })
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team} · +${gain} pts` })
         await supabase.from('bets').update({ status: 'won' }).eq('id', entry.id)
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'won', matchLabel: m.home_team + ' vs ' + m.away_team, gain }) }).catch(()=>{})
         addXp(entry.user_id, XP_REWARDS.bet_win, 'bet_win').catch(() => {})
         addWeeklyPoints(entry.user_id, gain).catch(() => {})
         // Rivalités : incrémenter le score du gagnant
@@ -2186,7 +2006,6 @@ class AN {
       } else {
         await supabase.from('bets').update({ status: 'lost' }).eq('id', entry.id)
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${m.home_team} vs ${m.away_team}` })
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'lost', matchLabel: m.home_team + ' vs ' + m.away_team, stake: entry.stake }) }).catch(()=>{})
       }
     }
     this._toast('Match terminé, gains distribués ✅', 'ok')
@@ -2222,21 +2041,15 @@ class AN {
     el.innerHTML = data.map(u => {
       const isBanned = bannedIds.has(u.id)
       const isMe = u.id === this.u?.id
-      const isAdmin = u.role === 'admin'
       return `<div class="an-admin-row">
         <div class="an-admin-row-info">
-          <div class="an-admin-row-title">${u.display_name||u.username} ${isAdmin?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
+          <div class="an-admin-row-title">${u.display_name||u.username} ${u.role==='admin'?'<span class="an-admin-badge">ADMIN</span>':''} ${isBanned?'<span class="an-admin-badge" style="background:#f0a500">BANNI</span>':''}</div>
           <div class="an-admin-row-sub">${u.rank} · ${u.points} pts</div>
         </div>
-        <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px;justify-content:flex-end">
-          <button class="an-micro-btn blue" onclick="AN.adminEditPoints('${u.id}','${u.display_name||u.username}',${u.points})">± Pts</button>
-          ${!isMe ? (isAdmin
-            ? `<button class="an-micro-btn orange" onclick="AN.adminDemote('${u.id}','${u.display_name||u.username}')">↓ Admin</button>`
-            : `<button class="an-micro-btn green" onclick="AN.adminPromote('${u.id}','${u.display_name||u.username}')">↑ Admin</button>`
-          ) : ''}
+        <div class="an-admin-acts">
           ${!isMe ? (isBanned
             ? `<button class="an-micro-btn green" onclick="AN.adminUnban('${u.id}')">Débannir</button>`
-            : `<button class="an-micro-btn red" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
+            : `<button class="an-micro-btn orange" onclick="AN.adminBan('${u.id}','${u.display_name||u.username}')">Bannir</button>`
           ) : ''}
         </div>
       </div>`
@@ -2260,35 +2073,6 @@ class AN {
     if (!this.isAdmin()) return
     await supabase.from('bans').delete().eq('user_id', userId)
     this._toast('Utilisateur débanni', 'ok')
-    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
-  }
-
-  async adminPromote(userId, username) {
-    if (!this.isAdmin()) return
-    if (!confirm(`Promouvoir ${username} en admin ?`)) return
-    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId)
-    this._toast(`${username} est maintenant admin ✅`, 'ok')
-    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
-  }
-
-  async adminDemote(userId, username) {
-    if (!this.isAdmin()) return
-    if (!confirm(`Rétrograder ${username} (retirer les droits admin) ?`)) return
-    await supabase.from('profiles').update({ role: 'user' }).eq('id', userId)
-    this._toast(`${username} rétrogradé`, 'ok')
-    this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
-  }
-
-  async adminEditPoints(userId, username, currentPts) {
-    if (!this.isAdmin()) return
-    const input = prompt(`Points actuels de ${username} : ${currentPts}\nEntrer le montant à ajouter (négatif pour enlever) :`)
-    if (input === null) return
-    const delta = parseInt(input)
-    if (isNaN(delta)) { this._toast('Valeur invalide', 'err'); return }
-    const newPts = Math.max(0, currentPts + delta)
-    await supabase.from('profiles').update({ points: newPts }).eq('id', userId)
-    await supabase.from('points_log').insert({ user_id: userId, amount: delta, reason: 'admin_edit', ref_id: null })
-    this._toast(`${username} : ${delta > 0 ? '+' : ''}${delta} pts (total: ${newPts})`, 'ok')
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
