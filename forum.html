@@ -762,6 +762,9 @@ window.submitReply = async function() {
       // Increment reply_count directly (no RPC needed)
       await supabase.from('forum_threads').update({ reply_count: (currentThread.reply_count || 0) + 1 }).eq('id', currentThread.id)
       currentThread.reply_count = (currentThread.reply_count || 0) + 1
+      // Sync allThreads en mémoire
+      const t = allThreads.find(x => x.id === currentThread.id)
+      if (t) t.reply_count = currentThread.reply_count
       showToast('+3 pts ! Réponse publiée', 'success')
     }
 
@@ -780,6 +783,9 @@ window.deleteReply = async function(replyId, threadId) {
   const newCount = Math.max(0, (t?.reply_count || 1) - 1)
   await supabase.from('forum_threads').update({ reply_count: newCount }).eq('id', threadId)
   if (currentThread?.id === threadId) currentThread.reply_count = newCount
+  // Sync allThreads en mémoire
+  const t = allThreads.find(x => x.id === threadId)
+  if (t) t.reply_count = newCount
   await openThread(threadId)
 }
 
@@ -1220,7 +1226,7 @@ function lbMiniRow(u, i, pts, field) {
   const avHTML = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
   const medals = ['🥇','🥈','🥉']
   const rankDisplay = i < 3 ? medals[i] : `${i+1}`
-  return `<div class="lb-mini-row">
+  return `<div class="lb-mini-row" style="cursor:pointer" onclick="AN?.openProfileCard('${u.id}',this)">
     <div class="lb-mini-rank">${rankDisplay}</div>
     <div class="lb-mini-av">${avHTML}</div>
     <div class="lb-mini-info">
