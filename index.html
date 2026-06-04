@@ -2307,6 +2307,61 @@ img[loading="lazy"].loaded { opacity: 1; }
   body > #cursor-glow,
   body > #page-loader { position: fixed !important; }
   </style>
+
+  <style>
+  /* ══ MOBILE UX OVERHAUL ══════════════════════════════════════════ */
+  @media (max-width: 768px) {
+
+    /* 1. RÉORDONNANCEMENT — match en premier */
+    .page { display: flex; flex-direction: column; }
+    nav { order: 0; }
+    .ticker { order: 1; }
+    .hero { order: 2; }
+    .match-section:last-of-type { order: 3; }
+    .articles-section { order: 4; }
+    .vitrine-section { order: 5; }
+    .match-section:first-of-type { order: 6; }
+    .shop-section { order: 7; }
+    .newsletter-section { order: 8; }
+    footer { order: 9; }
+
+    /* 2. HERO — épuré */
+    .hero-lead { display: none !important; }
+    .hero-title { font-size: clamp(38px, 11vw, 56px) !important; line-height: 0.9 !important; }
+    .hero-content { padding: 24px 20px 20px !important; }
+    .hero-btn { margin-top: 16px !important; padding: 10px 20px !important; font-size: 11px !important; }
+
+    /* 3. VITRINE — 2 gros boutons horizontaux */
+    .vitrine-section { padding: 32px 20px !important; }
+    .vitrine-title { font-size: clamp(26px, 8vw, 40px) !important; }
+    .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; }
+    .vitrine-card { padding: 20px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; }
+    .vitrine-card-title { font-size: 22px !important; line-height: 1 !important; }
+    .vitrine-card-desc, .vitrine-features, .vitrine-stats { display: none !important; }
+    .vitrine-cta { flex-shrink: 0 !important; font-size: 10px !important; white-space: nowrap !important; padding: 10px 14px !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+
+    /* 4. ARTICLES — 2 seulement */
+    .articles-section { padding: 24px 20px !important; }
+    .article-card:nth-child(3) { display: none !important; }
+    .article-card { min-height: 140px !important; }
+    .article-card.featured .article-title { font-size: 18px !important; }
+
+    /* 5. STATS LIGA — cachées */
+    .match-section:first-of-type { display: none !important; }
+
+    /* 6. SHOP — scroll horizontal snappé */
+    .shop-section { padding: 28px 0 28px 20px !important; }
+    .shop-header { padding: 0 20px 16px 0 !important; }
+    .shop-grid { display: flex !important; flex-direction: row !important; gap: 12px !important; overflow-x: auto !important; -webkit-overflow-scrolling: touch !important; padding-right: 20px !important; scroll-snap-type: x mandatory !important; }
+    .shop-card { flex: 0 0 72vw !important; scroll-snap-align: start !important; }
+
+    /* 7. TOAST au-dessus bottom nav */
+    #toast-container { bottom: calc(56px + env(safe-area-inset-bottom,0px) + 12px) !important; left: 16px !important; right: 16px !important; }
+  }
+  @media (max-width: 480px) {
+    .shop-card { flex: 0 0 82vw !important; }
+  }
+  </style>
 </head>
 <body>
 <div id="page-loader"><div class="loader-inner"><div class="loader-text">NewsPorto</div><div class="loader-bar"><div class="loader-bar-fill"></div></div></div></div>
