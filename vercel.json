@@ -1,12 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron-match",
-      "schedule": "0 8 * * *"
+      "path": "/api/cron-streak-reminder",
+      "schedule": "0 17 * * *"
     }
-  ],
-  "routes": [
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/404.html", "status": 404 }
   ]
 }
