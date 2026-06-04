@@ -314,51 +314,135 @@ const CSS = `
 .an-admin-form .an-label { margin-top:10px; }
 .an-odds-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 
+/* ── BOTTOM NAV MOBILE ── */
+.an-bottom-nav {
+  display:none;
+  position:fixed; bottom:0; left:0; right:0;
+  height:56px;
+  background:#04070d;
+  border-top:1px solid rgba(0,61,165,0.25);
+  z-index:801;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+.an-bottom-nav-inner {
+  display:flex; height:56px; align-items:stretch;
+}
+.an-bnav-btn {
+  flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap:3px; background:none; border:none; cursor:pointer;
+  color:rgba(255,255,255,0.35); transition:color .15s;
+  position:relative; padding:0;
+}
+.an-bnav-btn.active { color:#4d82d4; }
+.an-bnav-btn svg { width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.8; }
+.an-bnav-label { font-family:'Barlow Condensed',sans-serif; font-size:8px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+.an-bnav-dot { position:absolute; top:8px; right:calc(50% - 14px); width:6px; height:6px; border-radius:50%; background:#e74c3c; display:none; border:1.5px solid #04070d; }
+.an-bnav-dot.on { display:block; }
+
 @media(max-width:768px) {
-  /* Panel takes full screen */
-  #an-panel { width:100%; border-left:none; }
-  #an-pill-info { display:none; }
-  /* Bigger touch targets */
-  .an-tab { padding:12px 2px; font-size:8px; letter-spacing:1.5px; }
-  .an-friend-row { padding:12px 16px; }
-  .an-notif-item { padding:12px 16px; }
-  .an-admin-row { padding:12px 16px; }
-  .an-conv-row { padding:14px 16px; }
-  .an-rank-row { padding:14px 16px; }
-  /* Input fields bigger for mobile */
-  .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; } /* 16px prevents iOS zoom */
-  .an-auth-input { font-size:16px; } /* prevents iOS zoom */
-  .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
-  /* Chat full height mobile */
-  #an-sec-mp { overflow:hidden; display:flex; flex-direction:column; }
-  .an-admin-sub-content.active { display:flex; flex-direction:column; flex:1; min-height:0; }
-  #an-mp-convs { flex:1; min-height:0; overflow:hidden; display:flex; flex-direction:column; }
-  #an-chat-view { flex:1; min-height:0; }
-  .an-chat-wrap { height:100%; display:flex; flex-direction:column; }
-  .an-chat-msgs { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-  .an-chat-input-row { flex-shrink:0; padding-bottom:max(12px, env(safe-area-inset-bottom)); }
-  /* Auth modal */
-  #an-auth-modal { align-items:flex-end; }
-  .an-auth-box { border-radius:0; border-bottom:none; padding:28px 20px; padding-bottom:calc(28px + env(safe-area-inset-bottom,0px)); max-width:100%; }
-  /* Panel head smaller */
-  .an-panel-head { padding:12px 16px; }
-  .an-head-avatar { width:38px; height:38px; font-size:17px; }
+  /* Panel : full screen, pas de header, navigation par bottom nav */
+  #an-panel {
+    width:100%; border-left:none;
+    top:0; right:0; bottom:0;
+    transform:translateX(100%);
+  }
+  #an-panel.open { transform:translateX(0); }
+
+  /* Cacher les tabs horizontales sur mobile, remplacées par bottom nav */
+  .an-tabs { display:none; }
+
+  /* Panel head compact */
+  .an-panel-head { padding:10px 14px; min-height:54px; }
+  .an-head-avatar { width:36px; height:36px; font-size:16px; }
   .an-head-name { font-size:13px; }
-  .an-head-pts { font-size:18px; }
-  /* Row labels */
-  .an-row-label { padding:12px 16px 4px; }
-  .an-field { padding:0 16px 10px; }
-  .an-save-row { padding:10px 16px 16px; }
-  .an-search-wrap { padding:10px 16px; }
-  /* Admin sub tabs */
-  .an-admin-sub-tab { font-size:8px; padding:10px 4px; letter-spacing:1.5px; }
-  .an-admin-form { padding:10px 16px; }
-  /* Rank rows */
-  .an-rank-emoji { font-size:20px; }
-  .an-rank-name { font-size:17px; }
-  /* Trigger button */
+  .an-head-pts { font-size:16px; }
+  #an-pill-info { display:none; }
   #an-trigger-btn { padding:4px 8px 4px 4px; gap:6px; }
   #an-avatar-pill { width:28px; height:28px; font-size:12px; }
+
+  /* Body : prend tout l'espace, bottom nav réserve 56px */
+  .an-body {
+    padding-bottom:calc(56px + env(safe-area-inset-bottom,0px));
+  }
+
+  /* Sections : scroll interne correct, pas de débordement */
+  .an-section {
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    overflow-y:auto; -webkit-overflow-scrolling:touch;
+    display:none; flex-direction:column;
+  }
+  .an-section.active { display:flex; }
+
+  /* Body wrapper doit être relative pour que position:absolute fonctionne */
+  .an-body { position:relative; overflow:hidden; }
+
+  /* MP : chat prend toute la hauteur disponible */
+  #an-sec-mp { overflow:hidden; }
+  #an-mp-convs, #an-mp-groupes {
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    display:none; flex-direction:column; overflow:hidden;
+  }
+  #an-mp-convs.active, #an-mp-groupes.active { display:flex; }
+  #an-conv-view { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
+  #an-chat-view { flex:1; min-height:0; display:flex; flex-direction:column; }
+  .an-chat-wrap { flex:1; min-height:0; display:flex; flex-direction:column; }
+  .an-chat-msgs { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:10px 12px; }
+  .an-chat-input-row {
+    flex-shrink:0; padding:8px 12px;
+    padding-bottom:max(8px, env(safe-area-inset-bottom));
+    background:#04070d;
+  }
+
+  /* Bottom nav visible sur mobile */
+  .an-bottom-nav { display:block; z-index:802; }
+
+  /* Inputs 16px pour éviter zoom iOS */
+  .an-input, .an-search, .an-chat-input { font-size:16px; padding:12px; }
+  .an-auth-input { font-size:16px; }
+  .an-btn, .an-auth-btn { padding:14px; font-size:12px; }
+
+  /* Touch targets */
+  .an-friend-row { padding:14px 14px; min-height:56px; }
+  .an-notif-item { padding:12px 14px; }
+  .an-admin-row { padding:12px 14px; }
+  .an-conv-row { padding:14px 14px; min-height:56px; }
+  .an-rank-row { padding:16px 14px; min-height:56px; }
+
+  /* Labels & champs */
+  .an-row-label { padding:12px 14px 4px; }
+  .an-field { padding:0 14px 10px; }
+  .an-save-row { padding:10px 14px 14px; }
+  .an-search-wrap { padding:10px 14px; }
+  .an-admin-sub-tab { font-size:9px; padding:10px 6px; letter-spacing:1px; }
+  .an-admin-form { padding:10px 14px; }
+  .an-rank-emoji { font-size:22px; }
+  .an-rank-name { font-size:19px; }
+
+  /* Auth modal slide from bottom */
+  #an-auth-modal { align-items:flex-end; }
+  .an-auth-box {
+    border-radius:16px 16px 0 0; border-bottom:none;
+    padding:24px 18px calc(24px + env(safe-area-inset-bottom,0px));
+    max-width:100%;
+  }
+  .an-auth-box::before {
+    content:''; display:block; width:36px; height:4px;
+    background:rgba(255,255,255,0.15); border-radius:2px;
+    margin:0 auto 20px;
+  }
+
+  /* Profile card pleine largeur */
+  #an-profile-card {
+    width:calc(100vw - 24px) !important;
+    left:12px !important; right:12px;
+    top:50% !important; transform:translateY(-50%) !important;
+    max-height:90vh; overflow-y:auto;
+  }
+  #an-profile-card.open { display:block; }
+
+  /* Admin acts wrap */
+  .an-admin-acts { flex-wrap:wrap; gap:4px; max-width:160px; justify-content:flex-end; }
+  .an-micro-btn { padding:6px 8px; font-size:9px; min-height:32px; }
 }
 /* Safe area for panel */
 @supports(padding-bottom: env(safe-area-inset-bottom)){
@@ -755,6 +839,34 @@ function html() { return `
   </div>
 </div>
 
+<!-- BOTTOM NAV MOBILE -->
+<div class="an-bottom-nav" id="an-bottom-nav">
+  <div class="an-bottom-nav-inner">
+    <button class="an-bnav-btn active" data-tab="profil" onclick="AN.tabTo('profil')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span class="an-bnav-label">Profil</span>
+    </button>
+    <button class="an-bnav-btn" data-tab="notifs" onclick="AN.tabTo('notifs')">
+      <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="an-bnav-label">Notifs</span>
+      <span class="an-bnav-dot" id="bnav-dot-notifs"></span>
+    </button>
+    <button class="an-bnav-btn" data-tab="mp" onclick="AN.tabTo('mp')">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="an-bnav-label">Messages</span>
+      <span class="an-bnav-dot" id="bnav-dot-mp"></span>
+    </button>
+    <button class="an-bnav-btn" data-tab="amis" onclick="AN.tabTo('amis')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="an-bnav-label">Amis</span>
+    </button>
+    <button class="an-bnav-btn" data-tab="rangs" onclick="AN.tabTo('rangs')">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      <span class="an-bnav-label">Rangs</span>
+    </button>
+  </div>
+</div>
+
 <div id="an-toast"></div>
 
 <div id="an-profile-card">
@@ -994,11 +1106,27 @@ class AN {
   }
 
   tabTo(tab) {
+    // Tabs desktop
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
+    // Bottom nav mobile
+    document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
+    // Sections — toutes cachées puis active affichée
+    document.querySelectorAll('.an-section').forEach(s => {
+      s.classList.remove('active')
+      s.style.display = 'none'
+    })
+    const sec = document.getElementById('an-sec-' + tab)
+    if (sec) { sec.classList.add('active'); sec.style.display = 'flex' }
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
-    if (tab === 'mp') this._loadConvList()
+    if (tab === 'mp') {
+      this._loadConvList()
+      // Réinitialiser les sub-tabs MP
+      const convs = document.getElementById('an-mp-convs')
+      const grps = document.getElementById('an-mp-groupes')
+      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
+      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
+    }
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
@@ -1591,11 +1719,16 @@ class AN {
 
   mpSubTab(tab, btn) {
     document.querySelectorAll('#an-sec-mp .an-admin-sub-tab').forEach(b => b.classList.remove('active'))
-    document.querySelectorAll('#an-sec-mp .an-admin-sub-content').forEach(c => c.classList.remove('active'))
     btn.classList.add('active')
-    document.getElementById(`an-mp-${tab}`).classList.add('active')
-    if (tab === 'groupes') this._loadGroups()
-    if (tab === 'convs') this._loadConvList()
+    const convs = document.getElementById('an-mp-convs')
+    const grps = document.getElementById('an-mp-groupes')
+    if (tab === 'convs') {
+      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
+      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
+    } else {
+      if (grps) { grps.classList.add('active'); grps.style.display = 'flex' }
+      if (convs) { convs.classList.remove('active'); convs.style.display = 'none' }
+    }
   }
 
   // ── GROUPES ──
