@@ -608,11 +608,11 @@ function renderThreadList() {
     const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : ''
     const lvl = a.level || 1
     return `
-    <div class="thread-row" onclick="openThread(${t.id})">
+    <div class="thread-row" data-thread-id="${t.id}" onclick="openThread(${t.id})">
       <div class="vote-col" onclick="event.stopPropagation()">
-        <button class="vote-btn up${uv===1?' active':''}" onclick="castVote(${t.id},1,this)" title="Upvote">${upSVG}</button>
+        <button class="vote-btn up${uv===1?' active':''}" id="vup-${t.id}" onclick="castVote(${t.id},1,this)" title="Upvote">${upSVG}</button>
         <span class="vote-score ${scoreClass}" id="vs-${t.id}">${score}</span>
-        <button class="vote-btn down${uv===-1?' active':''}" onclick="castVote(${t.id},-1,this)" title="Downvote">${downSVG}</button>
+        <button class="vote-btn down${uv===-1?' active':''}" id="vdn-${t.id}" onclick="castVote(${t.id},-1,this)" title="Downvote">${downSVG}</button>
       </div>
       <div style="flex:1;min-width:0">
         <div class="thread-top">
@@ -760,11 +760,14 @@ window.submitReply = async function() {
       }
       // increment reply count
       // Increment reply_count directly (no RPC needed)
-      await supabase.from('forum_threads').update({ reply_count: (currentThread.reply_count || 0) + 1 }).eq('id', currentThread.id)
+      await supabase.rpc('increment_reply_count', { thread_id: currentThread.id }).catch(() => supabase.from('forum_threads').update({ reply_count: (currentThread.reply_count || 0) + 1 }).eq('id', currentThread.id))
       currentThread.reply_count = (currentThread.reply_count || 0) + 1
-      // Sync allThreads en mémoire
+      // Sync allThreads en mémoire + DOM direct
       const t = allThreads.find(x => x.id === currentThread.id)
       if (t) t.reply_count = currentThread.reply_count
+      // Mettre à jour le compteur visible dans la liste sans attendre le realtime
+      const replyCountEl = document.querySelector(`[data-thread-id="${currentThread.id}"] .thread-replies`)
+      if (replyCountEl) replyCountEl.textContent = currentThread.reply_count
       showToast('+3 pts ! Réponse publiée', 'success')
     }
 
@@ -876,17 +879,16 @@ window.castVote = async function(threadId, vote, btn) {
     // Update thread votes count
     await supabase.from('forum_threads').update({ votes: newScore }).eq('id', threadId)
 
-    // Update UI
-    const scoreEl = document.getElementById(`vs-${threadId}`)
+    // Update UI via ids directs
+    const scoreEl = document.getElementById('vs-' + threadId)
     if (scoreEl) {
       scoreEl.textContent = newScore
       scoreEl.className = 'vote-score' + (newScore > 0 ? ' positive' : newScore < 0 ? ' negative' : '')
     }
-    const row = btn.closest('.thread-row')
-    if (row) {
-      row.querySelector('.vote-btn.up')?.classList.toggle('active', newUserVote === 1)
-      row.querySelector('.vote-btn.down')?.classList.toggle('active', newUserVote === -1)
-    }
+    const upBtn = document.getElementById('vup-' + threadId)
+    const dnBtn = document.getElementById('vdn-' + threadId)
+    if (upBtn) upBtn.classList.toggle('active', newUserVote === 1)
+    if (dnBtn) dnBtn.classList.toggle('active', newUserVote === -1)
     userVotesMap[threadId] = newUserVote
     if (thread) thread.votes = newScore
   } catch(e) { showToast(e.message, 'error') }
@@ -927,8 +929,12 @@ function subscribeRealtime() {
         .limit(50)
       if (data) {
         allThreads = data
+        // Recharger les votes user pour garder l'état actif des boutons
+        if (currentUser && allThreads.length) {
+          userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
+        }
         updateCounts()
-        renderThreadList() // preserves currentSort + currentCat
+        renderThreadList()
       }
     })
     .subscribe()
