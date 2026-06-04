@@ -757,6 +757,9 @@ window.submitReply = async function() {
       if (currentThread.author_id !== currentUser.id) {
         const title = currentThread.title.substring(0,60)
         await supabase.from('notifications').insert({ user_id: currentThread.author_id, type: 'reply', from_user_id: currentUser.id, ref_id: String(currentThread.id), ref_label: title })
+        // Email
+        const fromName = currentProfile?.display_name || currentProfile?.username || 'Un membre'
+        fetch('/api/notify-forum', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: currentThread.author_id, fromName, threadTitle: title, type:'reply' }) }).catch(()=>{})
       }
       // increment reply count
       // Increment reply_count directly (no RPC needed)
@@ -860,33 +863,26 @@ window.castVote = async function(threadId, vote, btn) {
   try {
     const tid = String(threadId)
     const prevVote = parseInt(userVotesMap[tid] ?? userVotesMap[threadId] ?? 0)
-    const thread = allThreads.find(x => String(x.id) === tid)
-    // Récupérer le score réel depuis la DB pour éviter les états stale
-    const { data: freshThread } = await supabase.from('forum_threads').select('votes').eq('id', threadId).single()
-    const currentScore = parseInt(freshThread?.votes ?? thread?.votes ?? 0)
-
     const newUserVote = prevVote === vote ? 0 : vote
-    const delta = newUserVote - prevVote
-    const newScore = currentScore + delta
 
+    // DB update
     if (newUserVote === 0) {
       await supabase.from('thread_votes').delete().eq('thread_id', threadId).eq('user_id', currentUser.id)
     } else {
       await supabase.from('thread_votes').upsert({ thread_id: threadId, user_id: currentUser.id, vote: newUserVote }, { onConflict: 'thread_id,user_id' })
     }
+    // Recalcul depuis la source de vérité (évite tous les problèmes de stale state)
+    const { data: allVotes } = await supabase.from('thread_votes').select('vote').eq('thread_id', threadId)
+    const newScore = (allVotes || []).reduce((sum, v) => sum + (parseInt(v.vote) || 0), 0)
     await supabase.from('forum_threads').update({ votes: newScore }).eq('id', threadId)
 
+    // UI
     const scoreEl = document.getElementById('vs-' + threadId)
-    if (scoreEl) {
-      scoreEl.textContent = newScore
-      scoreEl.className = 'vote-score' + (newScore > 0 ? ' positive' : newScore < 0 ? ' negative' : '')
-    }
-    const upBtn = document.getElementById('vup-' + threadId)
-    const dnBtn = document.getElementById('vdn-' + threadId)
-    if (upBtn) upBtn.classList.toggle('active', newUserVote === 1)
-    if (dnBtn) dnBtn.classList.toggle('active', newUserVote === -1)
-    userVotesMap[tid] = newUserVote
-    userVotesMap[threadId] = newUserVote
+    if (scoreEl) { scoreEl.textContent = newScore; scoreEl.className = 'vote-score' + (newScore > 0 ? ' positive' : newScore < 0 ? ' negative' : '') }
+    document.getElementById('vup-' + threadId)?.classList.toggle('active', newUserVote === 1)
+    document.getElementById('vdn-' + threadId)?.classList.toggle('active', newUserVote === -1)
+    userVotesMap[tid] = newUserVote; userVotesMap[threadId] = newUserVote
+    const thread = allThreads.find(x => String(x.id) === tid)
     if (thread) thread.votes = newScore
   } catch(e) { showToast(e.message, 'error') }
 }
