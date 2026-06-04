@@ -3,20 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pronostics · NewsPorto</title>
+  <title>Forum · NewsPorto</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --white:#fff; --gray:rgba(255,255,255,0.45); --border:rgba(255,255,255,0.1);
-      --border-blue:rgba(0,61,165,0.38); --blue:#003DA5; --blue-mid:#0050CC;
-      --blue-light:#4d82d4; --blue-subtle:rgba(0,61,165,0.1);
-      --green:#00c87a; --green-subtle:rgba(0,200,122,0.1);
-      --red:#e74c3c; --red-subtle:rgba(231,76,60,0.1);
-      --yellow:#f0a500; --yellow-subtle:rgba(240,165,0,0.1);
-      --grid:rgba(255,255,255,0.05);
-    }
+    :root{--white:#fff;--gray:rgba(255,255,255,0.45);--border:rgba(255,255,255,0.1);--border-blue:rgba(0,61,165,0.38);--blue:#003DA5;--blue-mid:#0050CC;--blue-light:#4d82d4;--green:#00c87a;--red:#e74c3c;--yellow:#f0a500;--grid:rgba(255,255,255,0.05);}
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
     html{scroll-behavior:smooth;}
     body{background:#000;color:#fff;font-family:'Barlow',sans-serif;overflow-x:hidden;}
@@ -37,151 +29,164 @@
     .nav-hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;padding:4px;}
     .nav-hamburger span{display:block;width:22px;height:1.5px;background:#fff;transition:transform .3s,opacity .3s;}
     .page{position:relative;z-index:1;}
-    .page-header{padding:56px 48px 40px;border-bottom:1px solid var(--border);}
+
+    /* PAGE HEADER */
+    .page-header{padding:48px 48px 36px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:24px;}
     .page-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:14px;display:flex;align-items:center;gap:10px;}
     .page-eyebrow::before{content:'';display:block;width:28px;height:1px;background:var(--blue);}
-    .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,7vw,100px);line-height:.88;letter-spacing:1px;text-transform:uppercase;}
-    .page-title .outline{-webkit-text-stroke:1.5px var(--white);color:transparent;}
-    .page-sub{font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:1px;color:var(--gray);margin-top:16px;max-width:500px;line-height:1.6;}
-    .points-banner{padding:20px 48px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(0,61,165,0.04);}
-    .points-info{display:flex;align-items:center;gap:32px;}
-    .points-balance{display:flex;align-items:baseline;gap:8px;}
-    .points-num{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--blue-light);}
-    .points-label{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
-    .rank-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:4px 10px;border:1px solid;}
-    .rank-adepto{color:#fff;border-color:rgba(255,255,255,0.3);}
-    .rank-dragao{color:var(--blue-light);border-color:var(--blue);}
-    .rank-ultras{color:var(--yellow);border-color:var(--yellow);}
-    .rank-lenda{color:var(--red);border-color:var(--red);}
-    .rank-invicta{color:#c9a84c;border-color:#c9a84c;}
-    .main-content{padding:48px 48px 100px;max-width:1100px;margin:0 auto;}
-    .section-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:24px;display:flex;align-items:center;gap:10px;}
-    .section-label::before{content:'';display:block;width:28px;height:1px;background:var(--blue);}
-    .bet-card{border:1px solid var(--border);margin-bottom:2px;position:relative;overflow:hidden;transition:border-color .3s;}
-    .bet-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--blue),transparent);transform:scaleX(0);transition:transform .5s cubic-bezier(.22,1,.36,1);}
-    .bet-card:hover::before,.bet-card.active::before{transform:scaleX(1);}
-    .bet-card:hover{border-color:rgba(0,61,165,0.4);}
-    .bet-card-header{padding:24px 32px 0;display:flex;align-items:center;justify-content:space-between;}
-    .bet-competition{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
-    .bet-deadline{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
-    .deadline-dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 2s ease-in-out infinite;}
-    @keyframes pulse-dot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(0.7)}}
-    .deadline-text{color:var(--green);}
-    .deadline-closed{color:var(--gray);}
-    .deadline-closed .deadline-dot{background:var(--gray);animation:none;}
-    .bet-teams{padding:24px 32px;display:flex;align-items:center;justify-content:center;gap:40px;}
-    .bet-team{display:flex;flex-direction:column;align-items:center;gap:10px;flex:1;}
-    .bet-logo{width:56px;height:56px;object-fit:contain;}
-    .bet-logo-placeholder{width:56px;height:56px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gray);}
-    .bet-team-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;text-align:center;}
-    .bet-vs{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:rgba(255,255,255,0.15);min-width:80px;text-align:center;}
-    .bet-infos{display:flex;gap:0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
-    .bet-info{flex:1;padding:12px 20px;border-right:1px solid var(--border);text-align:center;}
-    .bet-info:last-child{border-right:none;}
-    .bet-info-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:4px;}
-    .bet-info-value{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;}
-    .bet-options{padding:24px 32px 32px;display:flex;gap:12px;}
-    .bet-option{flex:1;border:1px solid var(--border);padding:20px 16px;cursor:pointer;text-align:center;background:transparent;transition:border-color .2s,background .2s,transform .15s;position:relative;overflow:hidden;}
-    .bet-option:hover{border-color:rgba(0,61,165,0.5);transform:translateY(-2px);}
-    .bet-option.selected{border-color:var(--blue);background:rgba(0,61,165,0.12);}
-    .bet-option.win-option.selected{border-color:var(--green);background:var(--green-subtle);}
-    .bet-option.draw-option.selected{border-color:var(--yellow);background:var(--yellow-subtle);}
-    .bet-option.lose-option.selected{border-color:var(--red);background:var(--red-subtle);}
-    .bet-option.disabled{opacity:.35;cursor:not-allowed;pointer-events:none;}
-    .bet-option-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:8px;}
-    .bet-option-result{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;display:block;margin-bottom:10px;}
-    .win-option .bet-option-result{color:var(--green);}
-    .draw-option .bet-option-result{color:var(--yellow);}
-    .lose-option .bet-option-result{color:var(--red);}
-    .bet-option-mult{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;display:block;margin-bottom:4px;}
-    .win-option .bet-option-mult{color:var(--green);}
-    .draw-option .bet-option-mult{color:var(--yellow);}
-    .lose-option .bet-option-mult{color:var(--red);}
-    .bet-option-sub{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;}
-    .bet-stake{padding:0 32px 32px;display:flex;align-items:flex-end;gap:20px;border-top:1px solid var(--border);padding-top:24px;}
-    .stake-input-wrap{flex:1;}
-    .stake-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:8px;}
-    .stake-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;outline:none;transition:border-color .2s;width:100%;}
-    .stake-input:focus{border-color:var(--blue);background:rgba(0,20,80,0.1);}
-    .stake-input::placeholder{color:rgba(255,255,255,0.15);}
-    .stake-quick{display:flex;gap:6px;margin-top:8px;}
-    .stake-quick-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.12);color:var(--gray);padding:4px 10px;cursor:pointer;background:none;transition:.2s;}
-    .stake-quick-btn:hover{border-color:var(--blue-light);color:#fff;}
-    .stake-preview{text-align:right;min-width:140px;}
-    .stake-preview-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:6px;}
-    .stake-preview-value{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--green);display:block;margin-bottom:12px;}
-    .stake-preview-value.zero{color:rgba(255,255,255,0.15);}
-    .btn-bet{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:14px 32px;cursor:pointer;transition:.25s;width:100%;display:block;}
-    .btn-bet:hover{background:var(--blue-mid);transform:translateY(-1px);box-shadow:0 8px 32px rgba(0,61,165,0.35);}
-    .btn-bet:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;transform:none;box-shadow:none;}
-    .bet-result-banner{padding:12px 32px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);}
-    .bet-result-banner.won{background:var(--green-subtle);border-top-color:rgba(0,200,122,0.2);}
-    .bet-result-banner.lost{background:var(--red-subtle);border-top-color:rgba(231,76,60,0.2);}
-    .bet-result-banner.pending{background:rgba(255,255,255,0.02);}
-    .result-label{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
-    .result-points{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;}
-    .won .result-points{color:var(--green);}
-    .lost .result-points{color:var(--red);}
-    .history-grid{border:1px solid var(--border);}
-    .history-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;padding:16px 24px;border-bottom:1px solid var(--border);align-items:center;gap:16px;}
-    .history-row:last-child{border-bottom:none;}
-    .history-row.header{padding:10px 24px;background:rgba(255,255,255,0.02);}
-    .history-row.header span{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);}
-    .history-match{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;}
-    .history-pick{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;}
-    .history-stake{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--gray);}
-    .history-result{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;}
-    .history-result.won{color:var(--green);}
-    .history-result.lost{color:var(--red);}
-    .history-result.pending{color:var(--yellow);}
-    .history-date{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--gray);}
-    .leaderboard-list{border:1px solid var(--border);}
-    .lb-row{display:grid;grid-template-columns:48px 1fr auto;padding:16px 24px;border-bottom:1px solid var(--border);align-items:center;gap:16px;transition:background .2s;}
-    .lb-row:last-child{border-bottom:none;}
-    .lb-row:hover{background:rgba(255,255,255,0.02);}
-    .lb-row.top1{background:rgba(201,168,76,0.04);}
-    .lb-row.top2{background:rgba(192,192,192,0.03);}
-    .lb-row.top3{background:rgba(180,100,40,0.03);}
-    .lb-rank{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:rgba(255,255,255,0.15);text-align:center;}
-    .top1 .lb-rank{color:#c9a84c;}.top2 .lb-rank{color:#c0c0c0;}.top3 .lb-rank{color:#b46428;}
-    .lb-user{display:flex;align-items:center;gap:12px;}
-    .lb-avatar{width:36px;height:36px;border-radius:50%;background:rgba(0,61,165,0.3);border:1.5px solid rgba(0,61,165,0.5);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--blue-light);flex-shrink:0;overflow:hidden;}
-    .lb-avatar img{width:100%;height:100%;object-fit:cover;}
-    .lb-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
-    .lb-pts{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--blue-light);white-space:nowrap;}
-    .lb-pts-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
-    .tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px;}
-    .tab-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);padding:14px 24px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;transition:color .2s,border-color .2s;margin-bottom:-1px;}
-    .tab-btn.active{color:#fff;border-bottom-color:var(--blue);}
-    .tab-btn:hover:not(.active){color:rgba(255,255,255,0.7);}
-    .tab-content{display:none;}
-    .tab-content.active{display:block;}
-    .rules-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;border:1px solid var(--border);background:var(--border);margin-bottom:32px;}
-    .rule-cell{background:#000;padding:28px 24px;display:flex;flex-direction:column;gap:8px;}
-    .rule-icon{font-size:24px;margin-bottom:4px;}
-    .rule-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;}
-    .rule-desc{font-family:'Barlow',sans-serif;font-size:12px;color:var(--gray);line-height:1.6;}
-    .rule-highlight{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--blue-light);}
-    #toast{position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#0a0a0a;border:1px solid var(--border-blue);padding:12px 28px;z-index:500;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;}
-    #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-    #toast.success{border-color:var(--green);color:var(--green);}
-    #toast.error{border-color:var(--red);color:var(--red);}
-    #confirm-modal{display:none;position:fixed;inset:0;z-index:400;background:rgba(0,0,0,0.88);backdrop-filter:blur(8px);align-items:center;justify-content:center;}
-    #confirm-modal.open{display:flex;}
-    .confirm-box{border:1px solid var(--border-blue);background:#05090f;padding:40px 48px;max-width:440px;width:90%;text-align:center;animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
+    .page-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(56px,7vw,100px);line-height:.88;letter-spacing:1px;}
+    .page-title .outline{-webkit-text-stroke:1.5px #fff;color:transparent;}
+    .btn-new-thread{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:12px 24px;cursor:pointer;transition:.2s;white-space:nowrap;flex-shrink:0;}
+    .btn-new-thread:hover{background:var(--blue-mid);}
+
+    /* LAYOUT */
+    .forum-layout{display:grid;grid-template-columns:220px 1fr 240px;gap:0;border-top:1px solid var(--border);}
+
+    /* RIGHT SIDEBAR */
+    .forum-right{border-left:1px solid var(--border);padding:20px 0;display:flex;flex-direction:column;gap:0;}
+    .rs-section{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .rs-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;}
+    .rs-label span{font-family:'Bebas Neue',sans-serif;font-size:13px;color:#4d82d4;letter-spacing:1px;}
+    .online-dot{width:6px;height:6px;border-radius:50%;background:#00c87a;display:inline-block;margin-right:5px;box-shadow:0 0 4px #00c87a;}
+    .lb-mini-row{display:flex;align-items:center;gap:8px;padding:5px 0;}
+    .lb-mini-rank{font-family:'Bebas Neue',sans-serif;font-size:13px;color:rgba(255,255,255,0.2);width:16px;text-align:center;flex-shrink:0;}
+    .lb-mini-av{width:22px;height:22px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .lb-mini-av img{width:100%;height:100%;object-fit:cover;}
+    .lb-mini-info{flex:1;min-width:0;}
+    .lb-mini-name{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .lb-mini-pts{font-family:'Bebas Neue',sans-serif;font-size:11px;color:#4d82d4;flex-shrink:0;}
+    .level-badge{display:inline-flex;align-items:center;justify-content:center;background:rgba(0,61,165,0.25);border:1px solid rgba(0,61,165,0.5);color:#4d82d4;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;padding:1px 5px;flex-shrink:0;}
+    .online-user-row{display:flex;align-items:center;gap:6px;padding:4px 0;}
+    .online-user-av{width:20px;height:20px;border-radius:50%;background:rgba(0,61,165,0.3);display:flex;align-items:center;justify-content:center;font-size:9px;font-family:'Bebas Neue',sans-serif;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .online-user-av img{width:100%;height:100%;object-fit:cover;}
+    .online-user-name{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+    /* CHAT GÉNÉRAL */
+    #chat-general-view{display:none;flex-direction:column;height:calc(100vh - 72px);position:sticky;top:72px;}
+    #chat-general-view.active{display:flex;}
+    .chat-gen-msgs{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:8px;scrollbar-width:thin;scrollbar-color:rgba(0,61,165,0.3) transparent;}
+    .chat-gen-msg{display:flex;gap:8px;align-items:flex-start;}
+    .chat-gen-av{width:28px;height:28px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:12px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .chat-gen-av img{width:100%;height:100%;object-fit:cover;}
+    .chat-gen-body{flex:1;min-width:0;}
+    .chat-gen-meta{display:flex;align-items:baseline;gap:6px;margin-bottom:2px;}
+    .chat-gen-author{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:.5px;color:#fff;cursor:pointer;}
+    .chat-gen-author:hover{color:#4d82d4;}
+    .chat-gen-lvl{font-family:'Bebas Neue',sans-serif;font-size:9px;color:#4d82d4;background:rgba(0,61,165,0.2);border:1px solid rgba(0,61,165,0.4);padding:0 4px;}
+    .chat-gen-time{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:rgba(255,255,255,0.2);}
+    .chat-gen-text{font-family:'Barlow',sans-serif;font-size:13px;color:rgba(255,255,255,0.8);line-height:1.5;word-break:break-word;}
+    .chat-gen-input-row{padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;background:rgba(0,0,0,0.5);}
+    .chat-gen-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px 12px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
+    .chat-gen-input:focus{border-color:var(--blue);}
+    .chat-gen-input::placeholder{color:rgba(255,255,255,0.2);}
+    .chat-gen-send{background:#003DA5;border:none;color:#fff;padding:8px 14px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.2s;white-space:nowrap;}
+    .chat-gen-send:hover{background:#0050CC;}
+
+    /* SIDEBAR */
+    .forum-sidebar{border-right:1px solid var(--border);padding:28px 0;}
+    .sidebar-section{margin-bottom:28px;}
+    .sidebar-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:0 24px;margin-bottom:8px;}
+    .sidebar-item{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;cursor:pointer;transition:background .15s;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;border:none;background:none;width:100%;text-align:left;}
+    .sidebar-item:hover,.sidebar-item.active{background:rgba(0,61,165,0.08);color:#fff;}
+    .sidebar-item.active{border-left:2px solid var(--blue);}
+    .sidebar-count{font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,0.2);}
+    @keyframes pulseG{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* MAIN */
+    .forum-main{padding:0;min-width:0;overflow:hidden;}
+
+    /* FILTER BAR */
+    .filter-bar{padding:16px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px;}
+    .filter-tabs{display:flex;gap:0;}
+    .filter-tab{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:8px 16px;cursor:pointer;background:none;border:none;border-bottom:2px solid transparent;transition:.2s;}
+    .filter-tab.active{color:#fff;border-bottom-color:var(--blue);}
+    .forum-search{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:8px 14px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;width:220px;}
+    .forum-search:focus{border-color:var(--blue);}
+    .forum-search::placeholder{color:rgba(255,255,255,0.2);}
+
+    /* THREAD LIST */
+    .thread-list{border-bottom:1px solid var(--border);}
+    .thread-row{display:flex;align-items:flex-start;gap:12px;padding:20px 32px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;transition:background .15s;}
+    .thread-row:last-child{border-bottom:none;}
+    .thread-row:hover{background:rgba(0,61,165,0.04);}
+    .thread-row.pinned{background:rgba(0,61,165,0.03);border-left:2px solid rgba(0,61,165,0.4);}
+    .thread-top{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
+    .thread-cat{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:2px 8px;border:1px solid;}
+    .cat-general{color:rgba(255,255,255,0.5);border-color:rgba(255,255,255,0.15);}
+    .cat-matchs{color:#4d82d4;border-color:#003DA5;}
+    .cat-transferts{color:#f0a500;border-color:#f0a500;}
+    .cat-debats{color:#e74c3c;border-color:#e74c3c;}
+    .cat-tactique{color:#00c87a;border-color:#00c87a;}
+    .thread-title{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;letter-spacing:1px;color:#fff;margin-bottom:6px;line-height:1.3;}
+    .thread-meta{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);display:flex;align-items:center;gap:8px;}
+    .thread-author-av{width:16px;height:16px;border-radius:50%;background:rgba(0,61,165,0.4);display:inline-flex;align-items:center;justify-content:center;font-size:8px;font-family:'Bebas Neue',sans-serif;color:#4d82d4;vertical-align:middle;overflow:hidden;}
+    .thread-author-av img{width:100%;height:100%;object-fit:cover;}
+    .thread-rank-badge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:1px 5px;border:1px solid;}
+    .thread-stats{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0;}
+    .thread-replies{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:rgba(255,255,255,0.2);}
+    .thread-replies-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .thread-new-badge{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:var(--blue);color:#fff;padding:2px 6px;}
+    .nv-badge{display:inline-flex;align-items:center;background:rgba(0,61,165,0.2);border:1px solid rgba(0,61,165,0.45);color:#4d82d4;font-family:'Bebas Neue',sans-serif;font-size:9px;letter-spacing:1px;padding:1px 5px;vertical-align:middle;}
+
+    /* THREAD VIEW */
+    #thread-view{display:none;}
+    .thread-view-header{padding:28px 32px;border-bottom:1px solid var(--border);}
+    .back-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);background:none;border:none;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px;transition:color .2s;}
+    .back-btn:hover{color:#fff;}
+    .thread-view-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:1px;margin-bottom:8px;line-height:1.1;}
+    .thread-view-meta{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--gray);}
+    .replies-list{padding:0 32px;}
+    .reply-item{padding:24px 0;border-bottom:1px solid rgba(255,255,255,0.06);display:grid;grid-template-columns:48px 1fr;gap:16px;}
+    .reply-item:last-child{border-bottom:none;}
+    .reply-av{width:40px;height:40px;border-radius:50%;background:rgba(0,61,165,0.3);border:1.5px solid rgba(0,61,165,0.5);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
+    .reply-av img{width:100%;height:100%;object-fit:cover;}
+    .reply-header{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+    .reply-author{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;}
+    .reply-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);}
+    .reply-body{font-family:'Barlow',sans-serif;font-size:14px;color:rgba(255,255,255,0.8);line-height:1.7;}
+    .reply-best{background:rgba(0,200,122,0.06);border:1px solid rgba(0,200,122,0.25);padding:16px;border-radius:2px;}
+    .best-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:6px;}
+    .reply-actions{display:flex;align-items:center;gap:8px;margin-top:10px;}
+    .reply-action-btn{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3);padding:4px 10px;cursor:pointer;background:none;transition:.2s;}
+    .reply-action-btn:hover{border-color:var(--green);color:var(--green);}
+
+    /* REPLY FORM */
+    .reply-form{padding:24px 32px;border-top:1px solid var(--border);}
+    .reply-form-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:10px;display:block;}
+    .reply-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;resize:vertical;min-height:100px;}
+    .reply-textarea:focus{border-color:var(--blue);}
+    .reply-textarea::placeholder{color:rgba(255,255,255,0.2);}
+    .reply-form-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;}
+    .reply-pts-hint{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);}
+    .btn-reply{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:10px 24px;cursor:pointer;transition:.2s;}
+    .btn-reply:hover{background:var(--blue-mid);}
+    .btn-reply:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;}
+
+    /* NEW THREAD MODAL */
+    #new-thread-modal{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);align-items:center;justify-content:center;}
+    #new-thread-modal.open{display:flex;}
+    .new-thread-box{background:#05090f;border:1px solid rgba(0,61,165,0.35);width:100%;max-width:560px;padding:40px;position:relative;animation:fadeUp .3s cubic-bezier(.22,1,.36,1);}
     @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-    .confirm-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--gray);margin-bottom:16px;}
-    .confirm-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;}
-    .confirm-detail{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:28px;line-height:1.6;}
-    .confirm-detail strong{color:#fff;font-weight:700;}
-    .confirm-potential{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;color:var(--green);margin-bottom:4px;}
-    .confirm-potential-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:28px;}
-    .confirm-actions{display:flex;gap:12px;}
-    .btn-confirm{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:14px;cursor:pointer;transition:.2s;}
-    .btn-confirm:hover{background:var(--blue-mid);}
-    .btn-cancel{flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:transparent;color:var(--gray);border:1px solid rgba(255,255,255,0.15);padding:14px;cursor:pointer;transition:.2s;}
-    .btn-cancel:hover{color:#fff;border-color:#fff;}
-    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:150;background:rgba(0,0,0,0.97);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:translateY(-8px);transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
+    .nt-close{position:absolute;top:16px;right:20px;background:none;border:none;color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif;font-size:22px;cursor:pointer;transition:color .2s;}
+    .nt-close:hover{color:#fff;}
+    .nt-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;margin-bottom:24px;}
+    .nt-field{margin-bottom:16px;}
+    .nt-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.4);display:block;margin-bottom:6px;}
+    .nt-input{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;transition:border-color .2s;}
+    .nt-input:focus{border-color:var(--blue);}
+    .nt-input::placeholder{color:rgba(255,255,255,0.2);}
+    .nt-select{width:100%;background:#05090f;border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;outline:none;cursor:pointer;transition:border-color .2s;}
+    .nt-select:focus{border-color:var(--blue);}
+    .nt-textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:12px 14px;font-family:'Barlow',sans-serif;font-size:14px;outline:none;resize:vertical;min-height:120px;transition:border-color .2s;}
+    .nt-textarea:focus{border-color:var(--blue);}
+    .nt-textarea::placeholder{color:rgba(255,255,255,0.2);}
+    .nt-pts-hint{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:16px;}
+    .nt-submit{width:100%;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:.2s;}
+    .nt-submit:hover{background:var(--blue-mid);}
+    .nt-submit:disabled{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:var(--gray);cursor:not-allowed;}
+
+    /* MOBILE NAV */
+    .mobile-nav-overlay{display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,0.97);backdrop-filter:blur(12px);flex-direction:column;align-items:center;justify-content:center;opacity:0;transform:translateY(-8px);transition:opacity .35s cubic-bezier(.22,1,.36,1),transform .35s cubic-bezier(.22,1,.36,1);pointer-events:none;}
     .mobile-nav-overlay.open{opacity:1;transform:translateY(0);pointer-events:all;display:flex;}
     .mobile-nav-item{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,12vw,64px);letter-spacing:4px;color:rgba(255,255,255,0.25);text-decoration:none;transition:color .2s,letter-spacing .2s;line-height:1.15;padding:6px 0;}
     .mobile-nav-item:hover,.mobile-nav-item.active{color:#fff;letter-spacing:6px;}
@@ -189,6 +194,8 @@
     .nav-hamburger.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg);}
     .nav-hamburger.open span:nth-child(2){opacity:0;transform:scaleX(0);}
     .nav-hamburger.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg);}
+
+    /* FOOTER */
     footer{border-top:1px solid var(--border);padding:28px 48px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;}
     .footer-logo{display:flex;align-items:center;gap:10px;}
     .footer-logo img{height:36px;}
@@ -197,1544 +204,1074 @@
     .footer-links{display:flex;gap:28px;list-style:none;}
     .footer-links a{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;transition:color .2s;}
     .footer-links a:hover{color:#fff;}
-    @media(max-width:1024px){
-      .main-content{padding:40px 24px 80px;}
-      .page-header,.points-banner{padding-left:24px;padding-right:24px;}
-      .rules-grid{grid-template-columns:1fr 1fr;}
-      nav{padding:0 24px;}
-    }
 
-    /* ── MOBILE FIRST ── */
+    /* RESPONSIVE */
+    @media(max-width:1200px){.forum-layout{grid-template-columns:180px 1fr 200px;}}
+    @media(max-width:1024px){.forum-layout{grid-template-columns:180px 1fr;}.forum-right{display:none;}nav{padding:0 24px;}.page-header{padding:40px 24px 28px;}}
+
+    /* ── MOBILE ── */
     @media(max-width:768px){
-
-      /* ─ Nav ─ */
-      nav{padding:0 16px;height:56px;}
+      /* Nav */
+      nav{padding:0 16px;height:58px;}
       .nav-links,.nav-cta{display:none;}
       .nav-hamburger{display:flex;}
-      .nav-logo img{height:34px;}
-      .nav-logo-text{font-size:17px;}
+      .nav-logo img{height:36px;}
+      .nav-logo-text{font-size:18px;}
 
-      /* ─ Header minimaliste ─ */
-      .page-header{padding:14px 16px 12px;}
-      .page-title{font-size:32px;letter-spacing:1px;}
-      .page-sub{font-size:12px;margin-top:6px;max-width:100%;}
+      /* Page header — compact avec FAB */
+      .page-header{flex-direction:row;align-items:center;justify-content:space-between;padding:16px 16px 14px;gap:12px;}
+      .page-title{font-size:clamp(36px,10vw,56px);}
+      .page-eyebrow{display:none;}
+      .btn-new-thread{padding:10px 16px;font-size:11px;letter-spacing:1.5px;white-space:nowrap;flex-shrink:0;}
 
-      /* ─ Points banner — pill compact ─ */
-      .points-banner{
-        padding:10px 16px;gap:0;
-        display:flex;justify-content:space-between;align-items:center;
-        background:rgba(0,61,165,0.06);
-      }
-      .points-info{gap:12px;}
-      .points-num{font-size:24px;}
-      .points-label{font-size:8px;letter-spacing:1.5px;}
-      .rank-badge{font-size:9px;padding:3px 8px;}
+      /* Layout: sidebar cachée */
+      .forum-layout{grid-template-columns:1fr;}
+      .forum-sidebar{display:none;}
 
-      /* ─ Tabs bottom-style sticky ─ */
-      .tabs{
-        position:sticky;top:56px;z-index:50;
-        background:rgba(0,0,0,0.97);backdrop-filter:blur(16px);
-        overflow-x:auto;-webkit-overflow-scrolling:touch;
-        scrollbar-width:none;flex-wrap:nowrap;
-        border-bottom:1px solid rgba(255,255,255,0.08);
-        padding:0 4px;
-      }
-      .tabs::-webkit-scrollbar{display:none;}
-      .tab-btn{
-        flex-shrink:0;padding:12px 14px;font-size:10px;
-        letter-spacing:1.5px;min-height:44px;
-      }
+      /* Sticky filter bar */
+      .filter-bar{position:sticky;top:58px;z-index:50;background:rgba(0,0,0,0.95);backdrop-filter:blur(12px);padding:0;flex-direction:column;align-items:stretch;gap:0;border-bottom:1px solid var(--border);width:100%;max-width:100%;overflow:hidden;}
+      .filter-tabs{overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:0 16px;border-bottom:1px solid rgba(255,255,255,0.06);width:100%;}
+      .filter-tabs::-webkit-scrollbar{display:none;}
+      .filter-tab{flex-shrink:0;padding:11px 14px;font-size:10px;}
 
-      /* ─ Main content ─ */
-      .main-content{padding:0 0 calc(80px + env(safe-area-inset-bottom,0px));}
+      /* Barre de recherche pleine largeur */
+      .forum-search{margin:8px 16px 10px;width:calc(100% - 32px);max-width:calc(100% - 32px);font-size:16px;padding:10px 14px;box-sizing:border-box;}
 
-      /* ─ Bet card — pleine largeur, vraie card touch ─ */
-      .bet-card{
-        margin:8px 16px;
-        border:1px solid rgba(255,255,255,0.1);
-        border-radius:8px;overflow:hidden;
-      }
-      .bet-card::before{display:none;}/* enlever la barre top hover PC */
+      /* Category strip */
+      .mobile-cat-strip{display:flex;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 16px 10px;gap:8px;border-bottom:1px solid var(--border);}
+      .mobile-cat-strip::-webkit-scrollbar{display:none;}
+      .mobile-cat-pill{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:7px 14px;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);cursor:pointer;background:none;transition:.2s;white-space:nowrap;border-radius:2px;}
+      .mobile-cat-pill.active{border-color:var(--blue);color:#fff;background:rgba(0,61,165,0.15);}
 
-      .bet-card-header{
-        padding:12px 14px 10px;
-        display:flex;justify-content:space-between;align-items:center;
-      }
-      .bet-competition{font-size:9px;letter-spacing:2px;}
-      .bet-deadline{font-size:9px;}
+      /* Thread list — cards plus aérées */
+      .thread-row{padding:14px 16px;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+      .thread-row:active{background:rgba(0,61,165,0.06);}
+      .thread-title{font-size:14px;line-height:1.4;}
+      .thread-meta{font-size:9px;flex-wrap:wrap;gap:5px;}
+      .thread-replies{font-size:20px;}
+      .thread-replies-label{font-size:8px;}
 
-      /* Teams — logos propres ─ */
-      .bet-teams{
-        padding:12px 16px 10px;gap:0;
-        display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-      }
-      .bet-team{align-items:center;}
-      .bet-team:last-child{align-items:center;}
-      .bet-logo{width:40px;height:40px;}
-      .bet-logo-placeholder{width:40px;height:40px;font-size:13px;}
-      .bet-team-name{font-size:13px;letter-spacing:.5px;text-align:center;}
-      .bet-vs{font-size:22px;min-width:36px;text-align:center;color:rgba(255,255,255,0.2);}
+      /* Thread view — full screen natif */
+      .thread-view-header{padding:16px 16px 14px;border-bottom:1px solid var(--border);}
+      .thread-view-title{font-size:20px;line-height:1.2;}
+      .back-btn{font-size:10px;padding:6px 0;margin-bottom:12px;display:flex;align-items:center;gap:6px;}
+      .replies-list{padding:0 16px;}
+      .reply-item{padding:14px 0;grid-template-columns:32px 1fr;gap:10px;}
+      .reply-av{width:32px;height:32px;font-size:13px;}
+      .reply-body{font-size:14px;line-height:1.65;}
+      .reply-header{gap:6px;margin-bottom:6px;}
+      .reply-author{font-size:12px;}
+      .reply-actions{flex-wrap:wrap;gap:6px;margin-top:8px;}
+      .reply-action-btn{padding:5px 10px;font-size:9px;}
 
-      /* Infos — ligne unique scrollable ─ */
-      .bet-infos{
-        display:flex;overflow-x:auto;scrollbar-width:none;
-        border-top:1px solid rgba(255,255,255,0.07);
-        border-bottom:1px solid rgba(255,255,255,0.07);
-      }
-      .bet-infos::-webkit-scrollbar{display:none;}
-      .bet-info{flex-shrink:0;padding:8px 14px;border-right:1px solid rgba(255,255,255,0.07);border-bottom:none;}
-      .bet-info:last-child{border-right:none;}
-      .bet-info-label{font-size:8px;letter-spacing:1.5px;}
-      .bet-info-value{font-size:12px;}
+      /* Reply form — collante en bas */
+      .reply-form{position:sticky;bottom:0;z-index:40;background:rgba(4,7,13,0.97);backdrop-filter:blur(12px);border-top:1px solid rgba(0,61,165,0.3);padding:12px 16px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));}
+      .reply-textarea{min-height:72px;font-size:16px;padding:10px 12px;}
+      .reply-form-footer{flex-direction:row;gap:10px;align-items:center;justify-content:space-between;margin-top:8px;}
+      .reply-pts-hint{font-size:9px;}
+      .btn-reply{padding:10px 20px;font-size:11px;white-space:nowrap;}
 
-      /* Options — 3 colonnes égales ─ */
-      .bet-options{padding:10px 12px 12px;gap:6px;flex-wrap:nowrap;}
-      .bet-option{
-        flex:1;min-width:0;padding:12px 4px;
-        border-radius:4px;
-      }
-      .bet-option-label{font-size:8px;letter-spacing:1px;margin-bottom:6px;}
-      .bet-option-result{font-size:18px;margin-bottom:4px;}
-      .bet-option-mult{font-size:20px;margin-bottom:2px;}
-      .bet-option-sub{font-size:7px;}
+      /* New thread modal — slide from bottom */
+      #new-thread-modal{align-items:flex-end;padding:0;}
+      .new-thread-box{border-radius:0;max-height:94vh;overflow-y:auto;padding:20px 16px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px));width:100%;}
+      .nt-title{font-size:28px;margin-bottom:18px;}
+      .nt-input,.nt-textarea,.nt-select{font-size:16px;padding:12px 14px;}
+      .nt-textarea{min-height:100px;}
+      .nt-submit{padding:16px;font-size:13px;}
 
-      /* Stake — section dédiée ─ */
-      .bet-stake{
-        flex-direction:column;align-items:stretch;
-        padding:0 14px 14px;gap:10px;
-        border-top:1px solid rgba(255,255,255,0.07);padding-top:12px;
-      }
-      .stake-label{font-size:9px;letter-spacing:1.5px;}
-      .stake-input{font-size:22px;padding:10px 14px;border-radius:4px;}
-      .stake-quick{gap:6px;}
-      .stake-quick-btn{
-        flex:1;padding:8px 4px;font-size:10px;letter-spacing:1px;
-        border-radius:4px;min-height:36px;text-align:center;
-      }
-      /* Gain + bouton côte à côte */
-      .stake-preview{display:flex;align-items:center;gap:10px;}
-      .stake-preview-label{display:none;}
-      .stake-preview-value{font-size:24px;margin-bottom:0;flex-shrink:0;}
-      .btn-bet{
-        flex:1;padding:14px 10px;font-size:12px;letter-spacing:1.5px;
-        border-radius:4px;min-height:48px;
-      }
+      /* Carte communauté mondiale */
+      #leaflet-map{height:260px;}
 
-      /* Résultat banner ─ */
-      .bet-result-banner{padding:10px 14px;}
-      .result-label{font-size:9px;}
-      .result-points{font-size:18px;}
-
-      /* Historique — cards simples ─ */
-      .history-grid{border:none;display:flex;flex-direction:column;gap:1px;}
-      .history-row{
-        display:grid;grid-template-columns:1fr auto auto;
-        padding:12px 16px;gap:10px;align-items:center;
-        background:rgba(255,255,255,0.02);border-radius:2px;
-      }
-      .history-row.header{display:none;}
-      .history-row .history-date,.history-row .history-stake{display:none;}
-      .history-match{font-size:13px;}
-      .history-pick{font-size:14px;}
-      .history-result{font-size:13px;}
-
-      /* Stats bilan ─ */
-      .history-stats-row{flex-wrap:wrap;gap:0;padding:0;}
-
-      /* Leaderboard ─ */
-      .lb-row{grid-template-columns:32px 1fr auto;padding:12px 16px;gap:10px;}
-      .lb-rank{font-size:20px;}
-      .lb-avatar{width:32px;height:32px;font-size:13px;}
-      .lb-name{font-size:12px;}
-      .lb-pts{font-size:16px;}
-
-      /* Règles ─ */
-      .rules-grid{grid-template-columns:1fr;border:none;gap:1px;}
-      .rule-cell{padding:18px 16px;border:1px solid rgba(255,255,255,0.07);border-radius:4px;margin:0 0 1px;}
-
-      /* Confirm modal — drawer bottom ─ */
-      #confirm-modal{align-items:flex-end;}
-      .confirm-box{
-        max-width:100%;border-radius:16px 16px 0 0;
-        border-left:none;border-right:none;border-bottom:none;
-        padding:28px 20px calc(28px + env(safe-area-inset-bottom,0px));
-      }
-      .confirm-box::before{
-        content:'';display:block;width:36px;height:4px;
-        background:rgba(255,255,255,0.15);border-radius:2px;
-        margin:0 auto 20px;
-      }
-      .confirm-title{font-size:24px;}
-      .confirm-potential{font-size:34px;}
-      .confirm-actions{flex-direction:column;gap:8px;}
-      .btn-confirm{padding:15px;min-height:50px;border-radius:4px;font-size:13px;}
-      .btn-cancel{padding:13px;border-radius:4px;}
-
-      footer{flex-direction:column;gap:12px;padding:20px 16px;align-items:flex-start;}
-      .footer-links{flex-wrap:wrap;gap:10px;}
+      /* Footer */
+      footer{flex-direction:column;gap:14px;padding:24px 16px;align-items:flex-start;}
+      .footer-links{flex-wrap:wrap;gap:12px;}
     }
 
-    @media(max-width:400px){
-      .bet-option-result{font-size:16px;}
-      .bet-option-mult{font-size:18px;}
-      .tab-btn{padding:11px 10px;font-size:9px;letter-spacing:1px;}
-      .bet-card{margin:6px 12px;}
-    }
-
-    /* iPhone safe area */
+    /* ── BOTTOM SAFE AREA (iPhone notch) ── */
     @supports(padding-bottom: env(safe-area-inset-bottom)){
-      .main-content{padding-bottom:calc(80px + env(safe-area-inset-bottom));}
+      .reply-form{padding-bottom:calc(12px + env(safe-area-inset-bottom));}
     }
-    .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
-    .reveal.visible{opacity:1;transform:none;}
-    .reveal-delay-1{transition-delay:.1s;}.reveal-delay-2{transition-delay:.2s;}.reveal-delay-3{transition-delay:.3s;}
-    .empty-state{text-align:center;padding:48px 24px;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);border:1px solid var(--border);}
 
-    /* LIVE MATCH BADGE */
-    .live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.4);color:#e74c3c;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;}
-    .live-dot{width:6px;height:6px;border-radius:50%;background:#e74c3c;animation:livePulse 1s ease-in-out infinite;}
-    @keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
-    /* SCORE DISPLAY */
-    .match-score{display:flex;align-items:center;justify-content:center;gap:16px;padding:16px 32px;border-bottom:1px solid var(--border);}
-    .match-score-num{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;color:#fff;}
-    .match-score-sep{font-family:'Bebas Neue',sans-serif;font-size:32px;color:rgba(255,255,255,0.2);}
-    /* EVENTS */
-    .match-events{padding:8px 32px;display:flex;flex-wrap:wrap;gap:6px;}
-    .match-event-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:rgba(255,255,255,0.5);background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);padding:2px 7px;}
-    /* ADMIN MATCH CONTROLS */
-    .admin-match-controls{padding:10px 32px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,0.06);background:rgba(231,76,60,0.03);}
-    .admin-match-btn{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 10px;cursor:pointer;border:1px solid rgba(255,255,255,0.15);background:none;color:rgba(255,255,255,0.6);transition:.15s;}
-    .admin-match-btn:hover{border-color:#fff;color:#fff;}
-    .admin-match-btn.green{border-color:rgba(0,200,122,0.4);color:#00c87a;}
-    .admin-match-btn.green:hover{background:rgba(0,200,122,0.1);}
-    .admin-match-btn.red{border-color:rgba(231,76,60,0.4);color:#e74c3c;}
-    .admin-match-btn.red:hover{background:rgba(231,76,60,0.1);}
-    .admin-match-btn.orange{border-color:rgba(240,165,0,0.4);color:#f0a500;}
-    .admin-match-btn.orange:hover{background:rgba(240,165,0,0.1);}
+    @media(max-width:380px){
+      .thread-row{padding:12px 14px;}
+      .page-title{font-size:36px;}
+      .mobile-cat-pill{font-size:9px;padding:6px 10px;}
+    }
 
-    /* LIVE MATCH CHAT */
-    .match-live-chat{border-top:1px solid rgba(231,76,60,0.2);background:rgba(231,76,60,0.02);}
-    .match-live-chat-header{padding:10px 20px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;border-bottom:1px solid rgba(255,255,255,0.05);}
-    .match-live-chat-header:hover{background:rgba(255,255,255,0.02);}
-    .match-live-chat-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6);flex:1;}
-    .match-live-chat-toggle{font-family:'Bebas Neue',sans-serif;font-size:12px;color:rgba(255,255,255,0.3);transition:transform .2s;}
-    .match-live-chat-body{overflow:hidden;max-height:0;transition:max-height .3s ease;}
-    .match-live-chat-body.open{max-height:320px;}
-    .match-live-chat-msgs{height:220px;overflow-y:auto;padding:10px 20px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:rgba(231,76,60,0.2) transparent;}
-    .match-live-chat-msgs::-webkit-scrollbar{width:3px;}
-    .match-live-chat-msgs::-webkit-scrollbar-thumb{background:rgba(231,76,60,0.3);}
-    .mlc-msg{display:flex;gap:7px;align-items:flex-start;}
-    .mlc-av{width:22px;height:22px;border-radius:50%;background:rgba(0,61,165,0.3);border:1px solid rgba(0,61,165,0.4);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:10px;color:#4d82d4;overflow:hidden;flex-shrink:0;}
-    .mlc-av img{width:100%;height:100%;object-fit:cover;}
-    .mlc-body{flex:1;min-width:0;}
-    .mlc-meta{display:flex;align-items:baseline;gap:5px;margin-bottom:2px;}
-    .mlc-author{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:.5px;color:#fff;}
-    .mlc-time{font-family:'Barlow Condensed',sans-serif;font-size:8px;color:rgba(255,255,255,0.2);}
-    .mlc-text{font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.75);line-height:1.4;word-break:break-word;}
-    .match-live-chat-input-row{padding:8px 20px;border-top:1px solid rgba(255,255,255,0.06);display:flex;gap:6px;background:rgba(0,0,0,0.3);}
-    .mlc-input{flex:1;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:#fff;padding:7px 10px;font-family:'Barlow',sans-serif;font-size:13px;outline:none;transition:border-color .2s;}
-    .mlc-input:focus{border-color:#e74c3c;}
-    .mlc-input::placeholder{color:rgba(255,255,255,0.2);}
-    .mlc-send{background:#e74c3c;border:none;color:#fff;padding:7px 12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:.2s;}
-    .mlc-send:hover{background:#c0392b;}
+    .empty-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);}
+    .loading-state{padding:48px 32px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,0.15);animation:blink 1.5s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* ── VOTES ── */
+    .vote-col{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;padding:2px 0;}
+    .vote-btn{background:none;border:none;cursor:pointer;padding:4px 6px;border-radius:3px;transition:background .15s;line-height:1;display:flex;align-items:center;justify-content:center;}
+    .vote-btn:hover{background:rgba(255,255,255,0.08);}
+    .vote-btn svg{width:14px;height:14px;stroke:rgba(255,255,255,0.3);fill:none;stroke-width:2;transition:stroke .15s;}
+    .vote-btn.up.active svg{stroke:#00c87a;}
+    .vote-btn.down.active svg{stroke:#e74c3c;}
+    .vote-btn.up:hover svg{stroke:#00c87a;}
+    .vote-btn.down:hover svg{stroke:#e74c3c;}
+    .vote-score{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:rgba(255,255,255,0.4);min-width:24px;text-align:center;transition:color .15s;}
+    .vote-score.positive{color:#00c87a;}
+    .vote-score.negative{color:#e74c3c;}
+
     @media(max-width:768px){
-      .match-live-chat-msgs{height:180px;padding:8px 14px;}
-      .match-live-chat-input-row{padding:8px 14px;}
-      .match-live-chat-header{padding:10px 14px;}
+      .vote-btn{padding:6px 8px;min-height:32px;min-width:32px;}
+      .vote-btn svg{width:16px;height:16px;}
+      .vote-score{font-size:14px;}
     }
-
-
-
-    /* ── PARIS ACTIFS ── */
-    .active-bet-card {
-      border:1px solid var(--border);
-      border-left:3px solid var(--blue);
-      background:rgba(255,255,255,0.02);
-      margin-bottom:2px;
-      transition:background .2s;
-    }
-    .active-bet-card:hover { background:rgba(255,255,255,0.04); }
-    .active-bet-card.pending { border-left-color:var(--blue); }
-    .active-bet-card.live { border-left-color:var(--red); }
-    .abt-header {
-      display:flex;align-items:center;justify-content:space-between;
-      padding:14px 20px 10px;gap:10px;flex-wrap:wrap;
-    }
-    .abt-match {
-      font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
-      letter-spacing:1px;text-transform:uppercase;color:#fff;flex:1;min-width:0;
-      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-    }
-    .abt-status {
-      font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
-      letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border:1px solid;
-    }
-    .abt-status.pending { color:var(--blue-light);border-color:var(--blue-light); }
-    .abt-status.live { color:var(--red);border-color:var(--red);animation:blink-hint 1.4s ease-in-out infinite; }
-    .abt-body {
-      display:flex;align-items:center;gap:16px;padding:0 20px 12px;flex-wrap:wrap;
-    }
-    .abt-pick {
-      font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;
-    }
-    .abt-pick.win{color:var(--green)} .abt-pick.draw{color:var(--yellow)} .abt-pick.lose{color:var(--red)}
-    .abt-details {
-      flex:1;display:flex;flex-direction:column;gap:3px;
-    }
-    .abt-row {
-      font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
-      letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);
-    }
-    .abt-row span { color:#fff; }
-    .abt-actions {
-      display:flex;gap:6px;padding:0 20px 14px;
-    }
-    .abt-btn {
-      font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
-      letter-spacing:1.5px;text-transform:uppercase;border:1px solid;
-      padding:6px 14px;cursor:pointer;background:none;transition:.2s;
-    }
-    .abt-btn.cancel { border-color:rgba(231,76,60,0.4);color:#e74c3c; }
-    .abt-btn.cancel:hover { background:#e74c3c;color:#fff; }
-    .abt-btn.modify { border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.6); }
-    .abt-btn.modify:hover { border-color:#fff;color:#fff; }
-    @media(max-width:600px){
-      .abt-header{padding:12px 14px 8px}
-      .abt-body{padding:0 14px 10px;gap:10px}
-      .abt-actions{padding:0 14px 12px}
-    }
-    /* BET COUNT BAR */
-    .bet-count-bar{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);}
-    .bet-count-col{flex:1;padding:8px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.05);}
-    .bet-count-col:last-child{border-right:none;}
-    .bet-count-num{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;display:block;}
-    .bet-count-num.win{color:rgba(0,200,122,0.7);}
-    .bet-count-num.draw{color:rgba(240,165,0,0.7);}
-    .bet-count-num.lose{color:rgba(231,76,60,0.7);}
-    .bet-count-lbl{font-family:'Barlow Condensed',sans-serif;font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);display:block;}
-
-    .login-wall{border:1px solid var(--border);padding:48px;text-align:center;margin-bottom:2px;}
-    .login-wall-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:8px;}
-    .login-wall-sub{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--gray);margin-bottom:24px;}
-    .btn-primary{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:3px;text-transform:uppercase;background:var(--blue);color:#fff;border:1px solid var(--blue);padding:12px 28px;cursor:pointer;transition:.2s;}
-    .btn-primary:hover{background:var(--blue-mid);}
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 </head>
 <body>
 <div class="grid-bg"></div>
-<div class="page" id="main-content">
+<div class="page">
 
   <nav id="main-nav">
-    <a class="nav-logo" href="index.html">
-      <img src="Logo.png" alt="NewsPorto">
-      <span class="nav-logo-text">NewsPorto</span>
-    </a>
+    <a class="nav-logo" href="index.html"><img src="Logo.png" alt="NewsPorto"><span class="nav-logo-text">NewsPorto</span></a>
     <ul class="nav-links">
       <li><a href="actu.html">Actu</a></li>
       <li><a href="effectif.html">Effectif</a></li>
-      <li><a href="forum.html">Forum</a></li>
-      <li><a href="pronostics.html" class="active">Pronostics</a></li>
+      <li><a href="forum.html" class="active">Forum</a></li>
+      <li><a href="pronostics.html">Pronostics</a></li>
       <li><a href="shop.html">Shop</a></li>
       <li><a href="contact.html">Contact</a></li>
     </ul>
     <a href="#" class="nav-cta" onclick="event.preventDefault();AN?.openAuth('signup')">S'inscrire</a>
-    <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu" onclick="toggleMobileNav()">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="nav-hamburger" id="hamburger-btn" aria-label="Menu"><span></span><span></span><span></span></button>
   </nav>
 
   <div class="mobile-nav-overlay" id="mobile-nav">
     <a href="index.html" class="mobile-nav-item">Accueil</a>
     <a href="actu.html" class="mobile-nav-item">Actu</a>
     <a href="effectif.html" class="mobile-nav-item">Effectif</a>
-    <a href="forum.html" class="mobile-nav-item">Forum</a>
-    <a href="pronostics.html" class="mobile-nav-item active">Pronostics</a>
+    <a href="forum.html" class="mobile-nav-item active">Forum</a>
+    <a href="pronostics.html" class="mobile-nav-item">Pronostics</a>
     <a href="shop.html" class="mobile-nav-item">Shop</a>
     <a href="contact.html" class="mobile-nav-item">Contact</a>
     <span class="mobile-nav-bottom">© 2026 NewsPorto FR</span>
   </div>
 
-  <header class="page-header">
-    <div class="page-eyebrow">Communauté · Points</div>
-    <h1 class="page-title">Pronos<br><span class="outline">& Paris</span></h1>
-    <p class="page-sub">Mise tes points sur les matchs du FC Porto. Gagne gros, monte en rang, deviens une légende.</p>
-  </header>
-
-  <div class="points-banner" id="points-banner">
-    <div class="points-info">
-      <div class="points-balance">
-        <span class="points-num" id="user-points">—</span>
-        <span class="points-label">pts disponibles</span>
-      </div>
-      <div id="user-rank-wrap"></div>
+  <div class="page-header">
+    <div>
+      <div class="page-eyebrow">Communauté</div>
+      <h1 class="page-title">Forum<br><span class="outline">Porto</span></h1>
     </div>
-    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray)">
-      <span id="pts-en-jeu">0</span> pts en jeu
-    </div>
+    <button class="btn-new-thread" onclick="openNewThread()">+ Nouveau thread</button>
   </div>
 
-  <div class="main-content">
-    <div class="tabs" id="prono-tabs">
-      <button class="tab-btn active" data-tab="paris" onclick="switchTab('paris')">Matchs à miser</button>
-      <button class="tab-btn" data-tab="historique" onclick="switchTab('historique')">Mes Paris</button>
-      <button class="tab-btn" data-tab="classement" onclick="switchTab('classement')">Classement</button>
-      <button class="tab-btn" data-tab="regles" onclick="switchTab('regles')">Règles</button>
-    </div>
+  <div class="forum-layout">
+    <!-- SIDEBAR GAUCHE -->
+    <aside class="forum-sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Catégories</div>
+        <button class="sidebar-item active" data-cat="all" onclick="filterCat('all',this)">Tous les threads <span class="sidebar-count" id="count-all">—</span></button>
+        <button class="sidebar-item" data-cat="matchs" onclick="filterCat('matchs',this)">Matchs <span class="sidebar-count" id="count-matchs">—</span></button>
+        <button class="sidebar-item" data-cat="transferts" onclick="filterCat('transferts',this)">Transferts <span class="sidebar-count" id="count-transferts">—</span></button>
+        <button class="sidebar-item" data-cat="debats" onclick="filterCat('debats',this)">Débats <span class="sidebar-count" id="count-debats">—</span></button>
+        <button class="sidebar-item" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique <span class="sidebar-count" id="count-tactique">—</span></button>
+        <button class="sidebar-item" data-cat="general" onclick="filterCat('general',this)">Général <span class="sidebar-count" id="count-general">—</span></button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Live</div>
+        <button class="sidebar-item" id="chat-gen-btn" onclick="toggleChatGeneral(this)">💬 Discussion <span style="font-family:'Bebas Neue',sans-serif;font-size:10px;color:#00c87a;letter-spacing:1px">LIVE</span></button>
+      </div>
+    </aside>
 
-    <!-- TAB PARIS -->
-    <div class="tab-content active" id="tab-paris">
-      <p class="section-label" id="custom-bets-label" style="display:none">— Paris spéciaux</p>
-      <div id="custom-bets-container"></div>
-      <p class="section-label" id="custom-matches-label" style="display:none">— Matchs en cours / à venir</p>
-      <div id="custom-matches-container"></div>
-      <p class="section-label">— Matchs ouverts aux mises</p>
-      <div id="matches-container">
-        <div class="empty-state">Chargement des matchs...</div>
+    <!-- MAIN -->
+    <main class="forum-main">
+      <!-- THREAD LIST VIEW -->
+      <div id="thread-list-view">
+        <div class="filter-bar">
+          <div class="filter-tabs">
+            <button class="filter-tab active" data-sort="recent" onclick="sortThreads('recent',this)">Récents</button>
+            <button class="filter-tab" data-sort="popular" onclick="sortThreads('popular',this)">Populaires</button>
+            <button class="filter-tab" data-sort="top" onclick="sortThreads('top',this)">Top votes</button>
+          </div>
+          <input class="forum-search" type="text" placeholder="Rechercher un thread..." id="forum-search" oninput="searchThreads(this.value)">
+        </div>
+        <!-- Mobile category strip (hidden on desktop) -->
+        <div class="mobile-cat-strip" id="mobile-cat-strip" style="display:none">
+          <button class="mobile-cat-pill active" data-cat="all" onclick="filterCat('all',this)">Tous</button>
+          <button class="mobile-cat-pill" data-cat="matchs" onclick="filterCat('matchs',this)">Matchs</button>
+          <button class="mobile-cat-pill" data-cat="transferts" onclick="filterCat('transferts',this)">Transferts</button>
+          <button class="mobile-cat-pill" data-cat="debats" onclick="filterCat('debats',this)">Débats</button>
+          <button class="mobile-cat-pill" data-cat="tactique" onclick="filterCat('tactique',this)">Tactique</button>
+          <button class="mobile-cat-pill" data-cat="general" onclick="filterCat('general',this)">Général</button>
+          <button class="mobile-cat-pill" onclick="toggleChatGeneral(this)">💬 Live</button>
+        </div>
+        <div class="thread-list" id="thread-list">
+          <div class="loading-state">Chargement des threads...</div>
+        </div>
       </div>
-    </div>
 
-    <!-- TAB HISTORIQUE -->
-    <div class="tab-content" id="tab-historique">
-      <!-- Sous-tabs -->
-      <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:0">
-        <button id="htab-actifs" onclick="switchHistTab('actifs')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid var(--blue);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:.2s">Paris actifs</button>
-        <button id="htab-historique" onclick="switchHistTab('historique')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid transparent;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);cursor:pointer;transition:.2s">Historique</button>
+      <!-- THREAD VIEW -->
+      <div id="thread-view">
+        <div class="thread-view-header">
+          <button class="back-btn" onclick="backToList()">← Retour au forum</button>
+          <div id="tv-cat-wrap"></div>
+          <div class="thread-view-title" id="tv-title"></div>
+          <div class="thread-view-meta" id="tv-meta"></div>
+        </div>
+        <div class="replies-list" id="replies-list"></div>
+        <div class="reply-form" id="reply-form">
+          <span class="reply-form-label">Répondre</span>
+          <textarea class="reply-textarea" id="reply-input" placeholder="Partage ton avis..."></textarea>
+          <div class="reply-form-footer">
+            <span class="reply-pts-hint" id="reply-pts-hint">Connecte-toi pour répondre</span>
+            <button class="btn-reply" id="btn-reply" onclick="submitReply()" disabled>Répondre →</button>
+          </div>
+        </div>
       </div>
-      <div id="htab-actifs-content">
-        <div id="active-bets-container"><div class="empty-state">Chargement...</div></div>
-      </div>
-      <div id="htab-historique-content" style="display:none">
-        <div id="history-container"><div class="empty-state">Connecte-toi pour voir ton historique</div></div>
-      </div>
-    </div>
 
-    <!-- TAB CLASSEMENT -->
-    <div class="tab-content" id="tab-classement">
-      <p class="section-label">— Top de la semaine</p>
-      <div class="leaderboard-list" id="leaderboard-weekly-container" style="margin-bottom:32px">
-        <div class="empty-state">Chargement...</div>
+      <!-- CHAT GÉNÉRAL VIEW -->
+      <div id="chat-general-view">
+        <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+          <button class="back-btn" style="margin:0" onclick="toggleChatGeneral()">← Retour</button>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;">Discussion Générale</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;color:#00c87a;border:1px solid #00c87a;padding:2px 6px">LIVE</span>
+          <span id="chat-online-count" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);margin-left:auto"></span>
+        </div>
+        <div class="chat-gen-msgs" id="chat-gen-msgs"></div>
+        <div class="chat-gen-input-row">
+          <input class="chat-gen-input" id="chat-gen-input" placeholder="Envoie un message..." maxlength="500" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChatMsg()}">
+          <button class="chat-gen-send" onclick="sendChatMsg()">Envoyer</button>
+        </div>
       </div>
-      <p class="section-label">— Classement général</p>
-      <div class="leaderboard-list" id="leaderboard-container">
-        <div class="empty-state">Chargement...</div>
-      </div>
-    </div>
+    </main>
 
-    <!-- TAB REGLES -->
-    <div class="tab-content" id="tab-regles">
-      <p class="section-label">— Comment ça marche</p>
-      <div class="rules-grid reveal">
-        <div class="rule-cell"><div class="rule-icon">🎯</div><div class="rule-title">Choisir</div><div class="rule-desc">Sélectionne ton pronostic : victoire Porto, match nul ou défaite. Une seule mise par match.</div></div>
-        <div class="rule-cell"><div class="rule-icon">💰</div><div class="rule-title">Miser</div><div class="rule-desc">Définis ta mise en points. Le minimum est de 10 pts. Le maximum dépend de ton rang.</div><div class="rule-highlight">Min: 10 pts</div></div>
-        <div class="rule-cell"><div class="rule-icon">⏰</div><div class="rule-title">Deadline</div><div class="rule-desc">Les mises ferment 1h avant le coup d'envoi. Plus de modifications après la clôture.</div></div>
-        <div class="rule-cell"><div class="rule-icon">📊</div><div class="rule-title">Cotes</div><div class="rule-desc">Les cotes sont calculées selon les probabilités du match — plus la victoire est incertaine, plus le gain potentiel est élevé.</div></div>
-        <div class="rule-cell"><div class="rule-icon">🏆</div><div class="rule-title">Gagner</div><div class="rule-desc">Si ton pronostic est correct, ta mise est multipliée par la cote et créditée automatiquement.</div></div>
-        <div class="rule-cell"><div class="rule-icon">🚫</div><div class="rule-title">Perdre</div><div class="rule-desc">En cas d'erreur, ta mise est perdue. Les points ne peuvent pas être récupérés.</div></div>
+    <!-- SIDEBAR DROITE -->
+    <aside class="forum-right" id="forum-right">
+      <!-- Online -->
+      <div class="rs-section">
+        <div class="rs-label">🟢 En ligne <span id="rs-online-count">0</span></div>
+        <div id="rs-online-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
       </div>
-      <p class="section-label reveal">— Rangs & limites de mise</p>
-      <div class="history-grid reveal reveal-delay-1">
-        <div class="history-row header"><span>Rang</span><span>Points requis</span><span>Mise max</span></div>
-        <div class="history-row"><span class="history-match">⚪ Adepto</span><span class="history-stake">0 pts</span><span class="history-result" style="color:#fff">200 pts</span></div>
-        <div class="history-row"><span class="history-match" style="color:var(--blue-light)">🔵 Dragão</span><span class="history-stake">100 pts</span><span class="history-result" style="color:var(--blue-light)">500 pts</span></div>
-        <div class="history-row"><span class="history-match" style="color:var(--yellow)">🟡 Ultras</span><span class="history-stake">500 pts</span><span class="history-result" style="color:var(--yellow)">1 000 pts</span></div>
-        <div class="history-row"><span class="history-match" style="color:var(--red)">🔴 Lenda</span><span class="history-stake">2 000 pts</span><span class="history-result" style="color:var(--red)">3 000 pts</span></div>
-        <div class="history-row"><span class="history-match" style="color:#c9a84c">💎 Invicta</span><span class="history-stake">5 000 pts</span><span class="history-result" style="color:#c9a84c">Illimité</span></div>
+      <!-- Classement hebdo -->
+      <div class="rs-section">
+        <div class="rs-label">🏆 Cette semaine <span id="rs-week-label"></span></div>
+        <div id="rs-weekly-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
       </div>
-    </div>
+      <!-- All-time -->
+      <div class="rs-section">
+        <div class="rs-label">👑 All Time</div>
+        <div id="rs-alltime-list"><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Chargement...</div></div>
+      </div>
+    </aside>
   </div>
+
+  <!-- COMMUNAUTÉ MONDIALE -->
+  <section style="border-top:1px solid rgba(255,255,255,0.08);padding:48px 48px 64px;max-width:1100px;margin:0 auto;" class="reveal">
+    <p class="section-label" style="margin-bottom:8px;">Communauté mondiale</p>
+    <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:8px;">
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;" id="pin-count">0</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4);">Portistas dans le monde</span>
+    </div>
+    <p style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:16px;">Clique sur la carte pour marquer ta position · 1 pin par visiteur</p>
+    <div id="leaflet-map" style="width:100%;height:380px;border:1px solid rgba(255,255,255,0.1);"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div style="width:8px;height:8px;border-radius:50%;background:#003DA5;"></div>
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);">Position d'un lecteur</span>
+      </div>
+      <button onclick="resetMyPin()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;background:none;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.3);padding:6px 14px;cursor:pointer;transition:color .2s,border-color .2s;" onmouseover="this.style.color='#fff';this.style.borderColor='rgba(255,255,255,0.4)'" onmouseout="this.style.color='rgba(255,255,255,0.3)';this.style.borderColor='rgba(255,255,255,0.15)'">Effacer mon pin</button>
+    </div>
+  </section>
 
   <footer>
     <div class="footer-logo"><img src="Logo.png" alt="NewsPorto"><span class="footer-logo-text">NewsPorto</span></div>
     <span class="footer-copy">© 2026 NewsPorto FR</span>
+    
   </footer>
 </div>
 
-<div id="confirm-modal">
-  <div class="confirm-box">
-    <div class="confirm-eyebrow">Confirmer la mise</div>
-    <div class="confirm-title" id="confirm-match"></div>
-    <div class="confirm-detail">Tu mises <strong id="c-stake">–</strong> sur <strong id="c-pick">–</strong><br>Cote : <strong id="c-mult">–</strong></div>
-    <div class="confirm-potential" id="confirm-potential">+0 pts</div>
-    <div class="confirm-potential-label">Gain potentiel</div>
-    <div class="confirm-actions">
-      <button class="btn-cancel" onclick="closeConfirm()">Annuler</button>
-      <button class="btn-confirm" onclick="submitBet()">Confirmer →</button>
+<!-- NEW THREAD MODAL -->
+<div id="new-thread-modal">
+  <div class="new-thread-box">
+    <button class="nt-close" onclick="closeNewThread()">✕</button>
+    <div class="nt-title">Nouveau Thread</div>
+    <div class="nt-field"><label class="nt-label">Titre</label><input class="nt-input" type="text" id="nt-title" placeholder="Titre du thread" maxlength="120"></div>
+    <div class="nt-field">
+      <label class="nt-label">Catégorie</label>
+      <select class="nt-select" id="nt-cat">
+        <option value="general">Général</option>
+        <option value="matchs">Matchs</option>
+        <option value="transferts">Transferts</option>
+        <option value="debats">Débats</option>
+        <option value="tactique">Tactique</option>
+      </select>
     </div>
+    <div class="nt-field"><label class="nt-label">Contenu</label><textarea class="nt-textarea" id="nt-content" placeholder="Développe ta pensée..."></textarea></div>
+    <div class="nt-pts-hint">🎁 +5 pts pour chaque thread créé</div>
+    <button class="nt-submit" id="nt-submit" onclick="submitThread()">Publier le thread →</button>
   </div>
 </div>
-<div id="toast"></div>
 
 <script type="module" src="supabase-client.js"></script>
 <script type="module" src="auth-nav.js"></script>
 <script type="module">
-import { supabase, placeBet, getUserBets, getBetsLeaderboard, addXp, addWeeklyPoints, XP_REWARDS } from './supabase-client.js'
+import { supabase, addXp, addWeeklyPoints, XP_REWARDS } from './supabase-client.js'
+import { voteThread, getUserVotes } from './supabase-client.js'
 
 // ── STATE ──
-const RANK_MAX = { Adepto:200, Dragão:500, Ultras:1000, Lenda:3000, Invicta:999999 }
-const ODDS = { win:{ label:'Victoire Porto', mult:1.5 }, draw:{ label:'Match nul', mult:3 }, lose:{ label:'Défaite Porto', mult:4 } }
 let currentUser = null
 let currentProfile = null
-let upcomingMatches = []
-let selectedOptions = {}
-let pendingBet = null
-let existingBets = {}
+let allThreads = []
+let currentThread = null
+let currentCat = 'all'
+let currentSort = 'recent'
+let realtimeChannel = null
+let userVotesMap = {} // threadId → 1 | -1 | 0
+
+const RANK_COLORS = { Adepto:'rgba(255,255,255,0.5)', Dragão:'#4d82d4', Ultras:'#f0a500', Lenda:'#e74c3c', Invicta:'#c9a84c' }
+const RANK_EMOJI = { Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴', Invicta:'💎' }
+const CAT_LABELS = { general:'Général', matchs:'Matchs', transferts:'Transferts', debats:'Débats', tactique:'Tactique' }
 
 // ── NAV ──
 window.addEventListener('scroll', () => document.getElementById('main-nav').classList.toggle('scrolled', scrollY > 40))
-
-// ── REVEAL ──
-const obs = new IntersectionObserver(entries => entries.forEach(e => { if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)} }), {threshold:0.1})
-document.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+// Show mobile cat strip on mobile
+if (window.innerWidth <= 768) { const s = document.getElementById('mobile-cat-strip'); if(s) s.style.display = 'flex'; }
+window.addEventListener('resize', () => { const s = document.getElementById('mobile-cat-strip'); if(s) s.style.display = window.innerWidth <= 768 ? 'flex' : 'none'; })
+document.getElementById('hamburger-btn').addEventListener('click', () => {
+  const mn = document.getElementById('mobile-nav'), btn = document.getElementById('hamburger-btn')
+  const open = mn.classList.toggle('open'); btn.classList.toggle('open', open); document.body.style.overflow = open ? 'hidden' : ''
+})
 
 // ── AUTH ──
-window.addEventListener('an:login', async (e) => {
+window.addEventListener('an:login', (e) => {
   currentUser = e.detail.user
   currentProfile = e.detail.profile
-  updatePointsBanner()
-  await loadExistingBets()
-  renderMatches()
-  loadHistory()
+  updateReplyForm()
+  // Charger les votes de l'user
+  if (allThreads.length) {
+    getUserVotes(currentUser.id, allThreads.map(t => t.id)).then(v => { userVotesMap = v; renderThreadList() })
+  }
 })
 window.addEventListener('an:logout', () => {
-  currentUser = null; currentProfile = null
-  updatePointsBanner(); renderMatches()
+  currentUser = null; currentProfile = null; updateReplyForm()
 })
-// Fallback: auth-nav may have already fired
+// Fallback: auth-nav may have already fired — use supabase directly
 supabase.auth.getSession().then(async ({ data: { session } }) => {
   if (session && !currentUser) {
     currentUser = session.user
     const { data } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single()
     currentProfile = data
-    updatePointsBanner()
-    await loadExistingBets()
-    renderMatches()
-    loadActiveBets()
+    updateReplyForm()
   }
 })
-supabase.auth.onAuthStateChange((event) => {
-  if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; updatePointsBanner(); renderMatches() }
+supabase.auth.onAuthStateChange(async (event, session) => {
+  if (event === 'SIGNED_OUT') { currentUser = null; currentProfile = null; updateReplyForm() }
 })
 
-// Realtime points update
-window.addEventListener('points-updated', e => {
-  if (currentProfile) {
-    currentProfile.points = e.detail.points
-    currentProfile.rank = e.detail.rank
-    updatePointsBanner()
-    renderMatches() // refresh max stake
+// ── LOAD THREADS ──
+async function loadThreads() {
+  const { data, error } = await supabase
+    .from('forum_threads')
+    .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  if (error) { document.getElementById('thread-list').innerHTML = '<div class="empty-state">Erreur de chargement</div>'; return }
+  allThreads = data || []
+  // Charger les votes de l'user connecté
+  if (currentUser && allThreads.length) {
+    userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
   }
-})
-
-// ── POINTS BANNER ──
-function updatePointsBanner() {
-  const rankClass = { Adepto:'rank-adepto', Dragão:'rank-dragao', Ultras:'rank-ultras', Lenda:'rank-lenda', Invicta:'rank-invicta' }
-  const rankEmoji = { Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴', Invicta:'💎' }
-  if (currentProfile) {
-    document.getElementById('user-points').textContent = currentProfile.points
-    const rank = currentProfile.rank || 'Adepto'
-    document.getElementById('user-rank-wrap').innerHTML = `<span class="rank-badge ${rankClass[rank]||'rank-adepto'}">${rankEmoji[rank]||'⚪'} ${rank}</span>`
-  } else {
-    document.getElementById('user-points').textContent = '—'
-    document.getElementById('user-rank-wrap').innerHTML = `<button class="btn-primary" onclick="AuthNav.openAuthModal()">Se connecter</button>`
-  }
+  renderThreadList()
+  updateCounts()
+  subscribeRealtime()
 }
-updatePointsBanner()
+loadThreads()
 
-// ── LOAD PORTO-STATS ──
-async function loadMatches() {
-  try {
-    const res = await fetch('/api/porto-stats')
-    const data = await res.json()
-    upcomingMatches = data.upcomingMatches || []
-    // Ajoute le prochain match si pas dans upcoming
-    if (data.nextMatch && !upcomingMatches.find(m => m.id === data.nextMatch.id)) {
-      upcomingMatches.unshift(data.nextMatch)
-    }
-    renderMatches()
-    loadLeaderboard()
-  } catch(e) {
-    document.getElementById('matches-container').innerHTML = '<div class="empty-state">Impossible de charger les matchs</div>'
-  }
-}
-loadMatches()
+// ── RENDER LIST ──
+function renderThreadList() {
+  let filtered = currentCat === 'all' ? allThreads : allThreads.filter(t => t.category === currentCat)
+  const q = document.getElementById('forum-search')?.value?.toLowerCase() || ''
+  if (q) filtered = filtered.filter(t => t.title.toLowerCase().includes(q) || t.content.toLowerCase().includes(q))
+  if (currentSort === 'popular') filtered = [...filtered].sort((a,b) => b.reply_count - a.reply_count)
+  if (currentSort === 'top') filtered = [...filtered].sort((a,b) => (b.votes||0) - (a.votes||0))
 
-// ── CUSTOM MATCHES ──
-async function loadCustomMatches() {
-  const container = document.getElementById('custom-matches-container')
-  const label = document.getElementById('custom-matches-label')
-  const { data } = await supabase.from('custom_matches')
-    .select('*')
-    .in('status', ['upcoming','live'])
-    .order('kickoff_at', { ascending: true })
-  if (!data?.length) { container.innerHTML = ''; if(label) label.style.display='none'; return }
-  if(label) label.style.display = ''
-  let userMatchBets = {}
-  if (currentUser) {
-    const ids = data.map(m => String(m.id))
-    const { data: myBets } = await supabase.from('bets').select('*').eq('user_id', currentUser.id).in('match_id', ids).neq('status','refunded')
-    ;(myBets||[]).forEach(b => userMatchBets[b.match_id] = b)
-  }
-  const isAdmin = window.AN?.isAdmin?.()
-  container.innerHTML = data.map((m, i) => renderCustomMatchCard(m, i, userMatchBets, isAdmin)).join('')
-  container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
-}
-loadCustomMatches()
-window.addEventListener('custom-match-updated', loadCustomMatches)
+  const list = document.getElementById('thread-list')
+  if (!filtered.length) { list.innerHTML = '<div class="empty-state">Aucun thread · Sois le premier !</div>'; return }
 
-function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
-  const now = new Date()
-  const kickoff = new Date(m.kickoff_at)
-  const closes = new Date(m.closes_at)
-  const isLive = m.status === 'live'
-  const isOpen = !isLive && closes > now
-  const existingBet = userMatchBets?.[String(m.id)]
+  const upSVG = `<svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>`
+  const downSVG = `<svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>`
 
-  const homeImg = m.home_crest
-    ? `<img src="${m.home_crest}" class="bet-logo" alt="${m.home_team}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.home_team||'?')[0]}</div>`
-    : `<div class="bet-logo-placeholder">${(m.home_team||'?')[0]}</div>`
-  const awayImg = m.away_crest
-    ? `<img src="${m.away_crest}" class="bet-logo" alt="${m.away_team}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.away_team||'?')[0]}</div>`
-    : `<div class="bet-logo-placeholder">${(m.away_team||'?')[0]}</div>`
-
-  const deadlineBadge = isLive
-    ? `<div class="live-badge"><div class="live-dot"></div>EN COURS</div>`
-    : isOpen
-      ? `<div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">${formatDeadline(closes - now)}</span></div>`
-      : `<div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mises fermées</span></div>`
-
-  const liveChatHtml = isLive
-    ? `<div class="match-live-chat" id="mlc-wrap-${m.id}">
-        <div class="match-live-chat-header" onclick="toggleLiveChat('${m.id}')">
-          <div class="live-dot" style="background:#e74c3c;flex-shrink:0"></div>
-          <span class="match-live-chat-title">💬 Chat Live · <span id="mlc-count-${m.id}">0</span> en ligne</span>
-          <span class="match-live-chat-toggle" id="mlc-toggle-${m.id}">▼</span>
-        </div>
-        <div class="match-live-chat-body" id="mlc-body-${m.id}">
-          <div class="match-live-chat-msgs" id="mlc-msgs-${m.id}"></div>
-          <div class="match-live-chat-input-row">
-            ${currentUser
-              ? `<input class="mlc-input" id="mlc-input-${m.id}" placeholder="Réagis en direct..." maxlength="300" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendLiveChatMsg('${m.id}')}">`
-              : `<input class="mlc-input" placeholder="Connecte-toi pour chatter..." disabled style="cursor:pointer" onclick="window.AN?.openAuth?.()">`
-            }
-            ${currentUser ? `<button class="mlc-send" onclick="sendLiveChatMsg('${m.id}')">↑</button>` : ''}
-          </div>
-        </div>
-      </div>`
-    : ''
-
-  const scoreHtml = isLive && m.score_home != null
-    ? `<div class="match-score">
-        <span class="match-score-num">${m.score_home}</span>
-        <span class="match-score-sep">—</span>
-        <span class="match-score-num">${m.score_away}</span>
-      </div>`
-    : ''
-
-  const eventsHtml = m.events?.length
-    ? `<div class="match-events">${m.events.map(e =>
-        `<span class="match-event-tag">${e.type==='yellow'?'🟡':e.type==='red'?'🔴':'⚽'} ${e.player}${e.minute?` ${e.minute}'`:''}</span>`
-      ).join('')}</div>`
-    : ''
-
-  const adminHtml = isAdmin
-    ? `<div class="admin-match-controls">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
-        ${!isLive ? `<button class="admin-match-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
-        ${isLive ? `<button class="admin-match-btn orange" onclick="AN.updateMatchScore(${m.id})">Score</button>
-                    <button class="admin-match-btn" onclick="AN.addMatchEvent(${m.id})">+ Carton</button>
-                    <button class="admin-match-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>` : ''}
-        <button class="admin-match-btn red" style="margin-left:auto" onclick="AN.deleteCustomMatch(${m.id})">✕</button>
-      </div>`
-    : ''
-
-  const CUSTOM_ODDS = { win: m.odds_win||1.8, draw: m.odds_draw||3.5, lose: m.odds_lose||4.5 }
-  cmOdds[String(m.id)] = CUSTOM_ODDS
-
-  if (existingBet) {
-    const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }[existingBet.pick] || existingBet.pick
-    const statusMap = { pending:'⏳ En attente', won:'✅ Gagné', lost:'❌ Perdu', refunded:'💰 Remboursé' }
-    const canCancel = existingBet.status === 'pending' && isOpen && !isLive
-    return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}" id="bet-card-${m.id}">
-      <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
-      <div class="bet-teams">
-        <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
-        <div class="bet-vs">VS</div>
-        <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
+  list.innerHTML = filtered.map(t => {
+    const a = t.author || {}
+    const rank = a.rank || 'Adepto'
+    const color = RANK_COLORS[rank] || '#fff'
+    const emoji = RANK_EMOJI[rank] || '⚪'
+    const date = new Date(t.created_at).toLocaleDateString('fr-FR', {day:'2-digit',month:'short',year:'numeric'})
+    const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+    const score = t.votes || 0
+    const uv = userVotesMap[t.id] || 0
+    const scoreClass = score > 0 ? 'positive' : score < 0 ? 'negative' : ''
+    const lvl = a.level || 1
+    return `
+    <div class="thread-row" data-thread-id="${t.id}" onclick="openThread(${t.id})">
+      <div class="vote-col" onclick="event.stopPropagation()">
+        <button class="vote-btn up${uv===1?' active':''}" id="vup-${t.id}" onclick="castVote(${t.id},1,this)" title="Upvote">${upSVG}</button>
+        <span class="vote-score ${scoreClass}" id="vs-${t.id}">${score}</span>
+        <button class="vote-btn down${uv===-1?' active':''}" id="vdn-${t.id}" onclick="castVote(${t.id},-1,this)" title="Downvote">${downSVG}</button>
       </div>
-      ${scoreHtml}${eventsHtml}${liveChatHtml}
-      <div class="bet-result-banner ${existingBet.status}">
-        <span class="result-label">${pickLabel} · ${statusMap[existingBet.status]||'En attente'}</span>
-        <span class="result-points">${existingBet.status==='won'?'+'+existingBet.potential_gain+' pts':existingBet.status==='lost'?'-'+existingBet.stake+' pts':'Gain potentiel : +'+existingBet.potential_gain+' pts'}</span>
-      </div>
-      ${canCancel ? `<div style="padding:10px 32px;display:flex;gap:8px;border-top:1px solid rgba(255,255,255,0.06)">
-        <button class="admin-match-btn" onclick="cancelCustomBet('${existingBet.id}','${m.id}',${existingBet.stake})" style="border-color:rgba(231,76,60,0.4);color:#e74c3c">✕ Annuler ma mise</button>
-        <button class="admin-match-btn" onclick="changeBet('${existingBet.id}','${m.id}',${existingBet.stake},'${m.home_team} vs ${m.away_team}')">✎ Modifier</button>
-      </div>` : ''}
-      ${adminHtml}
-    </div>`
-  }
-
-  const canBet = isOpen && !isLive
-  const maxS = currentProfile ? (RANK_MAX[currentProfile.rank]||200) : 200
-  const userPts = currentProfile ? currentProfile.points : 0
-
-  return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
-    <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
-    <div class="bet-teams">
-      <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
-      <div class="bet-vs">VS</div>
-      <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
-    </div>
-    ${scoreHtml}${eventsHtml}${liveChatHtml}
-    <div class="bet-infos">
-      <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${kickoff.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</span></div>
-      <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${kickoff.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>
-    </div>
-    ${canBet ? `
-    <div class="bet-options" id="cm-options-${m.id}">
-      <button class="bet-option win-option" onclick="selectCmOpt('${m.id}','win')" id="cm-opt-${m.id}-win">
-        <span class="bet-option-label">Victoire ${m.home_team}</span>
-        <span class="bet-option-result">1</span>
-        <span class="bet-option-mult">×${CUSTOM_ODDS.win}</span>
-      </button>
-      <button class="bet-option draw-option" onclick="selectCmOpt('${m.id}','draw')" id="cm-opt-${m.id}-draw">
-        <span class="bet-option-label">Match nul</span>
-        <span class="bet-option-result">X</span>
-        <span class="bet-option-mult">×${CUSTOM_ODDS.draw}</span>
-      </button>
-      <button class="bet-option lose-option" onclick="selectCmOpt('${m.id}','lose')" id="cm-opt-${m.id}-lose">
-        <span class="bet-option-label">Victoire ${m.away_team}</span>
-        <span class="bet-option-result">2</span>
-        <span class="bet-option-mult">×${CUSTOM_ODDS.lose}</span>
-      </button>
-    </div>
-    <div class="bet-count-bar" id="bc-${m.id}">
-      <div class="bet-count-col"><span class="bet-count-num win" id="bc-win-${m.id}">—</span><span class="bet-count-lbl">sur 1</span></div>
-      <div class="bet-count-col"><span class="bet-count-num draw" id="bc-draw-${m.id}">—</span><span class="bet-count-lbl">sur X</span></div>
-      <div class="bet-count-col"><span class="bet-count-num lose" id="bc-lose-${m.id}">—</span><span class="bet-count-lbl">sur 2</span></div>
-    </div>
-    <div class="bet-stake">
-      <div class="stake-input-wrap">
-        <span class="stake-label">Mise (pts) · Max ${Math.min(maxS,userPts)} pts</span>
-        <input type="number" class="stake-input" id="cm-stake-${m.id}" placeholder="0" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCmPreview('${m.id}')">
-        <div class="stake-quick">
-          <button class="stake-quick-btn" onclick="setCmStake('${m.id}',50,${Math.min(maxS,userPts)})">50</button>
-          <button class="stake-quick-btn" onclick="setCmStake('${m.id}',100,${Math.min(maxS,userPts)})">100</button>
-          <button class="stake-quick-btn" onclick="setCmStake('${m.id}','all',${Math.min(maxS,userPts)})">TOUT</button>
+      <div style="flex:1;min-width:0">
+        <div class="thread-top">
+          <span class="thread-cat cat-${t.category}">${CAT_LABELS[t.category]||t.category}</span>
+        </div>
+        <div class="thread-title">${t.title}</div>
+        <div class="thread-meta">
+          <span class="thread-author-av">${avHTML}</span>
+          <span class="an-clickable-user" onclick="event.stopPropagation();AN?.openProfileCard('${a.id}',this)" style="cursor:pointer;transition:color .15s" onmouseover="this.style.color='#4d82d4'" onmouseout="this.style.color=''">${a.display_name||a.username||'Anonyme'}</span>
+          <span class="nv-badge">Nv${lvl}</span>
+          <span class="thread-rank-badge" style="color:${color};border-color:${color}">${emoji} ${rank}</span>
+          <span>·</span><span>${date}</span>
         </div>
       </div>
-      <div class="stake-preview">
-        <span class="stake-preview-label">Gain potentiel</span>
-        <span class="stake-preview-value zero" id="cm-preview-${m.id}">0 pts</span>
-        ${currentUser
-          ? `<button class="btn-bet" id="cm-btn-${m.id}" onclick="submitCustomMatchBet('${m.id}','${(m.home_team+' vs '+m.away_team).replace(/'/g,"\\'")}',cmOdds['${m.id}'])" disabled>Valider →</button>`
-          : `<button class="btn-bet" onclick="window.AN?.openAuth?.()">Connexion requise</button>`
-        }
-      </div>
-    </div>` : !isLive ? `<div style="padding:16px 32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;">Mises fermées pour ce match</div>` : ''}
-    ${adminHtml}
-  </div>`
-}
-
-const cmSelected = {}
-const cmOdds = {}
-window.cmOdds = cmOdds
-window.selectCmOpt = function(matchId, pick) {
-  if (!currentUser) { window.AN?.openAuth?.(); return }
-  cmSelected[matchId] = pick
-  ;['win','draw','lose'].forEach(p => document.getElementById(`cm-opt-${matchId}-${p}`)?.classList.remove('selected'))
-  document.getElementById(`cm-opt-${matchId}-${pick}`)?.classList.add('selected')
-  updateCmPreview(matchId)
-}
-window.setCmStake = function(matchId, val, max) {
-  const input = document.getElementById(`cm-stake-${matchId}`)
-  if (input) { input.value = val==='all'?max:Math.min(val,max); updateCmPreview(matchId) }
-}
-window.updateCmPreview = function(matchId) {
-  const pick = cmSelected[matchId]
-  const stake = parseInt(document.getElementById(`cm-stake-${matchId}`)?.value) || 0
-  const btnEl = document.getElementById(`cm-btn-${matchId}`)
-  const prevEl = document.getElementById(`cm-preview-${matchId}`)
-  if (!prevEl) return
-  const odds = cmOdds[matchId] || { win:1.8, draw:3.5, lose:4.5 }
-  const mult = pick ? (odds[pick]||1) : 1
-  const gain = pick && stake >= 10 ? Math.floor(stake * mult) : 0
-  if (gain > 0) { prevEl.textContent = '+'+gain+' pts'; prevEl.classList.remove('zero'); if(btnEl) btnEl.disabled = false }
-  else { prevEl.textContent = '0 pts'; prevEl.classList.add('zero'); if(btnEl) btnEl.disabled = true }
-}
-window.submitCustomMatchBet = async function(matchId, label, odds) {
-  if (!currentUser || !currentProfile) return
-  const pick = cmSelected[matchId]
-  const stake = parseInt(document.getElementById(`cm-stake-${matchId}`)?.value) || 0
-  if (!pick || stake < 10) { showToast('Sélectionne une option et mise ≥ 10 pts', 'error'); return }
-  if (stake > currentProfile.points) { showToast('Pas assez de points', 'error'); return }
-  const mult = odds[pick] || 2
-  const potential_gain = Math.floor(stake * mult)
-  const btn = document.getElementById(`cm-btn-${matchId}`)
-  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement...' }
-  try {
-    const newPts = currentProfile.points - stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: -stake, reason: 'custom_match_bet', ref_id: String(matchId) })
-    await supabase.from('bets').insert({ user_id: currentUser.id, match_id: String(matchId), match_label: label, pick, stake, multiplier: mult, potential_gain, status: 'pending' })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(`Mise de ${stake} pts enregistrée ! ✅`, 'ok')
-    loadCustomMatches()
-  } catch(e) {
-    showToast('Erreur lors de la mise', 'error')
-    if (btn) { btn.disabled = false; btn.textContent = 'Valider →' }
-  }
-}
-
-// ── CANCEL / CHANGE BET ──
-window.cancelCustomBet = async function(betId, matchId, stake) {
-  if (!currentUser) return
-  if (!confirm(`Annuler ta mise de ${stake} pts ? Tu seras remboursé.`)) return
-  try {
-    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
-    const newPts = (currentProfile.points || 0) + stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_cancelled', ref_id: String(matchId) })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(`Mise annulée · ${stake} pts remboursés`, 'ok')
-    loadCustomMatches()
-  } catch(e) { showToast('Erreur lors de l\'annulation', 'error') }
-}
-
-window.changeBet = async function(betId, matchId, stake, label) {
-  if (!currentUser) return
-  if (!confirm(`Modifier ta mise ? Elle sera annulée (${stake} pts remboursés) et tu pourras en passer une nouvelle.`)) return
-  try {
-    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
-    const newPts = (currentProfile.points || 0) + stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_changed', ref_id: String(matchId) })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(`Mise annulée · ${stake} pts remboursés · Passe une nouvelle mise`, 'ok')
-    loadCustomMatches()
-  } catch(e) { showToast('Erreur lors de la modification', 'error') }
-}
-
-// ── CUSTOM BETS ──
-async function loadCustomBets() {
-  const { data } = await supabase.from('custom_bets').select('*').eq('status','open').order('created_at', { ascending: false })
-  const container = document.getElementById('custom-bets-container')
-  const label = document.getElementById('custom-bets-label')
-  if (!data?.length) { container.innerHTML = ''; if(label) label.style.display='none'; return }
-  if(label) label.style.display = ''
-  // Load user's entries
-  let userEntries = {}
-  if (currentUser) {
-    const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('user_id', currentUser.id)
-    ;(entries||[]).forEach(e => userEntries[e.bet_id] = e)
-  }
-  container.innerHTML = data.map(b => {
-    const entry = userEntries[b.id]
-    const maxS = currentProfile ? (RANK_MAX[currentProfile.rank] || 200) : 200
-    const userPts = currentProfile ? currentProfile.points : 0
-    if (entry) {
-      return `<div class="bet-card">
-        <div class="bet-card-header"><span class="bet-competition">Pari Spécial</span><div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mise enregistrée</span></div></div>
-        <div style="padding:20px 32px"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:6px">${b.title}</div>${b.description?`<div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">${b.description}</div>`:''}</div>
-        <div class="bet-result-banner ${entry.status}">
-          <span class="result-label">${entry.pick==='yes'?b.option_yes:b.option_no} · ${entry.status==='won'?'✅ Gagné':entry.status==='lost'?'❌ Perdu':'⏳ En attente'}</span>
-          <span class="result-points">${entry.status==='won'?'+'+entry.potential_gain+' pts':entry.status==='lost'?'-'+entry.stake+' pts':'Gain potentiel : +'+entry.potential_gain+' pts'}</span>
-        </div>
-      </div>`
-    }
-    return `<div class="bet-card">
-      <div class="bet-card-header"><span class="bet-competition">🎲 Pari Spécial</span><div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">Ouvert</span></div></div>
-      <div style="padding:20px 32px 0">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:6px">${b.title}</div>
-        ${b.description?`<div style="font-family:'Barlow',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:12px">${b.description}</div>`:''}
-      </div>
-      <div class="bet-options" id="cb-options-${b.id}">
-        <button class="bet-option win-option" onclick="selectCustomOpt(${b.id},'yes')" id="cb-opt-${b.id}-yes">
-          <span class="bet-option-label">${b.option_yes}</span>
-          <span class="bet-option-result">OUI</span>
-          <span class="bet-option-mult">×${b.odds_yes}</span>
-        </button>
-        <button class="bet-option lose-option" onclick="selectCustomOpt(${b.id},'no')" id="cb-opt-${b.id}-no">
-          <span class="bet-option-label">${b.option_no}</span>
-          <span class="bet-option-result">NON</span>
-          <span class="bet-option-mult">×${b.odds_no}</span>
-        </button>
-      </div>
-      <div class="bet-stake">
-        <div class="stake-input-wrap">
-          <span class="stake-label">Mise (pts) · Max ${Math.min(maxS,userPts)} pts</span>
-          <input type="number" class="stake-input" id="cb-stake-${b.id}" placeholder="0" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCustomPreview(${b.id},${b.odds_yes},${b.odds_no})">
-          <div class="stake-quick">
-            <button class="stake-quick-btn" onclick="setCbStake(${b.id},50,${Math.min(maxS,userPts)})">50</button>
-            <button class="stake-quick-btn" onclick="setCbStake(${b.id},100,${Math.min(maxS,userPts)})">100</button>
-            <button class="stake-quick-btn" onclick="setCbStake(${b.id},'all',${Math.min(maxS,userPts)})">TOUT</button>
-          </div>
-        </div>
-        <div class="stake-preview">
-          <span class="stake-preview-label">Gain potentiel</span>
-          <span class="stake-preview-value zero" id="cb-preview-${b.id}">0 pts</span>
-          ${currentUser
-            ? `<button class="btn-bet" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider →</button>`
-            : `<button class="btn-bet" onclick="AuthNav.openAuth()">Connexion requise</button>`
-          }
-        </div>
+      <div class="thread-stats" style="display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="thread-replies">${t.reply_count}</div>
+        <div class="thread-replies-label">réponses</div>
+        ${window.AN?.isAdmin?.() ? `<button onclick="event.stopPropagation();AN.adminDeleteThread(${t.id})" style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;border:1px solid #e74c3c;color:#e74c3c;padding:3px 7px;cursor:pointer;background:none;transition:.2s;" onmouseover="this.style.background='#e74c3c';this.style.color='#fff'" onmouseout="this.style.background='none';this.style.color='#e74c3c'">✕</button>` : ''}
       </div>
     </div>`
   }).join('')
 }
-loadCustomBets()
-window.addEventListener('custom-bet-created', loadCustomBets)
-window.addEventListener('custom-bet-updated', loadCustomBets)
 
-const cbSelected = {}
-window.selectCustomOpt = function(betId, pick) {
-  cbSelected[betId] = pick
-  ;['yes','no'].forEach(p => document.getElementById(`cb-opt-${betId}-${p}`)?.classList.remove('selected'))
-  document.getElementById(`cb-opt-${betId}-${pick}`)?.classList.add('selected')
-  updateCustomPreview(betId)
-}
-window.setCbStake = function(betId, val, max) {
-  const input = document.getElementById(`cb-stake-${betId}`)
-  if (input) { input.value = val==='all'?max:Math.min(val,max); updateCustomPreview(betId) }
-}
-window.updateCustomPreview = function(betId) {
-  const pick = cbSelected[betId]
-  const stake = parseInt(document.getElementById(`cb-stake-${betId}`)?.value) || 0
-  const { data: bet } = { data: null } // odds from data attr
-  const btnEl = document.getElementById(`cb-btn-${betId}`)
-  const prevEl = document.getElementById(`cb-preview-${betId}`)
-  // Get odds from option buttons
-  const yesBtn = document.getElementById(`cb-opt-${betId}-yes`)
-  const noBtn = document.getElementById(`cb-opt-${betId}-no`)
-  if (!yesBtn || !noBtn || !prevEl) return
-  const oddsYes = parseFloat(yesBtn.querySelector('.bet-option-mult')?.textContent?.replace('×','')) || 2
-  const oddsNo  = parseFloat(noBtn.querySelector('.bet-option-mult')?.textContent?.replace('×','')) || 2
-  const mult = pick === 'yes' ? oddsYes : pick === 'no' ? oddsNo : 1
-  const gain = pick && stake >= 10 ? Math.floor(stake * mult) : 0
-  if (gain > 0) { prevEl.textContent = '+'+gain+' pts'; prevEl.classList.remove('zero'); if(btnEl) btnEl.disabled = false }
-  else { prevEl.textContent = '0 pts'; prevEl.classList.add('zero'); if(btnEl) btnEl.disabled = true }
-}
-window.submitCustomBet = async function(betId, title, oddsYes, oddsNo) {
-  if (!currentUser || !currentProfile) return
-  const pick = cbSelected[betId]
-  const stake = parseInt(document.getElementById(`cb-stake-${betId}`)?.value) || 0
-  if (!pick || stake < 10) { showToast('Sélectionne une option et une mise ≥ 10 pts', 'error'); return }
-  if (stake > currentProfile.points) { showToast('Pas assez de points', 'error'); return }
-  const mult = pick === 'yes' ? oddsYes : oddsNo
-  const potential_gain = Math.floor(stake * mult)
-  const btn = document.getElementById(`cb-btn-${betId}`)
-  if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement...' }
-  try {
-    // Débit points
-    const newPts = currentProfile.points - stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: -stake, reason: 'custom_bet', ref_id: String(betId) })
-    await supabase.from('custom_bet_entries').insert({ bet_id: betId, user_id: currentUser.id, pick, stake, potential_gain })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(`Mise de ${stake} pts enregistrée ! Gain potentiel : +${potential_gain} pts`, 'success')
-    await loadCustomBets()
-  } catch(e) {
-    showToast(e.message.includes('unique') ? 'Tu as déjà misé sur ce pari' : e.message, 'error')
-    if (btn) { btn.disabled = false; btn.textContent = 'Valider →' }
-  }
+function updateCounts() {
+  const cats = ['matchs','transferts','debats','tactique','general']
+  document.getElementById('count-all').textContent = allThreads.length
+  cats.forEach(c => {
+    const el = document.getElementById('count-' + c)
+    if (el) el.textContent = allThreads.filter(t => t.category === c).length
+  })
 }
 
+// ── OPEN THREAD ──
+window.openThread = async function(threadId) {
+  const { data: thread } = await supabase
+    .from('forum_threads')
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+    .eq('id', threadId).single()
+  if (!thread) return
+  currentThread = thread
 
-// ── LOAD EXISTING BETS ──
-async function loadExistingBets() {
-  if (!currentUser) return
-  const bets = await getUserBets(currentUser.id)
-  existingBets = {}
-  bets.forEach(b => existingBets[b.match_id] = b)
-}
+  const { data: replies } = await supabase
+    .from('forum_replies')
+    .select(`*, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+    .eq('thread_id', threadId)
+    .order('created_at', { ascending: true })
 
-// ── RENDER MATCHES ──
-function renderMatches() {
-  const container = document.getElementById('matches-container')
-  if (!upcomingMatches.length) {
-    container.innerHTML = `
-      <div style="border:1px solid rgba(255,255,255,0.08);padding:48px 24px;text-align:center;background:rgba(255,255,255,0.01)">
-        <div style="font-size:40px;margin-bottom:16px">⚽</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;margin-bottom:10px">Hors Saison</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);line-height:1.8;max-width:300px;margin:0 auto">
-          Aucun match du FC Porto prévu pour l'instant.<br>
-          Les paris sur les matchs officiels Porto seront disponibles dès la reprise de la saison.
-        </div>
-      </div>`
-    return
-  }
-  container.innerHTML = upcomingMatches.slice(0, 5).map((m, i) => renderBetCard(m, i)).join('')
-  // Re-observe reveals
-  container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
-  // Fix: ensure options are clickable when user is logged in
-  if (currentUser) {
-    container.querySelectorAll('.bet-option.disabled').forEach(btn => btn.classList.remove('disabled'))
-  }
-}
+  // Render header
+  const date = new Date(thread.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})
+  document.getElementById('tv-cat-wrap').innerHTML = `<span class="thread-cat cat-${thread.category}" style="display:inline-block;margin-bottom:10px">${CAT_LABELS[thread.category]||thread.category}</span>`
+  document.getElementById('tv-title').textContent = thread.title
+  const a = thread.author || {}
+  document.getElementById('tv-meta').innerHTML = `Par <strong>${a.display_name||a.username||'?'}</strong> · ${date}`
 
-function renderBetCard(m, idx) {
-  const matchDate = new Date(m.date)
-  const now = new Date()
-  const diffMs = matchDate - now - 3600000 // ferme 1h avant
-  const isOpen = diffMs > 0
-  const existingBet = existingBets[String(m.id)]
+  // Render replies (incl. original post)
+  const all = [{ ...thread, author: thread.author, content: thread.content, is_original: true }, ...(replies||[])]
+  const repliesList = document.getElementById('replies-list')
+  repliesList.innerHTML = all.map((r, i) => {
+    const ra = r.author || {}
+    const rrank = ra.rank || 'Adepto'
+    const rcolor = RANK_COLORS[rrank] || '#fff'
+    const remoji = RANK_EMOJI[rrank] || '⚪'
+    const rdate = new Date(r.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})
+    const avHTML = ra.avatar_url ? `<img src="${ra.avatar_url}">` : (ra.display_name||ra.username||'?')[0].toUpperCase()
+    const isBest = r.is_best_answer
+    const isAuthor = currentUser && thread.author?.id === currentUser.id
+    const canMarkBest = isAuthor && !r.is_original && !isBest
+    const likeCount = r.likes_count || 0
+    const isOwnReply = currentUser && ra.id === currentUser.id
 
-  const dateStr = matchDate.toLocaleDateString('fr-FR', {day:'2-digit', month:'short'})
-  const timeStr = matchDate.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
-  const deadlineStr = isOpen ? formatDeadline(diffMs) : 'Mises fermées'
-
-  const maxS = currentProfile ? (RANK_MAX[currentProfile.rank] || 200) : 200
-  const userPts = currentProfile ? currentProfile.points : 0
-
-  const homeImg = m.homeCrest ? `<img src="${m.homeCrest}" class="bet-logo" alt="${m.homeTeam}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.homeTeam||'?')[0]}</div>` : `<div class="bet-logo-placeholder">${(m.homeTeam||'?')[0]}</div>`
-  const awayImg = m.awayCrest ? `<img src="${m.awayCrest}" class="bet-logo" alt="${m.awayTeam}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="bet-logo-placeholder" style="display:none">${(m.awayTeam||'?')[0]}</div>` : `<div class="bet-logo-placeholder">${(m.awayTeam||'?')[0]}</div>`
-
-  // Si déjà misé
-  if (existingBet) {
-    const pickLabel = ODDS[existingBet.pick]?.label || existingBet.pick
-    const statusMap = { pending:'⏳ En attente', won:'✅ Gagné', lost:'❌ Perdu' }
-    const statusClass = existingBet.status
     return `
-    <div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
-      <div class="bet-card-header">
-        <span class="bet-competition">${m.competition}</span>
-        <div class="bet-deadline deadline-closed"><div class="deadline-dot"></div><span>Mise enregistrée</span></div>
-      </div>
-      <div class="bet-teams">
-        <div class="bet-team">${homeImg}<span class="bet-team-name">${m.homeTeam}</span></div>
-        <div class="bet-vs">VS</div>
-        <div class="bet-team">${awayImg}<span class="bet-team-name">${m.awayTeam}</span></div>
-      </div>
-      <div class="bet-infos">
-        <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${dateStr}</span></div>
-        <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${timeStr}</span></div>
-        <div class="bet-info"><span class="bet-info-label">Ton pari</span><span class="bet-info-value" style="color:var(--blue-light)">${pickLabel}</span></div>
-        <div class="bet-info"><span class="bet-info-label">Mise</span><span class="bet-info-value">${existingBet.stake} pts</span></div>
-      </div>
-      <div class="bet-result-banner ${statusClass}">
-        <span class="result-label">${statusMap[existingBet.status]||'En attente'}</span>
-        <span class="result-points">${existingBet.status==='won'?'+'+existingBet.potential_gain+' pts':existingBet.status==='lost'?'-'+existingBet.stake+' pts':'Gain potentiel : +'+existingBet.potential_gain+' pts'}</span>
+    <div class="reply-item${isBest?' reply-best':''}">
+      <div class="reply-av">${avHTML}</div>
+      <div>
+        ${isBest?'<div class="best-label">✅ Meilleure réponse</div>':''}
+        <div class="reply-header">
+          <span class="reply-author" style="cursor:pointer" onclick="AN?.openProfileCard('${ra.id}',this)">${ra.display_name||ra.username||'?'}</span>
+          <span class="nv-badge">Nv${ra.level||1}</span>
+          <span class="thread-rank-badge" style="color:${rcolor};border-color:${rcolor}">${remoji} ${rrank}</span>
+          <span class="reply-date">${rdate}</span>
+          ${r.is_original?'<span class="thread-new-badge">OP</span>':''}
+        </div>
+        <div class="reply-body">${r.content}</div>
+        <div class="reply-actions">
+          ${!r.is_original && !isOwnReply && currentUser ? '<button class="reply-action-btn" onclick="likeReply('+r.id+',\''+ra.id+'\','+likeCount+')" style="color:rgba(231,76,60,0.6);border-color:rgba(231,76,60,0.25)">❤️ '+likeCount+'</button>' : likeCount > 0 ? '<span style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(231,76,60,0.5)">❤️ '+likeCount+'</span>' : ''}
+          ${canMarkBest?'<button class="reply-action-btn" onclick="markBest('+r.id+')">✓ Meilleure réponse (+10 pts)</button>':''}
+          ${window.AN?.isAdmin?.() && !r.is_original ? '<button class="reply-action-btn" onclick="deleteReply('+r.id+','+r.thread_id+')" style="color:#e74c3c;border-color:rgba(231,76,60,0.3)">✕ Supprimer</button>' : ''}
+        </div>
       </div>
     </div>`
-  }
+  }).join('')
 
-  // Carte normale
-  return `
-  <div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
-    <div class="bet-card-header">
-      <span class="bet-competition">${m.competition}</span>
-      <div class="bet-deadline${!isOpen?' deadline-closed':''}">
-        <div class="deadline-dot"></div>
-        <span class="${isOpen?'deadline-text':''}">${deadlineStr}</span>
-      </div>
-    </div>
-    <div class="bet-teams">
-      <div class="bet-team">${homeImg}<span class="bet-team-name">${m.homeTeam}</span></div>
-      <div class="bet-vs">VS</div>
-      <div class="bet-team">${awayImg}<span class="bet-team-name">${m.awayTeam}</span></div>
-    </div>
-    <div class="bet-infos">
-      <div class="bet-info"><span class="bet-info-label">Compétition</span><span class="bet-info-value">${m.competition}</span></div>
-      <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${dateStr}</span></div>
-      <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${timeStr}</span></div>
-      ${m.venue?`<div class="bet-info"><span class="bet-info-label">Stade</span><span class="bet-info-value" style="font-size:12px">${m.venue}</span></div>`:''}
-    </div>
-    ${isOpen ? `
-    <div class="bet-options" id="options-${m.id}">
-      ${['win','draw','lose'].map(opt => `
-      <button class="bet-option ${opt}-option" onclick="selectOption('${m.id}','${opt}')" id="opt-${m.id}-${opt}">
-        <span class="bet-option-label">${ODDS[opt].label}</span>
-        <span class="bet-option-result">${opt==='win'?'1':opt==='draw'?'X':'2'}</span>
-        <span class="bet-option-mult">×${ODDS[opt].mult}</span>
-        <span class="bet-option-sub">${opt==='win'?'Favori':opt==='draw'?'Risqué':'Jackpot'}</span>
-      </button>`).join('')}
-    </div>
-    <div class="bet-stake">
-      <div class="stake-input-wrap">
-        <span class="stake-label">Mise (pts) · Max ${currentProfile?Math.min(maxS,userPts):maxS} pts</span>
-        <input type="number" class="stake-input" id="stake-input-${m.id}" placeholder="0" min="10" max="${Math.min(maxS,userPts)}" oninput="updatePreview('${m.id}',${ODDS['win'].mult})">
-        <div class="stake-quick">
-          <button class="stake-quick-btn" onclick="setStake('${m.id}',50,${Math.min(maxS,userPts)})">50</button>
-          <button class="stake-quick-btn" onclick="setStake('${m.id}',100,${Math.min(maxS,userPts)})">100</button>
-          <button class="stake-quick-btn" onclick="setStake('${m.id}',200,${Math.min(maxS,userPts)})">200</button>
-          <button class="stake-quick-btn" onclick="setStake('${m.id}','all',${Math.min(maxS,userPts)})">TOUT</button>
-        </div>
-      </div>
-      <div class="stake-preview">
-        <span class="stake-preview-label">Gain potentiel</span>
-        <span class="stake-preview-value zero" id="preview-${m.id}">0 pts</span>
-        ${currentUser
-          ? `<button class="btn-bet" id="btn-bet-${m.id}" onclick="openConfirmMatch('${m.id}','${m.homeTeam} vs ${m.awayTeam}')" disabled>Valider →</button>`
-          : `<button class="btn-bet" onclick="AuthNav.openAuthModal()">Connexion requise</button>`
-        }
-      </div>
-    </div>` : `<div style="padding:16px 32px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;">Mises fermées pour ce match</div>`}
-  </div>`
+  document.getElementById('thread-list-view').style.display = 'none'
+  document.getElementById('thread-view').style.display = 'block'
+  updateReplyForm()
+  window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
-function formatDeadline(ms) {
-  const h = Math.floor(ms/3600000)
-  const d = Math.floor(h/24)
-  if (d > 0) return `Ferme dans ${d}j ${h%24}h`
-  return `Ferme dans ${h}h`
+window.backToList = function() {
+  document.getElementById('thread-view').style.display = 'none'
+  document.getElementById('thread-list-view').style.display = 'block'
+  currentThread = null
 }
 
-// ── SELECT OPTION ──
-window.selectOption = function(matchId, opt) {
-  if (!currentUser) { AuthNav.openAuthModal(); return }
-  selectedOptions[matchId] = opt
-  ;['win','draw','lose'].forEach(o => document.getElementById(`opt-${matchId}-${o}`)?.classList.remove('selected'))
-  document.getElementById(`opt-${matchId}-${opt}`)?.classList.add('selected')
-  const stake = parseInt(document.getElementById(`stake-input-${matchId}`)?.value) || 0
-  updatePreviewWithOpt(matchId, opt, stake)
-}
-
-window.updatePreview = function(matchId) {
-  const opt = selectedOptions[matchId]
-  const stake = parseInt(document.getElementById(`stake-input-${matchId}`)?.value) || 0
-  if (opt) updatePreviewWithOpt(matchId, opt, stake)
-}
-
-function updatePreviewWithOpt(matchId, opt, stake) {
-  const mult = ODDS[opt]?.mult || 1
-  const gain = opt && stake >= 10 ? Math.floor(stake * mult) : 0
-  const prev = document.getElementById(`preview-${matchId}`)
-  const btn = document.getElementById(`btn-bet-${matchId}`)
-  if (!prev) return
-  if (gain > 0) { prev.textContent = `+${gain} pts`; prev.classList.remove('zero'); if(btn) btn.disabled = false }
-  else { prev.textContent = '0 pts'; prev.classList.add('zero'); if(btn) btn.disabled = true }
-  recalcEnJeu()
-}
-
-window.setStake = function(matchId, val, max) {
-  const input = document.getElementById(`stake-input-${matchId}`)
-  input.value = val === 'all' ? max : Math.min(val, max)
-  window.updatePreview(matchId)
-}
-
-function recalcEnJeu() {
-  let total = 0
-  document.querySelectorAll('[id^="stake-input-"]').forEach(el => total += parseInt(el.value)||0)
-  document.getElementById('pts-en-jeu').textContent = total
-}
-
-// ── CONFIRM ──
-window.openConfirmMatch = function(matchId, label) {
-  const stake = parseInt(document.getElementById(`stake-input-${matchId}`)?.value) || 0
-  const opt = selectedOptions[matchId]
-  if (!opt || stake < 10) { showToast('Sélectionne un pronostic et une mise ≥ 10 pts','error'); return }
-  if (!currentProfile || stake > currentProfile.points) { showToast('Pas assez de points','error'); return }
-  const mult = ODDS[opt].mult
-  const gain = Math.floor(stake * mult)
-  pendingBet = { matchId, matchLabel: label, stake, opt, mult, gain }
-  document.getElementById('confirm-match').textContent = label
-  document.getElementById('c-stake').textContent = stake + ' pts'
-  document.getElementById('c-pick').textContent = ODDS[opt].label
-  document.getElementById('c-mult').textContent = '×' + mult
-  document.getElementById('confirm-potential').textContent = '+' + gain + ' pts'
-  document.getElementById('confirm-modal').classList.add('open')
-  document.body.style.overflow = 'hidden'
-}
-
-window.closeConfirm = function() {
-  document.getElementById('confirm-modal').classList.remove('open')
-  document.body.style.overflow = ''
-  pendingBet = null
-}
-
-window.submitBet = async function() {
-  if (!pendingBet || !currentUser) return
-  const btn = document.querySelector('.btn-confirm')
-  btn.disabled = true; btn.textContent = 'Enregistrement...'
-  try {
-    await placeBet({
-      userId: currentUser.id,
-      matchId: pendingBet.matchId,
-      matchLabel: pendingBet.matchLabel,
-      pick: pendingBet.opt,
-      stake: pendingBet.stake,
-      multiplier: pendingBet.mult,
-    })
-    closeConfirm()
-    await loadExistingBets()
-    // Refresh profile points
-    const { data } = await supabase.from('profiles').select('points,rank').eq('id', currentUser.id).single()
-    if (data) { currentProfile.points = data.points; currentProfile.rank = data.rank; updatePointsBanner() }
-    renderMatches()
-    loadActiveBets()
-    showToast(`Mise de ${pendingBet.stake} pts enregistrée ! Gain potentiel : +${pendingBet.gain} pts`, 'success')
-  } catch(e) {
-    showToast(e.message, 'error')
-  } finally { btn.disabled = false; btn.textContent = 'Confirmer →' }
-}
-
-// ── HISTORY ──
-
-// ── PARIS ACTIFS ──
-window.switchHistTab = function(tab) {
-  document.getElementById('htab-actifs-content').style.display = tab === 'actifs' ? '' : 'none'
-  document.getElementById('htab-historique-content').style.display = tab === 'historique' ? '' : 'none'
-  const activeStyle = 'border-bottom:2px solid var(--blue);color:#fff'
-  const inactiveStyle = 'border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
-  document.getElementById('htab-actifs').style.cssText += tab==='actifs' ? ';border-bottom:2px solid var(--blue);color:#fff' : ';border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
-  document.getElementById('htab-historique').style.cssText += tab==='historique' ? ';border-bottom:2px solid var(--blue);color:#fff' : ';border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
-  if (tab === 'historique') loadHistory()
-  if (tab === 'actifs') loadActiveBets()
-}
-
-async function loadActiveBets() {
-  if (!currentUser) {
-    document.getElementById('active-bets-container').innerHTML = '<div class="empty-state">Connecte-toi pour voir tes paris</div>'
-    return
-  }
-  const container = document.getElementById('active-bets-container')
-  container.innerHTML = '<div class="empty-state">Chargement...</div>'
-
-  try {
-    // Les deux requêtes en parallèle avec timeout
-    const timeout = ms => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms))
-
-    const [betsResult, matchesResult] = await Promise.all([
-      Promise.race([
-        supabase.from('bets').select('*').eq('user_id', currentUser.id).eq('status', 'pending'),
-        timeout(8000)
-      ]),
-      Promise.race([
-        supabase.from('custom_matches').select('*'),  // ← plus de filtre status, on prend tout
-        timeout(8000)
-      ])
-    ])
-
-    const myBets = betsResult?.data || []
-    const customMatches = matchesResult?.data || []
-
-    if (!myBets.length) {
-      container.innerHTML = '<div class="empty-state">Aucun pari actif pour l\'instant</div>'
-      return
-    }
-
-    const matchMap = {}
-    customMatches.forEach(m => { matchMap[String(m.id)] = m })
-
-    const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }
-    const pickClass = { win:'win', draw:'draw', lose:'lose' }
-
-    container.innerHTML = myBets.map(b => {
-      const m = matchMap[String(b.match_id)]
-      const isLive = m?.status === 'live'
-      const deadline = m?.closes_at ? new Date(m.closes_at) : (m?.deadline_at ? new Date(m.deadline_at) : null)
-      const now = new Date()
-      const isOpen = !isLive && (!deadline || now < deadline)
-      const canAct = isOpen && !isLive
-
-      return `<div class="active-bet-card ${isLive ? 'live' : 'pending'}">
-        <div class="abt-header">
-          <div class="abt-match">${b.match_label || (m ? m.home_team + ' vs ' + m.away_team : '—')}</div>
-          <span class="abt-status ${isLive ? 'live' : 'pending'}">${isLive ? '● EN COURS' : '⏳ En attente'}</span>
-        </div>
-        <div class="abt-body">
-          <div class="abt-pick ${pickClass[b.pick] || ''}">${b.pick === 'win' ? '1' : b.pick === 'draw' ? 'X' : '2'}</div>
-          <div class="abt-details">
-            <div class="abt-row">Pronostic · <span>${pickLabel[b.pick] || b.pick}</span></div>
-            <div class="abt-row">Mise · <span>${b.stake} pts</span></div>
-            <div class="abt-row">Gain potentiel · <span style="color:var(--green)">+${b.potential_gain} pts</span></div>
-            ${deadline && isOpen ? `<div class="abt-row">Deadline · <span>${deadline.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span></div>` : ''}
-          </div>
-        </div>
-        ${canAct ? `<div class="abt-actions">
-          <button class="abt-btn cancel" onclick="cancelActiveBet('${b.id}','${b.match_id}',${b.stake})">✕ Annuler</button>
-          <button class="abt-btn modify" onclick="modifyActiveBet('${b.id}','${b.match_id}',${b.stake},'${(b.match_label||'').replace(/'/g,"\\'")}')">✎ Modifier</button>
-        </div>` : `<div style="padding:0 20px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2)">${isLive ? 'Match en cours · Modification impossible' : 'Mises fermées'}</div>`}
-      </div>`
-    }).join('')
-
-  } catch(e) {
-    console.error('loadActiveBets error:', e)
-    container.innerHTML = '<div class="empty-state">Erreur lors du chargement des paris. Réessaie.</div>'
+// ── REPLY FORM ──
+function updateReplyForm() {
+  const btn = document.getElementById('btn-reply')
+  const hint = document.getElementById('reply-pts-hint')
+  if (!btn) return
+  if (currentUser && currentProfile) {
+    btn.disabled = false
+    hint.textContent = '+3 pts pour ta première réponse dans ce thread'
+  } else {
+    btn.disabled = true
+    hint.innerHTML = '<span style="cursor:pointer;color:#4d82d4" onclick="AN?.openAuth()">Connecte-toi</span> pour répondre'
   }
 }
 
-window.cancelActiveBet = async function(betId, matchId, stake) {
-  if (!currentUser) return
-  if (!confirm('Annuler ce pari ? Tu seras remboursé de ' + stake + ' pts.')) return
-  try {
-    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
-    const newPts = (currentProfile.points || 0) + stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_cancelled', ref_id: String(matchId) })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(stake + ' pts remboursés ✅', 'ok')
-    loadActiveBets()
-    loadCustomMatches()
-  } catch(e) { showToast('Erreur', 'error') }
-}
-
-window.modifyActiveBet = async function(betId, matchId, stake, label) {
-  if (!currentUser) return
-  if (!confirm('Modifier ce pari ? Il sera annulé (' + stake + ' pts remboursés) et tu pourras en passer un nouveau.')) return
-  try {
-    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
-    const newPts = (currentProfile.points || 0) + stake
-    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
-    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_changed', ref_id: String(matchId) })
-    currentProfile.points = newPts
-    updatePointsBanner()
-    showToast(stake + ' pts remboursés · Repasse ta mise sur le match ✅', 'ok')
-    loadActiveBets()
-    loadCustomMatches()
-    // Switcher vers Paris
-    switchTab('paris')
-  } catch(e) { showToast('Erreur', 'error') }
-}
-
-async function loadHistory() {
-  if (!currentUser) return
-  const bets = await getUserBets(currentUser.id)
-  const container = document.getElementById('history-container')
-  if (!bets.length) { container.innerHTML = '<div class="empty-state">Aucune mise pour l\'instant</div>'; return }
-  const totalGain = bets.reduce((acc, b) => acc + (b.status==='won'?b.potential_gain:b.status==='lost'?-b.stake:0), 0)
-  const won = bets.filter(b=>b.status==='won').length
-  const rate = bets.filter(b=>b.status!=='pending').length ? Math.round(won/bets.filter(b=>b.status!=='pending').length*100) : 0
-  container.innerHTML = `
-    <div style="display:flex;gap:32px;padding:20px 24px;border:1px solid var(--border);margin-bottom:2px;background:rgba(255,255,255,0.02)">
-      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:4px">Bilan</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:${totalGain>=0?'var(--green)':'var(--red)'}">${totalGain>=0?'+':''}${totalGain} pts</div></div>
-      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:4px">Réussite</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px">${rate}%</div></div>
-      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:4px">Mises</div><div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px">${bets.length}</div></div>
-    </div>
-    <div class="history-grid">
-      <div class="history-row header"><span>Match</span><span>Pronostic</span><span>Mise</span><span>Résultat</span><span>Date</span></div>
-      ${bets.map(b => {
-        const pickLabel = b.pick==='win'?'1':b.pick==='draw'?'X':'2'
-        const pickColor = b.pick==='win'?'var(--green)':b.pick==='draw'?'var(--yellow)':'var(--red)'
-        const resultText = b.status==='won'?'+'+b.potential_gain+' pts':b.status==='lost'?'-'+b.stake+' pts':'En attente'
-        const dateStr = new Date(b.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'})
-        return `<div class="history-row">
-          <span class="history-match">${b.match_label||'—'}</span>
-          <span class="history-pick" style="color:${pickColor}">${pickLabel}</span>
-          <span class="history-stake">${b.stake} pts</span>
-          <span class="history-result ${b.status}">${resultText}</span>
-          <span class="history-date">${dateStr}</span>
-        </div>`
-      }).join('')}
-    </div>`
-}
-
-// ── LEADERBOARD ──
-async function loadWeeklyLeaderboard() {
-  const container = document.getElementById('leaderboard-weekly-container')
+window.submitReply = async function() {
+  if (!currentUser || !currentThread) return
+  const content = document.getElementById('reply-input').value.trim()
+  if (!content) return
+  const btn = document.getElementById('btn-reply')
+  btn.disabled = true; btn.textContent = 'Envoi...'
   try {
     const { data, error } = await supabase
-      .from('profiles')
-      .select('id, display_name, username, avatar_url, rank, weekly_pts')
-      .gt('weekly_pts', 0)
-      .order('weekly_pts', { ascending: false })
-      .limit(10)
-    const rankEmoji = { Supporter:'⚪', Dragon:'🔵', Socio:'🟡', Légende:'🔴', Invicta:'💎', Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴' }
-    if (error || !data?.length) { container.innerHTML = '<div class="empty-state">Aucune activité cette semaine</div>'; return }
-    container.innerHTML = data.map((u, i) => {
-      const isMe = currentUser && u.id === currentUser.id
-      const topClass = i===0?'top1':i===1?'top2':i===2?'top3':''
-      const meStyle = isMe ? ' style="background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue)"' : ''
-      const meColor = isMe ? ' style="color:var(--blue-light)"' : ''
-      const meAvStyle = isMe ? ' style="border-color:var(--blue-light)"' : ''
-      const avContent = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
-      return `<div class="lb-row ${topClass}"${meStyle} style="${isMe?'background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue);':''}cursor:pointer" onclick="AN?.openProfileCard('${u.id}',this)">
-        <div class="lb-rank"${meColor}>${i+1}</div>
-        <div class="lb-user">
-          <div class="lb-avatar"${meAvStyle}>${avContent}</div>
-          <div>
-            <div class="lb-name"${meColor}>${u.display_name||u.username}</div>
-            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3)">${rankEmoji[u.rank]||'⚪'} ${u.rank}</span>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div class="lb-pts"${meColor}>${u.weekly_pts} pts</div>
-          <div class="lb-pts-label">cette semaine</div>
-        </div>
-      </div>`
-    }).join('')
-  } catch(e) {
-    container.innerHTML = '<div class="empty-state">Erreur de chargement</div>'
-  }
+      .from('forum_replies')
+      .insert({ thread_id: currentThread.id, author_id: currentUser.id, content })
+      .select().single()
+
+    if (error) {
+      if (error.code === '23505') { showToast('Tu as déjà répondu à ce thread (pas de points supplémentaires)', ''); }
+      else throw error
+    } else {
+      // +3 pts
+      const newPts = (currentProfile.points || 0) + 3
+      await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+      await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 3, reason: 'forum_reply', ref_id: String(currentThread.id) })
+      addXp(currentUser.id, XP_REWARDS.forum_reply, 'forum_reply')
+      addWeeklyPoints(currentUser.id, 3)
+      // Notif au créateur du thread
+      if (currentThread.author_id !== currentUser.id) {
+        const title = currentThread.title.substring(0,60)
+        await supabase.from('notifications').insert({ user_id: currentThread.author_id, type: 'reply', from_user_id: currentUser.id, ref_id: String(currentThread.id), ref_label: title })
+        // Email
+        const fromName = currentProfile?.display_name || currentProfile?.username || 'Un membre'
+        fetch('/api/notify-forum', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: currentThread.author_id, fromName, threadTitle: title, type:'reply' }) }).catch(()=>{})
+      }
+      // increment reply count
+      // Increment reply_count directly (no RPC needed)
+      await supabase.rpc('increment_reply_count', { thread_id: currentThread.id }).catch(() => supabase.from('forum_threads').update({ reply_count: (currentThread.reply_count || 0) + 1 }).eq('id', currentThread.id))
+      currentThread.reply_count = (currentThread.reply_count || 0) + 1
+      // Sync allThreads en mémoire + DOM direct
+      const t = allThreads.find(x => x.id === currentThread.id)
+      if (t) t.reply_count = currentThread.reply_count
+      // Mettre à jour le compteur visible dans la liste sans attendre le realtime
+      const replyCountEl = document.querySelector(`[data-thread-id="${currentThread.id}"] .thread-replies`)
+      if (replyCountEl) replyCountEl.textContent = currentThread.reply_count
+      showToast('+3 pts ! Réponse publiée', 'success')
+    }
+
+    document.getElementById('reply-input').value = ''
+    await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = 'Répondre →' }
 }
 
-async function loadLeaderboard() {
-  const container = document.getElementById('leaderboard-container')
+window.deleteReply = async function(replyId, threadId) {
+  if (!window.AN?.isAdmin?.() || !confirm('Supprimer cette réponse ?')) return
+  await supabase.from('reply_likes').delete().eq('reply_id', replyId)
+  await supabase.from('forum_replies').delete().eq('id', replyId)
+  // Décrémenter reply_count
+  const { data: t } = await supabase.from('forum_threads').select('reply_count').eq('id', threadId).single()
+  const newCount = Math.max(0, (t?.reply_count || 1) - 1)
+  await supabase.from('forum_threads').update({ reply_count: newCount }).eq('id', threadId)
+  if (currentThread?.id === threadId) currentThread.reply_count = newCount
+  // Sync allThreads en mémoire
+  const threadInMemory = allThreads.find(x => x.id === threadId)
+  if (threadInMemory) threadInMemory.reply_count = newCount
+  await openThread(threadId)
+}
+
+window.markBest = async function(replyId) {
+  if (!currentUser || !currentThread) return
   try {
-    const data = await getBetsLeaderboard(20)
-    const rankEmoji = { Supporter:'⚪', Dragon:'🔵', Socio:'🟡', Légende:'🔴', Invicta:'💎', Adepto:'⚪', Dragão:'🔵', Ultras:'🟡', Lenda:'🔴' }
-    if (!data?.length) { container.innerHTML = '<div class="empty-state">Aucun joueur pour l\'instant</div>'; return }
-    container.innerHTML = data.map((u, i) => {
-      const isMe = currentUser && u.id === currentUser.id
-      const topClass = i===0?'top1':i===1?'top2':i===2?'top3':''
-      const meColor = isMe ? ' style="color:var(--blue-light)"' : ''
-      const meAvStyle = isMe ? ' style="border-color:var(--blue-light)"' : ''
-      const avContent = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
-      return `<div class="lb-row ${topClass}" style="${isMe?'background:rgba(0,61,165,0.06);border-top:1px solid var(--border-blue);':''}cursor:pointer" onclick="AN?.openProfileCard('${u.id}',this)">
-        <div class="lb-rank"${meColor}>${i+1}</div>
-        <div class="lb-user">
-          <div class="lb-avatar"${meAvStyle}>${avContent}</div>
-          <div>
-            <div class="lb-name"${meColor}>${u.display_name||u.username}</div>
-            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.3)">${rankEmoji[u.rank]||'⚪'} ${u.rank}</span>
-          </div>
-        </div>
-        <div style="text-align:right">
-          <div class="lb-pts"${meColor}>${u.points} pts</div>
-        </div>
-      </div>`
-    }).join('')
-  } catch(e) {
-    container.innerHTML = '<div class="empty-state">Erreur de chargement</div>'
-    console.error('loadLeaderboard error:', e)
-  }
+    const { data: reply } = await supabase.from('forum_replies').select('author_id').eq('id', replyId).single()
+    await supabase.from('forum_replies').update({ is_best_answer: true }).eq('id', replyId)
+    // +10 pts au répondant
+    const { data: rp } = await supabase.from('profiles').select('points').eq('id', reply.author_id).single()
+    await supabase.from('profiles').update({ points: (rp.points||0) + 10 }).eq('id', reply.author_id)
+    await supabase.from('points_log').insert({ user_id: reply.author_id, amount: 10, reason: 'best_answer', ref_id: String(currentThread.id) })
+    addXp(reply.author_id, XP_REWARDS.best_answer, 'best_answer')
+    addWeeklyPoints(reply.author_id, 10)
+    showToast('Meilleure réponse marquée ! +10 pts offerts', 'success')
+    await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
 }
 
-// ── TABS ──
-window.switchTab = function(tab) {
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab))
-  if (tab === 'historique') { loadActiveBets(); loadHistory() }
-  if (tab === 'classement') { loadWeeklyLeaderboard(); loadLeaderboard() }
+// ── NEW THREAD ──
+window.openNewThread = function() {
+  if (!currentUser) { AN?.openAuth(); return }
+  document.getElementById('new-thread-modal').classList.add('open')
+  document.body.style.overflow = 'hidden'
 }
+window.closeNewThread = function() {
+  document.getElementById('new-thread-modal').classList.remove('open')
+  document.body.style.overflow = ''
+}
+document.getElementById('new-thread-modal').addEventListener('click', e => { if(e.target.id==='new-thread-modal') closeNewThread() })
+
+window.submitThread = async function() {
+  if (!currentUser) return
+  const title = document.getElementById('nt-title').value.trim()
+  const category = document.getElementById('nt-cat').value
+  const content = document.getElementById('nt-content').value.trim()
+  if (!title || !content) { showToast('Remplis le titre et le contenu', 'error'); return }
+  const btn = document.getElementById('nt-submit')
+  btn.disabled = true; btn.textContent = 'Publication...'
+  try {
+    await supabase.from('forum_threads').insert({ author_id: currentUser.id, title, content, category })
+    // +5 pts
+    const newPts = (currentProfile.points || 0) + 5
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: 5, reason: 'forum_thread', ref_id: null })
+    addXp(currentUser.id, XP_REWARDS.forum_thread, 'forum_thread')
+    addWeeklyPoints(currentUser.id, 5)
+    document.getElementById('nt-title').value = ''
+    document.getElementById('nt-content').value = ''
+    closeNewThread()
+    await loadThreads()
+    showToast('+5 pts ! Thread publié', 'success')
+  } catch(e) { showToast(e.message, 'error') }
+  finally { btn.disabled = false; btn.textContent = 'Publier le thread →' }
+}
+
+// ── FILTERS ──
+window.filterCat = function(cat, btn) {
+  currentCat = cat
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'))
+  document.querySelectorAll('.mobile-cat-pill').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  // Sync l'autre liste via data-cat
+  document.querySelectorAll(`[data-cat="${cat}"]`).forEach(b => b.classList.add('active'))
+  renderThreadList()
+}
+window.castVote = async function(threadId, vote, btn) {
+  if (!currentUser) { AN?.openAuth(); return }
+  try {
+    const tid = String(threadId)
+    const prevVote = parseInt(userVotesMap[tid] ?? userVotesMap[threadId] ?? 0)
+    const newUserVote = prevVote === vote ? 0 : vote
+
+    // DB update
+    if (newUserVote === 0) {
+      await supabase.from('thread_votes').delete().eq('thread_id', threadId).eq('user_id', currentUser.id)
+    } else {
+      await supabase.from('thread_votes').upsert({ thread_id: threadId, user_id: currentUser.id, vote: newUserVote }, { onConflict: 'thread_id,user_id' })
+    }
+    // Recalcul depuis la source de vérité (évite tous les problèmes de stale state)
+    const { data: allVotes } = await supabase.from('thread_votes').select('vote').eq('thread_id', threadId)
+    const newScore = (allVotes || []).reduce((sum, v) => sum + (parseInt(v.vote) || 0), 0)
+    await supabase.from('forum_threads').update({ votes: newScore }).eq('id', threadId)
+
+    // UI
+    const scoreEl = document.getElementById('vs-' + threadId)
+    if (scoreEl) { scoreEl.textContent = newScore; scoreEl.className = 'vote-score' + (newScore > 0 ? ' positive' : newScore < 0 ? ' negative' : '') }
+    document.getElementById('vup-' + threadId)?.classList.toggle('active', newUserVote === 1)
+    document.getElementById('vdn-' + threadId)?.classList.toggle('active', newUserVote === -1)
+    userVotesMap[tid] = newUserVote; userVotesMap[threadId] = newUserVote
+    const thread = allThreads.find(x => String(x.id) === tid)
+    if (thread) thread.votes = newScore
+  } catch(e) { showToast(e.message, 'error') }
+}
+
+window.sortThreads = function(sort, btn) {
+  currentSort = sort
+  document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'))
+  btn.classList.add('active')
+  renderThreadList()
+}
+window.searchThreads = function(q) { renderThreadList() }
+
+// ── REALTIME ──
+function subscribeRealtime() {
+  if (realtimeChannel) supabase.removeChannel(realtimeChannel)
+  realtimeChannel = supabase.channel('forum-realtime')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, async () => {
+      const { data } = await supabase
+        .from('forum_threads')
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (data) {
+        allThreads = data
+        if (currentUser && allThreads.length) {
+          userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
+        }
+        updateCounts()
+        renderThreadList() // preserves currentSort + currentCat
+      }
+    })
+    .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, async () => {
+      const { data } = await supabase
+        .from('forum_threads')
+        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      if (data) {
+        allThreads = data
+        // Recharger les votes user pour garder l'état actif des boutons
+        if (currentUser && allThreads.length) {
+          userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
+        }
+        updateCounts()
+        renderThreadList()
+      }
+    })
+    .subscribe()
+}
+
+// ── ONLINE ──
+supabase.channel('online-users')
+  .on('presence', { event:'sync' }, function() {
+    const state = this.presenceState()
+    const users = Object.values(state).flat()
+    const list = document.getElementById('online-list')
+    if (!users.length) { list.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.15);">Personne en ligne</div>'; return }
+    list.innerHTML = users.slice(0,8).map(u => `
+      <div class="online-row">
+        <div class="online-dot"></div>
+        <span class="online-name">${u.username||'?'}</span>
+      </div>`).join('')
+  })
+  .subscribe()
 
 // ── TOAST ──
-window.showToast = function(msg, type='') {
-  const t = document.getElementById('toast')
-  t.textContent = msg; t.className = 'show ' + type
-  clearTimeout(t._t); t._t = setTimeout(() => t.className = '', 3500)
+function showToast(msg, type='') {
+  let t = document.getElementById('forum-toast')
+  if (!t) { t=document.createElement('div');t.id='forum-toast';t.style.cssText='position:fixed;bottom:32px;left:50%;transform:translateX(-50%) translateY(12px);background:#05090f;border:1px solid rgba(0,61,165,0.4);padding:10px 24px;z-index:600;font-family:Barlow Condensed,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;white-space:nowrap;';document.body.appendChild(t) }
+  t.textContent=msg; t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; t.style.borderColor=type==='success'?'#00c87a':type==='error'?'#e74c3c':'rgba(0,61,165,0.4)'; t.style.color=type==='success'?'#00c87a':type==='error'?'#e74c3c':'#fff'
+  clearTimeout(t._t); t._t=setTimeout(()=>{t.style.opacity='0';t.style.transform='translateX(-50%) translateY(12px)'},3000)
 }
 
-document.getElementById('confirm-modal').addEventListener('click', e => { if(e.target.id==='confirm-modal') closeConfirm() })
+window.likeReply = async function(replyId, authorId, currentCount) {
+  if (!currentUser) { AN?.openAuth(); return }
+  try {
+    const { error } = await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: currentUser.id })
+    if (error && error.code === '23505') { showToast('Déjà liké !', ''); return }
+    // Update likes_count
+    await supabase.from('forum_replies').update({ likes_count: currentCount + 1 }).eq('id', replyId)
+    // Notif à l'auteur
+    if (authorId && authorId !== currentUser.id) {
+      await supabase.from('notifications').insert({ user_id: authorId, type: 'like', from_user_id: currentUser.id, ref_id: String(replyId) })
+    }
+    showToast('❤️ Liké !', 'success')
+    if (currentThread) await openThread(currentThread.id)
+  } catch(e) { showToast(e.message, 'error') }
+}
+  // ── MAP LEAFLET + KV ──
+// ── MAP LEAFLET + KV ──
+  const VISITOR_KEY = 'newsporto_visitor_id';
 
-// ── LIVE MATCH CHAT ──
-const _mlcChannels = {}
-const _mlcOpen = {}
-let _mlcLastMsg = 0
+  // Génère un ID unique par visiteur
+  function getVisitorId() {
+    let id = localStorage.getItem(VISITOR_KEY);
+    if (!id) {
+      id = 'v_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+      localStorage.setItem(VISITOR_KEY, id);
+    }
+    return id;
+  }
 
+  let leafletMap = null;
+  let myMarker = null;
 
-// ── BET COUNTS ──
-async function loadBetCounts(matchIds) {
-  if (!matchIds.length) return
-  for (const id of matchIds) {
-    const { data } = await supabase
-      .from('bets')
-      .select('pick')
-      .eq('match_id', String(id))
-      .eq('status', 'pending')
-    if (!data) continue
-    const counts = { win: 0, draw: 0, lose: 0 }
-    data.forEach(b => { if (counts[b.pick] !== undefined) counts[b.pick]++ })
-    const total = counts.win + counts.draw + counts.lose
-    ;['win','draw','lose'].forEach(pick => {
-      const el = document.getElementById('bc-' + pick + '-' + id)
-      if (el) el.textContent = total > 0 ? counts[pick] : '0'
-    })
+  const pinIcon = (isMe = false) => L.divIcon({
+    className: '',
+    html: `<div style="width:${isMe?14:10}px;height:${isMe?14:10}px;border-radius:50%;background:${isMe?'#fff':'rgba(0,61,165,0.9)'};border:2px solid ${isMe?'#003DA5':'rgba(0,100,255,0.5)'};box-shadow:0 0 ${isMe?8:4}px rgba(0,61,165,0.6);"></div>`,
+    iconSize: [isMe?14:10, isMe?14:10], iconAnchor: [isMe?7:5, isMe?7:5]
+  });
+
+  async function loadAndRenderPins() {
+    try {
+      const r = await fetch('/api/pins');
+      const data = await r.json();
+      const pins = data.pins || [];
+      document.getElementById('pin-count').textContent = pins.length;
+
+      const visitorId = getVisitorId();
+      leafletMap.eachLayer(l => { if (l._isPin) leafletMap.removeLayer(l); });
+
+      pins.forEach(pin => {
+        const isMe = pin.visitorId === visitorId;
+        const m = L.marker([pin.lat, pin.lng], { icon: pinIcon(isMe) }).addTo(leafletMap);
+        m._isPin = true;
+        if (isMe) myMarker = m;
+      });
+    } catch(e) { console.error('loadPins error', e); }
+  }
+
+  async function resetMyPin() {
+    const visitorId = getVisitorId();
+    try {
+      await fetch('/api/pins', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ visitorId })
+      });
+      if (myMarker) { leafletMap.removeLayer(myMarker); myMarker = null; }
+      await loadAndRenderPins();
+    } catch(e) {}
+  }
+  window.resetMyPin = resetMyPin;
+
+  function initMap() {
+    leafletMap = L.map('leaflet-map', {
+      center: [20, 0], zoom: 2, minZoom: 1, maxZoom: 6,
+      zoomControl: true, attributionControl: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 19
+    }).addTo(leafletMap);
+
+    loadAndRenderPins();
+
+    leafletMap.on('click', async function(e) {
+      const visitorId = getVisitorId();
+      if (myMarker) return; // déjà un pin
+      try {
+        const r = await fetch('/api/pins', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            lat: e.latlng.lat,
+            lng: e.latlng.lng,
+            visitorId
+          })
+        });
+        const data = await r.json();
+        if (r.status === 409) return; // déjà existant
+        if (data.ok) {
+          myMarker = L.marker([e.latlng.lat, e.latlng.lng], { icon: pinIcon(true) }).addTo(leafletMap);
+          myMarker._isPin = true;
+          document.getElementById('pin-count').textContent = data.count;
+        }
+      } catch(err) {}
+    });
+  }
+
+  const s = document.createElement('script');
+  s.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+  s.onload = initMap;
+  document.head.appendChild(s);
+
+</script>
+
+<script type="module">
+import { supabase } from './supabase-client.js'
+
+// ── CHAT GÉNÉRAL ──
+let chatActive = false
+let chatChannel = null
+let chatUser = null
+let chatProfile = null
+
+window.addEventListener('an:login', e => { chatUser = e.detail.user; chatProfile = e.detail.profile })
+window.addEventListener('an:logout', () => { chatUser = null; chatProfile = null })
+// Fallback
+supabase.auth.getSession().then(async ({ data: { session } }) => {
+  if (session) {
+    chatUser = session.user
+    const { data } = await supabase.from('profiles').select('id,username,display_name,avatar_url,level').eq('id', session.user.id).single()
+    chatProfile = data
+  }
+})
+
+// Écouter l'ouverture depuis auth-nav (lien direct)
+window.addEventListener('open-chat-general', () => { if (!chatActive) toggleChatGeneral() })
+
+window.toggleChatGeneral = function(btn) {
+  chatActive = !chatActive
+  const chatView = document.getElementById('chat-general-view')
+  const threadListView = document.getElementById('thread-list-view')
+  const threadView = document.getElementById('thread-view')
+  if (chatActive) {
+    threadListView.style.display = 'none'
+    threadView.style.display = 'none'
+    chatView.classList.add('active')
+    document.getElementById('chat-gen-btn')?.classList.add('active')
+    loadChatMsgs()
+    subscribeChatRealtime()
+  } else {
+    chatView.classList.remove('active')
+    threadListView.style.display = 'block'
+    document.getElementById('chat-gen-btn')?.classList.remove('active')
+    if (chatChannel) { supabase.removeChannel(chatChannel); chatChannel = null }
   }
 }
 
-window.toggleLiveChat = function(matchId) {
-  const body = document.getElementById('mlc-body-' + matchId)
-  const toggle = document.getElementById('mlc-toggle-' + matchId)
-  if (!body) return
-  const opening = !_mlcOpen[matchId]
-  _mlcOpen[matchId] = opening
-  body.classList.toggle('open', opening)
-  if (toggle) toggle.textContent = opening ? '▲' : '▼'
-  if (opening && !_mlcChannels[matchId]) {
-    loadLiveChatMsgs(matchId)
-    subscribeLiveChat(matchId)
-  }
-}
-
-async function loadLiveChatMsgs(matchId) {
-  const el = document.getElementById('mlc-msgs-' + matchId)
-  if (!el) return
-  const { data } = await supabase
-    .from('match_chat_messages')
-    .select('*, author:user_id(id, username, display_name, avatar_url)')
-    .eq('match_id', String(matchId))
+async function loadChatMsgs() {
+  const { data } = await supabase.from('chat_messages')
+    .select('*, author:user_id(id, username, display_name, avatar_url, level)')
     .order('created_at', { ascending: true })
-    .limit(60)
-  if (!data?.length) { el.innerHTML = '<div style="text-align:center;font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2);padding:20px">Sois le premier à réagir !</div>'; return }
-  el.innerHTML = data.map(m => renderLiveChatMsg(m)).join('')
+    .limit(80)
+  renderChatMsgs(data || [])
+}
+
+function renderChatMsgs(msgs) {
+  const el = document.getElementById('chat-gen-msgs')
+  if (!el) return
+  if (!msgs.length) { el.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:rgba(255,255,255,0.2);padding:20px;text-align:center">Sois le premier à écrire !</div>'; return }
+  el.innerHTML = msgs.map(m => {
+    const a = m.author || {}
+    const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+    const time = new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+    const isMe = chatUser && m.user_id === chatUser.id
+    const isAdmin = window.AN?.isAdmin?.()
+    const delBtn = (isAdmin || isMe) ? `<button onclick="deleteChatMsg(${m.id},this)" style="background:none;border:none;color:rgba(231,76,60,0.5);cursor:pointer;font-size:10px;padding:0 2px;line-height:1;margin-left:4px;transition:color .15s" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='rgba(231,76,60,0.5)'">✕</button>` : ''
+    return `<div class="chat-gen-msg"${isMe?' data-me="1" style="flex-direction:row-reverse"':''}>
+      <div class="chat-gen-av" style="cursor:pointer" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
+      <div class="chat-gen-body">
+        <div class="chat-gen-meta">
+          <span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span>
+          <span class="chat-gen-lvl">Nv${a.level||1}</span>
+          <span class="chat-gen-time">${time}</span>
+          ${delBtn}
+        </div>
+        <div class="chat-gen-text">${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+    </div>`
+  }).join('')
   el.scrollTop = el.scrollHeight
 }
 
-function renderLiveChatMsg(m) {
-  const a = m.author || {}
-  const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
-  const time = new Date(m.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
-  return `<div class="mlc-msg">
-    <div class="mlc-av">${avHTML}</div>
-    <div class="mlc-body">
-      <div class="mlc-meta"><span class="mlc-author">${a.display_name||a.username||'?'}</span><span class="mlc-time">${time}</span></div>
-      <div class="mlc-text">${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-    </div>
-  </div>`
-}
-
-function subscribeLiveChat(matchId) {
-  if (_mlcChannels[matchId]) return
-  _mlcChannels[matchId] = supabase
-    .channel('match-chat-' + matchId)
-    .on('postgres_changes', { event:'INSERT', schema:'public', table:'match_chat_messages', filter:`match_id=eq.${matchId}` }, async (payload) => {
-      const el = document.getElementById('mlc-msgs-' + matchId)
-      if (!el) return
-      const { data: msg } = await supabase
-        .from('match_chat_messages')
-        .select('*, author:user_id(id, username, display_name, avatar_url)')
+function subscribeChatRealtime() {
+  if (chatChannel) supabase.removeChannel(chatChannel)
+  chatChannel = supabase.channel('chat-general')
+    .on('postgres_changes', { event:'INSERT', schema:'public', table:'chat_messages' }, async (payload) => {
+      const { data: msg } = await supabase.from('chat_messages')
+        .select('*, author:user_id(id, username, display_name, avatar_url, level)')
         .eq('id', payload.new.id).single()
       if (!msg) return
-      // Remove placeholder
-      const placeholder = el.querySelector('div[style*="Sois le premier"]')
-      if (placeholder) placeholder.remove()
+      const el = document.getElementById('chat-gen-msgs')
+      if (!el) return
       const div = document.createElement('div')
-      div.innerHTML = renderLiveChatMsg(msg)
-      el.appendChild(div.firstElementChild)
+      const a = msg.author || {}
+      const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+      const time = new Date(msg.created_at).toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'})
+      const isMe = chatUser && msg.user_id === chatUser.id
+      const isAdmin = window.AN?.isAdmin?.()
+      const delBtn = (isAdmin || isMe) ? `<button onclick="deleteChatMsg(${msg.id},this)" style="background:none;border:none;color:rgba(231,76,60,0.5);cursor:pointer;font-size:10px;padding:0 2px;line-height:1;margin-left:4px;transition:color .15s" onmouseover="this.style.color='#e74c3c'" onmouseout="this.style.color='rgba(231,76,60,0.5)'">✕</button>` : ''
+      div.className = 'chat-gen-msg'
+      if (isMe) { div.style.flexDirection = 'row-reverse'; div.dataset.me = '1' }
+      div.innerHTML = `<div class="chat-gen-av" onclick="AN?.openProfileCard('${a.id}',this)">${avHTML}</div>
+        <div class="chat-gen-body">
+          <div class="chat-gen-meta"><span class="chat-gen-author" onclick="AN?.openProfileCard('${a.id}',this)">${a.display_name||a.username||'?'}</span><span class="chat-gen-lvl">Nv${a.level||1}</span><span class="chat-gen-time">${time}</span>${delBtn}</div>
+          <div class="chat-gen-text">${msg.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+        </div>`
+      el.appendChild(div)
       el.scrollTop = el.scrollHeight
     })
     .subscribe()
 }
 
-window.sendLiveChatMsg = async function(matchId) {
-  if (!currentUser) { window.AN?.openAuth?.(); return }
-  const input = document.getElementById('mlc-input-' + matchId)
-  const content = input?.value?.trim()
+window.deleteChatMsg = async function(id, btn) {
+  if (!window.AN?.isAdmin?.() && !btn?.closest('[data-me]')) return
+  if (!confirm('Supprimer ce message ?')) return
+  await supabase.from('chat_messages').delete().eq('id', id)
+  btn?.closest('.chat-gen-msg')?.remove()
+}
+
+window.sendChatMsg = async function() {
+  if (!chatUser) { AN?.openAuth(); return }
+  const input = document.getElementById('chat-gen-input')
+  const content = input.value.trim()
   if (!content) return
   // Cooldown 3s
   const now = Date.now()
-  if (now - _mlcLastMsg < 3000) { showToast('Attends 3s entre chaque message', ''); return }
-  _mlcLastMsg = now
+  if (window._lastChatMsg && now - window._lastChatMsg < 3000) { return }
+  window._lastChatMsg = now
   input.value = ''
-  await supabase.from('match_chat_messages').insert({ match_id: String(matchId), user_id: currentUser.id, content })
+  await supabase.from('chat_messages').insert({ user_id: chatUser.id, content })
 }
 
-// Nettoyage des channels quand le match se termine
-window.addEventListener('custom-match-updated', () => {
-  // Les channels actifs seront recréés au prochain render si le match est encore live
-  Object.keys(_mlcChannels).forEach(id => {
-    supabase.removeChannel(_mlcChannels[id])
-    delete _mlcChannels[id]
-    delete _mlcOpen[id]
+// ── SIDEBAR DROITE ──
+async function loadRightSidebar() {
+  // Weekly leaderboard
+  const { data: weekly } = await supabase.from('profiles')
+    .select('id, username, display_name, avatar_url, rank, level, weekly_pts')
+    .order('weekly_pts', { ascending: false }).limit(5)
+  const wEl = document.getElementById('rs-weekly-list')
+  if (wEl && weekly?.length) {
+    wEl.innerHTML = weekly.map((u, i) => lbMiniRow(u, i, u.weekly_pts, 'weekly_pts')).join('')
+  } else if (wEl) { wEl.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Aucun joueur</div>' }
+
+  // All-time
+  const { data: alltime } = await supabase.from('profiles')
+    .select('id, username, display_name, avatar_url, rank, level, points')
+    .order('points', { ascending: false }).limit(5)
+  const aEl = document.getElementById('rs-alltime-list')
+  if (aEl && alltime?.length) {
+    aEl.innerHTML = alltime.map((u, i) => lbMiniRow(u, i, u.points, 'points')).join('')
+  }
+
+  // Week label
+  const now = new Date()
+  const monday = new Date(now); monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1))
+  document.getElementById('rs-week-label').textContent = `Sem. ${monday.getDate()}/${monday.getMonth()+1}`
+}
+
+function lbMiniRow(u, i, pts, field) {
+  const avHTML = u.avatar_url ? `<img src="${u.avatar_url}">` : (u.display_name||u.username||'?')[0].toUpperCase()
+  const medals = ['🥇','🥈','🥉']
+  const rankDisplay = i < 3 ? medals[i] : `${i+1}`
+  return `<div class="lb-mini-row" style="cursor:pointer" onclick="AN?.openProfileCard('${u.id}',this)">
+    <div class="lb-mini-rank">${rankDisplay}</div>
+    <div class="lb-mini-av">${avHTML}</div>
+    <div class="lb-mini-info">
+      <div class="lb-mini-name">${u.display_name||u.username}</div>
+      <div style="display:flex;gap:4px;align-items:center"><span class="level-badge">Nv${u.level||1}</span></div>
+    </div>
+    <div class="lb-mini-pts">${pts}</div>
+  </div>`
+}
+
+// Online users via presence
+const _forumPresenceCh = supabase.channel('forum-online')
+  .on('presence', { event: 'sync' }, function() {
+    const state = _forumPresenceCh.presenceState()
+    const users = Object.values(state).flat()
+    const count = users.length
+    const el = document.getElementById('rs-online-list')
+    const countEl = document.getElementById('rs-online-count')
+    if (countEl) countEl.textContent = count
+    const chatCount = document.getElementById('chat-online-count')
+    if (chatCount) chatCount.textContent = count > 0 ? `${count} en ligne` : ''
+    if (!el) return
+    if (!users.length) { el.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;color:rgba(255,255,255,0.2)">Personne en ligne</div>'; return }
+    el.innerHTML = users.slice(0,8).map(u => `
+      <div class="online-user-row">
+        <div style="width:6px;height:6px;border-radius:50%;background:#00c87a;flex-shrink:0"></div>
+        <span class="online-user-name">${u.username||'?'}</span>
+      </div>`).join('')
   })
-})
+  .subscribe(async (status) => {
+    if (status === 'SUBSCRIBED') {
+      const sess = await supabase.auth.getSession()
+      const uid = sess?.data?.session?.user?.id
+      if (!uid) return
+      const { data: prof } = await supabase.from('profiles').select('username,display_name').eq('id', uid).single()
+      await _forumPresenceCh.track({
+        username: prof?.display_name || prof?.username || 'Anonyme',
+        user_id: uid
+      })
+    }
+  })
 
+loadRightSidebar()
+// Refresh leaderboard toutes les 2 min
+setInterval(loadRightSidebar, 120000)
 </script>
-
-<script>
-function toggleMobileNav() {
-  var mn = document.getElementById('mobile-nav');
-  var btn = document.getElementById('hamburger-btn');
-  var open = mn.classList.toggle('open');
-  btn.classList.toggle('open', open);
-  document.body.style.overflow = open ? 'hidden' : '';
-}
-</script>
-</body>
-</html>
