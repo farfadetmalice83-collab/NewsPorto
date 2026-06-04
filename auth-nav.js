@@ -318,10 +318,9 @@ const CSS = `
 .an-bottom-nav {
   display:none;
   position:fixed; bottom:0; left:0; right:0;
-  height:56px;
   background:#04070d;
   border-top:1px solid rgba(0,61,165,0.25);
-  z-index:801;
+  z-index:803; /* au-dessus du panel et overlay */
   padding-bottom:env(safe-area-inset-bottom,0px);
 }
 .an-bottom-nav-inner {
@@ -376,21 +375,32 @@ const CSS = `
   /* Body wrapper doit être relative pour que position:absolute fonctionne */
   .an-body { position:relative; overflow:hidden; }
 
-  /* MP : chat prend toute la hauteur disponible */
-  #an-sec-mp { overflow:hidden; }
-  #an-mp-convs, #an-mp-groupes {
-    position:absolute; top:0; left:0; right:0; bottom:0;
-    display:none; flex-direction:column; overflow:hidden;
+  /* MP : layout correct sur mobile */
+  #an-sec-mp { overflow:hidden; display:flex; flex-direction:column; }
+  #an-mp-convs {
+    flex:1; min-height:0; display:flex; flex-direction:column; overflow:hidden;
   }
-  #an-mp-convs.active, #an-mp-groupes.active { display:flex; }
-  #an-conv-view { overflow-y:auto; flex:1; -webkit-overflow-scrolling:touch; }
-  #an-chat-view { flex:1; min-height:0; display:flex; flex-direction:column; }
+  #an-mp-groupes {
+    flex:1; min-height:0; display:none; flex-direction:column; overflow:hidden;
+  }
+  #an-conv-view {
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    display:flex; flex-direction:column;
+  }
+  #an-chat-view {
+    position:absolute; top:0; left:0; right:0; bottom:0;
+    display:none; flex-direction:column; background:#04070d; z-index:1;
+  }
+  #an-chat-view.visible { display:flex; }
   .an-chat-wrap { flex:1; min-height:0; display:flex; flex-direction:column; }
-  .an-chat-msgs { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding:10px 12px; }
+  .an-chat-msgs {
+    flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:10px 12px; display:flex; flex-direction:column; gap:8px;
+  }
   .an-chat-input-row {
     flex-shrink:0; padding:8px 12px;
     padding-bottom:max(8px, env(safe-area-inset-bottom));
-    background:#04070d;
+    background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
   }
 
   /* Bottom nav visible sur mobile */
@@ -839,30 +849,30 @@ function html() { return `
   </div>
 </div>
 
-<!-- BOTTOM NAV MOBILE -->
+<!-- BOTTOM NAV MOBILE — toujours visible, ouvre le panel sur l'onglet voulu -->
 <div class="an-bottom-nav" id="an-bottom-nav">
   <div class="an-bottom-nav-inner">
-    <button class="an-bnav-btn active" data-tab="profil" onclick="AN.tabTo('profil')">
+    <button class="an-bnav-btn" id="bnav-profil" data-tab="profil" onclick="AN.bnavTap('profil')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
       <span class="an-bnav-label">Profil</span>
     </button>
-    <button class="an-bnav-btn" data-tab="notifs" onclick="AN.tabTo('notifs')">
+    <button class="an-bnav-btn" id="bnav-notifs" data-tab="notifs" onclick="AN.bnavTap('notifs')">
       <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span class="an-bnav-label">Notifs</span>
       <span class="an-bnav-dot" id="bnav-dot-notifs"></span>
     </button>
-    <button class="an-bnav-btn" data-tab="mp" onclick="AN.tabTo('mp')">
+    <button class="an-bnav-btn" id="bnav-mp" data-tab="mp" onclick="AN.bnavTap('mp')">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span class="an-bnav-label">Messages</span>
       <span class="an-bnav-dot" id="bnav-dot-mp"></span>
     </button>
-    <button class="an-bnav-btn" data-tab="amis" onclick="AN.tabTo('amis')">
+    <button class="an-bnav-btn" id="bnav-badges" data-tab="badges" onclick="AN.bnavTap('badges')">
+      <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      <span class="an-bnav-label">Badges</span>
+    </button>
+    <button class="an-bnav-btn" id="bnav-amis" data-tab="amis" onclick="AN.bnavTap('amis')">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       <span class="an-bnav-label">Amis</span>
-    </button>
-    <button class="an-bnav-btn" data-tab="rangs" onclick="AN.tabTo('rangs')">
-      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-      <span class="an-bnav-label">Rangs</span>
     </button>
   </div>
 </div>
@@ -1105,7 +1115,29 @@ class AN {
     document.body.style.overflow = ''
   }
 
+  bnavTap(tab) {
+    const panel = document.getElementById('an-panel')
+    const isOpen = panel.classList.contains('open')
+    const isSameTab = this._currentTab === tab
+    // Mettre à jour l'état actif de la bottom nav
+    document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
+    if (isOpen && isSameTab) {
+      // Re-clic sur le même onglet = fermer le panel
+      this.closePanel()
+      document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.remove('active'))
+    } else {
+      if (!isOpen) {
+        // Ouvrir le panel
+        panel.classList.add('open')
+        document.getElementById('an-overlay')?.classList.add('on')
+        document.body.style.overflow = 'hidden'
+      }
+      this.tabTo(tab)
+    }
+  }
+
   tabTo(tab) {
+    this._currentTab = tab
     // Tabs desktop
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
     // Bottom nav mobile
@@ -1689,9 +1721,9 @@ class AN {
     const convView = document.getElementById('an-conv-view')
     const convList = document.getElementById('an-conv-list')
     if (!convList) return
-    if (convView) { convView.style.display = ''; }
+    if (convView) convView.style.display = ''
     const chatView = document.getElementById('an-chat-view')
-    if (chatView) chatView.style.display = 'none'
+    if (chatView) { chatView.classList.remove('visible'); chatView.style.display = '' }
     if (!friends.length) { convList.innerHTML = '<div class="an-empty">Ajoute des amis pour écrire</div>'; return }
     convList.innerHTML = '<div class="an-row-label">Conversations</div>' + friends.map(f => `<div class="an-conv-row" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">
       <div class="an-conv-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
@@ -1701,13 +1733,13 @@ class AN {
 
   async openChat(friendId, friendName) {
     this.mpFriend = { id: friendId, name: friendName }
-    // Switch to MP tab first (without triggering _loadConvList)
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'mp'))
     document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === 'an-sec-mp'))
-    // Then show chat view
-    document.getElementById('an-conv-view').style.display = 'none'
+    // Afficher chat, cacher liste
+    const convView = document.getElementById('an-conv-view')
+    if (convView) convView.style.display = 'none'
     const cv = document.getElementById('an-chat-view')
-    cv.style.display = 'flex'; cv.style.flexDirection = 'column'
+    if (cv) { cv.classList.add('visible'); cv.style.display = '' }
     document.getElementById('an-chat-name').textContent = friendName
     await this._loadMsgs()
     await markMessagesRead(friendId, this.u.id)
@@ -1722,13 +1754,9 @@ class AN {
     btn.classList.add('active')
     const convs = document.getElementById('an-mp-convs')
     const grps = document.getElementById('an-mp-groupes')
-    if (tab === 'convs') {
-      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
-      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
-    } else {
-      if (grps) { grps.classList.add('active'); grps.style.display = 'flex' }
-      if (convs) { convs.classList.remove('active'); convs.style.display = 'none' }
-    }
+    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = tab==='convs' ? 'flex' : 'none' }
+    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display  = tab!=='convs'  ? 'flex' : 'none' }
+    if (tab !== 'convs') this._loadGroups?.()
   }
 
   // ── GROUPES ──
@@ -1849,7 +1877,14 @@ class AN {
     await supabase.from('group_messages').insert({ group_id: this.currentGroup.id, user_id: this.u.id, content })
   }
 
-  backToConvList() { this._loadConvList(); this.mpFriend = null }
+  backToConvList() {
+    const cv = document.getElementById('an-chat-view')
+    if (cv) { cv.classList.remove('visible'); cv.style.display = '' }
+    const convView = document.getElementById('an-conv-view')
+    if (convView) convView.style.display = ''
+    this.mpFriend = null
+    this._loadConvList()
+  }
 
   async _loadMsgs() {
     if (!this.mpFriend) return
