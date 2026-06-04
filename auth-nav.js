@@ -977,7 +977,7 @@ class AN {
     document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
-    if (tab === 'mp') { this._loadConvList(); this._loadGroups() }
+    if (tab === 'mp') this._loadConvList()
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
@@ -1540,7 +1540,9 @@ class AN {
     const convView = document.getElementById('an-conv-view')
     const convList = document.getElementById('an-conv-list')
     if (!convList) return
-    convView.style.display = ''; document.getElementById('an-chat-view').style.display = 'none'
+    if (convView) { convView.style.display = ''; }
+    const chatView = document.getElementById('an-chat-view')
+    if (chatView) chatView.style.display = 'none'
     if (!friends.length) { convList.innerHTML = '<div class="an-empty">Ajoute des amis pour écrire</div>'; return }
     convList.innerHTML = '<div class="an-row-label">Conversations</div>' + friends.map(f => `<div class="an-conv-row" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">
       <div class="an-conv-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
@@ -1572,24 +1574,28 @@ class AN {
     btn.classList.add('active')
     document.getElementById(`an-mp-${tab}`).classList.add('active')
     if (tab === 'groupes') this._loadGroups()
+    if (tab === 'convs') this._loadConvList()
   }
 
   // ── GROUPES ──
   async _loadGroups() {
     const el = document.getElementById('an-groups-list'); if (!el || !this.u) return
     el.innerHTML = '<div class="an-empty">Chargement...</div>'
-    const { data } = await supabase.from('group_members')
-      .select('group:group_id(id, name, created_at), last_read_at')
-      .eq('user_id', this.u.id)
-      .order('group(created_at)', { ascending: false })
-    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun groupe — crée-en un !</div>'; return }
-    el.innerHTML = data.map(r => {
-      const g = r.group
-      return `<div class="an-conv-row" onclick="AN.openGroupChat(${g.id},'${g.name.replace(/'/g,"&#39;")}')">
-        <div class="an-conv-av" style="background:rgba(240,165,0,0.15);border-color:rgba(240,165,0,0.4);color:#f0a500;font-size:16px">👥</div>
-        <div><div class="an-conv-name">${g.name}</div><div class="an-conv-preview">Groupe de discussion</div></div>
-      </div>`
-    }).join('')
+    try {
+      const { data, error } = await supabase.from('group_members')
+        .select('group:group_id(id, name, created_at), last_read_at')
+        .eq('user_id', this.u.id)
+        .order('group(created_at)', { ascending: false })
+      if (error) { el.innerHTML = '<div class="an-empty">Groupes non disponibles</div>'; return }
+      if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun groupe — crée-en un !</div>'; return }
+      el.innerHTML = data.map(r => {
+        const g = r.group
+        return `<div class="an-conv-row" onclick="AN.openGroupChat(${g.id},'${g.name.replace(/'/g,"&#39;")}')">
+          <div class="an-conv-av" style="background:rgba(240,165,0,0.15);border-color:rgba(240,165,0,0.4);color:#f0a500;font-size:16px">👥</div>
+          <div><div class="an-conv-name">${g.name}</div><div class="an-conv-preview">Groupe de discussion</div></div>
+        </div>`
+      }).join('')
+    } catch(e) { el.innerHTML = '<div class="an-empty">Groupes non disponibles</div>' }
   }
 
   showCreateGroup() {
