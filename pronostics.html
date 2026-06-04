@@ -444,6 +444,65 @@
     }
 
 
+
+    /* ── PARIS ACTIFS ── */
+    .active-bet-card {
+      border:1px solid var(--border);
+      border-left:3px solid var(--blue);
+      background:rgba(255,255,255,0.02);
+      margin-bottom:2px;
+      transition:background .2s;
+    }
+    .active-bet-card:hover { background:rgba(255,255,255,0.04); }
+    .active-bet-card.pending { border-left-color:var(--blue); }
+    .active-bet-card.live { border-left-color:var(--red); }
+    .abt-header {
+      display:flex;align-items:center;justify-content:space-between;
+      padding:14px 20px 10px;gap:10px;flex-wrap:wrap;
+    }
+    .abt-match {
+      font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
+      letter-spacing:1px;text-transform:uppercase;color:#fff;flex:1;min-width:0;
+      white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    }
+    .abt-status {
+      font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
+      letter-spacing:2px;text-transform:uppercase;padding:2px 8px;border:1px solid;
+    }
+    .abt-status.pending { color:var(--blue-light);border-color:var(--blue-light); }
+    .abt-status.live { color:var(--red);border-color:var(--red);animation:blink-hint 1.4s ease-in-out infinite; }
+    .abt-body {
+      display:flex;align-items:center;gap:16px;padding:0 20px 12px;flex-wrap:wrap;
+    }
+    .abt-pick {
+      font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;
+    }
+    .abt-pick.win{color:var(--green)} .abt-pick.draw{color:var(--yellow)} .abt-pick.lose{color:var(--red)}
+    .abt-details {
+      flex:1;display:flex;flex-direction:column;gap:3px;
+    }
+    .abt-row {
+      font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
+      letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.4);
+    }
+    .abt-row span { color:#fff; }
+    .abt-actions {
+      display:flex;gap:6px;padding:0 20px 14px;
+    }
+    .abt-btn {
+      font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;
+      letter-spacing:1.5px;text-transform:uppercase;border:1px solid;
+      padding:6px 14px;cursor:pointer;background:none;transition:.2s;
+    }
+    .abt-btn.cancel { border-color:rgba(231,76,60,0.4);color:#e74c3c; }
+    .abt-btn.cancel:hover { background:#e74c3c;color:#fff; }
+    .abt-btn.modify { border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.6); }
+    .abt-btn.modify:hover { border-color:#fff;color:#fff; }
+    @media(max-width:600px){
+      .abt-header{padding:12px 14px 8px}
+      .abt-body{padding:0 14px 10px;gap:10px}
+      .abt-actions{padding:0 14px 12px}
+    }
     /* BET COUNT BAR */
     .bet-count-bar{display:flex;gap:0;border-top:1px solid rgba(255,255,255,0.05);border-bottom:1px solid rgba(255,255,255,0.05);}
     .bet-count-col{flex:1;padding:8px 12px;text-align:center;border-right:1px solid rgba(255,255,255,0.05);}
@@ -517,7 +576,7 @@
   <div class="main-content">
     <div class="tabs" id="prono-tabs">
       <button class="tab-btn active" data-tab="paris" onclick="switchTab('paris')">Matchs à miser</button>
-      <button class="tab-btn" data-tab="historique" onclick="switchTab('historique')">Mon historique</button>
+      <button class="tab-btn" data-tab="historique" onclick="switchTab('historique')">Mes Paris</button>
       <button class="tab-btn" data-tab="classement" onclick="switchTab('classement')">Classement</button>
       <button class="tab-btn" data-tab="regles" onclick="switchTab('regles')">Règles</button>
     </div>
@@ -536,9 +595,16 @@
 
     <!-- TAB HISTORIQUE -->
     <div class="tab-content" id="tab-historique">
-      <p class="section-label">— Mes mises</p>
-      <div id="history-container">
-        <div class="empty-state">Connecte-toi pour voir ton historique</div>
+      <!-- Sous-tabs -->
+      <div style="display:flex;border-bottom:1px solid var(--border);margin-bottom:0">
+        <button id="htab-actifs" onclick="switchHistTab('actifs')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid var(--blue);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#fff;cursor:pointer;transition:.2s">Paris actifs</button>
+        <button id="htab-historique" onclick="switchHistTab('historique')" style="flex:1;padding:12px 8px;background:none;border:none;border-bottom:2px solid transparent;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35);cursor:pointer;transition:.2s">Historique</button>
+      </div>
+      <div id="htab-actifs-content">
+        <div id="active-bets-container"><div class="empty-state">Chargement...</div></div>
+      </div>
+      <div id="htab-historique-content" style="display:none">
+        <div id="history-container"><div class="empty-state">Connecte-toi pour voir ton historique</div></div>
       </div>
     </div>
 
@@ -642,7 +708,7 @@ supabase.auth.getSession().then(async ({ data: { session } }) => {
     updatePointsBanner()
     await loadExistingBets()
     renderMatches()
-    loadHistory()
+    loadActiveBets()
   }
 })
 supabase.auth.onAuthStateChange((event) => {
@@ -1306,6 +1372,114 @@ window.submitBet = async function() {
 }
 
 // ── HISTORY ──
+
+// ── PARIS ACTIFS ──
+window.switchHistTab = function(tab) {
+  document.getElementById('htab-actifs-content').style.display = tab === 'actifs' ? '' : 'none'
+  document.getElementById('htab-historique-content').style.display = tab === 'historique' ? '' : 'none'
+  const activeStyle = 'border-bottom:2px solid var(--blue);color:#fff'
+  const inactiveStyle = 'border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
+  document.getElementById('htab-actifs').style.cssText += tab==='actifs' ? ';border-bottom:2px solid var(--blue);color:#fff' : ';border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
+  document.getElementById('htab-historique').style.cssText += tab==='historique' ? ';border-bottom:2px solid var(--blue);color:#fff' : ';border-bottom:2px solid transparent;color:rgba(255,255,255,0.35)'
+  if (tab === 'historique') loadHistory()
+  if (tab === 'actifs') loadActiveBets()
+}
+
+async function loadActiveBets() {
+  if (!currentUser) {
+    document.getElementById('active-bets-container').innerHTML = '<div class="empty-state">Connecte-toi pour voir tes paris</div>'
+    return
+  }
+  const container = document.getElementById('active-bets-container')
+  container.innerHTML = '<div class="empty-state">Chargement...</div>'
+
+  // Récupérer tous les matchs actifs + leurs bets
+  const { data: customMatches } = await supabase
+    .from('custom_matches')
+    .select('*')
+    .in('status', ['open', 'live'])
+
+  const { data: myBets } = await supabase
+    .from('bets')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .eq('status', 'pending')
+
+  if (!myBets?.length) {
+    container.innerHTML = '<div class="empty-state">Aucun pari actif pour l'instant</div>'
+    return
+  }
+
+  const matchMap = {}
+  ;(customMatches || []).forEach(m => { matchMap[String(m.id)] = m })
+
+  const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }
+  const pickClass = { win:'win', draw:'draw', lose:'lose' }
+
+  container.innerHTML = myBets.map(b => {
+    const m = matchMap[String(b.match_id)]
+    const isLive = m?.status === 'live'
+    const deadline = m?.deadline_at ? new Date(m.deadline_at) : null
+    const now = new Date()
+    const isOpen = !isLive && (!deadline || now < deadline)
+    const canAct = isOpen && !isLive
+
+    return `<div class="active-bet-card ${isLive ? 'live' : 'pending'}">
+      <div class="abt-header">
+        <div class="abt-match">${b.match_label || m?.home_team + ' vs ' + m?.away_team || '—'}</div>
+        <span class="abt-status ${isLive ? 'live' : 'pending'}">${isLive ? '● EN COURS' : '⏳ En attente'}</span>
+      </div>
+      <div class="abt-body">
+        <div class="abt-pick ${pickClass[b.pick] || ''}">${b.pick === 'win' ? '1' : b.pick === 'draw' ? 'X' : '2'}</div>
+        <div class="abt-details">
+          <div class="abt-row">Pronostic · <span>${pickLabel[b.pick] || b.pick}</span></div>
+          <div class="abt-row">Mise · <span>${b.stake} pts</span></div>
+          <div class="abt-row">Gain potentiel · <span style="color:var(--green)">+${b.potential_gain} pts</span></div>
+          ${deadline && isOpen ? `<div class="abt-row">Deadline · <span>${deadline.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span></div>` : ''}
+        </div>
+      </div>
+      ${canAct ? `<div class="abt-actions">
+        <button class="abt-btn cancel" onclick="cancelActiveBet('${b.id}','${b.match_id}',${b.stake})">✕ Annuler</button>
+        <button class="abt-btn modify" onclick="modifyActiveBet('${b.id}','${b.match_id}',${b.stake},'${(b.match_label||'').replace(/'/g,"\'")}')">✎ Modifier</button>
+      </div>` : `<div style="padding:0 20px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2)">${isLive ? 'Match en cours · Modification impossible' : 'Mises fermées'}</div>`}
+    </div>`
+  }).join('')
+}
+
+window.cancelActiveBet = async function(betId, matchId, stake) {
+  if (!currentUser) return
+  if (!confirm('Annuler ce pari ? Tu seras remboursé de ' + stake + ' pts.')) return
+  try {
+    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
+    const newPts = (currentProfile.points || 0) + stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_cancelled', ref_id: String(matchId) })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(stake + ' pts remboursés ✅', 'ok')
+    loadActiveBets()
+    loadCustomMatches()
+  } catch(e) { showToast('Erreur', 'error') }
+}
+
+window.modifyActiveBet = async function(betId, matchId, stake, label) {
+  if (!currentUser) return
+  if (!confirm('Modifier ce pari ? Il sera annulé (' + stake + ' pts remboursés) et tu pourras en passer un nouveau.')) return
+  try {
+    await supabase.from('bets').update({ status: 'refunded' }).eq('id', betId).eq('user_id', currentUser.id)
+    const newPts = (currentProfile.points || 0) + stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'bet_changed', ref_id: String(matchId) })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(stake + ' pts remboursés · Repasse ta mise sur le match ✅', 'ok')
+    loadActiveBets()
+    loadCustomMatches()
+    // Switcher vers Paris
+    switchTab('paris')
+  } catch(e) { showToast('Erreur', 'error') }
+}
+
 async function loadHistory() {
   if (!currentUser) return
   const bets = await getUserBets(currentUser.id)
