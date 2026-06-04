@@ -567,12 +567,22 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 async function loadThreads() {
   const { data, error } = await supabase
     .from('forum_threads')
-    .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
+    .select(`id, title, content, category, reply_count, votes, created_at, author_id`)
     .order('created_at', { ascending: false })
     .limit(50)
   if (error) { document.getElementById('thread-list').innerHTML = '<div class="empty-state">Erreur de chargement</div>'; return }
-  allThreads = data || []
-  // Charger les votes de l'user connecté
+
+  // Charger les profils séparément
+  const threads = data || []
+  if (threads.length) {
+    const authorIds = [...new Set(threads.map(t => t.author_id).filter(Boolean))]
+    const { data: profiles } = await supabase.from('profiles').select('id, username, display_name, avatar_url, rank, level').in('id', authorIds)
+    const profileMap = {}
+    ;(profiles || []).forEach(p => { profileMap[p.id] = p })
+    threads.forEach(t => { t.author = profileMap[t.author_id] || null })
+  }
+
+  allThreads = threads
   if (currentUser && allThreads.length) {
     userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
   }
@@ -884,7 +894,8 @@ window.castVote = async function(threadId, vote, btn) {
       row.querySelector('.vote-btn.down')?.classList.toggle('active', newUserVote === -1)
     }
     userVotesMap[threadId] = newUserVote
-    if (thread) thread.votes = newScore
+    const t = allThreads.find(x => x.id === threadId)
+    if (t) t.votes = newScore
   } catch(e) { showToast(e.message, 'error') }
 }
 
@@ -897,34 +908,43 @@ window.sortThreads = function(sort, btn) {
 window.searchThreads = function(q) { renderThreadList() }
 
 // ── REALTIME ──
+async function reloadThreads() {
+  const { data } = await supabase
+    .from('forum_threads')
+    .select(`id, title, content, category, reply_count, votes, created_at, author_id`)
+    .order('created_at', { ascending: false })
+    .limit(50)
+  if (data) {
+    const authorIds = [...new Set(data.map(t => t.author_id).filter(Boolean))]
+    const { data: profiles } = await supabase.from('profiles').select('id, username, display_name, avatar_url, rank, level').in('id', authorIds)
+    const profileMap = {}
+    ;(profiles || []).forEach(p => { profileMap[p.id] = p })
+    data.forEach(t => { t.author = profileMap[t.author_id] || null })
+    return data
+  }
+  return null
+}
+
 function subscribeRealtime() {
   if (realtimeChannel) supabase.removeChannel(realtimeChannel)
   realtimeChannel = supabase.channel('forum-realtime')
     .on('postgres_changes', { event:'INSERT', schema:'public', table:'forum_threads' }, async () => {
-      const { data } = await supabase
-        .from('forum_threads')
-        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
-        .order('created_at', { ascending: false })
-        .limit(50)
+      const data = await reloadThreads()
       if (data) {
         allThreads = data
         if (currentUser && allThreads.length) {
           userVotesMap = await getUserVotes(currentUser.id, allThreads.map(t => t.id))
         }
         updateCounts()
-        renderThreadList() // preserves currentSort + currentCat
+        renderThreadList()
       }
     })
     .on('postgres_changes', { event:'UPDATE', schema:'public', table:'forum_threads' }, async () => {
-      const { data } = await supabase
-        .from('forum_threads')
-        .select(`id, title, content, category, reply_count, votes, created_at, author:author_id(id, username, display_name, avatar_url, rank, level)`)
-        .order('created_at', { ascending: false })
-        .limit(50)
+      const data = await reloadThreads()
       if (data) {
         allThreads = data
         updateCounts()
-        renderThreadList() // preserves currentSort + currentCat
+        renderThreadList()
       }
     })
     .subscribe()
