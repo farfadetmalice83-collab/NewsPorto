@@ -705,7 +705,7 @@ async function loadCustomMatches() {
   let userMatchBets = {}
   if (currentUser) {
     const ids = data.map(m => String(m.id))
-    const { data: myBets } = await supabase.from('bets').select('*').eq('user_id', currentUser.id).in('match_id', ids)
+    const { data: myBets } = await supabase.from('bets').select('*').eq('user_id', currentUser.id).in('match_id', ids).neq('status','refunded')
     ;(myBets||[]).forEach(b => userMatchBets[b.match_id] = b)
   }
   const isAdmin = window.AN?.isAdmin?.()
