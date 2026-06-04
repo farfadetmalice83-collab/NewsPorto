@@ -1143,13 +1143,12 @@ class AN {
     this._currentTab = tab
     document.querySelectorAll('.an-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
     document.querySelectorAll('.an-bnav-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab))
-    // Classes uniquement — pas de style inline qui override le CSS
     document.querySelectorAll('#an-panel .an-section').forEach(s => {
       s.classList.remove('active')
       s.style.display = ''
     })
     const sec = document.getElementById('an-sec-' + tab)
-    if (sec) { sec.classList.add('active'); sec.style.display = '' }
+    if (sec) { sec.classList.add('active') }
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
     if (tab === 'mp') {
@@ -1157,8 +1156,8 @@ class AN {
       // Réinitialiser les sub-tabs MP
       const convs = document.getElementById('an-mp-convs')
       const grps = document.getElementById('an-mp-groupes')
-      if (convs) { convs.classList.add('active'); convs.style.display = '' }
-      if (grps) { grps.classList.remove('active'); grps.style.display = '' }
+      if (convs) { convs.classList.add('active'); convs.style.display = 'flex' }
+      if (grps) { grps.classList.remove('active'); grps.style.display = 'none' }
     }
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
@@ -1755,8 +1754,8 @@ class AN {
     btn.classList.add('active')
     const convs = document.getElementById('an-mp-convs')
     const grps = document.getElementById('an-mp-groupes')
-    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = '' }
-    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display = '' }
+    if (convs) { convs.classList.toggle('active', tab==='convs'); convs.style.display = tab==='convs' ? 'flex' : 'none' }
+    if (grps)  { grps.classList.toggle('active', tab!=='convs');  grps.style.display  = tab!=='convs'  ? 'flex' : 'none' }
     if (tab !== 'convs') this._loadGroups?.()
   }
 
@@ -2370,14 +2369,12 @@ class AN {
         await supabase.from('points_log').insert({ user_id: entry.user_id, amount: entry.potential_gain, reason: 'custom_bet_win', ref_id: String(betId) })
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_won', from_user_id: this.u.id, ref_label: `+${entry.potential_gain} pts` })
         await supabase.from('custom_bet_entries').update({ status: 'won' }).eq('id', entry.id)
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'won', matchLabel: entry.match_label||'Pari spécial', gain: entry.potential_gain }) }).catch(()=>{})
         addXp(entry.user_id, XP_REWARDS.bet_win, 'custom_bet_win').catch(() => {})
         addWeeklyPoints(entry.user_id, entry.potential_gain).catch(() => {})
         this._updateRivalScore(entry.user_id).catch(() => {})
       } else {
         await supabase.from('custom_bet_entries').update({ status: 'lost' }).eq('id', entry.id)
         await supabase.from('notifications').insert({ user_id: entry.user_id, type: 'prono_lost', from_user_id: this.u.id, ref_label: `${entry.stake} pts perdus` })
-        fetch('/api/notify-bet', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ toUserId: entry.user_id, result:'lost', matchLabel: entry.match_label||'Pari spécial', stake: entry.stake }) }).catch(()=>{})
       }
     }
     this._toast('Pari résolu, gains distribués ✅', 'ok')
