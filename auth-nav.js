@@ -547,19 +547,59 @@ function html() { return `
 
     <!-- MP -->
     <div class="an-section" id="an-sec-mp">
-      <div id="an-conv-view">
-        <div class="an-conv-list" id="an-conv-list"><div class="an-empty">Aucune conversation</div></div>
+      <div class="an-admin-sub-tabs" style="border-bottom:1px solid rgba(255,255,255,0.06)">
+        <button class="an-admin-sub-tab active" onclick="AN.mpSubTab('convs',this)">Messages</button>
+        <button class="an-admin-sub-tab" onclick="AN.mpSubTab('groupes',this)">Groupes</button>
       </div>
-      <div id="an-chat-view" style="display:none;flex-direction:column;height:100%">
-        <div class="an-chat-wrap" style="display:flex;flex-direction:column;height:100%;min-height:0">
-          <div class="an-chat-header">
-            <button class="an-chat-back" onclick="AN.backToConvList()">←</button>
-            <div class="an-chat-name" id="an-chat-name"></div>
+      <div class="an-admin-sub-content active" id="an-mp-convs">
+        <div id="an-conv-view">
+          <div class="an-conv-list" id="an-conv-list"><div class="an-empty">Aucune conversation</div></div>
+        </div>
+        <div id="an-chat-view" style="display:none;flex-direction:column;flex:1;min-height:0">
+          <div class="an-chat-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0">
+            <div class="an-chat-header">
+              <button class="an-chat-back" onclick="AN.backToConvList()">←</button>
+              <div class="an-chat-name" id="an-chat-name"></div>
+            </div>
+            <div class="an-chat-msgs" id="an-chat-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
+            <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
+              <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendMsg()}">
+              <button class="an-chat-send" onclick="AN.sendMsg()">↑</button>
+            </div>
           </div>
-          <div class="an-chat-msgs" id="an-chat-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
-          <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
-            <input class="an-chat-input" type="text" id="an-chat-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendMsg()}">
-            <button class="an-chat-send" onclick="AN.sendMsg()">↑</button>
+        </div>
+      </div>
+      <div class="an-admin-sub-content" id="an-mp-groupes" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div id="an-group-list-view">
+          <div class="an-row-label" style="display:flex;align-items:center;justify-content:space-between;padding-right:20px">
+            Mes groupes
+            <button class="an-micro-btn blue" onclick="AN.showCreateGroup()">+ Créer</button>
+          </div>
+          <div id="an-groups-list"><div class="an-empty">Chargement...</div></div>
+        </div>
+        <div id="an-group-create-view" style="display:none;padding:12px 20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+            <button class="an-chat-back" onclick="AN.hideCreateGroup()">←</button>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#fff">Nouveau groupe</span>
+          </div>
+          <label class="an-label">Nom du groupe</label>
+          <input class="an-input" type="text" id="an-group-name" placeholder="Ex: Les Dragons Bleus" maxlength="40">
+          <label class="an-label" style="margin-top:10px">Ajouter des amis</label>
+          <div id="an-group-friends-pick" style="margin-top:6px;display:flex;flex-direction:column;gap:4px;max-height:200px;overflow-y:auto"></div>
+          <button class="an-btn" style="width:100%;margin-top:14px" onclick="AN.createGroup()">Créer le groupe →</button>
+        </div>
+        <div id="an-group-chat-view" style="display:none;flex-direction:column;flex:1;min-height:0">
+          <div class="an-chat-wrap" style="display:flex;flex-direction:column;flex:1;min-height:0">
+            <div class="an-chat-header">
+              <button class="an-chat-back" onclick="AN.backToGroupList()">←</button>
+              <div class="an-chat-name" id="an-group-chat-name"></div>
+              <span id="an-group-members-count" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3);margin-left:auto"></span>
+            </div>
+            <div class="an-chat-msgs" id="an-group-msgs" style="flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch"></div>
+            <div class="an-chat-input-row" style="flex-shrink:0;padding:10px 12px;padding-bottom:max(10px,env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,0.07);display:flex;gap:6px;background:#04070d">
+              <input class="an-chat-input" type="text" id="an-group-input" placeholder="Écrire..." inputmode="text" autocomplete="off" onkeydown="if(event.key==='Enter'){event.preventDefault();AN.sendGroupMsg()}">
+              <button class="an-chat-send" onclick="AN.sendGroupMsg()">↑</button>
+            </div>
           </div>
         </div>
       </div>
@@ -937,7 +977,7 @@ class AN {
     document.querySelectorAll('.an-section').forEach(s => s.classList.toggle('active', s.id === `an-sec-${tab}`))
     if (tab === 'notifs') this._loadNotifs()
     if (tab === 'amis') { this._loadFriends(); this._loadRivals() }
-    if (tab === 'mp') this._loadConvList()
+    if (tab === 'mp') { this._loadConvList(); this._loadGroups() }
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
     if (tab === 'admin') this._loadAdminForum()
@@ -1436,8 +1476,8 @@ class AN {
       if (pending?.length) {
         html += `<div class="an-row-label">Demandes reçues (${pending.length})</div>`
         html += pending.map(f => `<div class="an-friend-row">
-          <div class="an-friend-av">${f.requester.avatar_url?`<img src="${f.requester.avatar_url}">`:(f.requester.display_name||f.requester.username||'?')[0].toUpperCase()}</div>
-          <div class="an-friend-info"><div class="an-friend-name">${f.requester.display_name||f.requester.username}</div><div class="an-friend-sub">${f.requester.rank}</div></div>
+          <div class="an-friend-av" style="cursor:pointer" onclick="AN.openProfileCard('${f.requester.id}',this)">${f.requester.avatar_url?`<img src="${f.requester.avatar_url}">`:(f.requester.display_name||f.requester.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info" style="cursor:pointer" onclick="AN.openProfileCard('${f.requester.id}',this)"><div class="an-friend-name">${f.requester.display_name||f.requester.username}</div><div class="an-friend-sub">${f.requester.rank}</div></div>
           <div class="an-friend-acts">
             <button class="an-micro-btn green" onclick="AN.acceptFriend(${f.id})">✓</button>
             <button class="an-micro-btn" onclick="AN.declineFriend(${f.id})">✕</button>
@@ -1448,8 +1488,8 @@ class AN {
       if (friends.length) {
         html += `<div class="an-row-label">Mes amis (${friends.length})</div>`
         html += friends.map(f => `<div class="an-friend-row">
-          <div class="an-friend-av">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
-          <div class="an-friend-info"><div class="an-friend-name">${f.display_name||f.username}</div><div class="an-friend-sub">${f.rank}</div></div>
+          <div class="an-friend-av" style="cursor:pointer" onclick="AN.openProfileCard('${f.id}',this)">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info" style="cursor:pointer" onclick="AN.openProfileCard('${f.id}',this)"><div class="an-friend-name">${f.display_name||f.username}</div><div class="an-friend-sub">${f.rank}</div></div>
           <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.openChat('${f.id}','${(f.display_name||f.username).replace(/'/g,"&#39;")}')">MP</button></div>
         </div>`).join('')
         html += '<div class="an-divider"></div>'
@@ -1457,8 +1497,8 @@ class AN {
       if (suggestions.length) {
         html += `<div class="an-row-label">Membres (${suggestions.length})</div>`
         html += suggestions.map(u => `<div class="an-friend-row">
-          <div class="an-friend-av">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
-          <div class="an-friend-info"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
+          <div class="an-friend-av" style="cursor:pointer" onclick="AN.openProfileCard('${u.id}',this)">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
+          <div class="an-friend-info" style="cursor:pointer" onclick="AN.openProfileCard('${u.id}',this)"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
           <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.addFriend('${u.id}')">+ Ajouter</button></div>
         </div>`).join('')
       }
@@ -1472,8 +1512,8 @@ class AN {
     const list = document.getElementById('an-friends-list'); if (!list) return
     if (!data?.length) { list.innerHTML = '<div class="an-empty">Aucun résultat</div>'; return }
     list.innerHTML = `<div class="an-row-label">Résultats</div>` + data.map(u => `<div class="an-friend-row">
-      <div class="an-friend-av">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
-      <div class="an-friend-info"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
+      <div class="an-friend-av" style="cursor:pointer" onclick="AN.openProfileCard('${u.id}',this)">${u.avatar_url?`<img src="${u.avatar_url}">`:(u.display_name||u.username||'?')[0].toUpperCase()}</div>
+      <div class="an-friend-info" style="cursor:pointer" onclick="AN.openProfileCard('${u.id}',this)"><div class="an-friend-name">${u.display_name||u.username}</div><div class="an-friend-sub">${u.rank}</div></div>
       <div class="an-friend-acts"><button class="an-micro-btn blue" onclick="AN.addFriend('${u.id}')">+ Ajouter</button></div>
     </div>`).join('')
   }
@@ -1524,6 +1564,129 @@ class AN {
     this.mpCh = supabase.channel('mp-'+friendId)
       .on('postgres_changes', { event:'INSERT', schema:'public', table:'messages', filter:`receiver_id=eq.${this.u.id}` }, () => this._loadMsgs())
       .subscribe()
+  }
+
+  mpSubTab(tab, btn) {
+    document.querySelectorAll('#an-sec-mp .an-admin-sub-tab').forEach(b => b.classList.remove('active'))
+    document.querySelectorAll('#an-sec-mp .an-admin-sub-content').forEach(c => c.classList.remove('active'))
+    btn.classList.add('active')
+    document.getElementById(`an-mp-${tab}`).classList.add('active')
+    if (tab === 'groupes') this._loadGroups()
+  }
+
+  // ── GROUPES ──
+  async _loadGroups() {
+    const el = document.getElementById('an-groups-list'); if (!el || !this.u) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    const { data } = await supabase.from('group_members')
+      .select('group:group_id(id, name, created_at), last_read_at')
+      .eq('user_id', this.u.id)
+      .order('group(created_at)', { ascending: false })
+    if (!data?.length) { el.innerHTML = '<div class="an-empty">Aucun groupe — crée-en un !</div>'; return }
+    el.innerHTML = data.map(r => {
+      const g = r.group
+      return `<div class="an-conv-row" onclick="AN.openGroupChat(${g.id},'${g.name.replace(/'/g,"&#39;")}')">
+        <div class="an-conv-av" style="background:rgba(240,165,0,0.15);border-color:rgba(240,165,0,0.4);color:#f0a500;font-size:16px">👥</div>
+        <div><div class="an-conv-name">${g.name}</div><div class="an-conv-preview">Groupe de discussion</div></div>
+      </div>`
+    }).join('')
+  }
+
+  showCreateGroup() {
+    document.getElementById('an-group-list-view').style.display = 'none'
+    document.getElementById('an-group-create-view').style.display = 'block'
+    document.getElementById('an-group-chat-view').style.display = 'none'
+    // Load friends to pick
+    getFriends(this.u.id).then(friends => {
+      const el = document.getElementById('an-group-friends-pick'); if (!el) return
+      if (!friends.length) { el.innerHTML = '<div class="an-empty" style="padding:8px 0">Ajoute des amis d\'abord</div>'; return }
+      el.innerHTML = friends.map(f => `
+        <label style="display:flex;align-items:center;gap:8px;padding:6px 0;cursor:pointer">
+          <input type="checkbox" value="${f.id}" style="accent-color:#003DA5;width:14px;height:14px">
+          <div class="an-friend-av" style="width:24px;height:24px;font-size:10px">${f.avatar_url?`<img src="${f.avatar_url}">`:(f.display_name||f.username||'?')[0]}</div>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;color:#fff">${f.display_name||f.username}</span>
+        </label>`).join('')
+    })
+  }
+
+  hideCreateGroup() {
+    document.getElementById('an-group-list-view').style.display = ''
+    document.getElementById('an-group-create-view').style.display = 'none'
+  }
+
+  async createGroup() {
+    if (!this.u) return
+    const name = document.getElementById('an-group-name')?.value.trim()
+    if (!name) { this._toast('Nom du groupe requis', 'err'); return }
+    const checked = [...document.querySelectorAll('#an-group-friends-pick input:checked')].map(i => i.value)
+    if (!checked.length) { this._toast('Sélectionne au moins un ami', 'err'); return }
+    const { data: group, error } = await supabase.from('groups').insert({ name, created_by: this.u.id }).select().single()
+    if (error) { this._toast(error.message, 'err'); return }
+    // Ajouter le créateur + les membres
+    const members = [this.u.id, ...checked].map(uid => ({ group_id: group.id, user_id: uid }))
+    await supabase.from('group_members').insert(members)
+    document.getElementById('an-group-name').value = ''
+    this._toast(`Groupe "${name}" créé ! 🎉`, 'ok')
+    this.hideCreateGroup()
+    this._loadGroups()
+  }
+
+  async openGroupChat(groupId, groupName) {
+    this.currentGroup = { id: groupId, name: groupName }
+    document.getElementById('an-group-list-view').style.display = 'none'
+    document.getElementById('an-group-create-view').style.display = 'none'
+    const cv = document.getElementById('an-group-chat-view')
+    cv.style.display = 'flex'
+    document.getElementById('an-group-chat-name').textContent = groupName
+    // Compter membres
+    const { count } = await supabase.from('group_members').select('*', { count: 'exact', head: true }).eq('group_id', groupId)
+    const countEl = document.getElementById('an-group-members-count')
+    if (countEl) countEl.textContent = `${count} membres`
+    await this._loadGroupMsgs()
+    // Realtime
+    if (this.groupCh) supabase.removeChannel(this.groupCh)
+    this.groupCh = supabase.channel('group-' + groupId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` }, () => this._loadGroupMsgs())
+      .subscribe()
+  }
+
+  backToGroupList() {
+    if (this.groupCh) { supabase.removeChannel(this.groupCh); this.groupCh = null }
+    this.currentGroup = null
+    document.getElementById('an-group-list-view').style.display = ''
+    document.getElementById('an-group-chat-view').style.display = 'none'
+    this._loadGroups()
+  }
+
+  async _loadGroupMsgs() {
+    if (!this.currentGroup) return
+    const { data } = await supabase.from('group_messages')
+      .select('*, author:user_id(id, display_name, username, avatar_url, level)')
+      .eq('group_id', this.currentGroup.id)
+      .order('created_at', { ascending: true })
+      .limit(80)
+    const el = document.getElementById('an-group-msgs'); if (!el) return
+    el.innerHTML = (data || []).map(m => {
+      const a = m.author || {}
+      const isMe = m.user_id === this.u.id
+      const avHTML = a.avatar_url ? `<img src="${a.avatar_url}">` : (a.display_name||a.username||'?')[0].toUpperCase()
+      const time = new Date(m.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+      return `<div class="an-msg ${isMe?'mine':'theirs'}" style="max-width:85%">
+        ${!isMe ? `<div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1px;color:rgba(255,255,255,0.4);margin-bottom:2px">${a.display_name||a.username}</div>` : ''}
+        ${m.content.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        <span class="an-msg-time">${time}</span>
+      </div>`
+    }).join('')
+    el.scrollTop = el.scrollHeight
+  }
+
+  async sendGroupMsg() {
+    if (!this.u || !this.currentGroup) return
+    const input = document.getElementById('an-group-input')
+    const content = input?.value.trim()
+    if (!content) return
+    input.value = ''
+    await supabase.from('group_messages').insert({ group_id: this.currentGroup.id, user_id: this.u.id, content })
   }
 
   backToConvList() { this._loadConvList(); this.mpFriend = null }
@@ -1721,14 +1884,18 @@ class AN {
     const awayFile = document.getElementById('an-m-away-img')?.files?.[0]
     try {
       if (homeFile) {
-        const ext = homeFile.name.split('.').pop()
-        const { data: up } = await supabase.storage.from('match-logos').upload(`home_${Date.now()}.${ext}`, homeFile, { upsert: true })
-        if (up) homeUrl = supabase.storage.from('match-logos').getPublicUrl(up.path).data.publicUrl
+        const ext = homeFile.name.split('.').pop().toLowerCase()
+        const path = `home_${Date.now()}.${ext}`
+        const { error: e1 } = await supabase.storage.from('match-logos').upload(path, homeFile, { upsert: true, contentType: homeFile.type })
+        if (!e1) homeUrl = supabase.storage.from('match-logos').getPublicUrl(path).data.publicUrl
+        else console.warn('home logo upload error:', e1.message)
       }
       if (awayFile) {
-        const ext = awayFile.name.split('.').pop()
-        const { data: up } = await supabase.storage.from('match-logos').upload(`away_${Date.now()}.${ext}`, awayFile, { upsert: true })
-        if (up) awayUrl = supabase.storage.from('match-logos').getPublicUrl(up.path).data.publicUrl
+        const ext = awayFile.name.split('.').pop().toLowerCase()
+        const path = `away_${Date.now()}.${ext}`
+        const { error: e2 } = await supabase.storage.from('match-logos').upload(path, awayFile, { upsert: true, contentType: awayFile.type })
+        if (!e2) awayUrl = supabase.storage.from('match-logos').getPublicUrl(path).data.publicUrl
+        else console.warn('away logo upload error:', e2.message)
       }
     } catch(e) { console.warn('Logo upload error:', e) }
 
