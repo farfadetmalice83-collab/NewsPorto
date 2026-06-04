@@ -81,6 +81,233 @@
     .shop-card:nth-child(1).anim-visible { transition-delay: 0s; }
     .shop-card:nth-child(2).anim-visible { transition-delay: 0.12s; }
     .shop-card:nth-child(3).anim-visible { transition-delay: 0.24s; }
+
+    /* ── VITRINE FORUM + PRONOSTICS ── */
+    .vitrine-section {
+      padding: 80px 48px;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+    .vitrine-section::before {
+      content: '';
+      position: absolute;
+      top: -120px; left: -80px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(0,61,165,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .vitrine-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 48px;
+      gap: 20px;
+    }
+    .vitrine-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(36px, 5vw, 60px);
+      letter-spacing: 2px;
+      line-height: 1;
+      color: #fff;
+    }
+    .vitrine-title span { color: #003DA5; }
+    .vitrine-sub {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-top: 8px;
+    }
+    .vitrine-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2px;
+    }
+    .vitrine-card {
+      position: relative;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 40px;
+      overflow: hidden;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      transition: background .3s, border-color .3s, transform .3s cubic-bezier(.16,1,.3,1);
+      opacity: 0;
+      transform: translateY(32px);
+    }
+    .vitrine-card.anim-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .vitrine-card:nth-child(1) { transition: opacity .7s .0s cubic-bezier(.16,1,.3,1), transform .7s .0s cubic-bezier(.16,1,.3,1), background .3s, border-color .3s; }
+    .vitrine-card:nth-child(2) { transition: opacity .7s .12s cubic-bezier(.16,1,.3,1), transform .7s .12s cubic-bezier(.16,1,.3,1), background .3s, border-color .3s; }
+    .vitrine-card:hover {
+      background: rgba(255,255,255,0.04);
+      border-color: rgba(0,61,165,0.4);
+      transform: translateY(-3px);
+    }
+    .vitrine-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: #003DA5;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform .4s cubic-bezier(.16,1,.3,1);
+    }
+    .vitrine-card:hover::before { transform: scaleX(1); }
+    .vitrine-card-eyebrow {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .vitrine-card-eyebrow::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: #003DA5;
+      flex-shrink: 0;
+    }
+    .vitrine-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+      letter-spacing: 1px;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+    .vitrine-card-desc {
+      font-family: 'Barlow', sans-serif;
+      font-size: 13px;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 28px;
+      max-width: 340px;
+    }
+    .vitrine-features {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .vitrine-feature {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .vitrine-feature::before {
+      content: '';
+      width: 4px;
+      height: 4px;
+      background: #003DA5;
+      flex-shrink: 0;
+    }
+    .vitrine-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.3);
+      padding: 12px 24px;
+      transition: border-color .2s, background .2s;
+    }
+    .vitrine-card:hover .vitrine-cta {
+      border-color: #fff;
+      background: rgba(255,255,255,0.05);
+    }
+    .vitrine-cta-arrow {
+      font-size: 16px;
+      transition: transform .2s;
+    }
+    .vitrine-card:hover .vitrine-cta-arrow { transform: translateX(4px); }
+    .vitrine-mock {
+      position: absolute;
+      bottom: -20px;
+      right: -10px;
+      width: 200px;
+      opacity: 0.06;
+      pointer-events: none;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 120px;
+      letter-spacing: -5px;
+      line-height: 1;
+      color: #fff;
+      user-select: none;
+    }
+    .vitrine-live-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #00c87a;
+      border: 1px solid #00c87a;
+      padding: 2px 8px;
+      margin-left: 8px;
+    }
+    .vitrine-live-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: #00c87a;
+      animation: blink-hint 1.4s ease-in-out infinite;
+    }
+    .vitrine-stats {
+      display: flex;
+      gap: 28px;
+      margin-bottom: 28px;
+    }
+    .vitrine-stat-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px;
+      letter-spacing: 1px;
+      color: #fff;
+      display: block;
+      line-height: 1;
+    }
+    .vitrine-stat-lbl {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.3);
+      display: block;
+    }
+    @media(max-width:900px) {
+      .vitrine-section { padding: 52px 20px; }
+      .vitrine-grid { grid-template-columns: 1fr; gap: 2px; }
+      .vitrine-card { padding: 28px 24px; }
+      .vitrine-header { flex-direction: column; align-items: flex-start; }
+      .vitrine-stats { gap: 20px; }
+    }
+
     @keyframes gridScroll {
       0%   { background-position: 0 0; }
       100% { background-position: 44px 44px; }
@@ -2530,6 +2757,67 @@ img[loading="lazy"].loaded { opacity: 1; }
   }
   </script>
 
+  <!-- ── VITRINE FORUM + PRONOSTICS ── -->
+  <section class="vitrine-section">
+    <div class="vitrine-header">
+      <div>
+        <p class="section-label">— Fonctionnalités</p>
+        <h2 class="vitrine-title">La communauté<br><span>Porto</span> vous attend</h2>
+        <p class="vitrine-sub">Forum · Pronostics · Messages · Classements</p>
+      </div>
+    </div>
+
+    <div class="vitrine-grid">
+
+      <!-- FORUM -->
+      <a href="forum.html" class="vitrine-card">
+        <div class="vitrine-mock">F</div>
+        <div class="vitrine-card-eyebrow">
+          Forum
+          <span class="vitrine-live-badge"><span class="vitrine-live-dot"></span>Live</span>
+        </div>
+        <div class="vitrine-card-title">Débats,<br>Analyses,<br>Réactions</div>
+        <div class="vitrine-card-desc">Rejoins des centaines de Portistas pour discuter de chaque match, chaque transfert, chaque décision tactique.</div>
+        <div class="vitrine-features">
+          <div class="vitrine-feature">Threads en temps réel</div>
+          <div class="vitrine-feature">Votes up/down & meilleure réponse</div>
+          <div class="vitrine-feature">Chat général en direct</div>
+          <div class="vitrine-feature">Messages privés entre membres</div>
+        </div>
+        <div class="vitrine-cta">Accéder au forum <span class="vitrine-cta-arrow">→</span></div>
+      </a>
+
+      <!-- PRONOSTICS -->
+      <a href="pronostics.html" class="vitrine-card">
+        <div class="vitrine-mock">P</div>
+        <div class="vitrine-card-eyebrow">Pronostics</div>
+        <div class="vitrine-card-title">Mise sur<br>chaque<br>victoire</div>
+        <div class="vitrine-card-desc">Parie tes points sur les matchs du FC Porto et grimpe dans le classement. Plus tu gagnes, plus tu deviens légende.</div>
+        <div class="vitrine-stats">
+          <div>
+            <span class="vitrine-stat-num">×4.5</span>
+            <span class="vitrine-stat-lbl">Cote max</span>
+          </div>
+          <div>
+            <span class="vitrine-stat-num">500</span>
+            <span class="vitrine-stat-lbl">Pts offerts</span>
+          </div>
+          <div>
+            <span class="vitrine-stat-num">5</span>
+            <span class="vitrine-stat-lbl">Rangs</span>
+          </div>
+        </div>
+        <div class="vitrine-features">
+          <div class="vitrine-feature">Matchs officiels & paris spéciaux</div>
+          <div class="vitrine-feature">Classement hebdomadaire</div>
+          <div class="vitrine-feature">Gains en temps réel</div>
+        </div>
+        <div class="vitrine-cta">Parier maintenant <span class="vitrine-cta-arrow">→</span></div>
+      </a>
+
+    </div>
+  </section>
+
   <!-- SHOP TEASER -->
   <section class="shop-section reveal">
     <div class="shop-header">
@@ -2587,6 +2875,8 @@ img[loading="lazy"].loaded { opacity: 1; }
 
     </div>
   </section>
+
+
 
   <!-- NEWSLETTER -->
   <section class="newsletter-section reveal">
@@ -2649,10 +2939,13 @@ img[loading="lazy"].loaded { opacity: 1; }
             setTimeout(() => card.classList.add('anim-visible'), i * 130);
           });
         }
+        if (e.target.classList.contains('vitrine-card')) {
+          e.target.classList.add('anim-visible');
+        }
         animObs.unobserve(e.target);
       });
     }, { threshold: 0.08, rootMargin: '0px 0px -60px 0px' });
-    document.querySelectorAll('.match-section, .shop-section').forEach(el => animObs.observe(el));
+    document.querySelectorAll('.match-section, .shop-section, .vitrine-card').forEach(el => animObs.observe(el));
   }, 100);
 
   // Scroll reveal
