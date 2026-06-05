@@ -1014,7 +1014,19 @@ async function loadCustomMatches() {
     ;(myBets||[]).forEach(b => userMatchBets[b.match_id] = b)
   }
   const isAdmin = window.AN?.isAdmin?.()
-  container.innerHTML = data.map((m, i) => renderCustomMatchCard(m, i, userMatchBets, isAdmin)).join('')
+
+  // Stats par match (nb parieurs + pts misés)
+  const matchIds = data.map(m => String(m.id))
+  const { data: allMatchBets } = await supabase.from('bets').select('match_id,stake,pick').in('match_id', matchIds).neq('status','refunded')
+  const matchStats = {}
+  ;(allMatchBets||[]).forEach(b => {
+    if (!matchStats[b.match_id]) matchStats[b.match_id] = { count:0, pts:0, win:0, draw:0, lose:0 }
+    matchStats[b.match_id].count++
+    matchStats[b.match_id].pts += (b.stake||0)
+    if (b.pick in matchStats[b.match_id]) matchStats[b.match_id][b.pick]++
+  })
+
+  container.innerHTML = data.map((m, i) => renderCustomMatchCard(m, i, userMatchBets, isAdmin, matchStats[String(m.id)])).join('')
   container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
   // Si hors-saison affiché, le masquer
   const mc = document.getElementById('matches-container')
@@ -1023,7 +1035,7 @@ async function loadCustomMatches() {
 loadCustomMatches()
 window.addEventListener('custom-match-updated', loadCustomMatches)
 
-function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
+function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
   const now = new Date()
   const kickoff = new Date(m.kickoff_at)
   const closes = new Date(m.closes_at)
@@ -1078,6 +1090,22 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
       ).join('')}</div>`
     : ''
 
+  // Stats bar du match
+  const mS = mStats || {}
+  const statsHtml = `<div class="bet-stats-bar">
+    <div class="bet-stat-item"><span class="bet-stat-label">Parieurs</span><span class="bet-stat-val">${mS.count||0}</span></div>
+    <div class="bet-stat-item"><span class="bet-stat-label">Pts misés</span><span class="bet-stat-val">${((mS.pts||0)).toLocaleString('fr-FR')}</span></div>
+    <div class="bet-stat-item"><span class="bet-stat-label">1 · X · 2</span><span class="bet-stat-val" style="font-size:14px">${mS.win||0} · ${mS.draw||0} · ${mS.lose||0}</span></div>
+  </div>`
+
+  // Stats bar du match
+  const mS = mStats || {}
+
+    <div class="bet-stat-item"><span class="bet-stat-label">Parieurs</span><span class="bet-stat-val">${mS.count||0}</span></div>
+    <div class="bet-stat-item"><span class="bet-stat-label">Pts misés</span><span class="bet-stat-val">${(mS.pts||0).toLocaleString('fr-FR')}</span></div>
+    <div class="bet-stat-item"><span class="bet-stat-label">1 · X · 2</span><span class="bet-stat-val" style="font-size:14px">${mS.win||0} · ${mS.draw||0} · ${mS.lose||0}</span></div>
+  </div>`
+
   const adminHtml = isAdmin
     ? `<div class="admin-match-controls">
         <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
@@ -1112,6 +1140,7 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin) {
         <button class="admin-match-btn" onclick="cancelCustomBet('${existingBet.id}','${m.id}',${existingBet.stake})" style="border-color:rgba(231,76,60,0.4);color:#e74c3c">✕ Annuler ma mise</button>
         <button class="admin-match-btn" onclick="changeBet('${existingBet.id}','${m.id}',${existingBet.stake},'${m.home_team} vs ${m.away_team}')">✎ Modifier</button>
       </div>` : ''}
+      ${statsHtml}
       ${adminHtml}
     </div>`
   }
@@ -1274,6 +1303,18 @@ async function loadCustomBets() {
     ;(entries||[]).forEach(e => userEntries[e.bet_id] = e)
   }
   const isAdmin = window.AN?.isAdmin?.()
+  // Stats par pari spécial
+  const betIds = data.map(b => b.id)
+  const { data: allCbEntries } = await supabase.from('custom_bet_entries').select('bet_id,stake,pick').in('bet_id', betIds).neq('status','refunded')
+  const cbStats = {}
+  ;(allCbEntries||[]).forEach(e => {
+    if (!cbStats[e.bet_id]) cbStats[e.bet_id] = { count:0, pts:0, yes:0, no:0 }
+    cbStats[e.bet_id].count++
+    cbStats[e.bet_id].pts += (e.stake||0)
+    if (e.pick === 'yes') cbStats[e.bet_id].yes++
+    else cbStats[e.bet_id].no++
+  })
+
   container.innerHTML = data.map(b => {
     const entry = userEntries[b.id]
     const maxS = currentProfile ? (RANK_MAX[currentProfile.rank] || 200) : 200
