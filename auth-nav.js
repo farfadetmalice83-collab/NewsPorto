@@ -2311,12 +2311,15 @@ class AN {
   async _loadAdminAdmins() {
     if (!this.isAdmin()) return
     const el = document.getElementById('an-admin-admins-list'); if (!el) return
-    const { data } = await supabase.from('profiles').select('id,display_name,username,role').eq('role','admin')
-    if (!data?.length) { el.innerHTML = '<div class="an-empty" style="padding:8px 20px;font-size:10px">Aucun autre admin</div>'; return }
-    el.innerHTML = data.map(u => `
+    const { data, error } = await supabase.from('profiles').select('id,display_name,username,role')
+    if (error) { console.error('admins load error:', error); el.innerHTML = '<div class="an-empty" style="padding:8px 20px;font-size:10px">Erreur RLS — ajoute une policy select sur profiles</div>'; return }
+    const admins = (data||[]).filter(u => u.role === 'admin')
+    if (!admins.length) { el.innerHTML = '<div class="an-empty" style="padding:8px 20px;font-size:10px">Aucun admin trouvé</div>'; return }
+    const me = this.u?.id
+    el.innerHTML = admins.map(u => `
       <div class="an-admin-row" style="padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px">
         <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#fff">${u.display_name||u.username} <span class="an-admin-badge">ADMIN</span></span>
-        ${u.id !== this.u?.id ? `<button class="an-micro-btn orange" onclick="AN.adminDemote('${u.id}','${u.display_name||u.username}')">✕ Retirer</button>` : '<span style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px">VOUS</span>'}
+        ${u.id !== me ? `<button class="an-micro-btn orange" onclick="AN.adminDemote('${u.id}','${u.display_name||u.username}')">✕ Retirer</button>` : '<span style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px">VOUS</span>'}
       </div>`).join('')
   }
 
@@ -2328,38 +2331,37 @@ class AN {
       const now = new Date()
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
       const weekAgo = new Date(Date.now() - 7*86400000).toISOString()
+      const safe = async (q) => { try { return await q } catch(e) { return {} } }
 
-      const [
-        { count: totalUsers },
-        { count: usersToday },
-        { count: totalBets },
-        { count: activeBets },
-        { data: pointsData },
-        { count: totalMatches },
-        { count: totalCustomBets },
-        { count: forumThreads },
-        { count: forumReplies },
-        { data: topBettors },
-        { data: recentSignups },
-      ] = await Promise.all([
-        supabase.from('profiles').select('*', { count: 'exact', head: true }),
-        supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', todayStart),
-        supabase.from('bets').select('*', { count: 'exact', head: true }),
-        supabase.from('bets').select('*', { count: 'exact', head: true }).eq('status','pending'),
-        supabase.from('bets').select('stake').neq('status','refunded'),
-        supabase.from('custom_matches').select('*', { count: 'exact', head: true }),
-        supabase.from('custom_bets').select('*', { count: 'exact', head: true }),
-        supabase.from('forum_threads').select('*', { count: 'exact', head: true }),
-        supabase.from('forum_replies').select('*', { count: 'exact', head: true }),
-        supabase.from('profiles').select('display_name,username,points').order('points',{ascending:false}).limit(5),
-        supabase.from('profiles').select('display_name,username,created_at').order('created_at',{ascending:false}).limit(5),
+      const [r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11] = await Promise.all([
+        safe(supabase.from('profiles').select('*',{count:'exact',head:true})),
+        safe(supabase.from('profiles').select('*',{count:'exact',head:true}).gte('created_at',todayStart)),
+        safe(supabase.from('bets').select('*',{count:'exact',head:true})),
+        safe(supabase.from('bets').select('*',{count:'exact',head:true}).eq('status','pending')),
+        safe(supabase.from('bets').select('stake').neq('status','refunded')),
+        safe(supabase.from('custom_matches').select('*',{count:'exact',head:true})),
+        safe(supabase.from('custom_bets').select('*',{count:'exact',head:true})),
+        safe(supabase.from('forum_threads').select('*',{count:'exact',head:true})),
+        safe(supabase.from('forum_replies').select('*',{count:'exact',head:true})),
+        safe(supabase.from('profiles').select('display_name,username,points').order('points',{ascending:false}).limit(5)),
+        safe(supabase.from('profiles').select('display_name,username,created_at').order('created_at',{ascending:false}).limit(5)),
       ])
+      const totalUsers = r1.count ?? 0
+      const usersToday = r2.count ?? 0
+      const totalBets = r3.count ?? 0
+      const activeBets = r4.count ?? 0
+      const totalPtsMised = (r5.data||[]).reduce((s,b)=>s+(b.stake||0),0)
+      const totalMatches = r6.count ?? 0
+      const totalCustomBets = r7.count ?? 0
+      const forumThreads = r8.count ?? null
+      const forumReplies = r9.count ?? null
+      const topBettors = r10.data || []
+      const recentSignups = r11.data || []
 
-      const totalPtsMised = (pointsData||[]).reduce((s,b) => s + (b.stake||0), 0)
-
-      // Users actifs aujourd'hui (last_seen)
-      const { count: activeToday } = await supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen', todayStart).catch(()=>({count:null}))
-      const { count: activeWeek } = await supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen', weekAgo).catch(()=>({count:null}))
+      const rAt = await safe(supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen',todayStart))
+      const rAw = await safe(supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen',weekAgo))
+      const activeToday = rAt.count ?? null
+      const activeWeek = rAw.count ?? null
 
       const stat = (icon, label, val, sub='') => `
         <div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:12px">
