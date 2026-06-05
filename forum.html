@@ -725,6 +725,7 @@ window.backToList = function() {
   document.getElementById('thread-view').style.display = 'none'
   document.getElementById('thread-list-view').style.display = 'block'
   currentThread = null
+  renderThreadList()
 }
 
 // ── REPLY FORM ──
@@ -870,9 +871,11 @@ window.castVote = async function(threadId, vote, btn) {
 
     // Upsert/delete vote
     if (newUserVote === 0) {
-      await supabase.from('thread_votes').delete().eq('thread_id', threadId).eq('user_id', currentUser.id)
+      const { error } = await supabase.from('thread_votes').delete().eq('thread_id', threadId).eq('user_id', currentUser.id)
+      if (error) throw error
     } else {
-      await supabase.from('thread_votes').upsert({ thread_id: threadId, user_id: currentUser.id, vote: newUserVote }, { onConflict: 'thread_id,user_id' })
+      const { error } = await supabase.from('thread_votes').upsert({ thread_id: threadId, user_id: currentUser.id, vote: newUserVote }, { onConflict: 'thread_id,user_id' })
+      if (error) throw error
     }
 
     // Recompte depuis la DB pour éviter les décalages
@@ -886,7 +889,7 @@ window.castVote = async function(threadId, vote, btn) {
       scoreEl.textContent = newScore
       scoreEl.className = 'vote-score' + (newScore > 0 ? ' positive' : newScore < 0 ? ' negative' : '')
     }
-    const row = btn.closest('.thread-row')
+    const row = btn.closest('[onclick^="openThread"]') || btn.closest('.thread-row')
     if (row) {
       row.querySelector('.vote-btn.up')?.classList.toggle('active', newUserVote === 1)
       row.querySelector('.vote-btn.down')?.classList.toggle('active', newUserVote === -1)
@@ -894,7 +897,7 @@ window.castVote = async function(threadId, vote, btn) {
     userVotesMap[threadId] = newUserVote
     const t = allThreads.find(x => x.id === threadId)
     if (t) t.votes = newScore
-  } catch(e) { showToast(e.message, 'error') }
+  } catch(e) { console.error('castVote error:', e); showToast(e.message || 'Erreur vote', 'error') }
 }
 
 window.sortThreads = function(sort, btn) {
@@ -975,17 +978,21 @@ window.likeReply = async function(replyId, authorId, currentCount) {
   if (!currentUser) { AN?.openAuth(); return }
   try {
     const { error } = await supabase.from('reply_likes').insert({ reply_id: replyId, user_id: currentUser.id })
-    if (error && error.code === '23505') { showToast('Déjà liké !', ''); return }
+    if (error) {
+      if (error.code === '23505') { showToast('Déjà liké !', ''); return }
+      throw error
+    }
     // Recompte depuis DB
     const { count } = await supabase.from('reply_likes').select('*', { count: 'exact', head: true }).eq('reply_id', replyId)
-    await supabase.from('forum_replies').update({ likes_count: count || (currentCount + 1) }).eq('id', replyId)
+    const { error: updErr } = await supabase.from('forum_replies').update({ likes_count: count || (currentCount + 1) }).eq('id', replyId)
+    if (updErr) throw updErr
     // Notif à l'auteur
     if (authorId && authorId !== currentUser.id) {
       await supabase.from('notifications').insert({ user_id: authorId, type: 'like', from_user_id: currentUser.id, ref_id: String(replyId) })
     }
     showToast('❤️ Liké !', 'success')
     if (currentThread) await openThread(currentThread.id)
-  } catch(e) { showToast(e.message, 'error') }
+  } catch(e) { console.error('likeReply error:', e); showToast(e.message || 'Erreur like', 'error') }
 }
   // ── MAP LEAFLET + KV ──
 // ── MAP LEAFLET + KV ──
