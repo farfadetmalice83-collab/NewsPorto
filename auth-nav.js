@@ -392,7 +392,8 @@ const CSS = `
   }
   #an-sec-mp { position:relative; }
   #an-chat-view {
-    position:absolute; top:0; left:0; right:0; bottom:0;
+    position:absolute; top:0; left:0; right:0;
+    bottom:calc(56px + env(safe-area-inset-bottom, 0px));
     display:none; flex-direction:column; background:#04070d; z-index:10;
   }
   #an-chat-view.visible { display:flex; }
@@ -402,11 +403,9 @@ const CSS = `
     padding:10px 12px; display:flex; flex-direction:column; gap:8px;
   }
   .an-chat-input-row {
-    flex-shrink:0; padding:10px 12px;
-    padding-bottom:max(10px, env(safe-area-inset-bottom, 0px));
+    flex-shrink:0; padding:12px;
     background:#04070d; border-top:1px solid rgba(255,255,255,0.07);
     display:flex; gap:6px;
-    position:sticky; bottom:0; left:0; right:0;
     box-sizing:border-box; width:100%;
   }
 
