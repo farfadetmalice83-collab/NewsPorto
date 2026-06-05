@@ -2778,6 +2778,7 @@ img[loading="lazy"].loaded { opacity: 1; }
     const m    = data.liveMatch || data.nextMatch;
     const live = !!data.liveMatch;
     _isLiveActive = live;
+    window._isLiveActive = live;
 
     // ── Aucun match programmé ─────────────────────────────────────────────
     if (!m) {
@@ -3681,9 +3682,8 @@ img[loading="lazy"].loaded { opacity: 1; }
 
   // Gestion du clic sur la match card :
   // → modal live si match en cours, sinon redirection vers match.html
-  let _isLiveActive = false;
   window.handleMatchCardClick = function() {
-    if (_isLiveActive && window._openLiveModal) {
+    if (window._isLiveActive && window._openLiveModal) {
       window._openLiveModal();
     } else {
       window.location.href = 'match.html';
