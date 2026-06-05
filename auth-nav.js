@@ -2145,34 +2145,35 @@ class AN {
     window.dispatchEvent(new CustomEvent('custom-match-updated'))
   }
 
-  async updateMatchScore(id) {
+  async updateMatchScore(id) { await this.updateMatchScoreInline(id) }
+
+  async updateMatchScoreInline(id) {
     if (!this.isAdmin()) return
-    const input = prompt('Score (format: 1-0) :')
-    if (!input) return
-    const parts = input.split('-')
-    if (parts.length !== 2) { this._toast('Format invalide, ex: 2-1', 'err'); return }
-    const sh = parseInt(parts[0]), sa = parseInt(parts[1])
-    if (isNaN(sh) || isNaN(sa)) { this._toast('Chiffres invalides', 'err'); return }
+    const sh = parseInt(document.getElementById('sh-' + id)?.value)
+    const sa = parseInt(document.getElementById('sa-' + id)?.value)
+    if (isNaN(sh) || isNaN(sa)) { this._toast('Score invalide', 'err'); return }
     await supabase.from('custom_matches').update({ score_home: sh, score_away: sa }).eq('id', id)
-    this._toast(`Score mis à jour : ${sh}-${sa}`, 'ok')
+    this._toast('Score : ' + sh + ' - ' + sa, 'ok')
     this._loadAdminMatches()
     window.dispatchEvent(new CustomEvent('custom-match-updated'))
   }
 
-  async addMatchEvent(id) {
+  async addMatchEventInline(id, type) {
     if (!this.isAdmin()) return
-    const type = prompt('Type d\'événement (yellow / red / goal) :')?.toLowerCase()
-    if (!['yellow','red','goal'].includes(type)) { this._toast('Type invalide', 'err'); return }
-    const player = prompt('Nom du joueur :')?.trim()
-    if (!player) return
-    const minute = prompt('Minute (optionnel) :') || ''
+    const player = document.getElementById('ev-player-' + id)?.value.trim()
+    if (!player) { this._toast('Nom du joueur requis', 'err'); return }
+    const minute = document.getElementById('ev-min-' + id)?.value || ''
     const { data: m } = await supabase.from('custom_matches').select('events').eq('id', id).single()
     const events = [...(m?.events || []), { type, player, minute }]
     await supabase.from('custom_matches').update({ events }).eq('id', id)
-    this._toast(`${type === 'yellow' ? '🟡' : type === 'red' ? '🔴' : '⚽'} ${player} ajouté`, 'ok')
+    this._toast((type==='yellow'?'🟡':type==='red'?'🔴':'⚽') + ' ' + player + ' ajouté', 'ok')
+    const pe = document.getElementById('ev-player-' + id); if(pe) pe.value = ''
+    const me = document.getElementById('ev-min-' + id); if(me) me.value = ''
     this._loadAdminMatches()
     window.dispatchEvent(new CustomEvent('custom-match-updated'))
   }
+
+  async addMatchEvent(id) { /* remplacé par addMatchEventInline */ }
 
   async finishCustomMatch(id) {
     if (!this.isAdmin() || !confirm('Terminer ce match et distribuer les gains ?')) return
