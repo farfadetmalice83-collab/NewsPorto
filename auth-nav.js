@@ -729,6 +729,7 @@ function html() { return `
         <button class="an-admin-sub-tab" onclick="AN.adminSubTab('users',this)">Users</button>
         <button class="an-admin-sub-tab" onclick="AN.adminSubTab('bets',this)">Paris</button>
         <button class="an-admin-sub-tab" onclick="AN.adminSubTab('matches',this)">Matchs</button>
+        <button class="an-admin-sub-tab" onclick="AN.adminSubTab('stats',this)">Stats</button>
       </div>
 
       <!-- FORUM -->
@@ -739,10 +740,13 @@ function html() { return `
 
       <!-- USERS -->
       <div class="an-admin-sub-content" id="an-admin-users">
-        <div class="an-search-wrap" style="padding:12px 20px">
-          <input class="an-search" type="text" placeholder="Rechercher un utilisateur..." id="an-admin-user-search" oninput="AN.adminSearchUsers(this.value)">
+        <div class="an-row-label" style="padding:10px 20px 4px;font-size:9px;letter-spacing:2px;opacity:.5">Admins actuels</div>
+        <div id="an-admin-admins-list"><div class="an-empty" style="padding:8px 20px">Chargement...</div></div>
+        <div class="an-row-label" style="padding:10px 20px 4px;font-size:9px;letter-spacing:2px;opacity:.5;border-top:1px solid rgba(255,255,255,0.06);margin-top:8px">Rechercher un utilisateur</div>
+        <div class="an-search-wrap" style="padding:8px 20px">
+          <input class="an-search" type="text" placeholder="Nom d'utilisateur..." id="an-admin-user-search" oninput="AN.adminSearchUsers(this.value)">
         </div>
-        <div id="an-admin-users-list"><div class="an-empty">Recherche un utilisateur</div></div>
+        <div id="an-admin-users-list"><div class="an-empty">Tape un nom pour chercher</div></div>
       </div>
 
       <!-- PARIS CUSTOM -->
@@ -779,6 +783,10 @@ function html() { return `
         </div>
       </div>
 
+      <!-- STATS -->
+      <div class="an-admin-sub-content" id="an-admin-stats">
+        <div id="an-admin-stats-content"><div class="an-empty">Chargement...</div></div>
+      </div>
       <!-- MATCHS CUSTOM -->
       <div class="an-admin-sub-content" id="an-admin-matches">
         <div class="an-row-label">Matchs actifs</div>
@@ -1171,7 +1179,7 @@ class AN {
     }
     if (tab === 'rangs') this._renderRanks()
     if (tab === 'badges') this._renderBadges()
-    if (tab === 'admin') this._loadAdminForum()
+    if (tab === 'admin') { this._loadAdminForum() }
     if (tab === 'profil') { this._checkChestStatus(); this._renderRanks() }
   }
 
@@ -2008,8 +2016,9 @@ class AN {
     document.getElementById(`an-admin-${tab}`).classList.add('active')
     if (tab === 'forum') this._loadAdminForum()
     if (tab === 'bets') this._loadAdminBets()
-    if (tab === 'users') this._loadAdminUsers()
+    if (tab === 'users') { this._loadAdminUsers(); this._loadAdminAdmins() }
     if (tab === 'matches') this._loadAdminMatches()
+    if (tab === 'stats') this._loadAdminStats()
   }
 
   async _loadAdminForum() {
@@ -2299,11 +2308,115 @@ class AN {
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
+  async _loadAdminAdmins() {
+    if (!this.isAdmin()) return
+    const el = document.getElementById('an-admin-admins-list'); if (!el) return
+    const { data } = await supabase.from('profiles').select('id,display_name,username,role').eq('role','admin')
+    if (!data?.length) { el.innerHTML = '<div class="an-empty" style="padding:8px 20px;font-size:10px">Aucun autre admin</div>'; return }
+    el.innerHTML = data.map(u => `
+      <div class="an-admin-row" style="padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#fff">${u.display_name||u.username} <span class="an-admin-badge">ADMIN</span></span>
+        ${u.id !== this.u?.id ? `<button class="an-micro-btn orange" onclick="AN.adminDemote('${u.id}','${u.display_name||u.username}')">✕ Retirer</button>` : '<span style="font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:1px">VOUS</span>'}
+      </div>`).join('')
+  }
+
+  async _loadAdminStats() {
+    if (!this.isAdmin()) return
+    const el = document.getElementById('an-admin-stats-content'); if (!el) return
+    el.innerHTML = '<div class="an-empty">Chargement...</div>'
+    try {
+      const now = new Date()
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString()
+      const weekAgo = new Date(Date.now() - 7*86400000).toISOString()
+
+      const [
+        { count: totalUsers },
+        { count: usersToday },
+        { count: totalBets },
+        { count: activeBets },
+        { data: pointsData },
+        { count: totalMatches },
+        { count: totalCustomBets },
+        { count: forumThreads },
+        { count: forumReplies },
+        { data: topBettors },
+        { data: recentSignups },
+      ] = await Promise.all([
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }).gte('created_at', todayStart),
+        supabase.from('bets').select('*', { count: 'exact', head: true }),
+        supabase.from('bets').select('*', { count: 'exact', head: true }).eq('status','pending'),
+        supabase.from('bets').select('stake').neq('status','refunded'),
+        supabase.from('custom_matches').select('*', { count: 'exact', head: true }),
+        supabase.from('custom_bets').select('*', { count: 'exact', head: true }),
+        supabase.from('forum_threads').select('*', { count: 'exact', head: true }),
+        supabase.from('forum_replies').select('*', { count: 'exact', head: true }),
+        supabase.from('profiles').select('display_name,username,points').order('points',{ascending:false}).limit(5),
+        supabase.from('profiles').select('display_name,username,created_at').order('created_at',{ascending:false}).limit(5),
+      ])
+
+      const totalPtsMised = (pointsData||[]).reduce((s,b) => s + (b.stake||0), 0)
+
+      // Users actifs aujourd'hui (last_seen)
+      const { count: activeToday } = await supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen', todayStart).catch(()=>({count:null}))
+      const { count: activeWeek } = await supabase.from('profiles').select('*',{count:'exact',head:true}).gte('last_seen', weekAgo).catch(()=>({count:null}))
+
+      const stat = (icon, label, val, sub='') => `
+        <div style="padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:12px">
+          <span style="font-size:18px;width:24px;text-align:center">${icon}</span>
+          <div style="flex:1">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.35)">${label}</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#fff;letter-spacing:1px">${val}</div>
+            ${sub ? `<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3)">${sub}</div>` : ''}
+          </div>
+        </div>`
+
+      const section = (title) => `<div style="padding:10px 20px 4px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#003DA5;border-top:1px solid rgba(0,61,165,0.2);margin-top:4px">${title}</div>`
+
+      const topList = (topBettors||[]).map((u,i) => `
+        <div style="padding:8px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:rgba(255,255,255,0.3);width:16px">${i+1}</span>
+          <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#fff">${u.display_name||u.username}</span>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:#f0a500">${u.points} pts</span>
+        </div>`).join('')
+
+      const signupList = (recentSignups||[]).map(u => `
+        <div style="padding:8px 20px;display:flex;align-items:center;gap:8px;border-bottom:1px solid rgba(255,255,255,0.04)">
+          <span style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:#fff">${u.display_name||u.username}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.3)">${new Date(u.created_at).toLocaleDateString('fr-FR')}</span>
+        </div>`).join('')
+
+      el.innerHTML = `
+        ${section('👥 Membres')}
+        ${stat('👥','Inscrits total', totalUsers || 0, `+${usersToday||0} aujourd'hui`)}
+        ${activeToday != null ? stat('🟢','Actifs aujourd'hui', activeToday) : ''}
+        ${activeWeek != null ? stat('📅','Actifs cette semaine', activeWeek) : ''}
+        ${section('🎲 Paris')}
+        ${stat('🎯','Paris placés (total)', totalBets || 0)}
+        ${stat('⏳','Paris en attente', activeBets || 0)}
+        ${stat('💰','Points misés (total)', totalPtsMised.toLocaleString('fr-FR') + ' pts')}
+        ${stat('⚽','Matchs créés', totalMatches || 0)}
+        ${stat('🎲','Paris spéciaux créés', totalCustomBets || 0)}
+        ${section('💬 Forum')}
+        ${stat('📝','Threads créés', forumThreads || 0)}
+        ${stat('💬','Réponses total', forumReplies || 0)}
+        ${section('🏆 Top 5 Points')}
+        ${topList}
+        ${section('🆕 Dernières inscriptions')}
+        ${signupList}
+      `
+    } catch(e) {
+      console.error(e)
+      el.innerHTML = '<div class="an-empty">Erreur chargement stats</div>'
+    }
+  }
+
   async adminPromote(userId, username) {
     if (!this.isAdmin()) return
     if (!confirm(`Promouvoir ${username} en admin ?`)) return
     await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId)
     this._toast(`${username} est maintenant admin ✅`, 'ok')
+    this._loadAdminAdmins()
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
@@ -2312,6 +2425,7 @@ class AN {
     if (!confirm(`Rétrograder ${username} (retirer les droits admin) ?`)) return
     await supabase.from('profiles').update({ role: 'user' }).eq('id', userId)
     this._toast(`${username} rétrogradé`, 'ok')
+    this._loadAdminAdmins()
     this.adminSearchUsers(document.getElementById('an-admin-user-search')?.value || '')
   }
 
