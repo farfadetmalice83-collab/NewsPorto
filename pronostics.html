@@ -1666,19 +1666,14 @@ async function loadActiveBets() {
   const container = document.getElementById('active-bets-container')
   container.innerHTML = '<div class="empty-state">Chargement...</div>'
 
-  // Récupérer tous les matchs actifs + leurs bets
-  const { data: customMatches } = await supabase
-    .from('custom_matches')
-    .select('*')
-    .in('status', ['open', 'live'])
+  // Paris sur matchs
+  const { data: customMatches } = await supabase.from('custom_matches').select('*').in('status', ['open','live'])
+  const { data: myBets } = await supabase.from('bets').select('*').eq('user_id', currentUser.id).eq('status','pending')
 
-  const { data: myBets } = await supabase
-    .from('bets')
-    .select('*')
-    .eq('user_id', currentUser.id)
-    .eq('status', 'pending')
+  // Paris spéciaux
+  const { data: myEntries } = await supabase.from('custom_bet_entries').select('*, custom_bets(*)').eq('user_id', currentUser.id).eq('status','pending')
 
-  if (!myBets?.length) {
+  if (!myBets?.length && !myEntries?.length) {
     container.innerHTML = '<div class="empty-state">Aucun pari actif pour l\'instant</div>'
     return
   }
@@ -1689,17 +1684,16 @@ async function loadActiveBets() {
   const pickLabel = { win:'Victoire domicile', draw:'Match nul', lose:'Victoire extérieur' }
   const pickClass = { win:'win', draw:'draw', lose:'lose' }
 
-  container.innerHTML = myBets.map(b => {
+  const matchCards = (myBets || []).map(b => {
     const m = matchMap[String(b.match_id)]
     const isLive = m?.status === 'live'
     const deadline = m?.deadline_at ? new Date(m.deadline_at) : null
     const now = new Date()
     const isOpen = !isLive && (!deadline || now < deadline)
     const canAct = isOpen && !isLive
-
     return `<div class="active-bet-card ${isLive ? 'live' : 'pending'}">
       <div class="abt-header">
-        <div class="abt-match">${b.match_label || m?.home_team + ' vs ' + m?.away_team || '—'}</div>
+        <div class="abt-match">${b.match_label || (m ? m.home_team + ' vs ' + m.away_team : '—')}</div>
         <span class="abt-status ${isLive ? 'live' : 'pending'}">${isLive ? '● EN COURS' : '⏳ En attente'}</span>
       </div>
       <div class="abt-body">
@@ -1716,7 +1710,51 @@ async function loadActiveBets() {
         <button class="abt-btn modify" onclick="modifyActiveBet('${b.id}','${b.match_id}',${b.stake},'${(b.match_label||'').replace(/'/g,"\'")}')">✎ Modifier</button>
       </div>` : `<div style="padding:0 20px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2)">${isLive ? 'Match en cours · Modification impossible' : 'Mises fermées'}</div>`}
     </div>`
-  }).join('')
+  })
+
+  const specialCards = (myEntries || []).map(e => {
+    const b = e.custom_bets
+    if (!b) return ''
+    const pickLabel = e.pick === 'yes' ? b.option_yes : b.option_no
+    const dl = b.deadline_at ? new Date(b.deadline_at) : null
+    const isOpen = !dl || dl > new Date()
+    return `<div class="active-bet-card pending">
+      <div class="abt-header">
+        <div class="abt-match">🎲 ${b.title}</div>
+        <span class="abt-status pending">⏳ En attente</span>
+      </div>
+      <div class="abt-body">
+        <div class="abt-pick draw" style="font-size:11px;letter-spacing:0;padding:0 6px">${e.pick === 'yes' ? 'OUI' : 'NON'}</div>
+        <div class="abt-details">
+          <div class="abt-row">Pronostic · <span>${pickLabel}</span></div>
+          <div class="abt-row">Mise · <span>${e.stake} pts</span></div>
+          <div class="abt-row">Gain potentiel · <span style="color:var(--green)">+${e.potential_gain} pts</span></div>
+          ${dl && isOpen ? `<div class="abt-row">Deadline · <span>${dl.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span></div>` : ''}
+        </div>
+      </div>
+      ${isOpen ? `<div class="abt-actions">
+        <button class="abt-btn cancel" onclick="cancelSpecialBet('${e.id}',${e.stake})">✕ Annuler</button>
+      </div>` : `<div style="padding:0 20px 12px;font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.2)">Mises fermées</div>`}
+    </div>`
+  })
+
+  container.innerHTML = [...matchCards, ...specialCards].filter(Boolean).join('') || '<div class="empty-state">Aucun pari actif</div>'
+}
+
+window.cancelSpecialBet = async function(entryId, stake) {
+  if (!currentUser) return
+  if (!confirm('Annuler ce pari spécial ? Tu seras remboursé de ' + stake + ' pts.')) return
+  try {
+    await supabase.from('custom_bet_entries').update({ status:'refunded' }).eq('id', entryId).eq('user_id', currentUser.id)
+    const newPts = (currentProfile.points || 0) + stake
+    await supabase.from('profiles').update({ points: newPts }).eq('id', currentUser.id)
+    await supabase.from('points_log').insert({ user_id: currentUser.id, amount: stake, reason: 'custom_bet_cancelled', ref_id: String(entryId) })
+    currentProfile.points = newPts
+    updatePointsBanner()
+    showToast(stake + ' pts remboursés ✅', 'ok')
+    loadActiveBets()
+    loadCustomBets()
+  } catch(e) { showToast('Erreur annulation', 'error') }
 }
 
 window.cancelActiveBet = async function(betId, matchId, stake) {
