@@ -2379,16 +2379,42 @@ img[loading="lazy"].loaded { opacity: 1; }
     .hero-content { padding: 24px 20px 20px !important; }
     .hero-btn { margin-top: 16px !important; padding: 10px 20px !important; font-size: 11px !important; }
 
-    /* 3. VITRINE — 2 gros boutons horizontaux */
-    .vitrine-section { padding: 32px 20px !important; }
+    /* 3. VITRINE — cards en colonne, layout propre */
+    .vitrine-section { padding: 28px 16px !important; }
     .vitrine-title { font-size: clamp(26px, 8vw, 40px) !important; }
-    .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 12px !important; width: 100% !important; }
-    .vitrine-card { padding: 16px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 10px !important; width: 100% !important; box-sizing: border-box !important; overflow: hidden !important; }
-    .vitrine-card-title { font-size: 18px !important; line-height: 1.1 !important; flex-shrink: 1 !important; min-width: 0 !important; }
-    .vitrine-card-title br { display: none !important; }
+    .vitrine-grid { display: flex !important; flex-direction: column !important; gap: 10px !important; width: 100% !important; }
+    .vitrine-card {
+      padding: 18px 16px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-start !important;
+      justify-content: flex-start !important;
+      gap: 0 !important;
+      width: 100% !important;
+      box-sizing: border-box !important;
+      overflow: hidden !important;
+      transform: none !important;
+    }
+    .vitrine-card-eyebrow { font-size: 9px !important; margin-bottom: 8px !important; }
+    .vitrine-card-title {
+      font-size: clamp(20px, 6vw, 26px) !important;
+      line-height: 1.1 !important;
+      margin-bottom: 14px !important;
+      width: 100% !important;
+    }
+    .vitrine-card-title br { display: inline !important; }
     .vitrine-card-desc, .vitrine-features, .vitrine-stats { display: none !important; }
-    .vitrine-card-eyebrow { font-size: 9px !important; margin-bottom: 4px !important; }
-    .vitrine-cta { flex-shrink: 0 !important; font-size: 10px !important; white-space: nowrap !important; padding: 8px 12px !important; border: 1px solid rgba(255,255,255,0.2) !important; }
+    .vitrine-cta {
+      display: inline-flex !important;
+      font-size: 10px !important;
+      white-space: nowrap !important;
+      padding: 9px 16px !important;
+      border: 1px solid rgba(255,255,255,0.25) !important;
+      position: static !important;
+    }
+
+    /* NEWSLETTER cachée sur mobile */
+    .newsletter-section { display: none !important; }
 
     /* 4. ARTICLES — 2 seulement */
     .articles-section { padding: 24px 20px !important; }
