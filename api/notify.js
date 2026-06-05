@@ -232,10 +232,11 @@ export default async function handler(req, res) {
         });
 
         try {
-          await resend.batch.send(emails);
+          const batchResult = await resend.batch.send(emails);
+          console.log('batch result:', JSON.stringify(batchResult));
           sent += emails.length;
         } catch(e) {
-          console.error('batch error:', e);
+          console.error('batch error:', JSON.stringify(e), e.message);
           failed += emails.length;
         }
       }
@@ -272,7 +273,12 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Unknown type' });
     }
 
-    await resend.emails.send({ from: FROM, to: user.email, subject, html });
+    const sendResult = await resend.emails.send({ from: FROM, to: user.email, subject, html });
+    console.log('send result:', JSON.stringify(sendResult));
+    if (sendResult.error) {
+      console.error('Resend error:', sendResult.error);
+      return res.status(500).json({ error: sendResult.error });
+    }
     return res.status(200).json({ ok: true });
   } catch (err) {
     console.error('notify error:', err);
