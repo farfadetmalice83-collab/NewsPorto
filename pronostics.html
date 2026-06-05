@@ -1098,14 +1098,6 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
     <div class="bet-stat-item"><span class="bet-stat-label">1 · X · 2</span><span class="bet-stat-val" style="font-size:14px">${mS.win||0} · ${mS.draw||0} · ${mS.lose||0}</span></div>
   </div>`
 
-  // Stats bar du match
-  const mS = mStats || {}
-
-    <div class="bet-stat-item"><span class="bet-stat-label">Parieurs</span><span class="bet-stat-val">${mS.count||0}</span></div>
-    <div class="bet-stat-item"><span class="bet-stat-label">Pts misés</span><span class="bet-stat-val">${(mS.pts||0).toLocaleString('fr-FR')}</span></div>
-    <div class="bet-stat-item"><span class="bet-stat-label">1 · X · 2</span><span class="bet-stat-val" style="font-size:14px">${mS.win||0} · ${mS.draw||0} · ${mS.lose||0}</span></div>
-  </div>`
-
   const adminHtml = isAdmin
     ? `<div class="admin-match-controls">
         <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
