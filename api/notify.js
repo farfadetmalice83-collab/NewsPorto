@@ -1,5 +1,6 @@
-// api/notify.js — Email unifié : bet, forum, mp, streak
-// Body: { type: 'bet'|'forum'|'mp'|'streak', ...params }
+// api/notify.js — Email unifié : bet, forum, mp, streak, new_prono
+// Body: { type: 'bet'|'forum'|'mp'|'streak'|'new_prono', toUserId?, ...params }
+// Pour new_prono : pas de toUserId → envoi à TOUS les membres avec email
 
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
@@ -97,6 +98,88 @@ function buildStreakEmail({ toName, streak, hoursLeft }) {
 </table></div></body></html>`;
 }
 
+// ── NOUVEAU : Email nouveau pari/match ───────────────────────────────────────
+function buildNewPronoEmail({ toName, pronoType, label, description, deadline, imageUrl }) {
+  const isMatch = pronoType === 'match';
+  const accent = '#003DA5';
+  const icon = isMatch ? '⚽' : '🎲';
+  const subtitle = isMatch ? 'Nouveau match à miser' : 'Nouveau pari spécial';
+  const eyebrow = isMatch ? 'Pronostics · Match' : 'Pronostics · Pari Spécial';
+  const ctaUrl = 'https://newsporto.fr/pronostics.html';
+
+  const imgBlock = imageUrl
+    ? `<tr><td style="padding:0"><img src="${imageUrl}" width="100%" style="display:block;max-height:200px;object-fit:cover" alt="${label}"></td></tr>`
+    : '';
+
+  const deadlineBlock = deadline
+    ? `<p style="margin:0 0 20px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:rgba(255,255,255,0.4);line-height:1.6">⏰ Deadline : <b style="color:#f0a500">${deadline}</b></p>`
+    : '';
+
+  return `<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{margin:0;padding:0;background:#f0f0f0}@media(max-width:600px){.wrap{padding:0!important}.box{border:none!important}.inner{padding:24px 16px!important}.head{padding:16px!important}.foot{padding:16px!important}.hero{font-size:22px!important}}</style>
+</head>
+<body style="margin:0;padding:0;background:#f0f0f0">
+<div class="wrap" style="padding:32px 16px">
+<table role="presentation" class="box" width="100%" cellpadding="0" cellspacing="0" style="max-width:600px;margin:0 auto;background:#fff;border:1px solid #e0e0e0">
+  <tr><td style="height:4px;background:${accent};font-size:0">&nbsp;</td></tr>
+  <!-- HEADER -->
+  <tr><td class="head" style="padding:20px 28px;border-bottom:1px solid #f0f0f0">
+    <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+      <td style="padding-right:12px;vertical-align:middle"><img src="https://newsporto.fr/Logo.png" width="36" height="36" alt="NP" style="display:block"></td>
+      <td style="vertical-align:middle">
+        <span style="font-family:Georgia,serif;font-size:16px;font-weight:700;letter-spacing:5px;text-transform:uppercase;color:#000;display:block">NEWSPORTO</span>
+        <span style="font-family:Helvetica,Arial,sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:#999">${subtitle}</span>
+      </td>
+    </tr></table>
+  </td></tr>
+  <!-- IMAGE si dispo -->
+  ${imgBlock}
+  <!-- CORPS NOIR -->
+  <tr><td style="padding:${imageUrl ? '0' : '24px'} 28px 0">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#000">
+      <tr><td style="height:2px;background:${accent};font-size:0">&nbsp;</td></tr>
+      <tr><td class="inner" style="padding:28px">
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin-bottom:14px"><tr>
+          <td style="width:18px;height:2px;background:${accent};padding-right:10px;vertical-align:middle;font-size:0">&nbsp;</td>
+          <td style="font-family:Helvetica,Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4)">${eyebrow}</td>
+        </tr></table>
+        <h1 class="hero" style="margin:0 0 14px;font-family:Georgia,serif;font-size:28px;font-weight:700;line-height:1.2;color:#fff">${icon} ${label}</h1>
+        ${description ? `<p style="margin:0 0 20px;font-family:Helvetica,Arial,sans-serif;font-size:13px;color:rgba(255,255,255,0.5);line-height:1.6">${description}</p>` : ''}
+        ${deadlineBlock}
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="border:1px solid rgba(255,255,255,0.5)">
+            <a href="${ctaUrl}" style="display:inline-block;font-family:Helvetica,Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#fff;text-decoration:none;padding:12px 28px">PARIER MAINTENANT &nbsp;→</a>
+          </td>
+        </tr></table>
+      </td></tr>
+    </table>
+  </td></tr>
+  <!-- DETAIL -->
+  <tr><td style="padding:0 28px">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eee;border-top:none"><tr><td style="padding:14px 20px">
+      <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+        <td style="padding-right:12px;font-size:18px;vertical-align:middle">${icon}</td>
+        <td>
+          <span style="font-family:Helvetica,Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#111;display:block">${isMatch ? 'Nouveau match disponible' : 'Nouveau pari spécial'}</span>
+          <span style="font-family:Helvetica,Arial,sans-serif;font-size:11px;color:#888">Mise tes points avant la deadline</span>
+        </td>
+      </tr></table>
+    </td></tr></table>
+  </td></tr>
+  <!-- FOOTER -->
+  <tr><td class="foot" style="padding:16px 28px;border-top:1px solid #f0f0f0">
+    <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:10px;line-height:1.8;color:#aaa">
+      <a href="https://newsporto.fr" style="color:#555;text-decoration:none;font-weight:700">newsporto.fr</a>
+      &nbsp;·&nbsp;<a href="https://newsporto.fr/unsubscribe.html" style="color:#aaa;text-decoration:none">Se désabonner</a>
+      &nbsp;·&nbsp;<span style="color:#ccc">© 2026 NewsPorto FR</span>
+    </p>
+  </td></tr>
+  <tr><td style="height:2px;background:${accent};font-size:0">&nbsp;</td></tr>
+</table>
+</div>
+</body></html>`;
+}
+
 // ── HANDLER ─────────────────────────────────────────────────────────────────
 
 export default async function handler(req, res) {
@@ -107,9 +190,61 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
   const { type, toUserId, ...params } = req.body || {};
-  if (!type || !toUserId) return res.status(400).json({ error: 'Missing type or toUserId' });
+  if (!type) return res.status(400).json({ error: 'Missing type' });
 
   try {
+    // ── Broadcast à tous les membres (new_prono) ────────────────────────────
+    if (type === 'new_prono') {
+      const { pronoType, label, description, deadline, imageUrl } = params;
+      if (!label) return res.status(400).json({ error: 'Missing label' });
+
+      // Récupérer tous les users auth avec email
+      let page = 1, allUsers = [], hasMore = true;
+      while (hasMore) {
+        const { data: { users }, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 100 });
+        if (error || !users?.length) break;
+        allUsers = allUsers.concat(users.filter(u => u.email && u.email_confirmed_at));
+        hasMore = users.length === 100;
+        page++;
+      }
+
+      let sent = 0, failed = 0;
+      // Resend supporte batch jusqu'à 100 emails
+      const chunks = [];
+      for (let i = 0; i < allUsers.length; i += 90) chunks.push(allUsers.slice(i, i + 90));
+
+      for (const chunk of chunks) {
+        // Récupérer les noms en une requête
+        const ids = chunk.map(u => u.id);
+        const { data: profiles } = await supabaseAdmin.from('profiles').select('id,display_name,username').in('id', ids);
+        const profileMap = {};
+        (profiles || []).forEach(p => { profileMap[p.id] = p; });
+
+        const emails = chunk.map(u => {
+          const p = profileMap[u.id];
+          const toName = p?.display_name || p?.username || 'Portista';
+          return {
+            from: FROM,
+            to: u.email,
+            subject: `${pronoType === 'match' ? '⚽' : '🎲'} ${label} — Parie maintenant sur NewsPorto`,
+            html: buildNewPronoEmail({ toName, pronoType: pronoType || 'bet', label, description, deadline, imageUrl }),
+          };
+        });
+
+        try {
+          await resend.batch.send(emails);
+          sent += emails.length;
+        } catch(e) {
+          console.error('batch error:', e);
+          failed += emails.length;
+        }
+      }
+
+      return res.status(200).json({ ok: true, sent, failed, total: allUsers.length });
+    }
+
+    // ── Envoi individuel ───────────────────────────────────────────────────
+    if (!toUserId) return res.status(400).json({ error: 'Missing toUserId' });
     const { data: { user }, error } = await supabaseAdmin.auth.admin.getUserById(toUserId);
     if (error || !user?.email) return res.status(200).json({ ok: true, skipped: 'no email' });
     const { data: profile } = await supabaseAdmin.from('profiles').select('display_name,username').eq('id', toUserId).single();
