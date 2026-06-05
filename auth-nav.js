@@ -1047,7 +1047,7 @@ class AN {
       const display_name = authUser.user_metadata?.full_name || username
       const avatar_url = authUser.user_metadata?.avatar_url || null
       const { data: newProfile } = await supabase.from('profiles').insert({ id: authUser.id, username, display_name, avatar_url, newsletter: true, points: 500, rank: 'Dragão' }).select().single()
-      await supabase.from('points_log').insert({ user_id: authUser.id, amount: 500, reason: 'welcome' }).catch(()=>{})
+      try { await supabase.from('points_log').insert({ user_id: authUser.id, amount: 500, reason: 'welcome' }) } catch {}
       try { await fetch('/api/subscribe', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ email: authUser.email }) }) } catch {}
       localStorage.setItem('np_email_subscribed', '1')
       profile = newProfile
