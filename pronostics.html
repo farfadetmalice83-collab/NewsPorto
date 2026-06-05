@@ -520,13 +520,17 @@
     .btn-primary:hover{background:var(--blue-mid);}
 
     /* ── PARIS SPÉCIAUX (custom bets) ── */
+    /* ══════════════════════════════════════════════
+       PARIS SPÉCIAUX — CARD JOUEUR
+    ══════════════════════════════════════════════ */
     .cb-compact-card {
       border: 1px solid var(--border);
-      margin-bottom: 2px;
+      margin-bottom: 12px;
       position: relative;
       overflow: hidden;
-      transition: border-color .3s;
+      transition: border-color .3s, box-shadow .3s;
       background: transparent;
+      border-radius: 2px;
     }
     .cb-compact-card::before {
       content: '';
@@ -536,53 +540,79 @@
       background: linear-gradient(90deg, transparent, var(--blue), transparent);
       transform: scaleX(0);
       transition: transform .5s cubic-bezier(.22,1,.36,1);
+      z-index: 2;
     }
     .cb-compact-card:hover::before { transform: scaleX(1); }
-    .cb-compact-card:hover { border-color: rgba(0,61,165,0.4); }
+    .cb-compact-card:hover { border-color: rgba(0,61,165,0.45); box-shadow: 0 4px 24px rgba(0,61,165,0.08); }
 
-    /* Layout principal : contenu à gauche, image à droite */
+    /* Layout : image à gauche en pleine hauteur, contenu à droite */
     .cb-inner {
       display: flex;
       align-items: stretch;
+      min-height: 160px;
     }
+
+    /* IMAGE JOUEUR — colonne gauche */
+    .cb-compact-img {
+      flex-shrink: 0;
+      width: 140px;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, rgba(0,20,60,0.9) 0%, rgba(0,5,20,0.98) 100%);
+      align-self: stretch;
+    }
+    .cb-compact-img::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 50%, rgba(5,5,15,0.85) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    .cb-compact-img img {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: auto;
+      height: 100%;
+      min-height: 160px;
+      object-fit: contain;
+      object-position: bottom center;
+      display: block;
+      filter: contrast(1.05) saturate(1.1);
+    }
+    /* Pas d'image : disparaît */
+    .cb-compact-img.no-img {
+      width: 0;
+      border: none;
+    }
+
+    /* CONTENU — colonne droite */
     .cb-compact-body {
       flex: 1;
       min-width: 0;
-      padding: 24px 32px 32px;
-    }
-    .cb-compact-img {
-      flex-shrink: 0;
-      width: 96px;
+      padding: 18px 24px 0;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      border-left: 1px solid var(--border);
-      background: rgba(255,255,255,0.02);
-      overflow: hidden;
-    }
-    .cb-compact-img img {
-      width: 72px;
-      height: 72px;
-      object-fit: contain;
-      display: block;
-      border-radius: 4px;
+      flex-direction: column;
     }
 
-    /* En-tête de card */
+    /* En-tête */
     .cb-compact-head {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 8px;
+      gap: 8px;
     }
 
-    /* Titre */
+    /* Titre — grand, Bebas */
     .cb-compact-title {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 2px;
+      font-size: 20px;
+      letter-spacing: 1.5px;
       color: #fff;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       line-height: 1.1;
     }
 
@@ -593,83 +623,82 @@
       font-weight: 600;
       letter-spacing: 1px;
       color: var(--gray);
-      margin-bottom: 16px;
+      margin-bottom: 12px;
       line-height: 1.5;
     }
 
     /* Options (boutons Oui/Non) */
     .cb-compact-opts {
       display: flex;
-      gap: 10px;
-      margin-bottom: 0;
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
-      margin: 16px -32px 0;
+      margin: auto -24px 0;
     }
     .cb-opt-btn {
       flex: 1;
       border: none;
       border-right: 1px solid var(--border);
-      padding: 16px 12px;
+      padding: 13px 10px;
       cursor: pointer;
       text-align: center;
       background: transparent;
-      transition: background .2s, transform .15s;
+      transition: background .2s;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
     }
     .cb-opt-btn:last-child { border-right: none; }
-    .cb-opt-btn:hover { background: rgba(255,255,255,0.04); transform: none; }
-    .cb-opt-btn.win-option.selected { background: var(--green-subtle); }
+    .cb-opt-btn:hover { background: rgba(255,255,255,0.04); }
+    .cb-opt-btn.win-option.selected  { background: var(--green-subtle); }
     .cb-opt-btn.lose-option.selected { background: var(--red-subtle); }
     .cb-opt-label {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
+      font-size: 9px;
       font-weight: 700;
       letter-spacing: 2px;
       text-transform: uppercase;
       color: var(--gray);
       display: block;
     }
-    .cb-opt-btn.win-option.selected .cb-opt-label { color: var(--green); }
+    .cb-opt-btn.win-option.selected  .cb-opt-label { color: var(--green); }
     .cb-opt-btn.lose-option.selected .cb-opt-label { color: var(--red); }
     .cb-opt-mult {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 26px;
-      letter-spacing: 2px;
-      color: rgba(255,255,255,0.5);
+      font-size: 24px;
+      letter-spacing: 1px;
+      color: rgba(255,255,255,0.45);
       display: block;
     }
-    .cb-opt-btn.win-option .cb-opt-mult { color: var(--green); }
+    .cb-opt-btn.win-option  .cb-opt-mult { color: var(--green); }
     .cb-opt-btn.lose-option .cb-opt-mult { color: var(--red); }
 
-    /* Zone mise + gain + bouton */
+    /* Zone mise */
     .cb-compact-stake {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px 0 0;
+      gap: 10px;
+      padding: 12px 0;
     }
     .cb-stake-input {
       flex: 1;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.12);
       color: #fff;
-      padding: 10px 14px;
+      padding: 9px 12px;
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       letter-spacing: 2px;
       outline: none;
       transition: border-color .2s;
       min-width: 0;
+      border-radius: 1px;
     }
     .cb-stake-input:focus { border-color: var(--blue); }
     .cb-stake-input::placeholder { color: rgba(255,255,255,0.15); }
     .cb-stake-gain {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
+      font-size: 20px;
       letter-spacing: 1px;
       color: var(--green);
       white-space: nowrap;
@@ -677,34 +706,58 @@
     .cb-stake-gain.zero { color: rgba(255,255,255,0.15); }
     .cb-bet-btn {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       letter-spacing: 3px;
       text-transform: uppercase;
       background: var(--blue);
       color: #fff;
       border: 1px solid var(--blue);
-      padding: 12px 24px;
+      padding: 10px 20px;
       cursor: pointer;
-      transition: .25s;
+      transition: .2s;
       white-space: nowrap;
+      border-radius: 1px;
     }
     .cb-bet-btn:hover { background: var(--blue-mid); }
     .cb-bet-btn:disabled { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--gray); cursor: not-allowed; }
 
+    /* Bouton supprimer admin */
+    .cb-admin-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding: 6px 10px;
+      border-top: 1px solid var(--border);
+      background: rgba(231,76,60,0.03);
+    }
+    .cb-delete-btn {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid rgba(231,76,60,0.3);
+      color: rgba(231,76,60,0.7);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: .2s;
+      border-radius: 1px;
+    }
+    .cb-delete-btn:hover { background: rgba(231,76,60,0.1); border-color: #e74c3c; color: #e74c3c; }
+
     /* Mobile */
     @media(max-width:768px) {
-      .cb-compact-body { padding: 14px 14px 18px; }
-      .cb-compact-img { width: 72px; }
-      .cb-compact-img img { width: 52px; height: 52px; }
+      .cb-compact-img { width: 100px; }
+      .cb-compact-body { padding: 14px 14px 0; }
       .cb-compact-title { font-size: 17px; }
-      .cb-compact-opts { margin: 12px -14px 0; }
-      .cb-opt-btn { padding: 12px 8px; }
+      .cb-compact-opts { margin: auto -14px 0; }
+      .cb-opt-btn { padding: 11px 6px; }
       .cb-opt-mult { font-size: 20px; }
-      .cb-compact-stake { gap: 8px; flex-wrap: wrap; }
-      .cb-stake-input { font-size: 18px; padding: 8px 10px; min-width: 80px; }
-      .cb-stake-gain { font-size: 18px; }
-      .cb-bet-btn { padding: 10px 14px; font-size: 11px; }
+      .cb-compact-stake { gap: 7px; flex-wrap: wrap; padding: 10px 0; }
+      .cb-stake-input { font-size: 17px; padding: 8px 10px; min-width: 70px; }
+      .cb-stake-gain { font-size: 17px; }
+      .cb-bet-btn { padding: 9px 12px; font-size: 10px; }
     }
   </style>
 </head>
@@ -963,6 +1016,9 @@ async function loadCustomMatches() {
   const isAdmin = window.AN?.isAdmin?.()
   container.innerHTML = data.map((m, i) => renderCustomMatchCard(m, i, userMatchBets, isAdmin)).join('')
   container.querySelectorAll('.reveal').forEach(el => obs.observe(el))
+  // Si hors-saison affiché, le masquer
+  const mc = document.getElementById('matches-container')
+  if (mc && data.length > 0) mc.innerHTML = ''
 }
 loadCustomMatches()
 window.addEventListener('custom-match-updated', loadCustomMatches)
@@ -1217,26 +1273,90 @@ async function loadCustomBets() {
     const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('user_id', currentUser.id)
     ;(entries||[]).forEach(e => userEntries[e.bet_id] = e)
   }
+  const isAdmin = window.AN?.isAdmin?.()
   container.innerHTML = data.map(b => {
     const entry = userEntries[b.id]
     const maxS = currentProfile ? (RANK_MAX[currentProfile.rank] || 200) : 200
     const userPts = currentProfile ? currentProfile.points : 0
     const deadlineBadge = b.deadline_at ? (() => {
       const dl = new Date(b.deadline_at); const now = new Date(); const open = dl > now
-      return `<div class="bet-deadline${open?'':' deadline-closed'}"><div class="deadline-dot"></div><span class="${open?'deadline-text':''}">${open ? formatDeadline(dl - now) : 'Fermé'}</span></div>`
+      return `<div class="bet-deadline${open?'':' deadline-closed'}"><div class="deadline-dot"></div><span class="${open?'deadline-text':''}">${open ? formatDeadline(dl - now) : 'Ferm\u00e9'}</span></div>`
     })() : '<div class="bet-deadline"><div class="deadline-dot"></div><span class="deadline-text">Ouvert</span></div>'
 
+    const imgHtml = b.image_url
+      ? `<div class="cb-compact-img"><img src="${b.image_url}" onerror="this.parentElement.classList.add('no-img');this.remove()"></div>`
+      : ''
+
+    const adminBar = isAdmin
+      ? `<div class="cb-admin-bar"><button class="cb-delete-btn" onclick="deleteCustomBet(${b.id},'${b.title.replace(/'/g,"\\'")}')">\u2715 Supprimer</button></div>`
+      : ''
+
     if (entry) {
-      return `<div class="cb-compact-card"><div class="cb-inner"><div class="cb-compact-body"><div class="cb-compact-head"><span class="bet-competition">🎲 Pari Spécial</span>${deadlineBadge}</div><div class="cb-compact-title">${b.title}</div><div class="bet-result-banner ${entry.status}" style="margin-top:8px;padding:8px 0"><span class="result-label">${entry.pick==='yes'?b.option_yes:b.option_no} · ${entry.status==='won'?'✅ Gagné':entry.status==='lost'?'❌ Perdu':'⏳ En attente'}</span><span class="result-points" style="font-size:16px">${entry.status==='won'?'+'+entry.potential_gain+' pts':entry.status==='lost'?'-'+entry.stake+' pts':'+'+entry.potential_gain+' pts'}</span></div></div>${b.image_url ? `<div class="cb-compact-img"><img src="${b.image_url}" onerror="this.parentElement.style.display='none'"></div>` : ''}</div></div>`
+      return `<div class="cb-compact-card">
+        <div class="cb-inner">
+          ${imgHtml}
+          <div class="cb-compact-body">
+            <div class="cb-compact-head"><span class="bet-competition">\u1f3b2 Pari Sp\u00e9cial</span>${deadlineBadge}</div>
+            <div class="cb-compact-title">${b.title}</div>
+            <div class="bet-result-banner ${entry.status}" style="margin-top:10px;padding:10px 0">
+              <span class="result-label">${entry.pick==='yes'?b.option_yes:b.option_no} \u00b7 ${entry.status==='won'?'\u2705 Gagn\u00e9':entry.status==='lost'?'\u274c Perdu':'\u23f3 En attente'}</span>
+              <span class="result-points" style="font-size:16px">${entry.status==='won'?'+'+entry.potential_gain+' pts':entry.status==='lost'?'-'+entry.stake+' pts':'+'+entry.potential_gain+' pts'}</span>
+            </div>
+          </div>
+        </div>${adminBar}</div>`
     }
+
     const cbDeadlinePassed = b.deadline_at && new Date(b.deadline_at) <= new Date()
     if (cbDeadlinePassed && !entry) return ''
-    return `<div class="cb-compact-card"><div class="cb-inner"><div class="cb-compact-body"><div class="cb-compact-head"><span class="bet-competition">🎲 Pari Spécial</span>${deadlineBadge}</div><div class="cb-compact-title">${b.title}</div>${b.description?`<div class="cb-compact-desc">${b.description}</div>`:''}<div class="cb-compact-opts" id="cb-options-${b.id}"><button class="cb-opt-btn win-option" onclick="selectCustomOpt(${b.id},'yes')" id="cb-opt-${b.id}-yes"><span class="cb-opt-label">${b.option_yes}</span><span class="cb-opt-mult">×${b.odds_yes}</span></button><button class="cb-opt-btn lose-option" onclick="selectCustomOpt(${b.id},'no')" id="cb-opt-${b.id}-no"><span class="cb-opt-label">${b.option_no}</span><span class="cb-opt-mult">×${b.odds_no}</span></button></div><div class="cb-compact-stake"><input type="number" class="cb-stake-input" id="cb-stake-${b.id}" placeholder="Mise" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCustomPreview(${b.id},${b.odds_yes},${b.odds_no})"><span class="cb-stake-gain zero" id="cb-preview-${b.id}">+0 pts</span>${currentUser?`<button class="cb-bet-btn" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider →</button>`:`<button class="cb-bet-btn" onclick="window.AN?.openAuth?.()">Connexion</button>`}</div></div>${b.image_url ? `<div class="cb-compact-img"><img src="${b.image_url}" onerror="this.parentElement.style.display='none'"></div>` : ''}</div></div>`
+
+    return `<div class="cb-compact-card">
+      <div class="cb-inner">
+        ${imgHtml}
+        <div class="cb-compact-body">
+          <div class="cb-compact-head"><span class="bet-competition">\u1f3b2 Pari Sp\u00e9cial</span>${deadlineBadge}</div>
+          <div class="cb-compact-title">${b.title}</div>
+          ${b.description?`<div class="cb-compact-desc">${b.description}</div>`:''}
+          <div class="cb-compact-opts" id="cb-options-${b.id}">
+            <button class="cb-opt-btn win-option" onclick="selectCustomOpt(${b.id},'yes')" id="cb-opt-${b.id}-yes">
+              <span class="cb-opt-label">${b.option_yes}</span>
+              <span class="cb-opt-mult">\u00d7${b.odds_yes}</span>
+            </button>
+            <button class="cb-opt-btn lose-option" onclick="selectCustomOpt(${b.id},'no')" id="cb-opt-${b.id}-no">
+              <span class="cb-opt-label">${b.option_no}</span>
+              <span class="cb-opt-mult">\u00d7${b.odds_no}</span>
+            </button>
+          </div>
+          <div class="cb-compact-stake">
+            <input type="number" class="cb-stake-input" id="cb-stake-${b.id}" placeholder="Mise" min="10" max="${Math.min(maxS,userPts)}" oninput="updateCustomPreview(${b.id},${b.odds_yes},${b.odds_no})">
+            <span class="cb-stake-gain zero" id="cb-preview-${b.id}">+0 pts</span>
+            ${currentUser
+              ? `<button class="cb-bet-btn" id="cb-btn-${b.id}" onclick="submitCustomBet(${b.id},'${b.title.replace(/'/g,"\\'")}',${b.odds_yes},${b.odds_no})" disabled>Valider \u2192</button>`
+              : `<button class="cb-bet-btn" onclick="window.AN?.openAuth?.()">Connexion</button>`}
+          </div>
+        </div>
+      </div>${adminBar}</div>`
   }).join('')
 }
 loadCustomBets()
 window.addEventListener('custom-bet-created', loadCustomBets)
 window.addEventListener('custom-bet-updated', loadCustomBets)
+window.deleteCustomBet = async function(betId, title) {
+  if (!window.AN?.isAdmin?.()) return
+  if (!confirm(`Supprimer le pari "${title}" ?
+Les mises en attente seront remboursées.`)) return
+  try {
+    // Rembourser les mises en attente
+    const { data: entries } = await supabase.from('custom_bet_entries').select('*').eq('bet_id', betId).eq('status','pending')
+    for (const e of entries || []) {
+      const { data: prof } = await supabase.from('profiles').select('points').eq('id', e.user_id).single()
+      await supabase.from('profiles').update({ points: (prof?.points||0) + e.stake }).eq('id', e.user_id)
+      await supabase.from('custom_bet_entries').update({ status:'refunded' }).eq('id', e.id)
+    }
+    await supabase.from('custom_bets').delete().eq('id', betId)
+    showToast('Pari supprimé · mises remboursées ✓', 'ok')
+    loadCustomBets()
+  } catch(e) { showToast('Erreur suppression', 'error') }
+}
 
 const cbSelected = {}
 window.selectCustomOpt = function(betId, pick) {
@@ -1304,7 +1424,10 @@ async function loadExistingBets() {
 // ── RENDER MATCHES ──
 function renderMatches() {
   const container = document.getElementById('matches-container')
+  // Masquer hors-saison si des custom matches sont affichés
+  const hasCustomMatches = document.getElementById('custom-matches-container')?.children?.length > 0
   if (!upcomingMatches.length) {
+    if (hasCustomMatches) { container.innerHTML = ''; return }
     container.innerHTML = `
       <div style="border:1px solid rgba(255,255,255,0.08);padding:48px 24px;text-align:center;background:rgba(255,255,255,0.01)">
         <div style="font-size:40px;margin-bottom:16px">⚽</div>
