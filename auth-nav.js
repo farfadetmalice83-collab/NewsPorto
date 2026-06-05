@@ -2389,7 +2389,7 @@ class AN {
       el.innerHTML = `
         ${section('👥 Membres')}
         ${stat('👥','Inscrits total', totalUsers || 0, `+${usersToday||0} aujourd'hui`)}
-        ${activeToday != null ? stat('🟢','Actifs aujourd'hui', activeToday) : ''}
+        ${activeToday != null ? stat('🟢','Actifs aujourd\'hui', activeToday) : ''}
         ${activeWeek != null ? stat('📅','Actifs cette semaine', activeWeek) : ''}
         ${section('🎲 Paris')}
         ${stat('🎯','Paris placés (total)', totalBets || 0)}
