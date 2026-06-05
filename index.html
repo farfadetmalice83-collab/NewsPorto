@@ -2297,6 +2297,38 @@ img[loading="lazy"].loaded { opacity: 1; }
   @media (max-width:600px) { #back-to-top { right:16px !important; bottom:16px !important; } }
   </style>
   <style>
+  /* ── MOBILE : DÉSACTIVER CLIC IMAGE PROFIL DANS NAV ── */
+  @media (max-width: 768px) {
+    /* Désactive tous les éléments cliquables de type avatar/profil dans la nav */
+    nav .an-avatar,
+    nav [data-an="avatar"],
+    nav .nav-avatar,
+    nav .user-avatar,
+    nav .an-user-avatar,
+    nav .profile-avatar,
+    nav [id*="nav-avatar"],
+    nav [id*="nav-profile"],
+    nav [class*="nav-user"],
+    nav [class*="user-btn"],
+    nav [class*="avatar-btn"],
+    nav button:has(img),
+    nav a:has(img:not(.nav-logo img)) {
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+    /* Ciblage spécifique si auth-nav injecte un bouton avec image */
+    nav .an-auth-avatar,
+    nav [data-an-role="avatar"],
+    nav #nav-user-btn,
+    nav #nav-profile-btn,
+    nav .nav-user-menu-trigger {
+      pointer-events: none !important;
+      cursor: default !important;
+    }
+  }
+  </style>
+
+  <style>
   /* ── SUPPRIME L'ESPACE AU DESSUS DU MENU ── */
   html, body { margin: 0 !important; padding: 0 !important; }
   .skip-to-content { position: fixed !important; top: -100px !important; }
@@ -2312,18 +2344,34 @@ img[loading="lazy"].loaded { opacity: 1; }
   /* ══ MOBILE UX OVERHAUL ══════════════════════════════════════════ */
   @media (max-width: 768px) {
 
-    /* 1. RÉORDONNANCEMENT — match en premier */
+    /* 1. RÉORDONNANCEMENT MOBILE */
     .page { display: flex; flex-direction: column; }
     nav { order: 0; }
     .ticker { order: 1; }
     .hero { order: 2; }
     .vitrine-section { order: 3; }
-    .match-section:first-of-type { order: 4; }
+    .stats-match-section { order: 4; }
     .articles-section { order: 5; }
-    .match-section:last-of-type { order: 6; }
+    .calendar-match-section { order: 6; }
     .shop-section { order: 7; }
     .newsletter-section { order: 8; }
     footer { order: 9; }
+
+    /* 2. DÉSACTIVER LE CLIC SUR L'IMAGE DE PROFIL EN MOBILE */
+    nav .an-avatar,
+    nav [data-an="avatar"],
+    nav .nav-avatar,
+    nav .user-avatar,
+    nav img.avatar,
+    nav .profile-img,
+    nav .an-user-avatar,
+    nav [class*="avatar"] img,
+    nav [class*="profile"] img,
+    nav .an-btn[data-action="profile"],
+    nav button[data-an="profile"] {
+      pointer-events: none !important;
+      cursor: default !important;
+    }
 
     /* 2. HERO — épuré */
     .hero-lead { display: none !important; }
@@ -2525,7 +2573,7 @@ img[loading="lazy"].loaded { opacity: 1; }
   </section>
 
   <!-- STATS + PROCHAIN MATCH -->
-  <section class="match-section reveal">
+  <section class="match-section stats-match-section reveal">
     <div class="section-header" style="display:flex;align-items:center;justify-content:space-between;">
       <span class="section-label" id="stats-label">— Stats · Liga Portugal</span>
       <a href="stats.html" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.3);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.15);padding-bottom:2px;transition:color .2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.3)'">Voir plus →</a>
@@ -2567,7 +2615,7 @@ img[loading="lazy"].loaded { opacity: 1; }
   </section>
 
   <!-- ── MATCH SECTION ── -->
-  <section class="match-section reveal">
+  <section class="match-section calendar-match-section reveal">
     <div class="section-header">
       <span class="section-label" id="match-section-label">— Prochain match</span>
     </div>
