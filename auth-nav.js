@@ -2139,6 +2139,15 @@ class AN {
     this._toast('Match créé ✅', 'ok')
     this._loadAdminMatches()
     window.dispatchEvent(new CustomEvent('custom-match-updated'))
+    // Email broadcast à tous les membres
+    const kickoffStr = kickoff ? new Date(kickoff).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : null
+    fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+      type: 'new_prono', pronoType: 'match',
+      label: home + ' vs ' + away,
+      description: competition || null,
+      deadline: kickoffStr,
+      imageUrl: homeUrl || awayUrl || null
+    })}).catch(()=>{})
   }
 
   async startCustomMatch(id) {
@@ -2379,8 +2388,14 @@ class AN {
     document.getElementById('an-cb-odds-no').value = '2.0'
     this._toast('Pari lancé ! 🎲', 'ok')
     this._loadAdminBets()
-    // Dispatch event so pronostics page can refresh
     window.dispatchEvent(new CustomEvent('custom-bet-created'))
+    // Email broadcast à tous les membres
+    const deadlineStr = deadlineAt ? new Date(deadlineAt).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : null
+    fetch('/api/notify', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({
+      type: 'new_prono', pronoType: 'bet',
+      label: title, description: desc || null,
+      deadline: deadlineStr, imageUrl: imgUrl
+    })}).catch(()=>{})
   }
 
   async editCustomBetOdds(betId, currentYes, currentNo) {
