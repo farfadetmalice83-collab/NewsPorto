@@ -770,6 +770,10 @@ function html() { return `
               <input class="an-input" type="number" id="an-cb-odds-no" value="2.0" step="0.1" min="1.1">
             </div>
           </div>
+          <label class="an-label">Image (optionnel)</label>
+          <input class="an-input" type="file" accept="image/*" id="an-cb-img" style="padding:5px">
+          <label class="an-label">Deadline de mise (date/heure limite)</label>
+          <input class="an-input" type="datetime-local" id="an-cb-deadline">
           <label class="an-label">Ferme le (optionnel)</label>
           <input class="an-input" type="datetime-local" id="an-cb-closes">
           <button class="an-btn" style="width:100%;margin-top:12px" onclick="AN.createCustomBet()">Lancer le pari →</button>
@@ -2346,16 +2350,29 @@ class AN {
     const oddsYes = parseFloat(document.getElementById('an-cb-odds-yes')?.value) || 2.0
     const oddsNo  = parseFloat(document.getElementById('an-cb-odds-no')?.value) || 2.0
     const closesAt = document.getElementById('an-cb-closes')?.value || null
+    const deadlineAt = document.getElementById('an-cb-deadline')?.value || null
     if (!title) { this._toast('Titre requis', 'err'); return }
+    let imgUrl = null
+    const imgFile = document.getElementById('an-cb-img')?.files?.[0]
+    if (imgFile) {
+      try {
+        const ext = imgFile.name.split('.').pop().toLowerCase()
+        const path = 'bet_' + Date.now() + '.' + ext
+        const { error: ie } = await supabase.storage.from('match-logos').upload(path, imgFile, { upsert: true, contentType: imgFile.type })
+        if (!ie) imgUrl = supabase.storage.from('match-logos').getPublicUrl(path).data.publicUrl
+      } catch(e) { console.warn('bet img upload:', e) }
+    }
     const { error } = await supabase.from('custom_bets').insert({
       created_by: this.u.id, title, description: desc,
       option_yes: optYes, option_no: optNo,
       odds_yes: oddsYes, odds_no: oddsNo,
-      closes_at: closesAt || null
+      closes_at: closesAt || null,
+      deadline_at: deadlineAt || closesAt || null,
+      image_url: imgUrl
     })
     if (error) { this._toast(error.message, 'err'); return }
     // Reset form
-    ;['an-cb-title','an-cb-desc','an-cb-closes'].forEach(id => { const el = document.getElementById(id); if(el) el.value = '' })
+    ;['an-cb-title','an-cb-desc','an-cb-closes','an-cb-deadline','an-cb-img'].forEach(id => { const el = document.getElementById(id); if(el) el.value = '' })
     document.getElementById('an-cb-yes').value = 'Oui'
     document.getElementById('an-cb-no').value = 'Non'
     document.getElementById('an-cb-odds-yes').value = '2.0'
