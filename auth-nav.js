@@ -2086,7 +2086,8 @@ class AN {
             </div>
           </div>
           <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px">
-            ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+            ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>
+              ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.3;margin-left:auto" onclick="AN.deleteCustomMatch(${m.id})">✕ Suppr</button>` : ''}` : ''}
             ${isLive ? `
               <div style="display:flex;align-items:center;gap:4px;width:100%;flex-wrap:wrap;margin-top:4px">
                 <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
@@ -2097,10 +2098,10 @@ class AN {
                 <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
                 <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
                 <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
-                <button class="an-micro-btn red" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
-                <button class="an-micro-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>
+                <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
+                <button class="an-micro-btn green" style="margin-left:auto" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer & distribuer</button>
               </div>` : ''}
-            ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.5" onclick="AN.deleteCustomMatch(${m.id})">✕</button>` : ''}
+            ${isDone ? '' : ''}
           </div>
         </div>
         ${m.events?.length ? `<div style="padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.05)">
