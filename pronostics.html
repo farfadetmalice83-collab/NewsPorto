@@ -1126,6 +1126,10 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
             <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4)">Événement</span>
             <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
               <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="flex:1;min-width:80px;padding:4px 8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px">
+              <select id="ev-team-${m.id}" style="padding:4px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px;cursor:pointer">
+                <option value="home">${m.home_team}</option>
+                <option value="away">${m.away_team}</option>
+              </select>
               <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:44px;padding:4px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px">
               <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽ But</button>
               <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡 Jaune</button>
