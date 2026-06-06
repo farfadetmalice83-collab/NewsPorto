@@ -2183,9 +2183,14 @@ class AN {
     if (!player) { this._toast('Nom du joueur requis', 'err'); return }
     const minute = document.getElementById('ev-min-' + id)?.value || ''
     const team = document.getElementById('ev-team-' + id)?.value || 'home'
-    const { data: m } = await supabase.from('custom_matches').select('events').eq('id', id).single()
+    const { data: m } = await supabase.from('custom_matches').select('events, score_home, score_away').eq('id', id).single()
     const events = [...(m?.events || []), { type, player, minute, team }]
-    await supabase.from('custom_matches').update({ events }).eq('id', id)
+    const update = { events }
+    if (type === 'goal') {
+      if (team === 'home') update.score_home = (m?.score_home || 0) + 1
+      else update.score_away = (m?.score_away || 0) + 1
+    }
+    await supabase.from('custom_matches').update(update).eq('id', id)
     this._toast((type==='yellow'?'🟡':type==='red'?'🔴':'⚽') + ' ' + player + ' ajouté', 'ok')
     const pe = document.getElementById('ev-player-' + id); if(pe) pe.value = ''
     const me = document.getElementById('ev-min-' + id); if(me) me.value = ''
