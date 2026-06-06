@@ -411,6 +411,11 @@
     .admin-match-btn.red:hover{background:rgba(231,76,60,0.1);}
     .admin-match-btn.orange{border-color:rgba(240,165,0,0.4);color:#f0a500;}
     .admin-match-btn.orange:hover{background:rgba(240,165,0,0.1);}
+    .bet-stats-bar{display:flex;border-top:1px solid var(--border);padding:10px 0;}
+    .bet-stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-right:1px solid var(--border);}
+    .bet-stat-item:last-child{border-right:none;}
+    .bet-stat-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
+    .bet-stat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:#fff;}
 
     /* LIVE MATCH CHAT */
     .match-live-chat{border-top:1px solid rgba(231,76,60,0.2);background:rgba(231,76,60,0.02);}
@@ -1099,22 +1104,35 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
   </div>`
 
   const adminHtml = isAdmin
-    ? `<div class="admin-match-controls">
-        <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
-        ${!isLive ? `<button class="admin-match-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+    ? `<div class="admin-match-controls" style="flex-direction:column;gap:8px;align-items:stretch">
+        <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);min-width:40px">ADMIN</span>
+          ${!isLive ? `<button class="admin-match-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+          ${isLive ? `<button class="admin-match-btn green" style="margin-left:auto" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer & distribuer</button>` : ''}
+          <button class="admin-match-btn red" style="opacity:0.35" onclick="AN.deleteCustomMatch(${m.id})">✕ Suppr</button>
+        </div>
         ${isLive ? `
-          <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:38px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
-          <span style="color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif;font-size:14px">-</span>
-          <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:38px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
-          <button class="admin-match-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓ Score</button>
-          <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="width:80px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
-          <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:36px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
-          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
-          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
-          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
-          <button class="admin-match-btn green" style="margin-left:auto" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer & distribuer</button>
-        ` : ''}
-        <button class="admin-match-btn red" style="opacity:0.35${isLive?';margin-left:4px':';margin-left:auto'}" onclick="AN.deleteCustomMatch(${m.id})">✕</button>
+        <div style="display:flex;gap:8px;padding-top:6px;border-top:1px solid rgba(255,255,255,0.06)">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(240,165,0,0.6)">Score</span>
+            <div style="display:flex;align-items:center;gap:4px">
+              <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:42px;padding:4px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;text-align:center">
+              <span style="color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif">–</span>
+              <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:42px;padding:4px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:16px;text-align:center">
+              <button class="admin-match-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓ Valider</button>
+            </div>
+          </div>
+          <div style="flex:2;display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.4)">Événement</span>
+            <div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap">
+              <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="flex:1;min-width:80px;padding:4px 8px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px">
+              <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:44px;padding:4px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:12px">
+              <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽ But</button>
+              <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡 Jaune</button>
+              <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'red')">🔴 Rouge</button>
+            </div>
+          </div>
+        </div>` : ''}
       </div>`
     : ''
 
