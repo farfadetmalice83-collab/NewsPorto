@@ -1081,19 +1081,28 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
       </div>`
     : ''
 
-  const scoreHtml = isLive && m.score_home != null
-    ? `<div class="match-score">
-        <span class="match-score-num">${m.score_home}</span>
-        <span class="match-score-sep">—</span>
-        <span class="match-score-num">${m.score_away}</span>
-      </div>`
-    : ''
+  const homeEvents = (m.events||[]).filter(e => e.team === 'home' || !e.team)
+  const awayEvents = (m.events||[]).filter(e => e.team === 'away')
+  const evTag = e => `<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:.5px">${e.type==='yellow'?'🟡':e.type==='red'?'🔴':'⚽'} ${e.player}${e.minute?` ${e.minute}'`:''}</div>`
 
-  const eventsHtml = m.events?.length
-    ? `<div class="match-events">${m.events.map(e =>
-        `<span class="match-event-tag">${e.type==='yellow'?'🟡':e.type==='red'?'🔴':'⚽'} ${e.player}${e.minute?` ${e.minute}'`:''}</span>`
-      ).join('')}</div>`
-    : ''
+  const scoreHtml = isLive && m.score_home != null ? '' : ''  // score now inline in teams
+  const eventsHtml = ''  // events now inline in teams
+
+  const teamsHtml = `<div class="bet-teams" style="align-items:flex-start">
+    <div class="bet-team" style="gap:6px">
+      ${homeImg}
+      <span class="bet-team-name">${m.home_team}</span>
+      ${isLive && m.score_home != null ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:#fff">${m.score_home}</span>` : ''}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:2px">${homeEvents.map(evTag).join('')}</div>
+    </div>
+    <div class="bet-vs" style="padding-top:${isLive?'8px':'0'}">${isLive ? '–' : 'VS'}</div>
+    <div class="bet-team" style="gap:6px">
+      ${awayImg}
+      <span class="bet-team-name">${m.away_team}</span>
+      ${isLive && m.score_away != null ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:36px;line-height:1;color:#fff">${m.score_away}</span>` : ''}
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;margin-top:2px">${awayEvents.map(evTag).join('')}</div>
+    </div>
+  </div>`
 
   // Stats bar du match
   const mS = mStats || {}
@@ -1137,12 +1146,8 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
     const canCancel = existingBet.status === 'pending' && isOpen && !isLive
     return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}" id="bet-card-${m.id}">
       <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
-      <div class="bet-teams">
-        <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
-        <div class="bet-vs">VS</div>
-        <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
-      </div>
-      ${scoreHtml}${eventsHtml}${liveChatHtml}
+      ${teamsHtml}
+      ${liveChatHtml}
       <div class="bet-result-banner ${existingBet.status}">
         <span class="result-label">${pickLabel} · ${statusMap[existingBet.status]||'En attente'}</span>
         <span class="result-points">${existingBet.status==='won'?'+'+existingBet.potential_gain+' pts':existingBet.status==='lost'?'-'+existingBet.stake+' pts':'Gain potentiel : +'+existingBet.potential_gain+' pts'}</span>
@@ -1162,12 +1167,8 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
 
   return `<div class="bet-card reveal${idx>0?' reveal-delay-'+Math.min(idx,3):''}">
     <div class="bet-card-header"><span class="bet-competition">${m.competition}</span>${deadlineBadge}</div>
-    <div class="bet-teams">
-      <div class="bet-team">${homeImg}<span class="bet-team-name">${m.home_team}</span></div>
-      <div class="bet-vs">VS</div>
-      <div class="bet-team">${awayImg}<span class="bet-team-name">${m.away_team}</span></div>
-    </div>
-    ${scoreHtml}${eventsHtml}${liveChatHtml}
+    ${teamsHtml}
+    ${liveChatHtml}
     <div class="bet-infos">
       <div class="bet-info"><span class="bet-info-label">Date</span><span class="bet-info-value">${kickoff.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</span></div>
       <div class="bet-info"><span class="bet-info-label">Heure</span><span class="bet-info-value">${kickoff.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}</span></div>
