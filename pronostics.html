@@ -98,11 +98,6 @@
     .draw-option .bet-option-mult{color:var(--yellow);}
     .lose-option .bet-option-mult{color:var(--red);}
     .bet-option-sub{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);display:block;}
-    .bet-stats-bar{display:flex;border-top:1px solid var(--border);padding:10px 0;}
-    .bet-stat-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-right:1px solid var(--border);}
-    .bet-stat-item:last-child{border-right:none;}
-    .bet-stat-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gray);}
-    .bet-stat-val{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:#fff;}
     .bet-stake{padding:0 32px 32px;display:flex;align-items:flex-end;gap:20px;border-top:1px solid var(--border);padding-top:24px;}
     .stake-input-wrap{flex:1;}
     .stake-label{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gray);display:block;margin-bottom:8px;}
@@ -1107,10 +1102,19 @@ function renderCustomMatchCard(m, idx, userMatchBets, isAdmin, mStats) {
     ? `<div class="admin-match-controls">
         <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.2);align-self:center">ADMIN</span>
         ${!isLive ? `<button class="admin-match-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
-        ${isLive ? `<button class="admin-match-btn orange" onclick="AN.updateMatchScore(${m.id})">Score</button>
-                    <button class="admin-match-btn" onclick="AN.addMatchEvent(${m.id})">+ Carton</button>
-                    <button class="admin-match-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>` : ''}
-        <button class="admin-match-btn red" style="margin-left:auto" onclick="AN.deleteCustomMatch(${m.id})">✕</button>
+        ${isLive ? `
+          <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:38px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
+          <span style="color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif;font-size:14px">-</span>
+          <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:38px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
+          <button class="admin-match-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓ Score</button>
+          <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="width:80px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
+          <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:36px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
+          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
+          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
+          <button class="admin-match-btn" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
+          <button class="admin-match-btn green" style="margin-left:auto" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer & distribuer</button>
+        ` : ''}
+        <button class="admin-match-btn red" style="opacity:0.35${isLive?';margin-left:4px':';margin-left:auto'}" onclick="AN.deleteCustomMatch(${m.id})">✕</button>
       </div>`
     : ''
 
