@@ -2087,9 +2087,19 @@ class AN {
           </div>
           <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px">
             ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
-            ${isLive ? `<button class="an-micro-btn orange" onclick="AN.updateMatchScore(${m.id})">Score</button>
-                        <button class="an-micro-btn" onclick="AN.addMatchEvent(${m.id})">Carton</button>
-                        <button class="an-micro-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>` : ''}
+            ${isLive ? `
+              <div style="display:flex;align-items:center;gap:4px;width:100%;flex-wrap:wrap;margin-top:4px">
+                <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
+                <span style="color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif">-</span>
+                <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
+                <button class="an-micro-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓ Score</button>
+                <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="width:90px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
+                <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
+                <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
+                <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
+                <button class="an-micro-btn red" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
+                <button class="an-micro-btn red" onclick="AN.finishCustomMatch(${m.id})">Terminer</button>
+              </div>` : ''}
             ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.5" onclick="AN.deleteCustomMatch(${m.id})">✕</button>` : ''}
           </div>
         </div>
