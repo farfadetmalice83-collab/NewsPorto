@@ -2095,6 +2095,10 @@ class AN {
                 <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
                 <button class="an-micro-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓ Score</button>
                 <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="width:90px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
+                <select id="ev-team-${m.id}" style="padding:3px 5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:10px;cursor:pointer">
+                  <option value="home">${m.home_team}</option>
+                  <option value="away">${m.away_team}</option>
+                </select>
                 <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:40px;padding:3px 6px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
                 <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
                 <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
@@ -2195,8 +2199,9 @@ class AN {
     const player = document.getElementById('ev-player-' + id)?.value.trim()
     if (!player) { this._toast('Nom du joueur requis', 'err'); return }
     const minute = document.getElementById('ev-min-' + id)?.value || ''
+    const team = document.getElementById('ev-team-' + id)?.value || 'home'
     const { data: m } = await supabase.from('custom_matches').select('events').eq('id', id).single()
-    const events = [...(m?.events || []), { type, player, minute }]
+    const events = [...(m?.events || []), { type, player, minute, team }]
     await supabase.from('custom_matches').update({ events }).eq('id', id)
     this._toast((type==='yellow'?'🟡':type==='red'?'🔴':'⚽') + ' ' + player + ' ajouté', 'ok')
     const pe = document.getElementById('ev-player-' + id); if(pe) pe.value = ''
