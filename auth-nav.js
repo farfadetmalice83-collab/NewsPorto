@@ -2086,32 +2086,9 @@ class AN {
             </div>
           </div>
           <div class="an-admin-acts" style="flex-wrap:wrap;gap:4px">
-            ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>
-              ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.3;margin-left:auto" onclick="AN.deleteCustomMatch(${m.id})">✕ Suppr</button>` : ''}` : ''}
-            ${isLive ? `
-              <div style="display:flex;flex-direction:column;gap:5px;width:100%;margin-top:4px">
-                <div style="display:flex;align-items:center;gap:4px">
-                  <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(240,165,0,0.6);text-transform:uppercase;width:32px">Score</span>
-                  <input id="sh-${m.id}" type="number" min="0" value="${m.score_home||0}" style="width:34px;padding:2px 4px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
-                  <span style="color:rgba(255,255,255,0.3);font-family:'Bebas Neue',sans-serif">-</span>
-                  <input id="sa-${m.id}" type="number" min="0" value="${m.score_away||0}" style="width:34px;padding:2px 4px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Bebas Neue',sans-serif;font-size:14px;text-align:center">
-                  <button class="an-micro-btn orange" onclick="AN.updateMatchScoreInline(${m.id})">✓</button>
-                  <button class="an-micro-btn green" style="margin-left:auto" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer</button>
-                </div>
-                <div style="display:flex;align-items:center;gap:4px">
-                  <span style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(255,255,255,0.3);text-transform:uppercase;width:32px">Évén.</span>
-                  <input id="ev-player-${m.id}" type="text" placeholder="Joueur" style="flex:1;padding:2px 5px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
-                  <input id="ev-min-${m.id}" type="number" min="1" max="120" placeholder="Min" style="width:32px;padding:2px 4px;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:11px">
-                  <select id="ev-team-${m.id}" style="padding:2px 3px;background:#111;border:1px solid rgba(255,255,255,0.15);color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:9px;cursor:pointer;max-width:60px">
-                    <option value="home">${m.home_team}</option>
-                    <option value="away">${m.away_team}</option>
-                  </select>
-                  <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'goal')">⚽</button>
-                  <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'yellow')">🟡</button>
-                  <button class="an-micro-btn" onclick="AN.addMatchEventInline(${m.id},'red')">🔴</button>
-                </div>
-              </div>` : ''}
-            ${isDone ? '' : ''}
+            ${!isLive && !isDone ? `<button class="an-micro-btn green" onclick="AN.startCustomMatch(${m.id})">▶ Lancer</button>` : ''}
+            ${isLive ? `<button class="an-micro-btn green" onclick="AN.finishCustomMatch(${m.id})">✓ Terminer</button>` : ''}
+            ${!isDone ? `<button class="an-micro-btn red" style="opacity:0.35" onclick="AN.deleteCustomMatch(${m.id})">✕ Suppr</button>` : ''}
           </div>
         </div>
         ${m.events?.length ? `<div style="padding:4px 0;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.05)">
